@@ -5,9 +5,7 @@ class TestGame : public Nebula::Application
 {
 public:
 	TestGame()
-	{
-
-	}
+	= default;
 
 	~TestGame()
 	{

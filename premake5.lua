@@ -1,5 +1,4 @@
 workspace "Nebula"
-	architecture "x64"
 
 	configurations
 	{
@@ -7,6 +6,45 @@ workspace "Nebula"
 		"Release",
 		"Dist"
 	}
+
+	platforms
+	{
+		"WindowsX86",
+		"WindowsARM",
+		"MacOS",
+		"LinuxX86",
+		"LinuxARM",
+		"IOS",
+		"Android"
+	}
+
+	filter "platforms:WindowsX86"
+		system "windows"
+		architecture "x64"
+		
+	filter "platforms:WindowsARM"
+		system "windows"
+		architecture "ARM64"
+
+	filter "platforms:MacOS"
+		system "macosx"
+		architecture "universal"
+
+	filter "platforms:LinuxX86"
+		system "linux"
+		architecture "x64"
+
+	filter "platforms:LinuxARM"
+		system "linux"
+		architecture "ARM64"
+
+	filter "platforms:IOS"
+		system "ios"
+		architecture "universal"
+
+	filter "platforms:Android"
+		system "android"
+		architecture "ARM64"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 

@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 	int a = 69;
 	NB_INFO("Hello World! Var={0}", a);
 
-	auto app = Nebula::CreateApplication();
+	const auto app = Nebula::CreateApplication();
 	app->Run();
 	delete app;
 }

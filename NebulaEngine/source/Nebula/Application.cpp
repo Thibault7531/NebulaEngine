@@ -3,14 +3,10 @@
 namespace Nebula {
 
 	Application::Application()
-	{
-
-	}
+	= default;
 
 	Application::~Application()
-	{
-
-	}
+	= default;
 
 	void Application::Run()
 	{
