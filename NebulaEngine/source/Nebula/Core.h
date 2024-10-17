@@ -10,3 +10,4 @@
 	#error Nebula Engine only supports windows
 #endif // NB_PLATFORM_WINDOWS
 
+#define  BIT(x) (1 << x)

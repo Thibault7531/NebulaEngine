@@ -64,7 +64,8 @@ project "NebulaEngine"
 
 	includedirs
 	{
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}/source"
 	}
 
 	filter "system:windows"
