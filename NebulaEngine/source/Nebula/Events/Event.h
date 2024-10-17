@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Nebula/Core.h"
+#include "nbpch.h"
 
-#include <string>
-#include <functional>
+#include "Nebula/Core.h"
 
 namespace Nebula
 {

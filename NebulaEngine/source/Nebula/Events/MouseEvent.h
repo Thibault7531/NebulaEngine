@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace Nebula
 {
 	class NEBULA_API MouseMovedEvent : public Event

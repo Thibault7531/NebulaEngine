@@ -56,6 +56,9 @@ project "NebulaEngine"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "nbpch.h"
+	pchsource "NebulaEngine/source/nbpch.cpp"
+
 	files
 	{
 		"%{prj.name}/source/**.h",

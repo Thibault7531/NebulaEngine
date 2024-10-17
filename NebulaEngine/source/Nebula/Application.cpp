@@ -1,3 +1,4 @@
+#include "nbpch.h"
 #include "Application.h"
 
 #include "Nebula/Events/ApplicationEvent.h"
