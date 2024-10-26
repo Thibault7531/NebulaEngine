@@ -2,22 +2,22 @@
 #include "Application.h"
 
 #include "Nebula/Events/ApplicationEvent.h"
-#include "Nebula/Log.h"
 
 namespace Nebula {
 
 	Application::Application()
-	= default;
+	{
+		m_Window = std::unique_ptr<Window>(Window::Create());
+	}
 
 	Application::~Application()
 	= default;
 
 	void Application::Run()
 	{
-		WindowResizeEvent e(1280, 720);
-		NB_TRACE(e);
-
-		while (true);
+		while (m_Running) {
+			m_Window->OnUpdate();
+		}
 	}
 
 }

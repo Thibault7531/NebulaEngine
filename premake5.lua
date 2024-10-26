@@ -74,6 +74,7 @@ project "NebulaEngine"
 	{
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/SDL3/include/SDL3",
+		"%{prj.name}/vendor/SDL3/include",
 		"%{prj.name}/source"
 	}
 
@@ -90,12 +91,22 @@ project "NebulaEngine"
 
 		postbuildcommands
 		{
-			("{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/TestGame")
+			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/TestGame")
 		}
 
 	filter "configurations:Debug"
 		defines "NB_DEBUG"
 		symbols "On"
+
+		defines
+		{
+			"NB_ENABLE_ASSERTS"
+		}
+
+		links
+		{
+			"bin-int/SDL3/Debug/SDL3"
+		}
 
 		postbuildcommands
 		{
@@ -106,9 +117,29 @@ project "NebulaEngine"
 		defines "NB_RELEASE"
 		optimize "On"
 
+		links
+		{
+			"bin-int/SDL3/Release/SDL3"
+		}
+
+		postbuildcommands
+		{
+			("{COPYFILE} %{wks.location}bin-int/SDL3/Release/SDL3.dll %{wks.location}bin/" .. outputdir .. "/TestGame")
+		}
+
 	filter "configurations:Dist"
 		defines "NB_DIST"
 		optimize "On"
+
+		links
+		{
+			"bin-int/SDL3/Release/SDL3"
+		}
+
+		postbuildcommands
+		{
+			("{COPYFILE} %{wks.location}bin-int/SDL3/Release/SDL3.dll %{wks.location}bin/" .. outputdir .. "/TestGame")
+		}
 
 
 project "TestGame"
