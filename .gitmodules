@@ -1,3 +1,6 @@
 [submodule "NebulaEngine/vendor/spdlog"]
 	path = NebulaEngine/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "NebulaEngine/vendor/SDL3"]
+	path = NebulaEngine/vendor/SDL3
+	url = https://github.com/libsdl-org/SDL.git

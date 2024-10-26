@@ -3,13 +3,10 @@
 ################################################################################
 
 /.vs
-/bin/Debug-x64
-/bin-int/Debug-x64
-*.user
-/bin-int/Debug-windows-x86_64
-/Nebula.sln
-/NebulaEngine/NebulaEngine.vcxproj
-/NebulaEngine/NebulaEngine.vcxproj.filters
-/TestGame/TestGame.vcxproj
-/bin/Debug-windows-x86_64
+/bin
 /bin-int
+*.user
+*.sln
+*.vcxproj
+*.vcxproj.filters
+/.idea

@@ -46,6 +46,11 @@ workspace "Nebula"
 		system "android"
 		architecture "ARM64"
 
+	filter "action:vs2022"
+		os.execute("cmake -S \"NebulaEngine/vendor/SDL3\" -B \"bin-int/SDL3\"")
+		os.execute("msbuild \"bin-int/SDL3/SDL3.sln\" /property:Configuration=Debug")
+		os.execute("msbuild \"bin-int/SDL3/SDL3.sln\" /property:Configuration=Release")
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 project "NebulaEngine"
@@ -68,6 +73,7 @@ project "NebulaEngine"
 	includedirs
 	{
 		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}/vendor/SDL3/include/SDL3",
 		"%{prj.name}/source"
 	}
 
@@ -84,12 +90,17 @@ project "NebulaEngine"
 
 		postbuildcommands
 		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/TestGame")
+			("{COPYFILE} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/TestGame")
 		}
 
 	filter "configurations:Debug"
 		defines "NB_DEBUG"
 		symbols "On"
+
+		postbuildcommands
+		{
+			("{COPYFILE} %{wks.location}bin-int/SDL3/Debug/SDL3.dll %{wks.location}bin/" .. outputdir .. "/TestGame")
+		}
 
 	filter "configurations:Release"
 		defines "NB_RELEASE"
