@@ -1,6 +1,10 @@
 #include "nbpch.h"
 #include "WindowsWindow.h"
 
+#include "Nebula/Events/ApplicationEvent.h"
+#include "Nebula/Events/KeyEvent.h"
+#include "Nebula/Events/MouseEvent.h"
+
 namespace Nebula {
 
 	static bool s_SDLInitialized = false;
@@ -25,6 +29,7 @@ namespace Nebula {
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
+		m_Data.EventCallback = std::bind([]{});
 
 		NB_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
@@ -35,18 +40,107 @@ namespace Nebula {
 			s_SDLInitialized = true;
 		}
 
-
-		SDL_PropertiesID SDLProps = SDL_CreateProperties();
-		SDL_SetPointerProperty(SDLProps, "props", &m_Data);
-		m_Window = SDL_CreateWindowWithProperties(SDLProps);
-
-		SDL_SetWindowTitle(m_Window, props.Title.c_str());
-		SDL_SetWindowSize(m_Window, props.Width, props.Height);
+		m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE);
+		SDL_PropertiesID windowProps = SDL_GetWindowProperties(m_Window);
+		SDL_SetPointerProperty(windowProps, "windowProps", &m_Data);
 
 		m_Context = SDL_GL_CreateContext(m_Window);
 		SDL_GL_MakeCurrent(m_Window, m_Context);
 		
 		SetVSync(true);
+
+		SDL_SetEventFilter([](void* userdata, SDL_Event* e)
+		{
+			switch (e->type)
+			{
+			case SDL_EVENT_WINDOW_RESIZED:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					data.Width = e->window.data1;
+					data.Height = e->window.data2;
+
+					WindowResizeEvent event(data.Width, data.Height);
+					data.EventCallback(event);
+
+					return false;
+				}
+
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+
+					WindowCloseEvent event;
+					data.EventCallback(event);
+
+					return false;
+				}
+
+			case SDL_EVENT_KEY_DOWN:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+
+					switch (e->key.repeat)
+					{
+					case false:
+						{
+							KeyPressedEvent event(e->key.key, 0);
+							data.EventCallback(event);
+							break;
+						}
+					case true:
+						{
+							KeyPressedEvent event(e->key.key, 1);
+							data.EventCallback(event);
+							break;
+						}
+					}
+				}
+
+			case SDL_EVENT_KEY_UP:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+
+					KeyReleasedEvent event(e->key.key);
+					data.EventCallback(event);
+				}
+
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+
+					MouseButtonPressedEvent event(e->button.button);
+					data.EventCallback(event);
+				}
+
+			case SDL_EVENT_MOUSE_BUTTON_UP:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+
+					MouseButtonReleasedEvent event(e->button.button);
+					data.EventCallback(event);
+				}
+
+			case SDL_EVENT_MOUSE_WHEEL:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+
+					MouseScrolledEvent event(e->wheel.x, e->wheel.y);
+					data.EventCallback(event);
+				}
+
+			case SDL_EVENT_MOUSE_MOTION:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+
+					MouseMovedEvent event(e->motion.x, e->motion.y);
+					data.EventCallback(event);
+				}
+
+			default:
+				return true;
+			}
+		}
+			, nullptr);
 	}
 
 	void WindowsWindow::Shutdown()

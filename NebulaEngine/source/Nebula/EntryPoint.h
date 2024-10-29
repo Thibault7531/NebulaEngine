@@ -8,8 +8,6 @@ int main(int argc, char** argv)
 {
 	Nebula::Log::Init();
 	NB_CORE_WARN("Initialized Log");
-	int a = 69;
-	NB_INFO("Hello World! Var={0}", a);
 
 	const auto app = Nebula::CreateApplication();
 	app->Run();
