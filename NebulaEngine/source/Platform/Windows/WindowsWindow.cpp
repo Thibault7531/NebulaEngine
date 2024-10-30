@@ -94,6 +94,8 @@ namespace Nebula {
 							break;
 						}
 					}
+
+					return false;
 				}
 
 			case SDL_EVENT_KEY_UP:
@@ -102,6 +104,8 @@ namespace Nebula {
 
 					KeyReleasedEvent event(e->key.key);
 					data.EventCallback(event);
+
+					return false;
 				}
 
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -110,6 +114,8 @@ namespace Nebula {
 
 					MouseButtonPressedEvent event(e->button.button);
 					data.EventCallback(event);
+
+					return false;
 				}
 
 			case SDL_EVENT_MOUSE_BUTTON_UP:
@@ -118,6 +124,8 @@ namespace Nebula {
 
 					MouseButtonReleasedEvent event(e->button.button);
 					data.EventCallback(event);
+
+					return false;
 				}
 
 			case SDL_EVENT_MOUSE_WHEEL:
@@ -126,6 +134,8 @@ namespace Nebula {
 
 					MouseScrolledEvent event(e->wheel.x, e->wheel.y);
 					data.EventCallback(event);
+
+					return false;
 				}
 
 			case SDL_EVENT_MOUSE_MOTION:
@@ -134,6 +144,8 @@ namespace Nebula {
 
 					MouseMovedEvent event(e->motion.x, e->motion.y);
 					data.EventCallback(event);
+
+					return false;
 				}
 
 			default:

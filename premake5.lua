@@ -96,6 +96,7 @@ project "NebulaEngine"
 
 	filter "configurations:Debug"
 		defines "NB_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 		defines
@@ -115,6 +116,7 @@ project "NebulaEngine"
 
 	filter "configurations:Release"
 		defines "NB_RELEASE"
+		buildoptions "MD"
 		optimize "On"
 
 		links
@@ -129,6 +131,7 @@ project "NebulaEngine"
 
 	filter "configurations:Dist"
 		defines "NB_DIST"
+		buildoptions "MD"
 		optimize "On"
 
 		links
@@ -179,12 +182,15 @@ project "TestGame"
 
 	filter "configurations:Debug"
 		defines "NB_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "NB_RELEASE"
+		buildoptions "/MD"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "NB_DIST"
+		buildoptions "/MD"
 		optimize "On"
