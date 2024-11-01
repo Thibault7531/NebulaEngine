@@ -1,6 +1,7 @@
 #include "nbpch.h"
 #include "WindowsWindow.h"
 
+#include "glad/glad.h"
 #include "Nebula/Events/ApplicationEvent.h"
 #include "Nebula/Events/KeyEvent.h"
 #include "Nebula/Events/MouseEvent.h"
@@ -40,12 +41,19 @@ namespace Nebula {
 			s_SDLInitialized = true;
 		}
 
-		m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+		m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 		SDL_PropertiesID windowProps = SDL_GetWindowProperties(m_Window);
 		SDL_SetPointerProperty(windowProps, "windowProps", &m_Data);
 
 		m_Context = SDL_GL_CreateContext(m_Window);
 		SDL_GL_MakeCurrent(m_Window, m_Context);
+
+		int status = gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
+		NB_CORE_ASSERT(status, "Failed to initialize Glad!");
 		
 		SetVSync(true);
 

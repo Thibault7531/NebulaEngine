@@ -5,6 +5,8 @@
 /.vs
 /bin
 /bin-int
+NebulaEngine/vendor/Glad/bin
+NebulaEngine/vendor/Glad/bin-int
 *.user
 *.sln
 *.vcxproj

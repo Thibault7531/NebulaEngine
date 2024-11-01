@@ -53,6 +53,8 @@ workspace "Nebula"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+include "NebulaEngine/vendor/Glad"
+
 project "NebulaEngine"
 	location "NebulaEngine"
 	kind "SharedLib"
@@ -75,7 +77,13 @@ project "NebulaEngine"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/SDL3/include/SDL3",
 		"%{prj.name}/vendor/SDL3/include",
-		"%{prj.name}/source"
+		"%{prj.name}/source",
+		"%{prj.name}/vendor/Glad/include"
+	}
+
+	links
+	{
+		"Glad"
 	}
 
 	filter "system:windows"
