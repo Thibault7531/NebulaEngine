@@ -4,3 +4,6 @@
 [submodule "NebulaEngine/vendor/SDL3"]
 	path = NebulaEngine/vendor/SDL3
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "NebulaEngine/vendor/imgui"]
+	path = NebulaEngine/vendor/imgui
+	url = https://github.com/Thibault7531/imgui-premake.git

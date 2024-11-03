@@ -54,6 +54,7 @@ workspace "Nebula"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "NebulaEngine/vendor/Glad"
+include "NebulaEngine/vendor/imgui"
 
 project "NebulaEngine"
 	location "NebulaEngine"
@@ -78,12 +79,14 @@ project "NebulaEngine"
 		"%{prj.name}/vendor/SDL3/include/SDL3",
 		"%{prj.name}/vendor/SDL3/include",
 		"%{prj.name}/source",
-		"%{prj.name}/vendor/Glad/include"
+		"%{prj.name}/vendor/Glad/include",
+		"%{prj.name}/vendor/imgui"
 	}
 
 	links
 	{
-		"Glad"
+		"Glad",
+		"ImGui"
 	}
 
 	filter "system:windows"
@@ -104,7 +107,11 @@ project "NebulaEngine"
 
 	filter "configurations:Debug"
 		defines "NB_DEBUG"
-		buildoptions "/MDd"
+		buildoptions
+		{
+			"/MDd",
+			"/utf-8"
+		}
 		symbols "On"
 
 		defines
@@ -124,7 +131,11 @@ project "NebulaEngine"
 
 	filter "configurations:Release"
 		defines "NB_RELEASE"
-		buildoptions "MD"
+		buildoptions
+		{
+			"/MD",
+			"/utf-8"
+		}
 		optimize "On"
 
 		links
@@ -139,7 +150,11 @@ project "NebulaEngine"
 
 	filter "configurations:Dist"
 		defines "NB_DIST"
-		buildoptions "MD"
+		buildoptions
+		{
+			"/MD",
+			"/utf-8"
+		}
 		optimize "On"
 
 		links
@@ -170,7 +185,10 @@ project "TestGame"
 	includedirs
 	{
 		"NebulaEngine/vendor/spdlog/include",
-		"NebulaEngine/source"
+		"NebulaEngine/source",
+		"NebulaEngine/vendor/SDL3/include",
+		"NebulaEngine/vendor/SDL3/include/SDL3",
+		"NebulaEngine/vendor/imgui"
 	}
 
 	links
@@ -190,15 +208,27 @@ project "TestGame"
 
 	filter "configurations:Debug"
 		defines "NB_DEBUG"
-		buildoptions "/MDd"
+		buildoptions
+		{
+			"/MDd",
+			"/utf-8"
+		}
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "NB_RELEASE"
-		buildoptions "/MD"
+		buildoptions
+		{
+			"/MD",
+			"/utf-8"
+		}
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "NB_DIST"
-		buildoptions "/MD"
+		buildoptions
+		{
+			"/MD",
+			"/utf-8"
+		}
 		optimize "On"

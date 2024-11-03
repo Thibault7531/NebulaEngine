@@ -25,6 +25,7 @@ public:
 	TestGame()
 	{
 		PushLayer(new ExampleLayer());
+		PushOverlay(new Nebula::ImGuiLayer());
 	}
 
 	~TestGame()
