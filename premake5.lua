@@ -126,7 +126,7 @@ project "NebulaEngine"
 
 		postbuildcommands
 		{
-			("{COPYFILE} %{wks.location}bin-int/SDL3/Debug/SDL3.dll %{wks.location}bin/" .. outputdir .. "/TestGame")
+			("{COPYFILE} %{wks.location}bin-int/SDL3/Debug/SDL3.dll %{wks.location}bin/" .. outputdir .. "/TestGame/")
 		}
 
 	filter "configurations:Release"

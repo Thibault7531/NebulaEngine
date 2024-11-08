@@ -54,6 +54,8 @@ namespace Nebula {
 
 		int status = gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
 		NB_CORE_ASSERT(status, "Failed to initialize Glad!");
+
+		SDL_StartTextInput(m_Window);
 		
 		SetVSync(true);
 
@@ -91,13 +93,13 @@ namespace Nebula {
 					{
 					case false:
 						{
-							KeyPressedEvent event(e->key.key, 0);
+							KeyPressedEvent event(e->key.key, 0, e->key.mod);
 							data.EventCallback(event);
 							break;
 						}
 					case true:
 						{
-							KeyPressedEvent event(e->key.key, 1);
+							KeyPressedEvent event(e->key.key, 1, e->key.mod);
 							data.EventCallback(event);
 							break;
 						}
@@ -110,7 +112,17 @@ namespace Nebula {
 				{
 					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
 
-					KeyReleasedEvent event(e->key.key);
+					KeyReleasedEvent event(e->key.key, e->key.mod);
+					data.EventCallback(event);
+
+					return false;
+				}
+
+			case SDL_EVENT_TEXT_INPUT:
+				{
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+
+					KeyTypedEvent event(*e->text.text);
 					data.EventCallback(event);
 
 					return false;
@@ -172,6 +184,7 @@ namespace Nebula {
 	{
 		while (SDL_PollEvent(&m_Event));
 		SDL_GL_SwapWindow(m_Window);
+		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)

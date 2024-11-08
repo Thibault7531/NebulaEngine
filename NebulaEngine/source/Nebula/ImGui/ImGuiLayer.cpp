@@ -1,10 +1,17 @@
 #include "nbpch.h"
 #include "ImGuiLayer.h"
 
+#include <SDL_clipboard.h>
+#include <SDL_keyboard.h>
 #include <SDL_keycode.h>
+#include <SDL_mouse.h>
 #include <SDL_time.h>
+#include <SDL_timer.h>
 
+#include "glad/glad.h"
 #include "Nebula/Application.h"
+#include "Nebula/Events/KeyEvent.h"
+#include "Nebula/Events/MouseEvent.h"
 #include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
 
 namespace Nebula
@@ -28,6 +35,8 @@ namespace Nebula
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
+        ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+
         SDL_GetCurrentTime(&m_Time);
 
 		ImGui_ImplOpenGL3_Init("#version 410");
@@ -40,13 +49,18 @@ namespace Nebula
 	void ImGuiLayer::OnUpdate()
 	{
 		ImGuiIO& io = ImGui::GetIO();
+        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
 		Application& app = Application::Get();
 		io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
+        platform_io.Platform_SetClipboardTextFn = SetClipboard;
+        platform_io.Platform_GetClipboardTextFn = GetClipboard;
 
-		SDL_Time time;
-		SDL_GetCurrentTime(&time);
-		io.DeltaTime = m_Time > 0 ? (time - m_Time) : (1.0f / 60.0f);
-		m_Time = time;
+        static Uint64 frequency = SDL_GetPerformanceFrequency();
+        Uint64 current_time = SDL_GetPerformanceCounter();
+        if (current_time <= m_Time)
+            current_time = m_Time + 1;
+		io.DeltaTime = m_Time > 0 ? (float)((double)(current_time - m_Time) / frequency) : (float)(1.0f / 60.0f);
+		m_Time = current_time;
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
@@ -60,7 +74,128 @@ namespace Nebula
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<MouseButtonPressedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressedEvent));
+        dispatcher.Dispatch<MouseButtonReleasedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleasedEvent));
+        dispatcher.Dispatch<MouseMovedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseMovedEvent));
+        dispatcher.Dispatch<MouseScrolledEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolledEvent));
+        dispatcher.Dispatch<KeyPressedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyPressedEvent));
+        dispatcher.Dispatch<KeyReleasedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyReleasedEvent));
+        dispatcher.Dispatch<KeyTypedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyTypedEvent));
+        dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnWindowResizeEvent));
 	}
+
+    bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+
+        int mouse_button = -1;
+        if (e.GetMouseButton() == SDL_BUTTON_LEFT) { mouse_button = 0; }
+        if (e.GetMouseButton() == SDL_BUTTON_RIGHT) { mouse_button = 1; }
+        if (e.GetMouseButton() == SDL_BUTTON_MIDDLE) { mouse_button = 2; }
+        if (e.GetMouseButton() == SDL_BUTTON_X1) { mouse_button = 3; }
+        if (e.GetMouseButton() == SDL_BUTTON_X2) { mouse_button = 4; }
+        if (mouse_button == -1)
+            return false;
+
+        io.AddMouseButtonEvent(mouse_button, true);
+
+        return false;
+    }
+
+    bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+
+        int mouse_button = -1;
+        if (e.GetMouseButton() == SDL_BUTTON_LEFT) { mouse_button = 0; }
+        if (e.GetMouseButton() == SDL_BUTTON_RIGHT) { mouse_button = 1; }
+        if (e.GetMouseButton() == SDL_BUTTON_MIDDLE) { mouse_button = 2; }
+        if (e.GetMouseButton() == SDL_BUTTON_X1) { mouse_button = 3; }
+        if (e.GetMouseButton() == SDL_BUTTON_X2) { mouse_button = 4; }
+        if (mouse_button == -1)
+            return false;
+
+        io.AddMouseButtonEvent(mouse_button, false);
+
+        return false;
+    }
+
+    bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& e)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMousePosEvent(e.GetX(), e.GetY());
+
+        return false;
+    }
+
+    bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent& e)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddMouseWheelEvent(e.GetXOffset(), e.GetYOffset());
+
+        return false;
+    }
+
+    bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& e)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        ImGuiKey key = getImGuiKey(e.GetKeyCode());
+        SDL_Keymod keymod = e.GetKeyMod();
+        io.AddKeyEvent(key, true);
+
+        io.AddKeyEvent(ImGuiMod_Ctrl, (keymod & SDL_KMOD_CTRL) != 0);
+        io.AddKeyEvent(ImGuiMod_Shift, (keymod & SDL_KMOD_SHIFT) != 0);
+        io.AddKeyEvent(ImGuiMod_Alt, (keymod & SDL_KMOD_ALT) != 0);
+        io.AddKeyEvent(ImGuiMod_Super, (keymod & SDL_KMOD_GUI) != 0);
+
+        return false;
+    }
+
+    bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& e)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        ImGuiKey key = getImGuiKey(e.GetKeyCode());
+        io.AddKeyEvent(key, false);
+
+        io.AddKeyEvent(ImGuiMod_Ctrl, SDL_KMOD_CTRL);
+        io.AddKeyEvent(ImGuiMod_Shift, SDL_KMOD_SHIFT);
+        io.AddKeyEvent(ImGuiMod_Alt, SDL_KMOD_ALT);
+        io.AddKeyEvent(ImGuiMod_Super, SDL_KMOD_GUI);
+
+        return false;
+    }
+
+    bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent& e)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+
+        int keycode = e.GetKeyCode();
+        if (keycode > 0 && keycode < 0x10000)
+            io.AddInputCharacter(keycode);
+
+        return false;
+    }
+
+    bool ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent& e)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
+        io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+        glViewport(0, 0, e.GetWidth(), e.GetHeight());
+
+		return false;
+    }
+
+    const char* ImGuiLayer::GetClipboard(ImGuiContext*)
+    {
+        return SDL_GetClipboardText();
+    }
+
+    void ImGuiLayer::SetClipboard(ImGuiContext*, const char* text)
+    {
+        SDL_SetClipboardText(text);
+    }
 
 	ImGuiKey ImGuiLayer::getImGuiKey(SDL_Keycode keycode)
 	{
@@ -172,6 +307,5 @@ namespace Nebula
         }
         return ImGuiKey_None;
 	}
-
 
 }
