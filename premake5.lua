@@ -1,4 +1,5 @@
 workspace "Nebula"
+	startproject "TestGame"
 
 	configurations
 	{
@@ -53,13 +54,16 @@ workspace "Nebula"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-include "NebulaEngine/vendor/Glad"
-include "NebulaEngine/vendor/imgui"
+group "Dependencies"
+	include "NebulaEngine/vendor/Glad"
+	include "NebulaEngine/vendor/imgui"
+group ""
 
 project "NebulaEngine"
 	location "NebulaEngine"
 	kind "SharedLib"
 	language "C++"
+	staticruntime "Off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -91,7 +95,6 @@ project "NebulaEngine"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -102,22 +105,17 @@ project "NebulaEngine"
 
 		postbuildcommands
 		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/TestGame")
+			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/TestGame/\"")
 		}
 
 	filter "configurations:Debug"
 		defines "NB_DEBUG"
+		runtime "Debug"
 		buildoptions
 		{
-			"/MDd",
 			"/utf-8"
 		}
 		symbols "On"
-
-		defines
-		{
-			"NB_ENABLE_ASSERTS"
-		}
 
 		links
 		{
@@ -131,9 +129,9 @@ project "NebulaEngine"
 
 	filter "configurations:Release"
 		defines "NB_RELEASE"
+		runtime "Release"
 		buildoptions
 		{
-			"/MD",
 			"/utf-8"
 		}
 		optimize "On"
@@ -150,9 +148,9 @@ project "NebulaEngine"
 
 	filter "configurations:Dist"
 		defines "NB_DIST"
+		runtime "Release"
 		buildoptions
 		{
-			"/MD",
 			"/utf-8"
 		}
 		optimize "On"
@@ -172,6 +170,7 @@ project "TestGame"
 	location "TestGame"
 	kind "ConsoleApp"
 	language "C++"
+	staticruntime "Off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -198,7 +197,6 @@ project "TestGame"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -208,27 +206,29 @@ project "TestGame"
 
 	filter "configurations:Debug"
 		defines "NB_DEBUG"
+		runtime "Debug"
+
 		buildoptions
 		{
-			"/MDd",
 			"/utf-8"
 		}
+
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "NB_RELEASE"
+		runtime "Release"
 		buildoptions
 		{
-			"/MD",
 			"/utf-8"
 		}
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "NB_DIST"
+		runtime "Release"
 		buildoptions
 		{
-			"/MD",
 			"/utf-8"
 		}
 		optimize "On"
