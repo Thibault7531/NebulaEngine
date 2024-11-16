@@ -65,7 +65,7 @@ namespace Nebula {
 			{
 			case SDL_EVENT_WINDOW_RESIZED:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 					data.Width = e->window.data1;
 					data.Height = e->window.data2;
 
@@ -77,7 +77,7 @@ namespace Nebula {
 
 			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
 					WindowCloseEvent event;
 					data.EventCallback(event);
@@ -87,7 +87,7 @@ namespace Nebula {
 
 			case SDL_EVENT_KEY_DOWN:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
 					switch (e->key.repeat)
 					{
@@ -110,7 +110,7 @@ namespace Nebula {
 
 			case SDL_EVENT_KEY_UP:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
 					KeyReleasedEvent event(e->key.key, e->key.mod);
 					data.EventCallback(event);
@@ -120,7 +120,7 @@ namespace Nebula {
 
 			case SDL_EVENT_TEXT_INPUT:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
 					KeyTypedEvent event(*e->text.text);
 					data.EventCallback(event);
@@ -130,7 +130,7 @@ namespace Nebula {
 
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
 					MouseButtonPressedEvent event(e->button.button);
 					data.EventCallback(event);
@@ -140,7 +140,7 @@ namespace Nebula {
 
 			case SDL_EVENT_MOUSE_BUTTON_UP:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
 					MouseButtonReleasedEvent event(e->button.button);
 					data.EventCallback(event);
@@ -150,7 +150,7 @@ namespace Nebula {
 
 			case SDL_EVENT_MOUSE_WHEEL:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
 					MouseScrolledEvent event(e->wheel.x, e->wheel.y);
 					data.EventCallback(event);
@@ -160,7 +160,7 @@ namespace Nebula {
 
 			case SDL_EVENT_MOUSE_MOTION:
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", "");
+					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
 					MouseMovedEvent event(e->motion.x, e->motion.y);
 					data.EventCallback(event);

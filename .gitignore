@@ -2,14 +2,18 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+# IDE Configs
 /.vs
-/bin
-/bin-int
-NebulaEngine/vendor/Glad/bin
-NebulaEngine/vendor/Glad/bin-int
+/.idea
 *.user
 *.sln
 *.vcxproj
 *.vcxproj.filters
-/.idea
+
+# Build directories
+/bin
+/bin-int
+/cmake*
+
+# Additional Runtime Files
 /TestGame/imgui.ini
