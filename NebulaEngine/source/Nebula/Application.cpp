@@ -1,6 +1,7 @@
 #include "nbpch.h"
 #include "Application.h"
 #include "Input.h"
+#include "KeyCodes.h"
 
 namespace Nebula {
 
@@ -37,8 +38,6 @@ namespace Nebula {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
 
-		NB_CORE_TRACE("{0}", e);
-
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 		{
 			(*--it)->OnEvent(e);
@@ -54,9 +53,6 @@ namespace Nebula {
 				layer->OnUpdate();
 
 			m_Window->OnUpdate();
-
-			auto[x, y] = Input::GetMousePosition();
-			NB_CORE_TRACE("{0}, {1}", x, y);
 		}
 	}
 

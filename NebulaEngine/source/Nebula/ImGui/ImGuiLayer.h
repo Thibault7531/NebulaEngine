@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL_keycode.h"
-
 #include "Nebula/Layer.h"
 #include "Nebula/Events/ApplicationEvent.h"
 #include "Nebula/Events/KeyEvent.h"
@@ -34,9 +32,9 @@ namespace Nebula
 		static void SetClipboard(ImGuiContext*, const char* text);
 
 	private:
-		ImGuiKey getImGuiKey(SDL_Keycode keycode);
+		ImGuiKey getImGuiKey(int keycode);
 
-		Sint64 m_Time;
+		long long m_Time;
 	};
 
 }

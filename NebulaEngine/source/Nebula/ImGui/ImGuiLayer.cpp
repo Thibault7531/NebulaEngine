@@ -2,16 +2,16 @@
 #include "ImGuiLayer.h"
 
 #include <SDL_clipboard.h>
-#include <SDL_keyboard.h>
-#include <SDL_keycode.h>
-#include <SDL_mouse.h>
 #include <SDL_time.h>
 #include <SDL_timer.h>
 
 #include "glad/glad.h"
 #include "Nebula/Application.h"
+#include "Nebula/Input.h"
 #include "Nebula/Events/KeyEvent.h"
 #include "Nebula/Events/MouseEvent.h"
+#include "Nebula/KeyCodes.h"
+#include "Nebula/MouseButtonCodes.h"
 #include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
 
 namespace Nebula
@@ -90,11 +90,11 @@ namespace Nebula
         ImGuiIO& io = ImGui::GetIO();
 
         int mouse_button = -1;
-        if (e.GetMouseButton() == SDL_BUTTON_LEFT) { mouse_button = 0; }
-        if (e.GetMouseButton() == SDL_BUTTON_RIGHT) { mouse_button = 1; }
-        if (e.GetMouseButton() == SDL_BUTTON_MIDDLE) { mouse_button = 2; }
-        if (e.GetMouseButton() == SDL_BUTTON_X1) { mouse_button = 3; }
-        if (e.GetMouseButton() == SDL_BUTTON_X2) { mouse_button = 4; }
+        if (e.GetMouseButton() == NB_BUTTON_LEFT) { mouse_button = 0; }
+        if (e.GetMouseButton() == NB_BUTTON_RIGHT) { mouse_button = 1; }
+        if (e.GetMouseButton() == NB_BUTTON_MIDDLE) { mouse_button = 2; }
+        if (e.GetMouseButton() == NB_BUTTON_X1) { mouse_button = 3; }
+        if (e.GetMouseButton() == NB_BUTTON_X2) { mouse_button = 4; }
         if (mouse_button == -1)
             return false;
 
@@ -108,11 +108,11 @@ namespace Nebula
         ImGuiIO& io = ImGui::GetIO();
 
         int mouse_button = -1;
-        if (e.GetMouseButton() == SDL_BUTTON_LEFT) { mouse_button = 0; }
-        if (e.GetMouseButton() == SDL_BUTTON_RIGHT) { mouse_button = 1; }
-        if (e.GetMouseButton() == SDL_BUTTON_MIDDLE) { mouse_button = 2; }
-        if (e.GetMouseButton() == SDL_BUTTON_X1) { mouse_button = 3; }
-        if (e.GetMouseButton() == SDL_BUTTON_X2) { mouse_button = 4; }
+        if (e.GetMouseButton() == NB_BUTTON_LEFT) { mouse_button = 0; }
+        if (e.GetMouseButton() == NB_BUTTON_RIGHT) { mouse_button = 1; }
+        if (e.GetMouseButton() == NB_BUTTON_MIDDLE) { mouse_button = 2; }
+        if (e.GetMouseButton() == NB_BUTTON_X1) { mouse_button = 3; }
+        if (e.GetMouseButton() == NB_BUTTON_X2) { mouse_button = 4; }
         if (mouse_button == -1)
             return false;
 
@@ -141,13 +141,12 @@ namespace Nebula
     {
         ImGuiIO& io = ImGui::GetIO();
         ImGuiKey key = getImGuiKey(e.GetKeyCode());
-        SDL_Keymod keymod = e.GetKeyMod();
         io.AddKeyEvent(key, true);
 
-        io.AddKeyEvent(ImGuiMod_Ctrl, (keymod & SDL_KMOD_CTRL) != 0);
-        io.AddKeyEvent(ImGuiMod_Shift, (keymod & SDL_KMOD_SHIFT) != 0);
-        io.AddKeyEvent(ImGuiMod_Alt, (keymod & SDL_KMOD_ALT) != 0);
-        io.AddKeyEvent(ImGuiMod_Super, (keymod & SDL_KMOD_GUI) != 0);
+        io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL));
+        io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT));
+        io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(NB_KEY_LALT) || Input::IsKeyPressed(NB_KEY_RALT));
+        io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(NB_KEY_LGUI) || Input::IsKeyPressed(NB_KEY_RGUI));
 
         return false;
     }
@@ -158,10 +157,10 @@ namespace Nebula
         ImGuiKey key = getImGuiKey(e.GetKeyCode());
         io.AddKeyEvent(key, false);
 
-        io.AddKeyEvent(ImGuiMod_Ctrl, SDL_KMOD_CTRL);
-        io.AddKeyEvent(ImGuiMod_Shift, SDL_KMOD_SHIFT);
-        io.AddKeyEvent(ImGuiMod_Alt, SDL_KMOD_ALT);
-        io.AddKeyEvent(ImGuiMod_Super, SDL_KMOD_GUI);
+		io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL));
+		io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT));
+		io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(NB_KEY_LALT) || Input::IsKeyPressed(NB_KEY_RALT));
+		io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(NB_KEY_LGUI) || Input::IsKeyPressed(NB_KEY_RGUI));
 
         return false;
     }
@@ -197,112 +196,112 @@ namespace Nebula
         SDL_SetClipboardText(text);
     }
 
-	ImGuiKey ImGuiLayer::getImGuiKey(SDL_Keycode keycode)
+	ImGuiKey ImGuiLayer::getImGuiKey(int keycode)
 	{
         switch (keycode)
         {
-        case SDLK_TAB: return ImGuiKey_Tab;
-        case SDLK_LEFT: return ImGuiKey_LeftArrow;
-        case SDLK_RIGHT: return ImGuiKey_RightArrow;
-        case SDLK_UP: return ImGuiKey_UpArrow;
-        case SDLK_DOWN: return ImGuiKey_DownArrow;
-        case SDLK_PAGEUP: return ImGuiKey_PageUp;
-        case SDLK_PAGEDOWN: return ImGuiKey_PageDown;
-        case SDLK_HOME: return ImGuiKey_Home;
-        case SDLK_END: return ImGuiKey_End;
-        case SDLK_INSERT: return ImGuiKey_Insert;
-        case SDLK_DELETE: return ImGuiKey_Delete;
-        case SDLK_BACKSPACE: return ImGuiKey_Backspace;
-        case SDLK_SPACE: return ImGuiKey_Space;
-        case SDLK_RETURN: return ImGuiKey_Enter;
-        case SDLK_ESCAPE: return ImGuiKey_Escape;
-        case SDLK_APOSTROPHE: return ImGuiKey_Apostrophe;
-        case SDLK_COMMA: return ImGuiKey_Comma;
-        case SDLK_MINUS: return ImGuiKey_Minus;
-        case SDLK_PERIOD: return ImGuiKey_Period;
-        case SDLK_SLASH: return ImGuiKey_Slash;
-        case SDLK_SEMICOLON: return ImGuiKey_Semicolon;
-        case SDLK_EQUALS: return ImGuiKey_Equal;
-        case SDLK_LEFTBRACKET: return ImGuiKey_LeftBracket;
-        case SDLK_BACKSLASH: return ImGuiKey_Backslash;
-        case SDLK_RIGHTBRACKET: return ImGuiKey_RightBracket;
-        case SDLK_GRAVE: return ImGuiKey_GraveAccent;
-        case SDLK_CAPSLOCK: return ImGuiKey_CapsLock;
-        case SDLK_SCROLLLOCK: return ImGuiKey_ScrollLock;
-        case SDLK_NUMLOCKCLEAR: return ImGuiKey_NumLock;
-        case SDLK_PRINTSCREEN: return ImGuiKey_PrintScreen;
-        case SDLK_PAUSE: return ImGuiKey_Pause;
-        case SDLK_LCTRL: return ImGuiKey_LeftCtrl;
-        case SDLK_LSHIFT: return ImGuiKey_LeftShift;
-        case SDLK_LALT: return ImGuiKey_LeftAlt;
-        case SDLK_LGUI: return ImGuiKey_LeftSuper;
-        case SDLK_RCTRL: return ImGuiKey_RightCtrl;
-        case SDLK_RSHIFT: return ImGuiKey_RightShift;
-        case SDLK_RALT: return ImGuiKey_RightAlt;
-        case SDLK_RGUI: return ImGuiKey_RightSuper;
-        case SDLK_APPLICATION: return ImGuiKey_Menu;
-        case SDLK_0: return ImGuiKey_0;
-        case SDLK_1: return ImGuiKey_1;
-        case SDLK_2: return ImGuiKey_2;
-        case SDLK_3: return ImGuiKey_3;
-        case SDLK_4: return ImGuiKey_4;
-        case SDLK_5: return ImGuiKey_5;
-        case SDLK_6: return ImGuiKey_6;
-        case SDLK_7: return ImGuiKey_7;
-        case SDLK_8: return ImGuiKey_8;
-        case SDLK_9: return ImGuiKey_9;
-        case SDLK_A: return ImGuiKey_A;
-        case SDLK_B: return ImGuiKey_B;
-        case SDLK_C: return ImGuiKey_C;
-        case SDLK_D: return ImGuiKey_D;
-        case SDLK_E: return ImGuiKey_E;
-        case SDLK_F: return ImGuiKey_F;
-        case SDLK_G: return ImGuiKey_G;
-        case SDLK_H: return ImGuiKey_H;
-        case SDLK_I: return ImGuiKey_I;
-        case SDLK_J: return ImGuiKey_J;
-        case SDLK_K: return ImGuiKey_K;
-        case SDLK_L: return ImGuiKey_L;
-        case SDLK_M: return ImGuiKey_M;
-        case SDLK_N: return ImGuiKey_N;
-        case SDLK_O: return ImGuiKey_O;
-        case SDLK_P: return ImGuiKey_P;
-        case SDLK_Q: return ImGuiKey_Q;
-        case SDLK_R: return ImGuiKey_R;
-        case SDLK_S: return ImGuiKey_S;
-        case SDLK_T: return ImGuiKey_T;
-        case SDLK_U: return ImGuiKey_U;
-        case SDLK_V: return ImGuiKey_V;
-        case SDLK_W: return ImGuiKey_W;
-        case SDLK_X: return ImGuiKey_X;
-        case SDLK_Y: return ImGuiKey_Y;
-        case SDLK_Z: return ImGuiKey_Z;
-        case SDLK_F1: return ImGuiKey_F1;
-        case SDLK_F2: return ImGuiKey_F2;
-        case SDLK_F3: return ImGuiKey_F3;
-        case SDLK_F4: return ImGuiKey_F4;
-        case SDLK_F5: return ImGuiKey_F5;
-        case SDLK_F6: return ImGuiKey_F6;
-        case SDLK_F7: return ImGuiKey_F7;
-        case SDLK_F8: return ImGuiKey_F8;
-        case SDLK_F9: return ImGuiKey_F9;
-        case SDLK_F10: return ImGuiKey_F10;
-        case SDLK_F11: return ImGuiKey_F11;
-        case SDLK_F12: return ImGuiKey_F12;
-        case SDLK_F13: return ImGuiKey_F13;
-        case SDLK_F14: return ImGuiKey_F14;
-        case SDLK_F15: return ImGuiKey_F15;
-        case SDLK_F16: return ImGuiKey_F16;
-        case SDLK_F17: return ImGuiKey_F17;
-        case SDLK_F18: return ImGuiKey_F18;
-        case SDLK_F19: return ImGuiKey_F19;
-        case SDLK_F20: return ImGuiKey_F20;
-        case SDLK_F21: return ImGuiKey_F21;
-        case SDLK_F22: return ImGuiKey_F22;
-        case SDLK_F23: return ImGuiKey_F23;
-        case SDLK_F24: return ImGuiKey_F24;
-        case SDLK_AC_BACK: return ImGuiKey_AppBack;
-        case SDLK_AC_FORWARD: return ImGuiKey_AppForward;
+        case NB_KEY_TAB: return ImGuiKey_Tab;
+        case NB_KEY_LEFT: return ImGuiKey_LeftArrow;
+        case NB_KEY_RIGHT: return ImGuiKey_RightArrow;
+        case NB_KEY_UP: return ImGuiKey_UpArrow;
+        case NB_KEY_DOWN: return ImGuiKey_DownArrow;
+        case NB_KEY_PAGEUP: return ImGuiKey_PageUp;
+        case NB_KEY_PAGEDOWN: return ImGuiKey_PageDown;
+        case NB_KEY_HOME: return ImGuiKey_Home;
+        case NB_KEY_END: return ImGuiKey_End;
+        case NB_KEY_INSERT: return ImGuiKey_Insert;
+        case NB_KEY_DELETE: return ImGuiKey_Delete;
+        case NB_KEY_BACKSPACE: return ImGuiKey_Backspace;
+        case NB_KEY_SPACE: return ImGuiKey_Space;
+        case NB_KEY_RETURN: return ImGuiKey_Enter;
+        case NB_KEY_ESCAPE: return ImGuiKey_Escape;
+        case NB_KEY_APOSTROPHE: return ImGuiKey_Apostrophe;
+        case NB_KEY_COMMA: return ImGuiKey_Comma;
+        case NB_KEY_MINUS: return ImGuiKey_Minus;
+        case NB_KEY_PERIOD: return ImGuiKey_Period;
+        case NB_KEY_SLASH: return ImGuiKey_Slash;
+        case NB_KEY_SEMICOLON: return ImGuiKey_Semicolon;
+        case NB_KEY_EQUALS: return ImGuiKey_Equal;
+        case NB_KEY_LEFTBRACKET: return ImGuiKey_LeftBracket;
+        case NB_KEY_BACKSLASH: return ImGuiKey_Backslash;
+        case NB_KEY_RIGHTBRACKET: return ImGuiKey_RightBracket;
+        case NB_KEY_GRAVE: return ImGuiKey_GraveAccent;
+        case NB_KEY_CAPSLOCK: return ImGuiKey_CapsLock;
+        case NB_KEY_SCROLLLOCK: return ImGuiKey_ScrollLock;
+        case NB_KEY_NUMLOCKCLEAR: return ImGuiKey_NumLock;
+        case NB_KEY_PRINTSCREEN: return ImGuiKey_PrintScreen;
+        case NB_KEY_PAUSE: return ImGuiKey_Pause;
+        case NB_KEY_LCTRL: return ImGuiKey_LeftCtrl;
+        case NB_KEY_LSHIFT: return ImGuiKey_LeftShift;
+        case NB_KEY_LALT: return ImGuiKey_LeftAlt;
+        case NB_KEY_LGUI: return ImGuiKey_LeftSuper;
+        case NB_KEY_RCTRL: return ImGuiKey_RightCtrl;
+        case NB_KEY_RSHIFT: return ImGuiKey_RightShift;
+        case NB_KEY_RALT: return ImGuiKey_RightAlt;
+        case NB_KEY_RGUI: return ImGuiKey_RightSuper;
+        case NB_KEY_APPLICATION: return ImGuiKey_Menu;
+        case NB_KEY_0: return ImGuiKey_0;
+        case NB_KEY_1: return ImGuiKey_1;
+        case NB_KEY_2: return ImGuiKey_2;
+        case NB_KEY_3: return ImGuiKey_3;
+        case NB_KEY_4: return ImGuiKey_4;
+        case NB_KEY_5: return ImGuiKey_5;
+        case NB_KEY_6: return ImGuiKey_6;
+        case NB_KEY_7: return ImGuiKey_7;
+        case NB_KEY_8: return ImGuiKey_8;
+        case NB_KEY_9: return ImGuiKey_9;
+        case NB_KEY_A: return ImGuiKey_A;
+        case NB_KEY_B: return ImGuiKey_B;
+        case NB_KEY_C: return ImGuiKey_C;
+        case NB_KEY_D: return ImGuiKey_D;
+        case NB_KEY_E: return ImGuiKey_E;
+        case NB_KEY_F: return ImGuiKey_F;
+        case NB_KEY_G: return ImGuiKey_G;
+        case NB_KEY_H: return ImGuiKey_H;
+        case NB_KEY_I: return ImGuiKey_I;
+        case NB_KEY_J: return ImGuiKey_J;
+        case NB_KEY_K: return ImGuiKey_K;
+        case NB_KEY_L: return ImGuiKey_L;
+        case NB_KEY_M: return ImGuiKey_M;
+        case NB_KEY_N: return ImGuiKey_N;
+        case NB_KEY_O: return ImGuiKey_O;
+        case NB_KEY_P: return ImGuiKey_P;
+        case NB_KEY_Q: return ImGuiKey_Q;
+        case NB_KEY_R: return ImGuiKey_R;
+        case NB_KEY_S: return ImGuiKey_S;
+        case NB_KEY_T: return ImGuiKey_T;
+        case NB_KEY_U: return ImGuiKey_U;
+        case NB_KEY_V: return ImGuiKey_V;
+        case NB_KEY_W: return ImGuiKey_W;
+        case NB_KEY_X: return ImGuiKey_X;
+        case NB_KEY_Y: return ImGuiKey_Y;
+        case NB_KEY_Z: return ImGuiKey_Z;
+        case NB_KEY_F1: return ImGuiKey_F1;
+        case NB_KEY_F2: return ImGuiKey_F2;
+        case NB_KEY_F3: return ImGuiKey_F3;
+        case NB_KEY_F4: return ImGuiKey_F4;
+        case NB_KEY_F5: return ImGuiKey_F5;
+        case NB_KEY_F6: return ImGuiKey_F6;
+        case NB_KEY_F7: return ImGuiKey_F7;
+        case NB_KEY_F8: return ImGuiKey_F8;
+        case NB_KEY_F9: return ImGuiKey_F9;
+        case NB_KEY_F10: return ImGuiKey_F10;
+        case NB_KEY_F11: return ImGuiKey_F11;
+        case NB_KEY_F12: return ImGuiKey_F12;
+        case NB_KEY_F13: return ImGuiKey_F13;
+        case NB_KEY_F14: return ImGuiKey_F14;
+        case NB_KEY_F15: return ImGuiKey_F15;
+        case NB_KEY_F16: return ImGuiKey_F16;
+        case NB_KEY_F17: return ImGuiKey_F17;
+        case NB_KEY_F18: return ImGuiKey_F18;
+        case NB_KEY_F19: return ImGuiKey_F19;
+        case NB_KEY_F20: return ImGuiKey_F20;
+        case NB_KEY_F21: return ImGuiKey_F21;
+        case NB_KEY_F22: return ImGuiKey_F22;
+        case NB_KEY_F23: return ImGuiKey_F23;
+        case NB_KEY_F24: return ImGuiKey_F24;
+        case NB_KEY_AC_BACK: return ImGuiKey_AppBack;
+        case NB_KEY_AC_FORWARD: return ImGuiKey_AppForward;
         default: break;
         }
         return ImGuiKey_None;

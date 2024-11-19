@@ -9,25 +9,20 @@ namespace Nebula
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
-		inline SDL_Keymod GetKeyMod() const { return m_Keymod; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
 		KeyEvent(int keycode)
 			: m_KeyCode(keycode) {}
 
-		KeyEvent(int keycode, SDL_Keymod keymod)
-			: m_KeyCode(keycode), m_Keymod(keymod) {}
-
 		int m_KeyCode;
-		SDL_Keymod m_Keymod;
 	};
 
 	class NEBULA_API KeyPressedEvent : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keycode, int repeatCount, SDL_Keymod keymod)
-			: KeyEvent(keycode, keymod), m_RepeatCount(repeatCount) {}
+		KeyPressedEvent(int keycode, int repeatCount)
+			: KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 
 		inline int GetRepeatCount() const { return m_RepeatCount; }
 
@@ -46,8 +41,8 @@ namespace Nebula
 	class NEBULA_API KeyReleasedEvent : public KeyEvent
 	{
 	public:
-		KeyReleasedEvent(int keycode, SDL_Keymod keymod)
-			: KeyEvent(keycode, keymod) {}
+		KeyReleasedEvent(int keycode)
+			: KeyEvent(keycode) {}
 
 		std::string ToString() const override
 		{

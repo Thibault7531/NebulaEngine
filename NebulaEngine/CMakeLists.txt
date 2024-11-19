@@ -19,10 +19,12 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Application.h
         source/Nebula/EntryPoint.h
         source/Nebula/Input.h
+        source/Nebula/KeyCodes.h
         source/Nebula/Core.h
         source/Nebula/Layer.h
         source/Nebula/LayerStack.h
         source/Nebula/Log.h
+        source/Nebula/MouseButtonCodes.h
         source/Nebula/Window.h
         source/Nebula/Events/ApplicationEvent.h
         source/Nebula/Events/Event.h

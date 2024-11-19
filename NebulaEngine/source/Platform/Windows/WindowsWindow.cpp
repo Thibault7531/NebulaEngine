@@ -93,13 +93,13 @@ namespace Nebula {
 					{
 					case false:
 						{
-							KeyPressedEvent event(e->key.key, 0, e->key.mod);
+							KeyPressedEvent event(e->key.key, 0);
 							data.EventCallback(event);
 							break;
 						}
 					case true:
 						{
-							KeyPressedEvent event(e->key.key, 1, e->key.mod);
+							KeyPressedEvent event(e->key.key, 1);
 							data.EventCallback(event);
 							break;
 						}
@@ -112,7 +112,7 @@ namespace Nebula {
 				{
 					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
 
-					KeyReleasedEvent event(e->key.key, e->key.mod);
+					KeyReleasedEvent event(e->key.key);
 					data.EventCallback(event);
 
 					return false;
