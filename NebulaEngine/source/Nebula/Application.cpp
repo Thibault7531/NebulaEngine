@@ -1,5 +1,6 @@
 #include "nbpch.h"
 #include "Application.h"
+#include "Input.h"
 
 namespace Nebula {
 
@@ -53,6 +54,9 @@ namespace Nebula {
 				layer->OnUpdate();
 
 			m_Window->OnUpdate();
+
+			auto[x, y] = Input::GetMousePosition();
+			NB_CORE_TRACE("{0}, {1}", x, y);
 		}
 	}
 

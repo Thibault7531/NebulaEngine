@@ -18,6 +18,7 @@ list(APPEND NebulaHeaderFiles
         source/Nebula.h
         source/Nebula/Application.h
         source/Nebula/EntryPoint.h
+        source/Nebula/Input.h
         source/Nebula/Core.h
         source/Nebula/Layer.h
         source/Nebula/LayerStack.h
@@ -36,10 +37,12 @@ if (nebula_cmake_platform STREQUAL Windows)
     list(APPEND NebulaSourceFiles
             source/Platform/OpenGL/ImGuiOpenGLRenderer.cpp
             source/Platform/Windows/WindowsWindow.cpp
+            source/Platform/Windows/WindowsInput.cpp
     )
     list(APPEND NebulaHeaderFiles
             source/Platform/OpenGL/ImGuiOpenGLRenderer.h
             source/Platform/Windows/WindowsWindow.h
+            source/Platform/Windows/WindowsInput.h
     )
 endif ()
 
