@@ -6,7 +6,7 @@
 	url = https://github.com/libsdl-org/SDL.git
 [submodule "NebulaEngine/vendor/imgui"]
 	path = NebulaEngine/vendor/imgui
-	url = https://github.com/Thibault7531/imgui-premake.git
+	url = https://github.com/ocornut/imgui.git
 [submodule "NebulaEngine/vendor/glm"]
 	path = NebulaEngine/vendor/glm
 	url = https://github.com/g-truc/glm.git
