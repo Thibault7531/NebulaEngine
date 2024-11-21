@@ -5,7 +5,6 @@ class TestGame : public Nebula::Application
 public:
 	TestGame()
 	{
-		PushOverlay(new Nebula::ImGuiLayer());
 	}
 
 	~TestGame()

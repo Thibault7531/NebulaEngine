@@ -2,17 +2,19 @@
 #include "ImGuiLayer.h"
 
 #include <SDL_clipboard.h>
-#include <SDL_time.h>
-#include <SDL_timer.h>
+#include <SDL_events.h>
+#include <SDL_video.h>
+#include <backends/imgui_impl_opengl3_loader.h>
 
-#include "glad/glad.h"
 #include "Nebula/Application.h"
 #include "Nebula/Input.h"
-#include "Nebula/Events/KeyEvent.h"
-#include "Nebula/Events/MouseEvent.h"
+#include "backends/imgui_impl_opengl3.h"
+#include "backends/imgui_impl_sdl3.h"
 #include "Nebula/KeyCodes.h"
 #include "Nebula/MouseButtonCodes.h"
-#include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
+
+struct ImGui_ImplSDL3_Data;
+struct ImGui_ImplSDL3_ViewportData;
 
 namespace Nebula
 {
@@ -28,173 +30,196 @@ namespace Nebula
 
 	void ImGuiLayer::OnAttach()
 	{
+		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
 		ImGui::StyleColorsDark();
 
-		ImGuiIO& io = ImGui::GetIO();
-		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
 
-        ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
-
-        SDL_GetCurrentTime(&m_Time);
-
-		ImGui_ImplOpenGL3_Init("#version 410");
-	}
-
-	void ImGuiLayer::OnDetach()
-	{
-	}
-
-	void ImGuiLayer::OnUpdate()
-	{
-		ImGuiIO& io = ImGui::GetIO();
-        ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
 		Application& app = Application::Get();
-		io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
-        platform_io.Platform_SetClipboardTextFn = SetClipboard;
-        platform_io.Platform_GetClipboardTextFn = GetClipboard;
+		SDL_Window* window = static_cast<SDL_Window*>(app.GetWindow().GetNativeWindow());
+		SDL_GLContext gl_context = SDL_GL_GetCurrentContext();
 
-        static Uint64 frequency = SDL_GetPerformanceFrequency();
-        Uint64 current_time = SDL_GetPerformanceCounter();
-        if (current_time <= m_Time)
-            current_time = m_Time + 1;
-		io.DeltaTime = m_Time > 0 ? (float)((double)(current_time - m_Time) / frequency) : (float)(1.0f / 60.0f);
-		m_Time = current_time;
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui::NewFrame();
-
-		static bool show = true;
-		ImGui::ShowDemoWindow();
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
+		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
-        EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<MouseButtonPressedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressedEvent));
-        dispatcher.Dispatch<MouseButtonReleasedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleasedEvent));
-        dispatcher.Dispatch<MouseMovedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseMovedEvent));
-        dispatcher.Dispatch<MouseScrolledEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolledEvent));
-        dispatcher.Dispatch<KeyPressedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyPressedEvent));
-        dispatcher.Dispatch<KeyReleasedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyReleasedEvent));
-        dispatcher.Dispatch<KeyTypedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyTypedEvent));
-        dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnWindowResizeEvent));
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<MouseMovedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseMovedEvent));
+		dispatcher.Dispatch<MouseScrolledEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolledEvent));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressedEvent));
+		dispatcher.Dispatch<MouseButtonReleasedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleasedEvent));
 	}
 
-    bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& e)
-    {
-        ImGuiIO& io = ImGui::GetIO();
+	void ImGuiLayer::OnDetach()
+	{
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplSDL3_Shutdown();
+		ImGui::DestroyContext();
+	}
 
-        int mouse_button = -1;
-        if (e.GetMouseButton() == NB_BUTTON_LEFT) { mouse_button = 0; }
-        if (e.GetMouseButton() == NB_BUTTON_RIGHT) { mouse_button = 1; }
-        if (e.GetMouseButton() == NB_BUTTON_MIDDLE) { mouse_button = 2; }
-        if (e.GetMouseButton() == NB_BUTTON_X1) { mouse_button = 3; }
-        if (e.GetMouseButton() == NB_BUTTON_X2) { mouse_button = 4; }
-        if (mouse_button == -1)
-            return false;
+	void ImGuiLayer::OnImGuiRender()
+	{
+		static bool show = true;
+		ImGui::ShowDemoWindow(&show);
+	}
 
-        io.AddMouseButtonEvent(mouse_button, true);
+	void ImGuiLayer::Begin()
+	{
+		SDL_Event event;
+		while (SDL_PollEvent(&event))
+			ImGui_ImplSDL3_ProcessEvent(&event);
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL3_NewFrame();
+		ImGui::NewFrame();
+	}
 
-        return false;
-    }
+	void ImGuiLayer::End()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		Application& app = Application::Get();
 
-    bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e)
-    {
-        ImGuiIO& io = ImGui::GetIO();
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        int mouse_button = -1;
-        if (e.GetMouseButton() == NB_BUTTON_LEFT) { mouse_button = 0; }
-        if (e.GetMouseButton() == NB_BUTTON_RIGHT) { mouse_button = 1; }
-        if (e.GetMouseButton() == NB_BUTTON_MIDDLE) { mouse_button = 2; }
-        if (e.GetMouseButton() == NB_BUTTON_X1) { mouse_button = 3; }
-        if (e.GetMouseButton() == NB_BUTTON_X2) { mouse_button = 4; }
-        if (mouse_button == -1)
-            return false;
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+			SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+		}
+	}
 
-        io.AddMouseButtonEvent(mouse_button, false);
+	bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
 
-        return false;
-    }
+		int mouse_button = -1;
+		if (event.GetMouseButton() == NB_BUTTON_LEFT) { mouse_button = 0; }
+		if (event.GetMouseButton() == NB_BUTTON_RIGHT) { mouse_button = 1; }
+		if (event.GetMouseButton() == NB_BUTTON_MIDDLE) { mouse_button = 2; }
+		if (event.GetMouseButton() == NB_BUTTON_X1) { mouse_button = 3; }
+		if (event.GetMouseButton() == NB_BUTTON_X2) { mouse_button = 4; }
+		if (mouse_button == -1)
+			return false;
 
-    bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& e)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMousePosEvent(e.GetX(), e.GetY());
+		io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+		io.AddMouseButtonEvent(mouse_button, true);
 
-        return false;
-    }
+		return false;
+	}
 
-    bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent& e)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddMouseWheelEvent(e.GetXOffset(), e.GetYOffset());
+	bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
 
-        return false;
-    }
+		int mouse_button = -1;
+		if (event.GetMouseButton() == NB_BUTTON_LEFT) { mouse_button = 0; }
+		if (event.GetMouseButton() == NB_BUTTON_RIGHT) { mouse_button = 1; }
+		if (event.GetMouseButton() == NB_BUTTON_MIDDLE) { mouse_button = 2; }
+		if (event.GetMouseButton() == NB_BUTTON_X1) { mouse_button = 3; }
+		if (event.GetMouseButton() == NB_BUTTON_X2) { mouse_button = 4; }
+		if (mouse_button == -1)
+			return false;
 
-    bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& e)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        ImGuiKey key = getImGuiKey(e.GetKeyCode());
-        io.AddKeyEvent(key, true);
+		io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+		io.AddMouseButtonEvent(mouse_button, false);
 
-        io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL));
-        io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT));
-        io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(NB_KEY_LALT) || Input::IsKeyPressed(NB_KEY_RALT));
-        io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(NB_KEY_LGUI) || Input::IsKeyPressed(NB_KEY_RGUI));
+		return false;
+	}
 
-        return false;
-    }
+	bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
 
-    bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& e)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        ImGuiKey key = getImGuiKey(e.GetKeyCode());
-        io.AddKeyEvent(key, false);
+		io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+		io.AddMousePosEvent(event.GetX(), event.GetY());
+
+		return false;
+	}
+
+	bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent& event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		io.AddMouseWheelEvent(event.GetXOffset(), event.GetYOffset());
+
+		return false;
+	}
+
+	bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiKey key = getImGuiKey(event.GetKeyCode());
+		io.AddKeyEvent(key, true);
 
 		io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL));
 		io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT));
 		io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(NB_KEY_LALT) || Input::IsKeyPressed(NB_KEY_RALT));
 		io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(NB_KEY_LGUI) || Input::IsKeyPressed(NB_KEY_RGUI));
 
-        return false;
-    }
+		return false;
+	}
 
-    bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent& e)
-    {
-        ImGuiIO& io = ImGui::GetIO();
+	bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiKey key = getImGuiKey(event.GetKeyCode());
+		io.AddKeyEvent(key, false);
 
-        int keycode = e.GetKeyCode();
-        if (keycode > 0 && keycode < 0x10000)
-            io.AddInputCharacter(keycode);
-
-        return false;
-    }
-
-    bool ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent& e)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
-        io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-        glViewport(0, 0, e.GetWidth(), e.GetHeight());
+		io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL));
+		io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT));
+		io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(NB_KEY_LALT) || Input::IsKeyPressed(NB_KEY_RALT));
+		io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(NB_KEY_LGUI) || Input::IsKeyPressed(NB_KEY_RGUI));
 
 		return false;
-    }
+	}
 
-    const char* ImGuiLayer::GetClipboard(ImGuiContext*)
-    {
-        return SDL_GetClipboardText();
-    }
+	bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent& event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
 
-    void ImGuiLayer::SetClipboard(ImGuiContext*, const char* text)
-    {
-        SDL_SetClipboardText(text);
-    }
+		int keycode = event.GetKeyCode();
+		if (keycode > 0 && keycode < 0x10000)
+			io.AddInputCharacter(keycode);
+
+		return false;
+	}
+
+	bool ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent& event)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.DisplaySize = ImVec2(event.GetWidth(), event.GetHeight());
+		io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+		glViewport(0, 0, event.GetWidth(), event.GetHeight());
+
+		return false;
+	}
+
+	const char* ImGuiLayer::GetClipboard(ImGuiContext*)
+	{
+		return SDL_GetClipboardText();
+	}
+
+	void ImGuiLayer::SetClipboard(ImGuiContext*, const char* text)
+	{
+		SDL_SetClipboardText(text);
+	}
 
 	ImGuiKey ImGuiLayer::getImGuiKey(int keycode)
 	{
@@ -306,5 +331,4 @@ namespace Nebula
         }
         return ImGuiKey_None;
 	}
-
 }

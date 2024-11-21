@@ -37,14 +37,16 @@ list(APPEND NebulaHeaderFiles
 # Windows Source Files
 if (nebula_cmake_platform STREQUAL Windows)
     list(APPEND NebulaSourceFiles
-            source/Platform/OpenGL/ImGuiOpenGLRenderer.cpp
             source/Platform/Windows/WindowsWindow.cpp
             source/Platform/Windows/WindowsInput.cpp
+            vendor/imgui/backends/imgui_impl_sdl3.cpp
+            vendor/imgui/backends/imgui_impl_opengl3.cpp
     )
     list(APPEND NebulaHeaderFiles
-            source/Platform/OpenGL/ImGuiOpenGLRenderer.h
             source/Platform/Windows/WindowsWindow.h
             source/Platform/Windows/WindowsInput.h
+            vendor/imgui/backends/imgui_impl_sdl3.h
+            vendor/imgui/backends/imgui_impl_opengl3.h
     )
 endif ()
 
@@ -77,6 +79,7 @@ add_custom_command(
 # Defines
 target_compile_definitions(Nebula PRIVATE NB_PLATFORM_WINDOWS)
 target_compile_definitions(Nebula PRIVATE NB_BUILD_DLL)
+target_compile_definitions(Nebula PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 if (CMAKE_BUILD_TYPE EQUAL "Debug")
     target_compile_definitions(Nebula PRIVATE NB_DEBUG)

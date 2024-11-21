@@ -61,118 +61,184 @@ namespace Nebula {
 
 		SDL_SetEventFilter([](void* userdata, SDL_Event* e)
 		{
-			switch (e->type)
+			if ((SDL_Window*)userdata == SDL_GetWindowFromEvent(e))
 			{
-			case SDL_EVENT_WINDOW_RESIZED:
+				switch (e->type)
 				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-					data.Width = e->window.data1;
-					data.Height = e->window.data2;
-
-					WindowResizeEvent event(data.Width, data.Height);
-					data.EventCallback(event);
-
-					return false;
-				}
-
-			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-
-					WindowCloseEvent event;
-					data.EventCallback(event);
-
-					return false;
-				}
-
-			case SDL_EVENT_KEY_DOWN:
-				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-
-					switch (e->key.repeat)
+				case SDL_EVENT_WINDOW_RESIZED:
 					{
-					case false:
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
 						{
-							KeyPressedEvent event(e->key.key, 0);
+							WindowData& data = *(WindowData*)props;
+							data.Width = e->window.data1;
+							data.Height = e->window.data2;
+
+							WindowResizeEvent event(data.Width, data.Height);
 							data.EventCallback(event);
-							break;
+
+							return false;
 						}
-					case true:
-						{
-							KeyPressedEvent event(e->key.key, 1);
-							data.EventCallback(event);
-							break;
-						}
+
+						return true;
 					}
 
-					return false;
+				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *(WindowData*)props;
+
+							WindowCloseEvent event;
+							data.EventCallback(event);
+
+							return false;
+						}
+
+						return true;
+					}
+
+				case SDL_EVENT_KEY_DOWN:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *(WindowData*)props;
+
+							switch (e->key.repeat)
+							{
+							case false:
+								{
+									KeyPressedEvent event(e->key.key, 0);
+									data.EventCallback(event);
+									break;
+								}
+							case true:
+								{
+									KeyPressedEvent event(e->key.key, 1);
+									data.EventCallback(event);
+									break;
+								}
+							}
+
+							return false;
+						}
+
+						return true;
+					}
+
+				case SDL_EVENT_KEY_UP:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *(WindowData*)props;
+
+							KeyReleasedEvent event(e->key.key);
+							data.EventCallback(event);
+
+							return false;
+						}
+
+						return true;
+					}
+
+				case SDL_EVENT_TEXT_INPUT:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *(WindowData*)props;
+
+							KeyTypedEvent event(*e->text.text);
+							data.EventCallback(event);
+
+							return false;
+						}
+
+						return true;
+					}
+
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *(WindowData*)props;
+
+							MouseButtonPressedEvent event(e->button.button);
+							data.EventCallback(event);
+
+							return false;
+						}
+
+						return true;
+					}
+
+				case SDL_EVENT_MOUSE_BUTTON_UP:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *(WindowData*)props;
+
+							MouseButtonReleasedEvent event(e->button.button);
+							data.EventCallback(event);
+
+							return false;
+						}
+
+						return true;
+					}
+
+				case SDL_EVENT_MOUSE_WHEEL:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *(WindowData*)props;
+
+							MouseScrolledEvent event(e->wheel.x, e->wheel.y);
+							data.EventCallback(event);
+
+							return false;
+						}
+
+						return true;
+					}
+
+				case SDL_EVENT_MOUSE_MOTION:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *(WindowData*)props;
+
+							MouseMovedEvent event(e->motion.x, e->motion.y);
+							data.EventCallback(event);
+
+							return false;
+						}
+
+						return true;
+					}
+
+				default:
+					return true;
 				}
-
-			case SDL_EVENT_KEY_UP:
-				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-
-					KeyReleasedEvent event(e->key.key);
-					data.EventCallback(event);
-
-					return false;
-				}
-
-			case SDL_EVENT_TEXT_INPUT:
-				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-
-					KeyTypedEvent event(*e->text.text);
-					data.EventCallback(event);
-
-					return false;
-				}
-
-			case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-
-					MouseButtonPressedEvent event(e->button.button);
-					data.EventCallback(event);
-
-					return false;
-				}
-
-			case SDL_EVENT_MOUSE_BUTTON_UP:
-				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-
-					MouseButtonReleasedEvent event(e->button.button);
-					data.EventCallback(event);
-
-					return false;
-				}
-
-			case SDL_EVENT_MOUSE_WHEEL:
-				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-
-					MouseScrolledEvent event(e->wheel.x, e->wheel.y);
-					data.EventCallback(event);
-
-					return false;
-				}
-
-			case SDL_EVENT_MOUSE_MOTION:
-				{
-					WindowData& data = *(WindowData*)SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
-
-					MouseMovedEvent event(e->motion.x, e->motion.y);
-					data.EventCallback(event);
-
-					return false;
-				}
-
-			default:
-				return true;
-			}
+			} else return true;
 		}
-			, nullptr);
+			, m_Window);
 	}
 
 	void WindowsWindow::Shutdown()
@@ -182,7 +248,6 @@ namespace Nebula {
 
 	void WindowsWindow::OnUpdate()
 	{
-		while (SDL_PollEvent(&m_Event));
 		SDL_GL_SwapWindow(m_Window);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
