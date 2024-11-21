@@ -89,5 +89,17 @@ endif ()
 
 #Libraries
 target_precompile_headers(Nebula PRIVATE source/nbpch.h)
-target_link_libraries(Nebula PRIVATE ImGui SDL3-shared GLAD spdlog)
-target_include_directories(Nebula PRIVATE source vendor/Glad/include vendor/imgui vendor/SDL3/include vendor/SDL3/include/SDL3)
+target_link_libraries(Nebula PRIVATE
+        ImGui
+        SDL3-shared
+        GLAD
+        spdlog
+)
+target_include_directories(Nebula PRIVATE
+        source
+        vendor/Glad/include
+        vendor/imgui
+        vendor/SDL3/include
+        vendor/SDL3/include/SDL3
+        vendor/glm
+)
