@@ -37,8 +37,6 @@ namespace Nebula
 
 	private:
 		ImGuiKey getImGuiKey(int keycode);
-
-		long long m_Time;
 	};
 
 }

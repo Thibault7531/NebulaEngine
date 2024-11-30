@@ -62,6 +62,10 @@ namespace Nebula
 		dispatcher.Dispatch<MouseScrolledEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolledEvent));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonPressedEvent));
 		dispatcher.Dispatch<MouseButtonReleasedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonReleasedEvent));
+		dispatcher.Dispatch<KeyPressedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyPressedEvent));
+		dispatcher.Dispatch<KeyReleasedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyReleasedEvent));
+		dispatcher.Dispatch<KeyTypedEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnKeyTypedEvent));
+		dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(ImGuiLayer::OnWindowResizeEvent));
 	}
 
 	void ImGuiLayer::OnDetach()
@@ -79,9 +83,19 @@ namespace Nebula
 
 	void ImGuiLayer::Begin()
 	{
+		ImGuiIO& io = ImGui::GetIO();
+
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 			ImGui_ImplSDL3_ProcessEvent(&event);
+
+		SDL_Window* window = SDL_GL_GetCurrentWindow();
+		if (io.WantTextInput) {
+			SDL_StartTextInput(window);
+		} else {
+			SDL_StopTextInput(window);
+		}
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
