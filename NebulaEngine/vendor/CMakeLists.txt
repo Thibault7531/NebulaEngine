@@ -20,6 +20,7 @@ add_library(ImGui STATIC
         imgui/imstb_truetype.h
         imgui/imgui_demo.cpp
 )
+target_compile_definitions(ImGui PRIVATE "IMGUI_API=__declspec(dllexport)")
 
 
 # SDL

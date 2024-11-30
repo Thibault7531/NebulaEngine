@@ -11,6 +11,7 @@ set_target_properties(TestGame PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOUR
 
 # Defines
 target_compile_definitions(TestGame PUBLIC NB_PLATFORM_WINDOWS)
+target_compile_definitions(TestGame PRIVATE "IMGUI_API=__declspec(dllimport)")
 
 
 # Libraries
