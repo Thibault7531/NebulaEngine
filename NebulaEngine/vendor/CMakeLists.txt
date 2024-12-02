@@ -4,6 +4,14 @@ add_library(GLAD STATIC Glad/src/glad.c Glad/include/glad/glad.h Glad/include/KH
 
 target_include_directories(GLAD PUBLIC Glad/include)
 
+if (MSVC)
+    if (CMAKE_BUILD_TYPE EQUAL "Debug")
+        set_property(TARGET GLAD PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+    else ()
+        set_property(TARGET GLAD PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    endif ()
+endif ()
+
 
 # ImGui
 
@@ -20,7 +28,12 @@ add_library(ImGui STATIC
         imgui/imstb_truetype.h
         imgui/imgui_demo.cpp
 )
-target_compile_definitions(ImGui PRIVATE "IMGUI_API=__declspec(dllexport)")
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set_property(TARGET ImGui PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+else ()
+    set_property(TARGET ImGui PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+endif ()
 
 
 # SDL

@@ -22,7 +22,7 @@ namespace Nebula {
 	};
 
 	// Interface for a desktop window
-	class NEBULA_API Window
+	class Window
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;

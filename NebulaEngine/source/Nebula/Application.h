@@ -10,7 +10,7 @@
 
 namespace Nebula {
 
-	class NEBULA_API Application
+	class Application
 	{
 	public:
 		Application();

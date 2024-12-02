@@ -9,9 +9,17 @@ add_executable(TestGame source/TestGame.cpp)
 set_target_properties(TestGame PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}/TestGame")
 
 
+# Compile Options
+set_target_properties(TestGame PROPERTIES COMPILE_OPTIONS "/utf-8")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set_property(TARGET TestGame PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+else ()
+    set_property(TARGET TestGame PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+endif ()
+
+
 # Defines
 target_compile_definitions(TestGame PUBLIC NB_PLATFORM_WINDOWS)
-target_compile_definitions(TestGame PRIVATE "IMGUI_API=__declspec(dllimport)")
 
 
 # Libraries

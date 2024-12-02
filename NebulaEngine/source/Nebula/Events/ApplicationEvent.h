@@ -4,7 +4,7 @@
 
 namespace Nebula
 {
-	class NEBULA_API WindowResizeEvent : public Event
+	class WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -26,7 +26,7 @@ namespace Nebula
 		unsigned int m_Width, m_Height;
 	};
 
-	class NEBULA_API WindowCloseEvent : public Event
+	class WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() = default;
@@ -35,7 +35,7 @@ namespace Nebula
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class NEBULA_API AppTickEvent : public Event
+	class AppTickEvent : public Event
 	{
 	public:
 		AppTickEvent() = default;
@@ -44,7 +44,7 @@ namespace Nebula
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class NEBULA_API AppUpdateEvent : public Event
+	class AppUpdateEvent : public Event
 	{
 	public:
 		AppUpdateEvent() = default;
@@ -53,7 +53,7 @@ namespace Nebula
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class NEBULA_API AppRenderEvent : public Event
+	class AppRenderEvent : public Event
 	{
 	public:
 		AppRenderEvent() = default;

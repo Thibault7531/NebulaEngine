@@ -52,7 +52,7 @@ endif ()
 
 
 # Setup Target
-add_library(Nebula SHARED)
+add_library(Nebula STATIC)
 target_sources(Nebula PRIVATE ${NebulaSourceFiles} PUBLIC ${NebulaHeaderFiles})
 
 
@@ -66,14 +66,13 @@ add_custom_command(
         TARGET Nebula
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy $<TARGET_FILE:Nebula> $<TARGET_FILE_DIR:TestGame>/$<TARGET_FILE_NAME:Nebula>
-)
-add_custom_command(
-        TARGET Nebula
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
         ARGS -E copy $<TARGET_FILE:SDL3-shared> $<TARGET_FILE_DIR:TestGame>/$<TARGET_FILE_NAME:SDL3-shared>
 )
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set_property(TARGET Nebula PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+else ()
+    set_property(TARGET Nebula PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+endif ()
 
 
 # Defines
@@ -96,7 +95,7 @@ target_link_libraries(Nebula PRIVATE
         ImGui
         SDL3-shared
         GLAD
-        spdlog
+        spdlog::spdlog_header_only
 )
 target_include_directories(Nebula PRIVATE
         source

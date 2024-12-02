@@ -8,7 +8,7 @@
 namespace Nebula
 {
 
-	class NEBULA_API LayerStack
+	class LayerStack
 	{
 	public:
 		LayerStack();
