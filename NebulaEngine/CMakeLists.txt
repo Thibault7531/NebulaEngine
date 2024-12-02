@@ -31,18 +31,21 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Events/KeyEvent.h
         source/Nebula/Events/MouseEvent.h
         source/Nebula/ImGui/ImGuiLayer.h
+        source/Nebula/Renderer/GraphicsContext.h
 )
 
 
 # Windows Source Files
 if (nebula_cmake_platform STREQUAL Windows)
     list(APPEND NebulaSourceFiles
+            source/Platform/OpenGL/OpenGLContext.cpp
             source/Platform/Windows/WindowsWindow.cpp
             source/Platform/Windows/WindowsInput.cpp
             vendor/imgui/backends/imgui_impl_sdl3.cpp
             vendor/imgui/backends/imgui_impl_opengl3.cpp
     )
     list(APPEND NebulaHeaderFiles
+            source/Platform/OpenGL/OpenGLContext.h
             source/Platform/Windows/WindowsWindow.h
             source/Platform/Windows/WindowsInput.h
             vendor/imgui/backends/imgui_impl_sdl3.h

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Nebula/Window.h"
+#include "Nebula/Renderer/GraphicsContext.h"
 
 #include <SDL.h>
 
@@ -27,8 +28,9 @@ namespace Nebula {
 		virtual void Shutdown();
 	private:
 		SDL_Window* m_Window;
-		SDL_GLContext m_Context;
 		SDL_Event m_Event;
+
+		GraphicsContext* m_Context;
 
 		struct WindowData
 		{

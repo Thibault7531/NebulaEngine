@@ -1,10 +1,10 @@
 #include "nbpch.h"
 #include "WindowsWindow.h"
 
-#include "glad/glad.h"
 #include "Nebula/Events/ApplicationEvent.h"
 #include "Nebula/Events/KeyEvent.h"
 #include "Nebula/Events/MouseEvent.h"
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Nebula {
 
@@ -49,11 +49,8 @@ namespace Nebula {
 		SDL_PropertiesID windowProps = SDL_GetWindowProperties(m_Window);
 		SDL_SetPointerProperty(windowProps, "windowProps", &m_Data);
 
-		m_Context = SDL_GL_CreateContext(m_Window);
-		SDL_GL_MakeCurrent(m_Window, m_Context);
-
-		int status = gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
-		NB_CORE_ASSERT(status, "Failed to initialize Glad!");
+		m_Context = new OpenGLContext(m_Window);
+		m_Context->Init();
 
 		SDL_StartTextInput(m_Window);
 		
@@ -248,8 +245,7 @@ namespace Nebula {
 
 	void WindowsWindow::OnUpdate()
 	{
-		SDL_GL_SwapWindow(m_Window);
-		glClear(GL_COLOR_BUFFER_BIT);
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
