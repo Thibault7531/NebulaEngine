@@ -12,6 +12,7 @@ list(APPEND NebulaSourceFiles
         source/Nebula/LayerStack.cpp
         source/Nebula/Log.cpp
         source/Nebula/ImGui/ImGuiLayer.cpp
+        source/Nebula/Renderer/Shader.cpp
 )
 
 list(APPEND NebulaHeaderFiles
@@ -32,6 +33,7 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Events/MouseEvent.h
         source/Nebula/ImGui/ImGuiLayer.h
         source/Nebula/Renderer/GraphicsContext.h
+        source/Nebula/Renderer/Shader.h
 )
 
 
