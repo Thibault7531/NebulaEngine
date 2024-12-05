@@ -12,7 +12,10 @@ list(APPEND NebulaSourceFiles
         source/Nebula/LayerStack.cpp
         source/Nebula/Log.cpp
         source/Nebula/ImGui/ImGuiLayer.cpp
+        source/Nebula/Renderer/Buffer.cpp
+        source/Nebula/Renderer/Renderer.cpp
         source/Nebula/Renderer/Shader.cpp
+        source/Nebula/Renderer/VertexArray.cpp
 )
 
 list(APPEND NebulaHeaderFiles
@@ -32,22 +35,31 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Events/KeyEvent.h
         source/Nebula/Events/MouseEvent.h
         source/Nebula/ImGui/ImGuiLayer.h
+        source/Nebula/Renderer/Buffer.h
         source/Nebula/Renderer/GraphicsContext.h
+        source/Nebula/Renderer/Renderer.h
         source/Nebula/Renderer/Shader.h
+        source/Nebula/Renderer/VertexArray.h
 )
 
 
 # Windows Source Files
 if (nebula_cmake_platform STREQUAL Windows)
     list(APPEND NebulaSourceFiles
+            source/Platform/OpenGL/OpenGLBuffer.cpp
             source/Platform/OpenGL/OpenGLContext.cpp
+            source/Platform/OpenGL/OpenGLShader.cpp
+            source/Platform/OpenGL/OpenGLVertexArray.cpp
             source/Platform/Windows/WindowsWindow.cpp
             source/Platform/Windows/WindowsInput.cpp
             vendor/imgui/backends/imgui_impl_sdl3.cpp
             vendor/imgui/backends/imgui_impl_opengl3.cpp
     )
     list(APPEND NebulaHeaderFiles
+            source/Platform/OpenGL/OpenGLBuffer.h
             source/Platform/OpenGL/OpenGLContext.h
+            source/Platform/OpenGL/OpenGLShader.h
+            source/Platform/OpenGL/OpenGLVertexArray.h
             source/Platform/Windows/WindowsWindow.h
             source/Platform/Windows/WindowsInput.h
             vendor/imgui/backends/imgui_impl_sdl3.h
