@@ -24,4 +24,4 @@ target_compile_definitions(TestGame PUBLIC NB_PLATFORM_WINDOWS)
 
 # Libraries
 target_link_libraries(TestGame PUBLIC Nebula)
-target_include_directories(TestGame PRIVATE ../NebulaEngine/source ../NebulaEngine/vendor/spdlog/include ../NebulaEngine/vendor/SDL3/include/SDL3 ../NebulaEngine/vendor/SDL3/include ../NebulaEngine/vendor/imgui)
+target_include_directories(TestGame PRIVATE ../NebulaEngine/source ../NebulaEngine/vendor/spdlog/include ../NebulaEngine/vendor/SDL3/include/SDL3 ../NebulaEngine/vendor/SDL3/include ../NebulaEngine/vendor/imgui ../NebulaEngine/vendor/Glad/include)
