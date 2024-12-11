@@ -11,26 +11,6 @@ namespace Nebula {
 
 	Application* Application::s_Instance = nullptr;
 
-	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
-	{
-		switch (type)
-		{
-			case ShaderDataType::Float: return GL_FLOAT;
-			case ShaderDataType::Float2: return GL_FLOAT;
-			case ShaderDataType::Float3: return GL_FLOAT;
-			case ShaderDataType::Float4: return GL_FLOAT;
-			case ShaderDataType::Mat3: return GL_FLOAT;
-			case ShaderDataType::Mat4: return GL_FLOAT;
-			case ShaderDataType::Int: return GL_INT;
-			case ShaderDataType::Int2: return GL_INT;
-			case ShaderDataType::Int3: return GL_INT;
-			case ShaderDataType::Int4: return GL_INT;
-			case ShaderDataType::Bool: return GL_BOOL;
-		}
-
-		return GL_INVALID_ENUM;
-	}
-
 	Application::Application()
 	{
 		NB_CORE_ASSERT(!s_Instance, "Application already exists!");
@@ -44,32 +24,34 @@ namespace Nebula {
 
 		m_VertexArray.reset(VertexArray::Create());
 
-		float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-			0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+		float vertices[4 * 7] = {
+			-0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+			-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
 		};
 
-		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+		std::shared_ptr<VertexBuffer> vertexBuffer;
+		vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		BufferLayout layout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color"}
 		};
 
-		m_VertexBuffer->SetLayout(layout);
+		vertexBuffer->SetLayout(layout);
 
-		uint32_t index = 0;
-		for (const auto& element : m_VertexBuffer->GetLayout())
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, m_VertexBuffer->GetLayout().GetStride(), reinterpret_cast<const void*>(element.Offset));
-			index++;
-		}
+		m_VertexArray->AddVertexBuffer(vertexBuffer);
 
-		uint32_t indices[3] = { 0, 1, 2 };
+		uint32_t indices[2 * 3] = {
+			0, 1, 2,
+			2, 1, 3
+		};
 
-		m_IndexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+		std::shared_ptr<IndexBuffer> indexBuffer;
+		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+
+		m_VertexArray->SetIndexBuffer(indexBuffer);
 
 		std::string vertexSrc = R"(
 			#version 330 core
@@ -143,7 +125,7 @@ namespace Nebula {
 
 			m_Shader->Bind();
 			m_VertexArray->Bind();
-			glDrawElements(GL_TRIANGLES, m_IndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
