@@ -10,8 +10,6 @@ namespace Nebula {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		virtual void SetAttributes() const = 0;
-
 		static VertexArray* Create();
 	};
 

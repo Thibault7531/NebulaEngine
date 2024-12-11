@@ -14,8 +14,6 @@ namespace Nebula {
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual void SetAttributes() const override;
-
 	private:
 		uint32_t m_RendererID;
 	};

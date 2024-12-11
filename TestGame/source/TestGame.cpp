@@ -30,12 +30,16 @@ public:
 		ImGui::Text("x");
 		ImGui::SameLine();
 		ImGui::Text(std::to_string(Nebula::Application::Get().GetWindow().GetHeight()).c_str());
-		ImGui::BulletText("Frame Rate: ");
+		ImGui::BulletText("Frame Rate");
 		ImGui::SameLine();
 		ImGui::Value("", (float)(1.0f/(ImGui::GetTime() - m_PreviousTime)));
-		ImGui::BulletText("Frame Time: ");
 		ImGui::SameLine();
-		ImGui::Value("", (float)(ImGui::GetTime() - m_PreviousTime));
+		ImGui::Text("fps");
+		ImGui::BulletText("Frame Time");
+		ImGui::SameLine();
+		ImGui::Value("", (float)(ImGui::GetTime() - m_PreviousTime) * 1000.0f);
+		ImGui::SameLine();
+		ImGui::Text("ms");
 		m_PreviousTime = ImGui::GetTime();
 		ImGui::End();
 	}
