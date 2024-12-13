@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.30.3)
 
 # Project Specification
 project(NebulaEngine LANGUAGES CXX C VERSION 0.0)
-set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD 23)
 
 
 # Multi-config Generators

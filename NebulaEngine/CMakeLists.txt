@@ -13,7 +13,9 @@ list(APPEND NebulaSourceFiles
         source/Nebula/Log.cpp
         source/Nebula/ImGui/ImGuiLayer.cpp
         source/Nebula/Renderer/Buffer.cpp
+        source/Nebula/Renderer/RenderCommand.cpp
         source/Nebula/Renderer/Renderer.cpp
+        source/Nebula/Renderer/RendererAPI.cpp
         source/Nebula/Renderer/Shader.cpp
         source/Nebula/Renderer/VertexArray.cpp
 )
@@ -37,7 +39,9 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/ImGui/ImGuiLayer.h
         source/Nebula/Renderer/Buffer.h
         source/Nebula/Renderer/GraphicsContext.h
+        source/Nebula/Renderer/RenderCommand.h
         source/Nebula/Renderer/Renderer.h
+        source/Nebula/Renderer/RendererAPI.h
         source/Nebula/Renderer/Shader.h
         source/Nebula/Renderer/VertexArray.h
 )
@@ -48,6 +52,7 @@ if (nebula_cmake_platform STREQUAL Windows)
     list(APPEND NebulaSourceFiles
             source/Platform/OpenGL/OpenGLBuffer.cpp
             source/Platform/OpenGL/OpenGLContext.cpp
+            source/Platform/OpenGL/OpenGLRendererAPI.cpp
             source/Platform/OpenGL/OpenGLShader.cpp
             source/Platform/OpenGL/OpenGLVertexArray.cpp
             source/Platform/Windows/WindowsWindow.cpp
@@ -58,6 +63,7 @@ if (nebula_cmake_platform STREQUAL Windows)
     list(APPEND NebulaHeaderFiles
             source/Platform/OpenGL/OpenGLBuffer.h
             source/Platform/OpenGL/OpenGLContext.h
+            source/Platform/OpenGL/OpenGLRendererAPI.h
             source/Platform/OpenGL/OpenGLShader.h
             source/Platform/OpenGL/OpenGLVertexArray.h
             source/Platform/Windows/WindowsWindow.h
@@ -113,12 +119,14 @@ target_link_libraries(Nebula PRIVATE
         SDL3-shared
         GLAD
         spdlog::spdlog_header_only
+        glm
 )
 target_include_directories(Nebula PRIVATE
         source
+        vendor
         vendor/Glad/include
         vendor/imgui
         vendor/SDL3/include
         vendor/SDL3/include/SDL3
-        vendor/glm
+        vendor/glm/glm
 )

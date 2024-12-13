@@ -13,6 +13,11 @@ if (MSVC)
 endif ()
 
 
+# glm
+
+add_subdirectory(glm)
+
+
 # ImGui
 
 add_library(ImGui STATIC
