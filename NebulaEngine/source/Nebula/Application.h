@@ -37,8 +37,6 @@ namespace Nebula {
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 
-		std::shared_ptr<Shader> m_Shader;
-		std::shared_ptr<VertexArray> m_VertexArray;
 	private:
 		static  Application* s_Instance;
 	};
