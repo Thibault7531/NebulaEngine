@@ -5,12 +5,14 @@
 #include "Nebula/Renderer/Buffer.h"
 
 namespace Nebula {
-
+	/**
+	 * OpenGL Vertex buffer.
+	 */
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
-		OpenGLVertexBuffer(float* vertices, uint32_t size);
-		virtual ~OpenGLVertexBuffer();
+		OpenGLVertexBuffer(const float* vertices, uint32_t size);
+		virtual ~OpenGLVertexBuffer() override;
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
@@ -23,16 +25,19 @@ namespace Nebula {
 		BufferLayout m_Layout;
 	};
 
+	/**
+	 * OpenGL Index buffer.
+	 */
 	class OpenGLIndexBuffer : public IndexBuffer
 	{
 	public:
-		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
-		virtual ~OpenGLIndexBuffer();
+		OpenGLIndexBuffer(const uint32_t* indices, uint32_t count);
+		virtual ~OpenGLIndexBuffer() override;
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
 
-		virtual uint32_t GetCount() const { return m_Count; }
+		virtual uint32_t GetCount() const override { return m_Count; }
 
 	private:
 		uint32_t m_RendererID;

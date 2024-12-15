@@ -1,16 +1,31 @@
+/**
+ * This file describes events related to the application
+ **/
+
 #pragma once
 
 #include "Event.h"
 
 namespace Nebula
 {
+	/**
+	 * Event for when a window is resized
+	 */
 	class WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
 			: m_Width(width), m_Height(height) {}
 
+		/**
+		 * Gets the width of the window from the event.
+		 * @return Width of the window after being resized
+		 */
 		inline unsigned int GetWidth() const { return m_Width; }
+		/**
+		 * Gets the height of the window from the event.
+		 * @return Height of the window after being resized
+		 */
 		inline unsigned int GetHeight() const { return m_Height; }
 
 		std::string ToString() const override
@@ -26,6 +41,9 @@ namespace Nebula
 		unsigned int m_Width, m_Height;
 	};
 
+	/**
+	 * Event for when the user wants to close a window
+	 */
 	class WindowCloseEvent : public Event
 	{
 	public:

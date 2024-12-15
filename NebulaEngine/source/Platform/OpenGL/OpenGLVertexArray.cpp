@@ -1,6 +1,6 @@
 #include "OpenGLVertexArray.h"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 namespace Nebula {
 
@@ -19,6 +19,7 @@ namespace Nebula {
 			case ShaderDataType::Int3: return GL_INT;
 			case ShaderDataType::Int4: return GL_INT;
 			case ShaderDataType::Bool: return GL_BOOL;
+			default: break;
 		}
 
 		return GL_INVALID_ENUM;
@@ -56,7 +57,7 @@ namespace Nebula {
 		for (const auto& element : layout)
 		{
 			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), (const void*)element.Offset);
+			glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), reinterpret_cast<const void*>(element.Offset));
 			index++;
 		}
 

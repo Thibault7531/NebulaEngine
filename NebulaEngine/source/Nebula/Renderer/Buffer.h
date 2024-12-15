@@ -1,12 +1,19 @@
 #pragma once
 
 namespace Nebula {
-
+	/**
+	 * Class listing all possible data types that can be input into a shader.
+	 */
 	enum class ShaderDataType
 	{
 		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool
 	};
 
+	/**
+	 * Gets the size of any Shader data type.
+	 * @param type Shader data type
+	 * @return Size of the data type
+	 */
 	static uint32_t ShaderDataTypeSize(ShaderDataType type)
 	{
 		switch (type)
@@ -22,12 +29,16 @@ namespace Nebula {
 			case ShaderDataType::Int3: return 4 * 3;
 			case ShaderDataType::Int4: return 4 * 4;
 			case ShaderDataType::Bool: return 1;
+			default: break;
 		}
 
 		NB_CORE_ASSERT(false, "Unknown ShaderDataType!");
 		return 0;
 	}
 
+	/**
+	 * Information about data to input inside a shader.
+	 */
 	struct BufferElement
 	{
 		std::string Name;
@@ -43,6 +54,10 @@ namespace Nebula {
 		{
 		}
 
+		/**
+		 * Gets the amount of component inside a data type.
+		 * @return Amount of component inside a data type
+		 */
 		uint32_t GetComponentCount() const
 		{
 			switch (Type)
@@ -58,6 +73,7 @@ namespace Nebula {
 				case ShaderDataType::Int3: return 3;
 				case ShaderDataType::Int4: return 4;
 				case ShaderDataType::Bool: return 1;
+				default: break;
 			}
 
 			NB_CORE_ASSERT(false, "Unknown ShaderDataType!");
@@ -65,6 +81,9 @@ namespace Nebula {
 		}
 	};
 
+	/**
+	 * Class laying out all the data being inputted inside a shader.
+	 */
 	class BufferLayout
 	{
 	public:
@@ -76,7 +95,15 @@ namespace Nebula {
 			CalculateOffsetsAndStride();
 		}
 
+		/**
+		 * Gets all the elements being inputted inside a shader.
+		 * @return Vector with all the elements
+		 */
 		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
+		/**
+		 * Gets the stride of the data being inputted inside a shader.
+		 * @return Stride of the data
+		 */
 		inline uint32_t GetStride() const { return m_Stride; }
 
 		std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
@@ -102,6 +129,9 @@ namespace Nebula {
 		uint32_t m_Stride;
 	};
 
+	/**
+	 * Class representing a Vertex buffer object.
+	 */
 	class VertexBuffer
 	{
 	public:
@@ -110,12 +140,29 @@ namespace Nebula {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		/**
+		 * Gets the layout of the vertex buffer.
+		 * @return Layout of the vertex buffer
+		 */
 		virtual const BufferLayout& GetLayout() const = 0;
+		/**
+		 * Sets the layout of the vertex buffer.
+		 * @param layout Layout of the vertex buffer
+		 */
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
+		/**
+		 * Creates a vertex buffer with the inputted vertices.
+		 * @param vertices Table with all the vertices
+		 * @param size size of the table
+		 * @return Pointer to the generated vertex buffer
+		 */
 		static VertexBuffer* Create(float* vertices, uint32_t size);
 	};
 
+	/**
+	 * Class representing an index buffer object.
+	 */
 	class IndexBuffer
 	{
 	public:
@@ -124,8 +171,18 @@ namespace Nebula {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		/**
+		 * Gets the amount of indices inside the index buffer.
+		 * @return Amount of indices
+		 */
 		virtual uint32_t GetCount() const = 0;
 
+		/**
+		 * Creates an index buffer object with the inputted indices.
+		 * @param Indices Table with all the indices
+		 * @param count Amount of indices
+		 * @return Pointer to the generated index buffer
+		 */
 		static IndexBuffer* Create(uint32_t* Indices, uint32_t count);
 	};
 

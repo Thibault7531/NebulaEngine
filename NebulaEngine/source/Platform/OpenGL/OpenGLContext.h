@@ -5,7 +5,9 @@
 #include "Nebula/Renderer/GraphicsContext.h"
 
 namespace Nebula {
-
+	/**
+	 * OpenGL Context.
+	 */
 	class OpenGLContext : public GraphicsContext
 	{
 	public:

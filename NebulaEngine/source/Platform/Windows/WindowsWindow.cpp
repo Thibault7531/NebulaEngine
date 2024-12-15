@@ -1,4 +1,3 @@
-#include "nbpch.h"
 #include "WindowsWindow.h"
 
 #include "Nebula/Events/ApplicationEvent.h"
@@ -17,12 +16,12 @@ namespace Nebula {
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
-		Init(props);
+		WindowsWindow::Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
-		Shutdown();
+		WindowsWindow::Shutdown();
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
@@ -58,7 +57,7 @@ namespace Nebula {
 
 		SDL_SetEventFilter([](void* userdata, SDL_Event* e)
 		{
-			if ((SDL_Window*)userdata == SDL_GetWindowFromEvent(e))
+			if (static_cast<SDL_Window*>(userdata) == SDL_GetWindowFromEvent(e))
 			{
 				switch (e->type)
 				{
@@ -68,7 +67,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 							data.Width = e->window.data1;
 							data.Height = e->window.data2;
 
@@ -87,7 +86,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 
 							WindowCloseEvent event;
 							data.EventCallback(event);
@@ -104,7 +103,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 
 							switch (e->key.repeat)
 							{
@@ -134,7 +133,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 
 							KeyReleasedEvent event(e->key.key);
 							data.EventCallback(event);
@@ -151,7 +150,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 
 							KeyTypedEvent event(*e->text.text);
 							data.EventCallback(event);
@@ -168,7 +167,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 
 							MouseButtonPressedEvent event(e->button.button);
 							data.EventCallback(event);
@@ -185,7 +184,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 
 							MouseButtonReleasedEvent event(e->button.button);
 							data.EventCallback(event);
@@ -202,7 +201,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 
 							MouseScrolledEvent event(e->wheel.x, e->wheel.y);
 							data.EventCallback(event);
@@ -219,7 +218,7 @@ namespace Nebula {
 
 						if (props != nullptr)
 						{
-							WindowData& data = *(WindowData*)props;
+							WindowData& data = *static_cast<WindowData*>(props);
 
 							MouseMovedEvent event(e->motion.x, e->motion.y);
 							data.EventCallback(event);

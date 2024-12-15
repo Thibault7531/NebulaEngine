@@ -1,7 +1,9 @@
 #pragma once
 
 namespace Nebula {
-
+	/**
+	 * Class representing a graphics context.
+	 */
 	class GraphicsContext
 	{
 	public:

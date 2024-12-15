@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#include "RenderCommand.h"
+
 namespace Nebula {
 
 	void Renderer::BeginScene()

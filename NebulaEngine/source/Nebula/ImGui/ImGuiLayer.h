@@ -1,37 +1,46 @@
 #pragma once
 
+#include <backends/imgui_impl_opengl3.h>
+
 #include "Nebula/Layer.h"
 #include "Nebula/Events/ApplicationEvent.h"
 #include "Nebula/Events/KeyEvent.h"
 #include "Nebula/Events/MouseEvent.h"
-#include "backends/imgui_impl_opengl3.h"
 
 namespace Nebula
 {
-
+	/**
+	 * Base ImGui Layer to allow ImGui rendering and interaction.
+	 */
 	class ImGuiLayer : public Layer
 	{
 	public:
 		ImGuiLayer();
-		~ImGuiLayer();
+		~ImGuiLayer() override;
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 		virtual void OnEvent(Event& event) override;
 		virtual void OnImGuiRender() override;
 
+		/**
+		 * Allows to begin ImGui rendering.
+		 */
 		void Begin();
+		/**
+		 * Allows to stop ImGui rendering.
+		 */
 		void End();
 
 	private:
-		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& event);
-		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event);
-		bool OnMouseMovedEvent(MouseMovedEvent& event);
-		bool OnMouseScrolledEvent(MouseScrolledEvent& event);
-		bool OnKeyPressedEvent(KeyPressedEvent& event);
-		bool OnKeyReleasedEvent(KeyReleasedEvent& event);
-		bool OnKeyTypedEvent(KeyTypedEvent& event);
-		bool OnWindowResizeEvent(WindowResizeEvent& event);
+		bool OnMouseButtonPressedEvent(const MouseButtonPressedEvent& event);
+		bool OnMouseButtonReleasedEvent(const MouseButtonReleasedEvent& event);
+		bool OnMouseMovedEvent(const MouseMovedEvent& event);
+		bool OnMouseScrolledEvent(const MouseScrolledEvent& event);
+		bool OnKeyPressedEvent(const KeyPressedEvent& event);
+		bool OnKeyReleasedEvent(const KeyReleasedEvent& event);
+		bool OnKeyTypedEvent(const KeyTypedEvent& event);
+		bool OnWindowResizeEvent(const WindowResizeEvent& event);
 		static const char* GetClipboard(ImGuiContext*);
 		static void SetClipboard(ImGuiContext*, const char* text);
 

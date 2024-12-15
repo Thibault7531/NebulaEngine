@@ -1,15 +1,14 @@
-#include "nbpch.h"
 #include "ImGuiLayer.h"
 
 #include <SDL_clipboard.h>
 #include <SDL_events.h>
 #include <SDL_video.h>
+#include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_opengl3_loader.h>
+#include <backends/imgui_impl_sdl3.h>
 
 #include "Nebula/Application.h"
 #include "Nebula/Input.h"
-#include "backends/imgui_impl_opengl3.h"
-#include "backends/imgui_impl_sdl3.h"
 #include "Nebula/KeyCodes.h"
 #include "Nebula/MouseButtonCodes.h"
 
@@ -33,7 +32,6 @@ namespace Nebula
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGuiPlatformIO& platformIO = ImGui::GetPlatformIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -77,8 +75,6 @@ namespace Nebula
 
 	void ImGuiLayer::OnImGuiRender()
 	{
-		static bool show = true;
-		//ImGui::ShowDemoWindow(&show);
 	}
 
 	void ImGuiLayer::Begin()
@@ -104,7 +100,6 @@ namespace Nebula
 	void ImGuiLayer::End()
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		Application& app = Application::Get();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -119,7 +114,7 @@ namespace Nebula
 		}
 	}
 
-	bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
+	bool ImGuiLayer::OnMouseButtonPressedEvent(const MouseButtonPressedEvent& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -138,7 +133,7 @@ namespace Nebula
 		return false;
 	}
 
-	bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event)
+	bool ImGuiLayer::OnMouseButtonReleasedEvent(const MouseButtonReleasedEvent& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -157,7 +152,7 @@ namespace Nebula
 		return false;
 	}
 
-	bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent& event)
+	bool ImGuiLayer::OnMouseMovedEvent(const MouseMovedEvent& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -167,7 +162,7 @@ namespace Nebula
 		return false;
 	}
 
-	bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent& event)
+	bool ImGuiLayer::OnMouseScrolledEvent(const MouseScrolledEvent& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -176,7 +171,7 @@ namespace Nebula
 		return false;
 	}
 
-	bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& event)
+	bool ImGuiLayer::OnKeyPressedEvent(const KeyPressedEvent& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiKey key = getImGuiKey(event.GetKeyCode());
@@ -190,7 +185,7 @@ namespace Nebula
 		return false;
 	}
 
-	bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& event)
+	bool ImGuiLayer::OnKeyReleasedEvent(const KeyReleasedEvent& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiKey key = getImGuiKey(event.GetKeyCode());
@@ -204,7 +199,7 @@ namespace Nebula
 		return false;
 	}
 
-	bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent& event)
+	bool ImGuiLayer::OnKeyTypedEvent(const KeyTypedEvent& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -215,7 +210,7 @@ namespace Nebula
 		return false;
 	}
 
-	bool ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent& event)
+	bool ImGuiLayer::OnWindowResizeEvent(const WindowResizeEvent& event)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		io.DisplaySize = ImVec2(event.GetWidth(), event.GetHeight());

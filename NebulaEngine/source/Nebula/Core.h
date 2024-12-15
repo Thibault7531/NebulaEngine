@@ -1,5 +1,6 @@
 #pragma once
 
+/* Windows specific */
 #ifdef NB_PLATFORM_WINDOWS
 #else
 	#error Nebula Engine only supports windows
@@ -9,6 +10,7 @@
 	#define NB_ENABLE_ASSERTS
 #endif
 
+/* Debug */
 #ifdef NB_ENABLE_ASSERTS
 	#define NB_ASSERT(x, ...) { if (!(x)) { NB_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
 	#define NB_CORE_ASSERT(x, ...) { if (!(x)) { NB_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }

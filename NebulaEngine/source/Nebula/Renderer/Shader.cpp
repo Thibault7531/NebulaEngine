@@ -1,7 +1,5 @@
 #include "Shader.h"
 
-#include <glad/glad.h>
-
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 

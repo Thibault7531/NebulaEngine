@@ -1,7 +1,6 @@
-#include "nbpch.h"
 #include "OpenGLContext.h"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 namespace Nebula {
 
@@ -14,7 +13,7 @@ namespace Nebula {
 	{
 		m_Context = SDL_GL_CreateContext(m_WindowHandle);
 
-		int status = gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
+		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress));
 		NB_CORE_ASSERT(status, "Failed to initialize Glad!");
 
 		NB_CORE_INFO("OpenGL Info:");

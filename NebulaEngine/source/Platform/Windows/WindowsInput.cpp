@@ -1,8 +1,8 @@
 #include "WindowsInput.h"
 
-#include "Nebula/Application.h"
-
 #include <SDL.h>
+
+#include "Nebula/Application.h"
 
 namespace Nebula {
 

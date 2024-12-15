@@ -12,8 +12,9 @@
 
 #include "Nebula/ImGui/ImGuiLayer.h"
 
-#include "Nebula/Renderer/Renderer.h"
 #include "Nebula/Renderer/RenderCommand.h"
+#include "Nebula/Renderer/Renderer.h"
+#include "Nebula/Renderer/Shader.h"
 
 // ----Entry Point-----------------------
 #include "Nebula/EntryPoint.h"

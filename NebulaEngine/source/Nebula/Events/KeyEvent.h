@@ -4,10 +4,16 @@
 
 namespace Nebula
 {
-
+	/**
+	 * Base keyboard event.
+	 */
 	class KeyEvent : public Event
 	{
 	public:
+		/**
+		 * Gets the keycode from the event.
+		 * @return Keycode from the event
+		 */
 		inline int GetKeyCode() const { return m_KeyCode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
@@ -18,12 +24,19 @@ namespace Nebula
 		int m_KeyCode;
 	};
 
+	/**
+	 * Event for when a key is pressed.
+	 */
 	class KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(int keycode, int repeatCount)
 			: KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 
+		/**
+		 * Gets how many times the key has been repeated.
+		 * @return How many times the key has been repeated
+		 */
 		inline int GetRepeatCount() const { return m_RepeatCount; }
 
 		std::string ToString() const override
@@ -38,6 +51,9 @@ namespace Nebula
 		int m_RepeatCount;
 	};
 
+	/**
+	 * Event for when a key is released.
+	 */
 	class KeyReleasedEvent : public KeyEvent
 	{
 	public:
@@ -54,6 +70,9 @@ namespace Nebula
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 
+	/**
+	 * Event for when a character has been typed in a field.
+	 */
 	class KeyTypedEvent : public KeyEvent
 	{
 	public:

@@ -1,4 +1,3 @@
-#include "nbpch.h"
 #include "LayerStack.h"
 
 namespace Nebula
@@ -25,9 +24,9 @@ namespace Nebula
 		m_Layers.emplace_back(overlay);
 	}
 
-	void LayerStack::PopLayer(Layer* layer)
+	void LayerStack::PopLayer(const Layer* layer)
 	{
-		auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
+		auto it = std::ranges::find(m_Layers, layer);
 		if (it != m_Layers.end())
 		{
 			m_Layers.erase(it);
@@ -35,9 +34,9 @@ namespace Nebula
 		}
 	}
 
-	void LayerStack::PopOverlay(Layer* overlay)
+	void LayerStack::PopOverlay(const Layer* overlay)
 	{
-		auto it = std::find(m_Layers.begin(), m_Layers.end(), overlay);
+		auto it = std::ranges::find(m_Layers, overlay);
 		if (it != m_Layers.end())
 			m_Layers.erase(it);
 	}

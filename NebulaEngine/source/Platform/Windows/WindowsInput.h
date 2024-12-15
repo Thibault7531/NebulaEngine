@@ -3,7 +3,9 @@
 #include "Nebula/Input.h"
 
 namespace Nebula {
-
+	/**
+	 * Windows Input polling.
+	 */
 	class WindowsInput : public Input
 	{
 	protected:

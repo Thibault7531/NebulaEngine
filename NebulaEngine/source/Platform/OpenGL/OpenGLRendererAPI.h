@@ -3,7 +3,9 @@
 #include "Nebula/Renderer/RendererAPI.h"
 
 namespace Nebula {
-
+	/**
+	 * OpenGL API.
+	 */
 	class OpenGLRendererAPI : public RendererAPI
 	{
 	public:

@@ -1,10 +1,13 @@
 #pragma once
+
 #include <string>
 
 #include "Nebula/Renderer/Shader.h"
 
 namespace Nebula {
-
+	/**
+	 * OpenGL Shader.
+	 */
 	class OpenGLShader : public Shader
 	{
 	public:

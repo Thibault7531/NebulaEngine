@@ -1,17 +1,19 @@
 #pragma once
 
+#include <SDL.h>
+
 #include "Nebula/Window.h"
 #include "Nebula/Renderer/GraphicsContext.h"
 
-#include <SDL.h>
-
 namespace Nebula {
-
+	/**
+	 * Windows window.
+	 */
 	class WindowsWindow : public Window
 	{
 	public:
 		WindowsWindow(const WindowProps& props);
-		virtual ~WindowsWindow();
+		virtual ~WindowsWindow() override;
 
 		void OnUpdate() override;
 

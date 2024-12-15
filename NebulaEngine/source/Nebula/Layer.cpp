@@ -1,4 +1,3 @@
-#include "nbpch.h"
 #include "Layer.h"
 
 namespace Nebula
