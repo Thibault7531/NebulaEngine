@@ -10,8 +10,7 @@ namespace Nebula {
 
 	bool WindowsInput::IsKeyPressedImpl(int keycode)
 	{
-		auto KeyboardState = SDL_GetKeyboardState(nullptr);
-		return *(KeyboardState + SDL_GetScancodeFromKey(keycode, nullptr));
+		return m_KeyboardState[SDL_GetScancodeFromKey(keycode, nullptr)];
 	}
 
 	bool WindowsInput::IsMouseButtonPressedImpl(int button)

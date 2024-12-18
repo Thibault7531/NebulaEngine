@@ -12,6 +12,7 @@
 
 #include "Nebula/ImGui/ImGuiLayer.h"
 
+#include "Nebula/Renderer/OrthographicCamera.h"
 #include "Nebula/Renderer/RenderCommand.h"
 #include "Nebula/Renderer/Renderer.h"
 #include "Nebula/Renderer/Shader.h"

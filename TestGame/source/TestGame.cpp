@@ -1,5 +1,8 @@
 #include <Nebula.h>
-#include "glad/glad.h"
+#include <SDL_keycode.h>
+#include <glad/glad.h>
+
+#include "Nebula/Renderer/OrthographicCamera.h"
 
 class OpenGLDebugWindow : public Nebula::Layer
 {
@@ -14,13 +17,13 @@ public:
 		ImGui::SeparatorText("OpenGL Info:");
 		ImGui::BulletText("GL_VENDOR: ");
 		ImGui::SameLine();
-		ImGui::Text((const char*)glGetString(GL_VENDOR));
+		ImGui::Text(reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
 		ImGui::BulletText("GL_RENDERER: ");
 		ImGui::SameLine();
-		ImGui::Text((const char*)glGetString(GL_RENDERER));
+		ImGui::Text(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 		ImGui::BulletText("GL_VERSION: ");
 		ImGui::SameLine();
-		ImGui::Text((const char*)glGetString(GL_VERSION));
+		ImGui::Text(reinterpret_cast<const char*>(glGetString(GL_VERSION)));
 
 		ImGui::SeparatorText("Rendering Info:");
 		ImGui::BulletText("Screen Resolution: " );
@@ -32,12 +35,12 @@ public:
 		ImGui::Text(std::to_string(Nebula::Application::Get().GetWindow().GetHeight()).c_str());
 		ImGui::BulletText("Frame Rate");
 		ImGui::SameLine();
-		ImGui::Value("", (float)(1.0f/(ImGui::GetTime() - m_PreviousTime)));
+		ImGui::Value("", static_cast<float>(1.0f / (ImGui::GetTime() - m_PreviousTime)));
 		ImGui::SameLine();
 		ImGui::Text("fps");
 		ImGui::BulletText("Frame Time");
 		ImGui::SameLine();
-		ImGui::Value("", (float)(ImGui::GetTime() - m_PreviousTime) * 1000.0f);
+		ImGui::Value("", static_cast<float>(ImGui::GetTime() - m_PreviousTime) * 1000.0f);
 		ImGui::SameLine();
 		ImGui::Text("ms");
 		m_PreviousTime = ImGui::GetTime();
@@ -52,6 +55,9 @@ private:
 class TestCube : public Nebula::Layer
 {
 public:
+	TestCube()
+		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f) {}
+
 	void OnAttach() override
 	{
 		m_VAO.reset(Nebula::VertexArray::Create());
@@ -91,6 +97,8 @@ public:
 			layout(location = 0) in vec3 a_Position;
 			layout(location = 1) in vec4 a_Color;
 
+			uniform mat4 u_ViewProjection;
+
 			out vec3 v_Position;
 			out vec4 v_Color;
 
@@ -98,7 +106,7 @@ public:
 			{
 				v_Position = a_Position;
 				v_Color = a_Color;
-				gl_Position = vec4(a_Position, 1.0);
+				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 			}
 
 		)";
@@ -123,14 +131,38 @@ public:
 
 	void OnUpdate() override
 	{
+		if (Nebula::Input::IsKeyPressed(NB_KEY_Z)) {
+			glm::vec3 position = m_Camera.getPosition();
+			m_Camera.setPosition(position + glm::vec3(0.0f, 0.01f, 0.0f));
+		}
+		if (Nebula::Input::IsKeyPressed(NB_KEY_S)) {
+			glm::vec3 position = m_Camera.getPosition();
+			m_Camera.setPosition(position + glm::vec3(0.0f, -0.01f, 0.0f));
+		}
+		if (Nebula::Input::IsKeyPressed(NB_KEY_D)) {
+			glm::vec3 position = m_Camera.getPosition();
+			m_Camera.setPosition(position + glm::vec3(0.01f, 0.0f, 0.0f));
+		}
+		if (Nebula::Input::IsKeyPressed(NB_KEY_Q)) {
+			glm::vec3 position = m_Camera.getPosition();
+			m_Camera.setPosition(position + glm::vec3(-0.01f, 0.0f, 0.0f));
+		}
+
+		if (Nebula::Input::IsKeyPressed(NB_KEY_A)) {
+			float rotation = m_Camera.getRotation();
+			m_Camera.setRotation(rotation - 1.0f);
+		}
+		if (Nebula::Input::IsKeyPressed(NB_KEY_E)) {
+			float rotation = m_Camera.getRotation();
+			m_Camera.setRotation(rotation + 1.0f);
+		}
+
 		Nebula::RenderCommand::SetClearColor({0.18f, 0.49f, 0.6f, 1.0f});
 		Nebula::RenderCommand::Clear();
 
-		Nebula::Renderer::BeginScene();
+		Nebula::Renderer::BeginScene(m_Camera);
 
-		m_Shader->Bind();
-		Nebula::Renderer::Submit(m_VAO);
-		m_Shader->Unbind();
+		Nebula::Renderer::Submit(m_Shader, m_VAO);
 
 		Nebula::Renderer::EndScene();
 	}
@@ -138,6 +170,8 @@ public:
 private:
 	std::shared_ptr<Nebula::VertexArray> m_VAO;
 	std::shared_ptr<Nebula::Shader> m_Shader;
+
+	Nebula::OrthographicCamera m_Camera;
 };
 
 
@@ -150,7 +184,7 @@ public:
 		PushLayer(new TestCube());
 	}
 
-	~TestGame()
+	~TestGame() override
 	{
 	}
 

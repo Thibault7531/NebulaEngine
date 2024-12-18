@@ -13,6 +13,7 @@ list(APPEND NebulaSourceFiles
         source/Nebula/Log.cpp
         source/Nebula/ImGui/ImGuiLayer.cpp
         source/Nebula/Renderer/Buffer.cpp
+        source/Nebula/Renderer/OrthographicCamera.cpp
         source/Nebula/Renderer/RenderCommand.cpp
         source/Nebula/Renderer/Renderer.cpp
         source/Nebula/Renderer/RendererAPI.cpp
@@ -39,6 +40,7 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/ImGui/ImGuiLayer.h
         source/Nebula/Renderer/Buffer.h
         source/Nebula/Renderer/GraphicsContext.h
+        source/Nebula/Renderer/OrthographicCamera.h
         source/Nebula/Renderer/RenderCommand.h
         source/Nebula/Renderer/Renderer.h
         source/Nebula/Renderer/RendererAPI.h
