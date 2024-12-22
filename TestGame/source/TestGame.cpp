@@ -129,32 +129,32 @@ public:
 		m_Shader.reset(Nebula::Shader::Create(vertexSrc, fragmentSrc));
 	}
 
-	void OnUpdate() override
+	void OnUpdate(Nebula::Timestep ts) override
 	{
 		if (Nebula::Input::IsKeyPressed(NB_KEY_Z)) {
 			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(0.0f, 0.01f, 0.0f));
+			m_Camera.setPosition(position + glm::vec3(0.0f, 1.0f * ts, 0.0f));
 		}
 		if (Nebula::Input::IsKeyPressed(NB_KEY_S)) {
 			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(0.0f, -0.01f, 0.0f));
+			m_Camera.setPosition(position + glm::vec3(0.0f, -1.0f * ts, 0.0f));
 		}
 		if (Nebula::Input::IsKeyPressed(NB_KEY_D)) {
 			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(0.01f, 0.0f, 0.0f));
+			m_Camera.setPosition(position + glm::vec3(1.0f * ts, 0.0f, 0.0f));
 		}
 		if (Nebula::Input::IsKeyPressed(NB_KEY_Q)) {
 			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(-0.01f, 0.0f, 0.0f));
+			m_Camera.setPosition(position + glm::vec3(-1.0f * ts, 0.0f, 0.0f));
 		}
 
 		if (Nebula::Input::IsKeyPressed(NB_KEY_A)) {
 			float rotation = m_Camera.getRotation();
-			m_Camera.setRotation(rotation - 1.0f);
+			m_Camera.setRotation(rotation - 50.0f * ts);
 		}
 		if (Nebula::Input::IsKeyPressed(NB_KEY_E)) {
 			float rotation = m_Camera.getRotation();
-			m_Camera.setRotation(rotation + 1.0f);
+			m_Camera.setRotation(rotation + 50.0f * ts);
 		}
 
 		Nebula::RenderCommand::SetClearColor({0.18f, 0.49f, 0.6f, 1.0f});
@@ -182,6 +182,7 @@ public:
 	{
 		PushOverlay(new OpenGLDebugWindow());
 		PushLayer(new TestCube());
+		this->GetWindow().SetVSync(true);
 	}
 
 	~TestGame() override

@@ -51,8 +51,12 @@ namespace Nebula {
 	void Application::Run()
 	{
 		while (m_Running) {
+			const float time = static_cast<float>(m_Window->GetTime()) / 1000.0f;
+			Timestep timestep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(timestep);
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)

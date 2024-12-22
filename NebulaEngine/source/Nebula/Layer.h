@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Timestep.h"
 #include "Nebula/Events/Event.h"
 
 namespace Nebula
@@ -24,7 +25,7 @@ namespace Nebula
 		/**
 		 * Code to run at every frame.
 		 */
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep ts) {}
 		/**
 		 * Code to run if using ImGui Rendering.
 		 */

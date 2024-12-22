@@ -45,6 +45,11 @@ namespace Nebula {
 		 * @return Height of the window
 		 */
 		virtual unsigned int GetHeight() const = 0;
+		/**
+		 * Gets the time since the app started.
+		 * @return Time in milliseconds
+		 */
+		virtual unsigned int GetTime() const = 0;
 
 		/**
 		 * Sets the function to be called when an event arrives.

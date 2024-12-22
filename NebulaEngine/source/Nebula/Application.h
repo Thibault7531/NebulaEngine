@@ -3,6 +3,7 @@
 #include "Core.h"
 
 #include "Window.h"
+#include "Core/Timestep.h"
 #include "Events/ApplicationEvent.h"
 #include "Events/Event.h"
 #include "ImGui/ImGuiLayer.h"
@@ -51,13 +52,16 @@ namespace Nebula {
 		 * @return Pointer to the application
 		 */
 		inline static Application& Get() { return *s_Instance; }
+
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);
 
+	private:
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
+		float m_LastFrameTime = 0.0f;
 
 	private:
 		static  Application* s_Instance;
