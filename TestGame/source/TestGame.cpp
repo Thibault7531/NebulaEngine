@@ -2,6 +2,7 @@
 #include <SDL_keycode.h>
 #include <glad/glad.h>
 
+#include <glm/gtc/matrix_transform.hpp>
 #include "Nebula/Renderer/OrthographicCamera.h"
 
 class OpenGLDebugWindow : public Nebula::Layer
@@ -56,7 +57,7 @@ class TestCube : public Nebula::Layer
 {
 public:
 	TestCube()
-		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f) {}
+		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_Position(glm::vec3(0.0f, 0.0f, 0.0f)) {}
 
 	void OnAttach() override
 	{
@@ -98,6 +99,7 @@ public:
 			layout(location = 1) in vec4 a_Color;
 
 			uniform mat4 u_ViewProjection;
+			uniform mat4 u_Transform;
 
 			out vec3 v_Position;
 			out vec4 v_Color;
@@ -106,7 +108,7 @@ public:
 			{
 				v_Position = a_Position;
 				v_Color = a_Color;
-				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
 			}
 
 		)";
@@ -157,12 +159,33 @@ public:
 			m_Camera.setRotation(rotation + 50.0f * ts);
 		}
 
+		if (Nebula::Input::IsKeyPressed(NB_KEY_UP)) {
+			m_Position += glm::vec3(0.0f, 1.0f, 0.0f) * static_cast<float>(ts);
+		}
+		if (Nebula::Input::IsKeyPressed(NB_KEY_DOWN)) {
+			m_Position -= glm::vec3(0.0f, 1.0f, 0.0f) * static_cast<float>(ts);
+		}
+		if (Nebula::Input::IsKeyPressed(NB_KEY_RIGHT)) {
+			m_Position += glm::vec3(1.0f, 0.0f, 0.0f) * static_cast<float>(ts);
+		}
+		if (Nebula::Input::IsKeyPressed(NB_KEY_LEFT)) {
+			m_Position -= glm::vec3(1.0f, 0.0f, 0.0f) * static_cast<float>(ts);
+		}
+
 		Nebula::RenderCommand::SetClearColor({0.18f, 0.49f, 0.6f, 1.0f});
 		Nebula::RenderCommand::Clear();
 
 		Nebula::Renderer::BeginScene(m_Camera);
 
-		Nebula::Renderer::Submit(m_Shader, m_VAO);
+		glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position);
+		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		for (int i = 0; i < 4; i++)
+		{
+			glm::vec3 position = m_Position + glm::vec3(0.11f, 0.0f, 0.0f) * static_cast<float>(i);
+			transform = glm::translate(glm::mat4(1.0f), position) * scale;
+			Nebula::Renderer::Submit(m_Shader, m_VAO, transform);
+		}
 
 		Nebula::Renderer::EndScene();
 	}
@@ -172,6 +195,8 @@ private:
 	std::shared_ptr<Nebula::Shader> m_Shader;
 
 	Nebula::OrthographicCamera m_Camera;
+
+	glm::vec3 m_Position;
 };
 
 

@@ -24,8 +24,9 @@ namespace Nebula {
 		 * Submits a vertex array to be drawn on the screen.
 		 * @param shader Shader used to draw Vertex array
 		 * @param vertexArray Vertex array to be drawn on the screen
+		 * @param transform Transform matrix to move the object
 		 */
-		static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray);
+		static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
 		/**
 		 * Gets the Graphics API being used.
