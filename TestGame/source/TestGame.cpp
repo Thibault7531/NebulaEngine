@@ -3,7 +3,11 @@
 #include <glad/glad.h>
 
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "glm/gtc/type_ptr.inl"
 #include "Nebula/Renderer/OrthographicCamera.h"
+#include "Platform/OpenGL/OpenGLShader.h"
+#include "spdlog/fmt/bundled/color.h"
 
 class OpenGLDebugWindow : public Nebula::Layer
 {
@@ -45,6 +49,7 @@ public:
 		ImGui::SameLine();
 		ImGui::Text("ms");
 		m_PreviousTime = ImGui::GetTime();
+
 		ImGui::End();
 	}
 
@@ -57,7 +62,7 @@ class TestCube : public Nebula::Layer
 {
 public:
 	TestCube()
-		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_Position(glm::vec3(0.0f, 0.0f, 0.0f)) {}
+		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_Position(glm::vec3(0.0f, 0.0f, 0.0f)), m_Color(0.0f, 0.0f, 0.0f) {}
 
 	void OnAttach() override
 	{
@@ -70,7 +75,7 @@ public:
 			0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
 		};
 
-		std::shared_ptr<Nebula::VertexBuffer> vbo;
+		Nebula::Ref<Nebula::VertexBuffer> vbo;
 		vbo.reset(Nebula::VertexBuffer::Create(vertices, sizeof(vertices)));
 
 		Nebula::BufferLayout layout = {
@@ -87,12 +92,12 @@ public:
 			2, 1, 3
 		};
 
-		std::shared_ptr<Nebula::IndexBuffer> ibo;
+		Nebula::Ref<Nebula::IndexBuffer> ibo;
 		ibo.reset(Nebula::IndexBuffer::Create(indices, std::size(indices)));
 
 		m_VAO->SetIndexBuffer(ibo);
 
-		std::string vertexSrc = R"(
+		const std::string vertexSrc = R"(
 			#version 330 core
 
 			layout(location = 0) in vec3 a_Position;
@@ -113,17 +118,19 @@ public:
 
 		)";
 
-		std::string fragmentSrc = R"(
+		const std::string fragmentSrc = R"(
 			#version 330 core
 
 			layout(location = 0) out vec4 color;
+
+			uniform vec3 u_Color;
 
 			in vec3 v_Position;
 			in vec4 v_Color;
 
 			void main()
 			{
-				color = v_Color;
+				color = vec4(u_Color, 1.0);
 			}
 
 		)";
@@ -177,26 +184,39 @@ public:
 
 		Nebula::Renderer::BeginScene(m_Camera);
 
-		glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position);
 		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		m_Shader->Bind();
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_Color);
 
 		for (int i = 0; i < 4; i++)
 		{
 			glm::vec3 position = m_Position + glm::vec3(0.11f, 0.0f, 0.0f) * static_cast<float>(i);
-			transform = glm::translate(glm::mat4(1.0f), position) * scale;
+			glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
+
 			Nebula::Renderer::Submit(m_Shader, m_VAO, transform);
 		}
 
 		Nebula::Renderer::EndScene();
 	}
 
+	virtual void OnImGuiRender() override
+	{
+		ImGui::Begin("Settings");
+
+		ImGui::ColorEdit3("Square color", glm::value_ptr(m_Color));
+
+		ImGui::End();
+	}
+
 private:
-	std::shared_ptr<Nebula::VertexArray> m_VAO;
-	std::shared_ptr<Nebula::Shader> m_Shader;
+	Nebula::Ref<Nebula::VertexArray> m_VAO;
+	Nebula::Ref<Nebula::Shader> m_Shader;
 
 	Nebula::OrthographicCamera m_Camera;
 
 	glm::vec3 m_Position;
+	glm::vec3 m_Color;
 };
 
 
@@ -211,8 +231,7 @@ public:
 	}
 
 	~TestGame() override
-	{
-	}
+	= default;
 
 };
 

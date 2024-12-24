@@ -21,11 +21,11 @@ namespace Nebula
 	ImGuiLayer::ImGuiLayer()
 		: Layer("ImGuiLayer")
 	{
+		NB_CORE_INFO("Creating ImGui Layer");
 	}
 
 	ImGuiLayer::~ImGuiLayer()
-	{
-	}
+	= default;
 
 	void ImGuiLayer::OnAttach()
 	{
@@ -46,7 +46,7 @@ namespace Nebula
 		}
 
 		Application& app = Application::Get();
-		SDL_Window* window = static_cast<SDL_Window*>(app.GetWindow().GetNativeWindow());
+		auto* window = static_cast<SDL_Window*>(app.GetWindow().GetNativeWindow());
 		SDL_GLContext gl_context = SDL_GL_GetCurrentContext();
 
 		ImGui_ImplSDL3_InitForOpenGL(window, gl_context);

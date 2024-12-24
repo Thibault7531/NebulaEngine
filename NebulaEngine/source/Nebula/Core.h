@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 /* Windows specific */
 #ifdef NB_PLATFORM_WINDOWS
 #else
@@ -22,3 +24,13 @@
 #define  BIT(x) (1 << x)
 
 #define NB_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+
+namespace Nebula
+{
+	template<typename T>
+	using Scope = std::unique_ptr<T>;
+
+	template<typename T>
+	using Ref = std::shared_ptr<T>;
+
+}
