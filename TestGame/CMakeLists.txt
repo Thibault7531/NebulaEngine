@@ -11,6 +11,12 @@ set_target_properties(TestGame PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOUR
 
 # Compile Options
 set_target_properties(TestGame PROPERTIES COMPILE_OPTIONS "/utf-8")
+add_custom_command(
+        TARGET TestGame
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+        ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:TestGame>/assets"
+)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET TestGame PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
 else ()

@@ -21,6 +21,7 @@
 #include "Nebula/Renderer/RenderCommand.h"
 #include "Nebula/Renderer/Renderer.h"
 #include "Nebula/Renderer/Shader.h"
+#include "Nebula/Renderer/Texture.h"
 
 // ----Entry Point-----------------------
 #include "Nebula/EntryPoint.h"

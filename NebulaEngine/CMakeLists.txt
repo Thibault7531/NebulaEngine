@@ -18,6 +18,7 @@ list(APPEND NebulaSourceFiles
         source/Nebula/Renderer/Renderer.cpp
         source/Nebula/Renderer/RendererAPI.cpp
         source/Nebula/Renderer/Shader.cpp
+        source/Nebula/Renderer/Texture.cpp
         source/Nebula/Renderer/VertexArray.cpp
 )
 
@@ -46,6 +47,7 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Renderer/Renderer.h
         source/Nebula/Renderer/RendererAPI.h
         source/Nebula/Renderer/Shader.h
+        source/Nebula/Renderer/Texture.h
         source/Nebula/Renderer/VertexArray.h
 )
 
@@ -57,6 +59,7 @@ if (nebula_cmake_platform STREQUAL Windows)
             source/Platform/OpenGL/OpenGLContext.cpp
             source/Platform/OpenGL/OpenGLRendererAPI.cpp
             source/Platform/OpenGL/OpenGLShader.cpp
+            source/Platform/OpenGL/OpenGLTexture.cpp
             source/Platform/OpenGL/OpenGLVertexArray.cpp
             source/Platform/Windows/WindowsWindow.cpp
             source/Platform/Windows/WindowsInput.cpp
@@ -68,6 +71,7 @@ if (nebula_cmake_platform STREQUAL Windows)
             source/Platform/OpenGL/OpenGLContext.h
             source/Platform/OpenGL/OpenGLRendererAPI.h
             source/Platform/OpenGL/OpenGLShader.h
+            source/Platform/OpenGL/OpenGLTexture.h
             source/Platform/OpenGL/OpenGLVertexArray.h
             source/Platform/Windows/WindowsWindow.h
             source/Platform/Windows/WindowsInput.h
@@ -128,8 +132,9 @@ target_include_directories(Nebula PRIVATE
         source
         vendor
         vendor/Glad/include
+        vendor/glm/glm
         vendor/imgui
         vendor/SDL3/include
         vendor/SDL3/include/SDL3
-        vendor/glm/glm
+        vendor/stb_image
 )

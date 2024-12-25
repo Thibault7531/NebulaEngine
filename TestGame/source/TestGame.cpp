@@ -68,11 +68,11 @@ public:
 	{
 		m_VAO.reset(Nebula::VertexArray::Create());
 
-		float vertices[4 * 7] = {
-			-0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-			-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-			0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+		float vertices[5 * 4] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f, 0.5f, 0.0f, 0.0f, 1.0f
 		};
 
 		Nebula::Ref<Nebula::VertexBuffer> vbo;
@@ -80,7 +80,7 @@ public:
 
 		Nebula::BufferLayout layout = {
 			{ Nebula::ShaderDataType::Float3, "a_Position" },
-			{ Nebula::ShaderDataType::Float4, "a_Color"}
+			{ Nebula::ShaderDataType::Float2, "a_TextCoord"}
 		};
 
 		vbo->SetLayout(layout);
@@ -89,7 +89,7 @@ public:
 
 		uint32_t indices[2 * 3] = {
 			0, 1, 2,
-			2, 1, 3
+			2, 3, 0
 		};
 
 		Nebula::Ref<Nebula::IndexBuffer> ibo;
@@ -101,18 +101,15 @@ public:
 			#version 330 core
 
 			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec4 a_Color;
 
 			uniform mat4 u_ViewProjection;
 			uniform mat4 u_Transform;
 
 			out vec3 v_Position;
-			out vec4 v_Color;
 
 			void main()
 			{
 				v_Position = a_Position;
-				v_Color = a_Color;
 				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
 			}
 
@@ -126,7 +123,6 @@ public:
 			uniform vec3 u_Color;
 
 			in vec3 v_Position;
-			in vec4 v_Color;
 
 			void main()
 			{
@@ -136,6 +132,48 @@ public:
 		)";
 
 		m_Shader.reset(Nebula::Shader::Create(vertexSrc, fragmentSrc));
+
+		const std::string textVertexSrc = R"(
+			#version 330 core
+
+			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TextCoord;
+
+			uniform mat4 u_ViewProjection;
+			uniform mat4 u_Transform;
+
+			out vec2 v_TextCoord;
+
+			void main()
+			{
+				v_TextCoord = a_TextCoord;
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
+			}
+
+		)";
+
+		const std::string textFragmentSrc = R"(
+			#version 330 core
+
+			layout(location = 0) out vec4 color;
+
+			in vec2 v_TextCoord;
+
+			uniform sampler2D u_Texture;
+
+			void main()
+			{
+				color = texture(u_Texture, v_TextCoord);
+			}
+
+		)";
+
+		m_TextureShader.reset(Nebula::Shader::Create(textVertexSrc, textFragmentSrc));
+
+		m_Texture = Nebula::Texture2D::Create("assets/textures/crafting_table_front.png");
+
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->Bind();
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Nebula::Timestep ts) override
@@ -188,6 +226,7 @@ public:
 
 		m_Shader->Bind();
 		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_Color);
+		m_Shader->Unbind();
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -196,6 +235,9 @@ public:
 
 			Nebula::Renderer::Submit(m_Shader, m_VAO, transform);
 		}
+
+		m_Texture->Bind();
+		Nebula::Renderer::Submit(m_TextureShader, m_VAO, glm::mat4(1.0f));
 
 		Nebula::Renderer::EndScene();
 	}
@@ -211,7 +253,9 @@ public:
 
 private:
 	Nebula::Ref<Nebula::VertexArray> m_VAO;
-	Nebula::Ref<Nebula::Shader> m_Shader;
+	Nebula::Ref<Nebula::Shader> m_Shader, m_TextureShader;
+
+	Nebula::Ref<Nebula::Texture2D> m_Texture;
 
 	Nebula::OrthographicCamera m_Camera;
 
