@@ -62,7 +62,7 @@ class TestCube : public Nebula::Layer
 {
 public:
 	TestCube()
-		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_Position(glm::vec3(0.0f, 0.0f, 0.0f)), m_Color(0.0f, 0.0f, 0.0f) {}
+		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_Position(glm::vec3(0.6f, 0.6f, 0.0f)), m_Color(0.0f, 0.0f, 0.0f) {}
 
 	void OnAttach() override
 	{
@@ -171,9 +171,7 @@ public:
 		m_TextureShader.reset(Nebula::Shader::Create(textVertexSrc, textFragmentSrc));
 
 		m_Texture = Nebula::Texture2D::Create("assets/textures/crafting_table_front.png");
-
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->Bind();
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
+		m_Glass = Nebula::Texture2D::Create("assets/textures/glass.png");
 	}
 
 	void OnUpdate(Nebula::Timestep ts) override
@@ -236,8 +234,16 @@ public:
 			Nebula::Renderer::Submit(m_Shader, m_VAO, transform);
 		}
 
-		m_Texture->Bind();
+		m_Texture->Bind(0);
+		m_Glass->Bind(1);
+
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->Bind();
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
 		Nebula::Renderer::Submit(m_TextureShader, m_VAO, glm::mat4(1.0f));
+
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->Bind();
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 1);
+		Nebula::Renderer::Submit(m_TextureShader, m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f)));
 
 		Nebula::Renderer::EndScene();
 	}
@@ -255,7 +261,7 @@ private:
 	Nebula::Ref<Nebula::VertexArray> m_VAO;
 	Nebula::Ref<Nebula::Shader> m_Shader, m_TextureShader;
 
-	Nebula::Ref<Nebula::Texture2D> m_Texture;
+	Nebula::Ref<Nebula::Texture2D> m_Texture, m_Glass;
 
 	Nebula::OrthographicCamera m_Camera;
 

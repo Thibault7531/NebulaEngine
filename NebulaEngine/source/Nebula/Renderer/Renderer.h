@@ -12,6 +12,11 @@ namespace Nebula {
 	{
 	public:
 		/**
+		 * Initializes the renderer with the correct settings.
+		 */
+		static void Init();
+
+		/**
 		 * Begins the rendering process.
 		 */
 		static void BeginScene(OrthographicCamera& camera);

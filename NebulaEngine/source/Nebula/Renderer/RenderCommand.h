@@ -10,6 +10,14 @@ namespace Nebula {
 	{
 	public:
 		/**
+		 * Initializes the renderer with correct settings.
+		 */
+		inline static void Init()
+		{
+			s_RendererAPI->Init();
+		}
+
+		/**
 		 * Sets the color of the background.
 		 * @param color Color for the background
 		 */

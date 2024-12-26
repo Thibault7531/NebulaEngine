@@ -22,6 +22,11 @@ namespace Nebula {
 
 	public:
 		/**
+		 * Initializes the renderer with the correct settings.
+		 */
+		virtual void Init() = 0;
+
+		/**
 		 * Sets the background color.
 		 * @param color Background color
 		 */
