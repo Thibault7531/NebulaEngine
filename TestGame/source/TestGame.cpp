@@ -3,11 +3,10 @@
 #include <glad/glad.h>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-#include "glm/gtc/type_ptr.inl"
 #include "Nebula/Renderer/OrthographicCamera.h"
 #include "Platform/OpenGL/OpenGLShader.h"
-#include "spdlog/fmt/bundled/color.h"
 
 class OpenGLDebugWindow : public Nebula::Layer
 {
@@ -97,9 +96,10 @@ public:
 
 		m_VAO->SetIndexBuffer(ibo);
 
-		m_Shader.reset(Nebula::Shader::Create("assets/shaders/SolidColorVS.glsl", "assets/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE));
+		m_Shader = Nebula::Shader::Create("SolidColor", "assets/shaders/SolidColorVS.glsl", "assets/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
+		m_ShaderLibrary.Add("SolidColor", m_Shader);
 
-		m_TextureShader.reset(Nebula::Shader::Create("assets/shaders/Texture.glsl"));
+		m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 
 		m_Texture = Nebula::Texture2D::Create("assets/textures/crafting_table_front.png");
 		m_Glass = Nebula::Texture2D::Create("assets/textures/glass.png");
@@ -153,28 +153,28 @@ public:
 
 		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		m_Shader->Bind();
+		m_ShaderLibrary.Get("SolidColor")->Bind();
 		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_Color);
-		m_Shader->Unbind();
+		m_ShaderLibrary.Get("SolidColor")->Unbind();
 
 		for (int i = 0; i < 4; i++)
 		{
 			glm::vec3 position = m_Position + glm::vec3(0.11f, 0.0f, 0.0f) * static_cast<float>(i);
 			glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
 
-			Nebula::Renderer::Submit(m_Shader, m_VAO, transform);
+			Nebula::Renderer::Submit(m_ShaderLibrary.Get("SolidColor"), m_VAO, transform);
 		}
 
 		m_Texture->Bind(0);
 		m_Glass->Bind(1);
 
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->Bind();
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
-		Nebula::Renderer::Submit(m_TextureShader, m_VAO, glm::mat4(1.0f));
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->Bind();
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->UploadUniformInt("u_Texture", 0);
+		Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::mat4(1.0f));
 
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->Bind();
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 1);
-		Nebula::Renderer::Submit(m_TextureShader, m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f)));
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->Bind();
+		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->UploadUniformInt("u_Texture", 1);
+		Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f)));
 
 		Nebula::Renderer::EndScene();
 	}
@@ -189,6 +189,8 @@ public:
 	}
 
 private:
+	Nebula::ShaderLibrary m_ShaderLibrary;
+
 	Nebula::Ref<Nebula::VertexArray> m_VAO;
 	Nebula::Ref<Nebula::Shader> m_Shader, m_TextureShader;
 

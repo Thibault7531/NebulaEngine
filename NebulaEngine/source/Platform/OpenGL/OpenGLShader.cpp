@@ -15,7 +15,8 @@ namespace Nebula {
 		return 0;
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc, SOURCE_TYPE sourceType)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const SOURCE_TYPE sourceType)
+		: m_Name(name)
 	{
 		std::string VertexSource;
 		std::string FragmentSource;
@@ -41,6 +42,12 @@ namespace Nebula {
 		std::string shaderSource = ReadFile(filepath);
         auto shaderSources = PreProcess(shaderSource);
 		Compile(shaderSources);
+
+		auto lastSlash = filepath.find_last_of("\\/");
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+		auto lastDot = filepath.rfind('.');
+		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+		m_Name = filepath.substr(lastSlash, count);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -103,7 +110,7 @@ namespace Nebula {
 	std::string OpenGLShader::ReadFile(const std::string& filepath)
 	{
 		std::string result;
-		std::ifstream in(filepath, std::ios::in, std::ios::binary);
+		std::ifstream in(filepath, std::ios::in | std::ios::binary);
 		if (in)
 		{
 			in.seekg(0, std::ios::end);
@@ -146,8 +153,9 @@ namespace Nebula {
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
 		GLuint program = glCreateProgram();
-		std::vector<GLenum> glShaderIDs;
-		glShaderIDs.reserve(shaderSources.size());
+		NB_CORE_ASSERT(shaderSources.size() <= 2, "Only 2 shaders are supported in a program")
+		std::array<GLenum, 2> glShaderIDs;
+		int glShaderIDIndex = 0;
 
 		for (auto& kv : shaderSources)
 		{
@@ -179,7 +187,7 @@ namespace Nebula {
 			}
 
 			glAttachShader(program, shader);
-			glShaderIDs.push_back(shader);
+			glShaderIDs[glShaderIDIndex++] = shader;
 		}
 
 		glLinkProgram(program);
@@ -195,9 +203,9 @@ namespace Nebula {
 			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 
 			glDeleteProgram(program);
-			for (GLenum shader : glShaderIDs)
+			for (auto id : glShaderIDs)
 			{
-				glDeleteShader(shader);
+				glDeleteShader(id);
 			}
 
 			NB_CORE_ERROR("{0}", infoLog.data());
@@ -205,9 +213,9 @@ namespace Nebula {
 			return;
 		}
 
-		for (GLenum shader : glShaderIDs)
+		for (auto id : glShaderIDs)
 		{
-			glDetachShader(program, shader);
+			glDetachShader(program, id);
 		}
 
 		m_RendererID = program;
