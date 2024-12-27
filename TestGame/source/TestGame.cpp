@@ -97,78 +97,9 @@ public:
 
 		m_VAO->SetIndexBuffer(ibo);
 
-		const std::string vertexSrc = R"(
-			#version 330 core
+		m_Shader.reset(Nebula::Shader::Create("assets/shaders/SolidColorVS.glsl", "assets/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE));
 
-			layout(location = 0) in vec3 a_Position;
-
-			uniform mat4 u_ViewProjection;
-			uniform mat4 u_Transform;
-
-			out vec3 v_Position;
-
-			void main()
-			{
-				v_Position = a_Position;
-				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
-			}
-
-		)";
-
-		const std::string fragmentSrc = R"(
-			#version 330 core
-
-			layout(location = 0) out vec4 color;
-
-			uniform vec3 u_Color;
-
-			in vec3 v_Position;
-
-			void main()
-			{
-				color = vec4(u_Color, 1.0);
-			}
-
-		)";
-
-		m_Shader.reset(Nebula::Shader::Create(vertexSrc, fragmentSrc));
-
-		const std::string textVertexSrc = R"(
-			#version 330 core
-
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec2 a_TextCoord;
-
-			uniform mat4 u_ViewProjection;
-			uniform mat4 u_Transform;
-
-			out vec2 v_TextCoord;
-
-			void main()
-			{
-				v_TextCoord = a_TextCoord;
-				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
-			}
-
-		)";
-
-		const std::string textFragmentSrc = R"(
-			#version 330 core
-
-			layout(location = 0) out vec4 color;
-
-			in vec2 v_TextCoord;
-
-			uniform sampler2D u_Texture;
-
-			void main()
-			{
-				color = texture(u_Texture, v_TextCoord);
-			}
-
-		)";
-
-		m_TextureShader.reset(Nebula::Shader::Create(textVertexSrc, textFragmentSrc));
+		m_TextureShader.reset(Nebula::Shader::Create("assets/shaders/Texture.glsl"));
 
 		m_Texture = Nebula::Texture2D::Create("assets/textures/crafting_table_front.png");
 		m_Glass = Nebula::Texture2D::Create("assets/textures/glass.png");
