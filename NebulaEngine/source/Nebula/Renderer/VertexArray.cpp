@@ -5,12 +5,12 @@
 
 namespace Nebula {
 
-	VertexArray* VertexArray::Create()
+	Ref<VertexArray> VertexArray::Create()
 	{
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-			case RendererAPI::API::OpenGL: return new OpenGLVertexArray();
+			case RendererAPI::API::OpenGL: return std::make_shared<OpenGLVertexArray>();
 		}
 
 		NB_CORE_ASSERT(false, "Unknown RendererAPI");

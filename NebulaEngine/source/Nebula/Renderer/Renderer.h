@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OrthographicCamera.h"
+#include "Camera.h"
 #include "RendererAPI.h"
 #include "Shader.h"
 
@@ -19,7 +19,7 @@ namespace Nebula {
 		/**
 		 * Begins the rendering process.
 		 */
-		static void BeginScene(OrthographicCamera& camera);
+		static void BeginScene(Camera& camera);
 		/**
 		 * Ends the rendering process.
 		 */

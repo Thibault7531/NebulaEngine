@@ -12,7 +12,7 @@ namespace Nebula {
 		RenderCommand::Init();
 	}
 
-	void Renderer::BeginScene(OrthographicCamera& camera)
+	void Renderer::BeginScene(Camera& camera)
 	{
 		m_SceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
 	}

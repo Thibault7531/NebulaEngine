@@ -39,7 +39,7 @@ namespace Nebula {
 		 * Creates a vertex array.
 		 * @return Pointer to the generated vertex array.
 		 */
-		static VertexArray* Create();
+		static Ref<VertexArray> Create();
 	};
 
 }

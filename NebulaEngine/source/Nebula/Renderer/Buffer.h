@@ -157,7 +157,7 @@ namespace Nebula {
 		 * @param size size of the table
 		 * @return Pointer to the generated vertex buffer
 		 */
-		static VertexBuffer* Create(float* vertices, uint32_t size);
+		static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
 	};
 
 	/**
@@ -183,7 +183,7 @@ namespace Nebula {
 		 * @param count Amount of indices
 		 * @return Pointer to the generated index buffer
 		 */
-		static IndexBuffer* Create(uint32_t* Indices, uint32_t count);
+		static Ref<IndexBuffer> Create(uint32_t* Indices, uint32_t count);
 	};
 
 }
