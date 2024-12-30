@@ -55,6 +55,8 @@ namespace Nebula {
 	public:
 		OrthographicCamera(float left, float right, float bottom, float top);
 
+		void SetProjection(float left, float right, float bottom, float top);
+
 		/**
 		 * Gets the rotation of the camera.
 		 * @return Rotation of the camera in degrees

@@ -9,6 +9,7 @@
 #include "Nebula/Core/Timestep.h"
 
 // Input system
+#include "Nebula/CameraController.h"
 #include "Nebula/Input.h"
 #include "Nebula/KeyCodes.h"
 #include "Nebula/MouseButtonCodes.h"

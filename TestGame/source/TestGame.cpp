@@ -61,7 +61,7 @@ class TestCube : public Nebula::Layer
 {
 public:
 	TestCube()
-		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_Position(glm::vec3(0.6f, 0.6f, 0.0f)), m_Color(0.0f, 0.0f, 0.0f) {}
+		: m_CameraController(16.0f/9.0f, true), m_Position(glm::vec3(0.6f, 0.6f, 0.0f)), m_Color(0.0f, 0.0f, 0.0f) {}
 
 	void OnAttach() override
 	{
@@ -105,31 +105,7 @@ public:
 
 	void OnUpdate(Nebula::Timestep ts) override
 	{
-		if (Nebula::Input::IsKeyPressed(NB_KEY_Z)) {
-			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(0.0f, 1.0f * ts, 0.0f));
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_S)) {
-			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(0.0f, -1.0f * ts, 0.0f));
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_D)) {
-			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(1.0f * ts, 0.0f, 0.0f));
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_Q)) {
-			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(-1.0f * ts, 0.0f, 0.0f));
-		}
-
-		if (Nebula::Input::IsKeyPressed(NB_KEY_A)) {
-			float rotation = m_Camera.getRotation();
-			m_Camera.setRotation(rotation - 50.0f * ts);
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_E)) {
-			float rotation = m_Camera.getRotation();
-			m_Camera.setRotation(rotation + 50.0f * ts);
-		}
+		m_CameraController.OnUpdate(ts);
 
 		if (Nebula::Input::IsKeyPressed(NB_KEY_UP)) {
 			m_Position += glm::vec3(0.0f, 1.0f, 0.0f) * static_cast<float>(ts);
@@ -147,7 +123,7 @@ public:
 		Nebula::RenderCommand::SetClearColor({0.18f, 0.49f, 0.6f, 1.0f});
 		Nebula::RenderCommand::Clear();
 
-		Nebula::Renderer::BeginScene(m_Camera);
+		Nebula::Renderer::BeginScene(m_CameraController.GetCamera());
 
 		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -177,6 +153,11 @@ public:
 		Nebula::Renderer::EndScene();
 	}
 
+	virtual void OnEvent(Nebula::Event& event) override
+	{
+		m_CameraController.OnEvent(event);
+	}
+
 	virtual void OnImGuiRender() override
 	{
 		ImGui::Begin("Settings");
@@ -194,7 +175,7 @@ private:
 
 	Nebula::Ref<Nebula::Texture2D> m_Texture, m_Glass;
 
-	Nebula::OrthographicCamera m_Camera;
+	Nebula::OrthographicCameraController m_CameraController;
 
 	glm::vec3 m_Position;
 	glm::vec3 m_Color;

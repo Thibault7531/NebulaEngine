@@ -8,6 +8,7 @@ add_subdirectory(vendor)
 # Standard Source Files
 list(APPEND NebulaSourceFiles
         source/Nebula/Application.cpp
+        source/Nebula/CameraController.cpp
         source/Nebula/Layer.cpp
         source/Nebula/LayerStack.cpp
         source/Nebula/Log.cpp
@@ -25,6 +26,7 @@ list(APPEND NebulaSourceFiles
 list(APPEND NebulaHeaderFiles
         source/Nebula.h
         source/Nebula/Application.h
+        source/Nebula/CameraController.h
         source/Nebula/EntryPoint.h
         source/Nebula/Input.h
         source/Nebula/KeyCodes.h
