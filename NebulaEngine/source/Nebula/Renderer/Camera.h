@@ -3,37 +3,15 @@
 #include <glm/glm.hpp>
 
 namespace Nebula {
-	/**
-	 * Base camera class
-	 */
+
 	class Camera
 	{
 	public:
-		/**
-		 * Gets the position of the camera.
-		 * @return Vec3 of the position of the camera
-		 */
 		const glm::vec3& getPosition() const { return m_Position; }
-		/**
-		 * Sets the position of the camera.
-		 * @param position Vec3 of the position of the camera
-		 */
 		void setPosition(const glm::vec3& position) { m_Position = position; RecalculateViewMatrix(); }
 
-		/**
-		 * Gets the projection matrix.
-		 * @return Mat4 of the projection matrix
-		 */
 		const glm::mat4& getProjectionMatrix() const { return m_ProjectionMatrix; }
-		/**
-		 * Gets the view matrix.
-		 * @return Mat4 of the view matrix
-		 */
 		const glm::mat4& getViewMatrix() const { return m_ViewMatrix; }
-		/**
-		 * Gets the view projection matrix.
-		 * @return Mat4 of the view projection matrix
-		 */
 		const glm::mat4& getViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 
 	protected:
@@ -47,9 +25,6 @@ namespace Nebula {
 		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 	};
 
-	/**
-	 * Orthographic Camera.
-	 */
 	class OrthographicCamera : public Camera
 	{
 	public:
@@ -57,15 +32,7 @@ namespace Nebula {
 
 		void SetProjection(float left, float right, float bottom, float top);
 
-		/**
-		 * Gets the rotation of the camera.
-		 * @return Rotation of the camera in degrees
-		 */
 		const float getRotation() const { return m_Rotation; }
-		/**
-		 * Sets the rotation of the camera.
-		 * @param rotation Rotation of the camera in degrees
-		 */
 		void setRotation(const float rotation) { m_Rotation = rotation; RecalculateViewMatrix(); }
 
 	private:
@@ -80,37 +47,15 @@ namespace Nebula {
 	public:
 		PerspectiveCamera(const float FOV, const float aspectRatio);
 
-		/**
-		 * Gets the aspect ratio of the camera.
-		 * @return Aspect ratio of the camera
-		 */
+		void SetProjection(const float aspectRatio);
+
 		const float getAspectRatio() const { return m_AspectRatio; }
-		/**
-		 * Sets the aspect ratio of the camera.
-		 * @param aspectRatio Aspect ratio of the camera
-		 */
 		void setAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; RecalculateProjectionMatrix(); }
 
-		/**
-		 * Gets the FOV of the camera.
-		 * @return FOV of the camera
-		 */
-		const float getFOV() const { return m_FOV; }
-		/**
-		 * Sets the FOV of the camera.
-		 * @param FOV FOV of the camera
-		 */
+		float getFOV() const { return m_FOV; }
 		void setFOV(const float FOV) { m_FOV = FOV; RecalculateProjectionMatrix(); }
 
-		/**
-		 * Gets the rotation of the camera.
-		 * @return Rotation of the camera
-		 */
 		const glm::vec3& getRotation() const { return m_Rotation; }
-		/**
-		 * Sets the rotation of the camera.
-		 * @param rotation Rotation of the camera
-		 */
 		void setRotation(const glm::vec3& rotation);
 
 	private:

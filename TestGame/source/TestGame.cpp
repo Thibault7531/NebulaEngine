@@ -185,7 +185,7 @@ private:
 class Cube3D : public Nebula::Layer
 {
 public:
-	Cube3D() : m_Camera(60.0f, 16.0f/9.0f) {}
+	Cube3D() : m_CameraController(16.0f/9.0f, 60.0f) {}
 
 	virtual void OnAttach() override
 	{
@@ -259,39 +259,12 @@ public:
 	}
 	virtual void OnUpdate(Nebula::Timestep ts) override
 	{
-		if (Nebula::Input::IsKeyPressed(NB_KEY_Z)) {
-			glm::vec3 position = m_Camera.getPosition();
-			glm::vec3 rotation = m_Camera.getRotation();
-			m_Camera.setPosition(position + glm::vec3(2.0f * glm::cos(glm::radians(rotation.y)) * ts, 0.0f, 2.0f * glm::sin(glm::radians(rotation.y)) * ts));
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_S)) {
-			glm::vec3 position = m_Camera.getPosition();
-			glm::vec3 rotation = m_Camera.getRotation();
-			m_Camera.setPosition(position + glm::vec3(-2.0f * glm::cos(glm::radians(rotation.y)) * ts, 0.0f, -2.0f * glm::sin(glm::radians(rotation.y)) * ts));
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_D)) {
-			glm::vec3 position = m_Camera.getPosition();
-			glm::vec3 rotation = m_Camera.getRotation();
-			m_Camera.setPosition(position + glm::vec3(-2.0f * glm::sin(glm::radians(rotation.y)) * ts, 0.0f, 2.0f * glm::cos(glm::radians(rotation.y)) * ts));
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_Q)) {
-			glm::vec3 position = m_Camera.getPosition();
-			glm::vec3 rotation = m_Camera.getRotation();
-			m_Camera.setPosition(position + glm::vec3(2.0f * glm::sin(glm::radians(rotation.y)) * ts, 0.0f, -2.0f * glm::cos(glm::radians(rotation.y)) * ts));
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_SPACE)) {
-			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(0.0f, 2.0f * ts, 0.0f));
-		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_LSHIFT)) {
-			glm::vec3 position = m_Camera.getPosition();
-			m_Camera.setPosition(position + glm::vec3(0.0f, -2.0f * ts, 0.0f));
-		}
+		m_CameraController.OnUpdate(ts);
 
 		Nebula::RenderCommand::SetClearColor({0.18f, 0.49f, 0.6f, 1.0f});
 		Nebula::RenderCommand::Clear();
 
-		Nebula::Renderer::BeginScene(m_Camera);
+		Nebula::Renderer::BeginScene(m_CameraController.GetCamera());
 
 		m_Texture->Bind(0);
 		m_Glass->Bind(1);
@@ -311,20 +284,7 @@ public:
 
 	virtual void OnEvent(Nebula::Event& event) override
 	{
-		switch (event.GetEventType())
-		{
-		case Nebula::EventType::MouseMoved:
-			{
-				Nebula::MouseMovedEvent mouseEvent = dynamic_cast<Nebula::MouseMovedEvent&>(event);
-				if (Nebula::Input::IsMouseButtonPressed(NB_BUTTON_LEFT))
-				{
-					m_Camera.setRotation(m_Camera.getRotation() + glm::vec3(m_PreviousMousePos.y - mouseEvent.GetY(), mouseEvent.GetX() - m_PreviousMousePos.x, 0.0f) * 0.1f);
-				}
-			}
-		default:;
-		}
-
-		m_PreviousMousePos = {Nebula::Input::GetMouseX(), Nebula::Input::GetMouseY()};
+		m_CameraController.OnEvent(event);
 	}
 
 private:
@@ -334,9 +294,7 @@ private:
 	Nebula::Ref<Nebula::Texture2D> m_Texture;
 	Nebula::Ref<Nebula::Texture2D> m_Glass;
 
-	Nebula::PerspectiveCamera m_Camera;
-
-	glm::vec2 m_PreviousMousePos;
+	Nebula::PerspectiveCameraController m_CameraController;
 };
 
 

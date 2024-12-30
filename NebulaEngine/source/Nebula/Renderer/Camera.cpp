@@ -32,6 +32,12 @@ namespace Nebula {
 		PerspectiveCamera::RecalculateViewMatrix();
 	}
 
+	void PerspectiveCamera::SetProjection(const float aspectRatio)
+	{
+		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOV), aspectRatio, 0.1f, 100.0f);
+		RecalculateViewMatrix();
+	}
+
 	void PerspectiveCamera::RecalculateProjectionMatrix()
 	{
 		m_ProjectionMatrix = glm::perspective(m_FOV, m_AspectRatio, 0.1f, 100.0f);
