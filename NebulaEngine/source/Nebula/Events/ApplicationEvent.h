@@ -53,6 +53,24 @@ namespace Nebula
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
+	class WindowMinimizeEvent : public Event
+	{
+	public:
+		WindowMinimizeEvent() = default;
+
+		EVENT_CLASS_TYPE(WindowMinimize)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class WindowMaximizeEvent : public Event
+	{
+	public:
+		WindowMaximizeEvent() = default;
+
+		EVENT_CLASS_TYPE(WindowMaximize)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
 	class AppTickEvent : public Event
 	{
 	public:

@@ -31,7 +31,7 @@ namespace Nebula {
 		m_Data.Height = props.Height;
 		m_Data.EventCallback = std::bind([]{});
 
-		NB_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		NB_CORE_INFO("Creating window: {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 		if (!s_SDLInitialized) {
 			int success = SDL_Init(SDL_INIT_VIDEO);
@@ -78,6 +78,36 @@ namespace Nebula {
 						}
 
 						return true;
+					}
+
+				case SDL_EVENT_WINDOW_MINIMIZED:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *static_cast<WindowData*>(props);
+
+							WindowMinimizeEvent event{};
+							data.EventCallback(event);
+
+							return false;
+						}
+					}
+
+				case SDL_EVENT_WINDOW_MAXIMIZED:
+					{
+						void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)), "windowProps", nullptr);
+
+						if (props != nullptr)
+						{
+							WindowData& data = *static_cast<WindowData*>(props);
+
+							WindowMaximizeEvent event{};
+							data.EventCallback(event);
+
+							return false;
+						}
 					}
 
 				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
