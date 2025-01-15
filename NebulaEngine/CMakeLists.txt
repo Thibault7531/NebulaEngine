@@ -7,14 +7,14 @@ add_subdirectory(vendor)
 
 # Standard Source Files
 list(APPEND NebulaSourceFiles
-        source/Nebula/Application.cpp
-        source/Nebula/CameraController.cpp
-        source/Nebula/Layer.cpp
-        source/Nebula/LayerStack.cpp
-        source/Nebula/Log.cpp
+        source/Nebula/Core/Application.cpp
+        source/Nebula/Core/Layer.cpp
+        source/Nebula/Core/LayerStack.cpp
+        source/Nebula/Core/Log.cpp
         source/Nebula/ImGui/ImGuiLayer.cpp
         source/Nebula/Renderer/Buffer.cpp
         source/Nebula/Renderer/Camera.cpp
+        source/Nebula/Renderer/CameraController.cpp
         source/Nebula/Renderer/RenderCommand.cpp
         source/Nebula/Renderer/Renderer.cpp
         source/Nebula/Renderer/RendererAPI.cpp
@@ -25,17 +25,16 @@ list(APPEND NebulaSourceFiles
 
 list(APPEND NebulaHeaderFiles
         source/Nebula.h
-        source/Nebula/Application.h
-        source/Nebula/CameraController.h
-        source/Nebula/EntryPoint.h
-        source/Nebula/Input.h
-        source/Nebula/KeyCodes.h
-        source/Nebula/Core.h
-        source/Nebula/Layer.h
-        source/Nebula/LayerStack.h
-        source/Nebula/Log.h
-        source/Nebula/MouseButtonCodes.h
-        source/Nebula/Window.h
+        source/Nebula/Core/Application.h
+        source/Nebula/Core/EntryPoint.h
+        source/Nebula/Core/Input.h
+        source/Nebula/Core/KeyCodes.h
+        source/Nebula/Core/Core.h
+        source/Nebula/Core/Layer.h
+        source/Nebula/Core/LayerStack.h
+        source/Nebula/Core/Log.h
+        source/Nebula/Core/MouseButtonCodes.h
+        source/Nebula/Core/Window.h
         source/Nebula/Core/Timestep.h
         source/Nebula/Events/ApplicationEvent.h
         source/Nebula/Events/Event.h
@@ -43,8 +42,9 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Events/MouseEvent.h
         source/Nebula/ImGui/ImGuiLayer.h
         source/Nebula/Renderer/Buffer.h
-        source/Nebula/Renderer/GraphicsContext.h
         source/Nebula/Renderer/Camera.h
+        source/Nebula/Renderer/CameraController.h
+        source/Nebula/Renderer/GraphicsContext.h
         source/Nebula/Renderer/RenderCommand.h
         source/Nebula/Renderer/Renderer.h
         source/Nebula/Renderer/RendererAPI.h

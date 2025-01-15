@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Nebula/Events/Event.h"
+#include "../Events/Event.h"
 
 namespace Nebula {
 	/**

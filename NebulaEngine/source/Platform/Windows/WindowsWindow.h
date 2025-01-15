@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 
-#include "Nebula/Window.h"
+#include "../../Nebula/Core/Window.h"
 #include "Nebula/Renderer/GraphicsContext.h"
 
 namespace Nebula {

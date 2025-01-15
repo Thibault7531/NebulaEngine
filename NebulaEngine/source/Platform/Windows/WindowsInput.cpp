@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 
-#include "Nebula/Application.h"
+#include "../../Nebula/Core/Application.h"
 
 namespace Nebula {
 

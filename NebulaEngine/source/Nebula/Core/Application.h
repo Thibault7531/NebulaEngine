@@ -3,11 +3,11 @@
 #include "Core.h"
 
 #include "Window.h"
-#include "Core/Timestep.h"
-#include "Events/ApplicationEvent.h"
-#include "Events/Event.h"
-#include "ImGui/ImGuiLayer.h"
-#include "Nebula/LayerStack.h"
+#include "Timestep.h"
+#include "../Events/ApplicationEvent.h"
+#include "../Events/Event.h"
+#include "../ImGui/ImGuiLayer.h"
+#include "LayerStack.h"
 
 namespace Nebula {
 	/**

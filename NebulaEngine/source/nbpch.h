@@ -13,7 +13,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Nebula/Log.h"
+#include "Nebula/Core/Log.h"
 
 #ifdef NB_PLATFORM_WINDOWS
 	#include <Windows.h>

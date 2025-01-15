@@ -1,6 +1,6 @@
 #include "Application.h"
 
-#include "Renderer/Renderer.h"
+#include "../Renderer/Renderer.h"
 
 namespace Nebula {
 

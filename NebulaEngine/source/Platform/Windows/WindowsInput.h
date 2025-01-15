@@ -2,7 +2,7 @@
 
 #include <SDL_keyboard.h>
 
-#include "Nebula/Input.h"
+#include "../../Nebula/Core/Input.h"
 
 namespace Nebula {
 	/**

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/Timestep.h"
-#include "Events/ApplicationEvent.h"
-#include "Events/Event.h"
-#include "Events/MouseEvent.h"
-#include "Renderer/Camera.h"
+#include "../Core/Timestep.h"
+#include "../Events/ApplicationEvent.h"
+#include "../Events/Event.h"
+#include "../Events/MouseEvent.h"
+#include "Camera.h"
 
 namespace Nebula
 {

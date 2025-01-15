@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/Timestep.h"
-#include "Nebula/Events/Event.h"
+#include "Timestep.h"
+#include "../Events/Event.h"
 
 namespace Nebula
 {

@@ -7,10 +7,10 @@
 #include <backends/imgui_impl_opengl3_loader.h>
 #include <backends/imgui_impl_sdl3.h>
 
-#include "Nebula/Application.h"
-#include "Nebula/Input.h"
-#include "Nebula/KeyCodes.h"
-#include "Nebula/MouseButtonCodes.h"
+#include "../Core/Application.h"
+#include "../Core/Input.h"
+#include "../Core/KeyCodes.h"
+#include "../Core/MouseButtonCodes.h"
 
 struct ImGui_ImplSDL3_Data;
 struct ImGui_ImplSDL3_ViewportData;

@@ -3,16 +3,16 @@
 // For use by Nebula Application
 
 // Native application
-#include "Nebula/Application.h"
-#include "Nebula/Layer.h"
-#include "Nebula/Log.h"
+#include "Nebula/Core/Application.h"
+#include "Nebula/Core/Layer.h"
+#include "Nebula/Core/Log.h"
 #include "Nebula/Core/Timestep.h"
 
 // Input system
-#include "Nebula/CameraController.h"
-#include "Nebula/Input.h"
-#include "Nebula/KeyCodes.h"
-#include "Nebula/MouseButtonCodes.h"
+#include "Nebula/Renderer/CameraController.h"
+#include "Nebula/Core/Input.h"
+#include "Nebula/Core/KeyCodes.h"
+#include "Nebula/Core/MouseButtonCodes.h"
 
 // ImGui
 #include "Nebula/ImGui/ImGuiLayer.h"
@@ -25,5 +25,5 @@
 #include "Nebula/Renderer/Texture.h"
 
 // ----Entry Point-----------------------
-#include "Nebula/EntryPoint.h"
+#include "Nebula/Core/EntryPoint.h"
 // --------------------------------------

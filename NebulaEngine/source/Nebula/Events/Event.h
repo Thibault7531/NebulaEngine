@@ -2,7 +2,7 @@
 
 #include "nbpch.h"
 
-#include "Nebula/Core.h"
+#include "../Core/Core.h"
 
 namespace Nebula
 {
