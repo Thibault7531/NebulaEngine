@@ -108,8 +108,6 @@ endif ()
 
 
 # Defines
-target_compile_definitions(Nebula PRIVATE NB_PLATFORM_WINDOWS)
-target_compile_definitions(Nebula PRIVATE NB_BUILD_DLL)
 target_compile_definitions(Nebula PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 if (CMAKE_BUILD_TYPE EQUAL "Debug")

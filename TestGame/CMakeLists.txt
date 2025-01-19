@@ -24,10 +24,6 @@ else ()
 endif ()
 
 
-# Defines
-target_compile_definitions(TestGame PUBLIC NB_PLATFORM_WINDOWS)
-
-
 # Libraries
 target_link_libraries(TestGame PUBLIC Nebula)
 target_include_directories(TestGame PRIVATE
