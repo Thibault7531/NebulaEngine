@@ -1,10 +1,12 @@
 #include <Nebula.h>
+#include <Nebula/Core/EntryPoint.h>
 #include <SDL_keycode.h>
 #include <glad/glad.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Sandbox2D.h"
 #include "Nebula/Renderer/Camera.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
@@ -311,7 +313,8 @@ public:
 	{
 		PushOverlay(new OpenGLDebugWindow());
 		//PushLayer(new TestCube());
-		PushLayer(new Cube3D());
+		//PushLayer(new Cube3D());
+		PushLayer(new Sandbox2D);
 		this->GetWindow().SetVSync(true);
 	}
 

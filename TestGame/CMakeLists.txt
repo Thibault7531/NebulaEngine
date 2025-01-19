@@ -2,7 +2,7 @@
 
 
 # Setup Target
-add_executable(TestGame source/TestGame.cpp)
+add_executable(TestGame source/TestGame.cpp source/Sandbox2D.h source/Sandbox2D.cpp)
 
 
 # Output Directory
