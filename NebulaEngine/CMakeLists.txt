@@ -17,6 +17,7 @@ list(APPEND NebulaSourceFiles
         source/Nebula/Renderer/CameraController.cpp
         source/Nebula/Renderer/RenderCommand.cpp
         source/Nebula/Renderer/Renderer.cpp
+        source/Nebula/Renderer/Renderer2D.cpp
         source/Nebula/Renderer/RendererAPI.cpp
         source/Nebula/Renderer/Shader.cpp
         source/Nebula/Renderer/Texture.cpp
@@ -47,6 +48,7 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Renderer/GraphicsContext.h
         source/Nebula/Renderer/RenderCommand.h
         source/Nebula/Renderer/Renderer.h
+        source/Nebula/Renderer/Renderer2D.h
         source/Nebula/Renderer/RendererAPI.h
         source/Nebula/Renderer/Shader.h
         source/Nebula/Renderer/Texture.h

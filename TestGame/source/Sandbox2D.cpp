@@ -10,30 +10,6 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
-    m_VertexArray = Nebula::VertexArray::Create();
-
-    float vertices[] = {
-        -0.5f, 0.5f, 0.0f,
-        0.5f, 0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f
-    };
-
-    Nebula::Ref<Nebula::VertexBuffer> vbo = Nebula::VertexBuffer::Create(vertices, sizeof(vertices));
-    Nebula::BufferLayout layout = {
-        { Nebula::ShaderDataType::Float3, "a_Position"}
-    };
-    vbo->SetLayout(layout);
-    m_VertexArray->AddVertexBuffer(vbo);
-
-    uint32_t indices[] = {
-        0, 2, 1,
-        1, 2, 3
-    };
-    Nebula::Ref<Nebula::IndexBuffer> ibo = Nebula::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
-    m_VertexArray->SetIndexBuffer(ibo);
-
-    m_Shader = Nebula::Shader::Create("Solid Color", "assets/shaders/SolidColorVS.glsl", "assets/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
 }
 
 void Sandbox2D::OnDetach()
@@ -47,13 +23,12 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
     Nebula::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
     Nebula::RenderCommand::Clear();
 
-    Nebula::Renderer::BeginScene(m_CameraController.GetCamera());
+    Nebula::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-    m_Shader->Bind();
-    std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_SquareColor);
-    m_Shader->Unbind();
+    Nebula::Renderer2D::DrawQuad({-1.0f, 0.0f}, 45.0f, {1.0f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
+    Nebula::Renderer2D::DrawQuad({0.5f, -0.5f}, 10.0f, {0.5f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
 
-    Nebula::Renderer::Submit(m_Shader, m_VertexArray, glm::mat4(1.0f));
+    Nebula::Renderer2D::EndScene();
 }
 
 void Sandbox2D::OnImGuiRender()

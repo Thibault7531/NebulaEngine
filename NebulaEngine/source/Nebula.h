@@ -21,5 +21,6 @@
 #include "Nebula/Renderer/Camera.h"
 #include "Nebula/Renderer/RenderCommand.h"
 #include "Nebula/Renderer/Renderer.h"
+#include "Nebula/Renderer/Renderer2D.h"
 #include "Nebula/Renderer/Shader.h"
 #include "Nebula/Renderer/Texture.h"
