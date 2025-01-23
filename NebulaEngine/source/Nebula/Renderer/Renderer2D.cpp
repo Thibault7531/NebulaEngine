@@ -12,6 +12,7 @@ namespace Nebula
     {
         Ref<VertexArray> QuadVertexArray;
         Ref<Shader> FlatColorShader;
+        Ref<Shader> TextureShader;
     };
 
     static Renderer2DStorage* s_Data;
@@ -23,15 +24,16 @@ namespace Nebula
         s_Data->QuadVertexArray = VertexArray::Create();
 
         float vertices[] = {
-            -0.5f, 0.5f, 0.0f,
-            0.5f, 0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f
+            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+            0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, 0.0f, 1.0f, 0.0f
         };
 
         Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
         vertexBuffer->SetLayout({
-            {ShaderDataType::Float3, "a_Position"}
+            {ShaderDataType::Float3, "a_Position"},
+            {ShaderDataType::Float2, "a_TexCoord"},
         });
         s_Data->QuadVertexArray->AddVertexBuffer(vertexBuffer);
 
@@ -43,6 +45,8 @@ namespace Nebula
         s_Data->QuadVertexArray->SetIndexBuffer(indexBuffer);
 
         s_Data->FlatColorShader = Shader::Create("Solid Color", "assets/shaders/SolidColorVS.glsl", "assets/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
+        s_Data->TextureShader = Shader::Create("assets/shaders/Texture.glsl");
+        s_Data->TextureShader->SetInt("u_Texture", 0);
     }
 
     void Renderer2D::Shutdown()
@@ -55,6 +59,9 @@ namespace Nebula
         s_Data->FlatColorShader->Bind();
         s_Data->FlatColorShader->SetMat4("u_ViewProjection", camera.getViewProjectionMatrix());
         s_Data->FlatColorShader->Unbind();
+        s_Data->TextureShader->Bind();
+        s_Data->TextureShader->SetMat4("u_ViewProjection", camera.getViewProjectionMatrix());
+        s_Data->TextureShader->Unbind();
     }
 
     void Renderer2D::EndScene()
@@ -81,4 +88,23 @@ namespace Nebula
         s_Data->FlatColorShader->Unbind();
     }
 
+    void Renderer2D::DrawQuad(const glm::vec2& position, const float& rotation, const glm::vec2& size, const Ref<Texture2D>& texture)
+    {
+        DrawQuad({position.x, position.y, 0.0f}, rotation, size, texture);
+    }
+
+    void Renderer2D::DrawQuad(const glm::vec3& position, const float& rotation, const glm::vec2& size, const Ref<Texture2D>& texture)
+    {
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
+
+        texture->Bind();
+        s_Data->TextureShader->Bind();
+        s_Data->TextureShader->SetMat4("u_Transform", transform);
+
+        s_Data->QuadVertexArray->Bind();
+        RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
+        s_Data->QuadVertexArray->Unbind();
+
+        s_Data->TextureShader->Unbind();
+    }
 }

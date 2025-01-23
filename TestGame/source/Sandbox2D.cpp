@@ -10,6 +10,7 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
+    m_Craft = Nebula::Texture2D::Create("assets/textures/crafting_table_front.png");
 }
 
 void Sandbox2D::OnDetach()
@@ -27,6 +28,7 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
 
     Nebula::Renderer2D::DrawQuad({-1.0f, 0.0f}, 45.0f, {1.0f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
     Nebula::Renderer2D::DrawQuad({0.5f, -0.5f}, 10.0f, {0.5f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
+    Nebula::Renderer2D::DrawQuad({1.0f, 0.5f}, 0.0f, {1.0f, 0.8f}, m_Craft);
 
     Nebula::Renderer2D::EndScene();
 }
