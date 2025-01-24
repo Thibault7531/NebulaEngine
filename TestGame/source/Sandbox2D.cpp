@@ -27,8 +27,8 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
     Nebula::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
     Nebula::Renderer2D::DrawQuad({-1.0f, 0.0f}, 45.0f, {1.0f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
-    Nebula::Renderer2D::DrawQuad({0.5f, -0.5f}, 10.0f, {0.5f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
-    Nebula::Renderer2D::DrawQuad({1.0f, 0.5f}, 0.0f, {1.0f, 0.8f}, m_Craft);
+    Nebula::Renderer2D::DrawQuad({0.5f, -0.5f}, 10.0f, {0.5f, 0.8f}, m_SquareColor);
+    Nebula::Renderer2D::DrawQuad({1.0f, 0.5f}, 0.0f, {1.0f, 0.8f}, {1.0f, 1.0f, 1.0f, 1.0f}, m_Craft);
 
     Nebula::Renderer2D::EndScene();
 }
@@ -36,7 +36,7 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
 void Sandbox2D::OnImGuiRender()
 {
     ImGui::Begin("Settings");
-    ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
+    ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
     ImGui::End();
 }
 

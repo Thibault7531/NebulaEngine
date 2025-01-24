@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "VertexArray.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "gtc/type_ptr.inl"
 
 namespace Nebula
 {
@@ -11,8 +12,8 @@ namespace Nebula
     struct Renderer2DStorage
     {
         Ref<VertexArray> QuadVertexArray;
-        Ref<Shader> FlatColorShader;
-        Ref<Shader> TextureShader;
+        Ref<Shader> Shader2D;
+        Ref<Texture2D> WhiteTexture;
     };
 
     static Renderer2DStorage* s_Data;
@@ -44,9 +45,12 @@ namespace Nebula
         Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
         s_Data->QuadVertexArray->SetIndexBuffer(indexBuffer);
 
-        s_Data->FlatColorShader = Shader::Create("Solid Color", "assets/shaders/SolidColorVS.glsl", "assets/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
-        s_Data->TextureShader = Shader::Create("assets/shaders/Texture.glsl");
-        s_Data->TextureShader->SetInt("u_Texture", 0);
+        s_Data->Shader2D = Shader::Create("assets/shaders/Renderer2D.glsl");
+
+        s_Data->WhiteTexture = Texture2D::Create(1, 1);
+        uint32_t whiteTextureData = 0xffffffff;
+        s_Data->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+        s_Data->WhiteTexture->Bind();
     }
 
     void Renderer2D::Shutdown()
@@ -56,16 +60,13 @@ namespace Nebula
 
     void Renderer2D::BeginScene(const OrthographicCamera& camera)
     {
-        s_Data->FlatColorShader->Bind();
-        s_Data->FlatColorShader->SetMat4("u_ViewProjection", camera.getViewProjectionMatrix());
-        s_Data->FlatColorShader->Unbind();
-        s_Data->TextureShader->Bind();
-        s_Data->TextureShader->SetMat4("u_ViewProjection", camera.getViewProjectionMatrix());
-        s_Data->TextureShader->Unbind();
+        s_Data->Shader2D->Bind();
+        s_Data->Shader2D->SetMat4("u_ViewProjection", camera.getViewProjectionMatrix());
     }
 
     void Renderer2D::EndScene()
     {
+        s_Data->Shader2D->Unbind();
     }
 
     void Renderer2D::DrawQuad(const glm::vec2& position, const float& rotation, const glm::vec2& size, const glm::vec4& color)
@@ -77,34 +78,31 @@ namespace Nebula
     {
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-        s_Data->FlatColorShader->Bind();
-        s_Data->FlatColorShader->SetMat4("u_Transform", transform);
-        s_Data->FlatColorShader->SetFloat3("u_Color", color);
+        s_Data->Shader2D->SetMat4("u_Transform", transform);
+        s_Data->Shader2D->SetFloat4("u_Color", color);
+        s_Data->Shader2D->SetInt("u_Texture", 0);
 
         s_Data->QuadVertexArray->Bind();
         RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
         s_Data->QuadVertexArray->Unbind();
-
-        s_Data->FlatColorShader->Unbind();
     }
 
-    void Renderer2D::DrawQuad(const glm::vec2& position, const float& rotation, const glm::vec2& size, const Ref<Texture2D>& texture)
+    void Renderer2D::DrawQuad(const glm::vec2& position, const float& rotation, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture)
     {
-        DrawQuad({position.x, position.y, 0.0f}, rotation, size, texture);
+        DrawQuad({position.x, position.y, 0.0f}, rotation, size, color, texture);
     }
 
-    void Renderer2D::DrawQuad(const glm::vec3& position, const float& rotation, const glm::vec2& size, const Ref<Texture2D>& texture)
+    void Renderer2D::DrawQuad(const glm::vec3& position, const float& rotation, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture)
     {
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
-        texture->Bind();
-        s_Data->TextureShader->Bind();
-        s_Data->TextureShader->SetMat4("u_Transform", transform);
+        texture->Bind(1);
+        s_Data->Shader2D->SetMat4("u_Transform", transform);
+        s_Data->Shader2D->SetFloat4("u_Color", color);
+        s_Data->Shader2D->SetInt("u_Texture", 1);
 
         s_Data->QuadVertexArray->Bind();
         RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
         s_Data->QuadVertexArray->Unbind();
-
-        s_Data->TextureShader->Unbind();
     }
 }
