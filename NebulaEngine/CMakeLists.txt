@@ -37,6 +37,7 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Core/MouseButtonCodes.h
         source/Nebula/Core/Window.h
         source/Nebula/Core/Timestep.h
+        source/Nebula/Debug/Instrumentor.h
         source/Nebula/Events/ApplicationEvent.h
         source/Nebula/Events/Event.h
         source/Nebula/Events/KeyEvent.h
