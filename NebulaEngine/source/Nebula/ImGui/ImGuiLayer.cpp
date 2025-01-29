@@ -29,6 +29,8 @@ namespace Nebula
 
 	void ImGuiLayer::OnAttach()
 	{
+		NB_PROFILE_FUNCTION();
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -68,6 +70,8 @@ namespace Nebula
 
 	void ImGuiLayer::OnDetach()
 	{
+		NB_PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplSDL3_Shutdown();
 		ImGui::DestroyContext();
@@ -79,6 +83,8 @@ namespace Nebula
 
 	void ImGuiLayer::Begin()
 	{
+		NB_PROFILE_FUNCTION();
+
 		ImGuiIO& io = ImGui::GetIO();
 
 		SDL_Event event;
@@ -99,6 +105,8 @@ namespace Nebula
 
 	void ImGuiLayer::End()
 	{
+		NB_PROFILE_FUNCTION();
+
 		ImGuiIO& io = ImGui::GetIO();
 
 		ImGui::Render();

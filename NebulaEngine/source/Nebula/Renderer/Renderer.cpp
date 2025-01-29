@@ -9,8 +9,15 @@ namespace Nebula {
 
 	void Renderer::Init()
 	{
+		NB_PROFILE_FUNCTION();
+
 		RenderCommand::Init();
 		Renderer2D::Init();
+	}
+
+	void Renderer::Shutdown()
+	{
+		NB_PROFILE_FUNCTION();
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)

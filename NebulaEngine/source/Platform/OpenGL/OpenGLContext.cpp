@@ -11,6 +11,8 @@ namespace Nebula {
 
 	void OpenGLContext::Init()
 	{
+		NB_PROFILE_FUNCTION();
+
 		m_Context = SDL_GL_CreateContext(m_WindowHandle);
 
 		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress));
@@ -33,6 +35,8 @@ namespace Nebula {
 
 	void OpenGLContext::SwapBuffers()
 	{
+		NB_PROFILE_FUNCTION();
+
 		SDL_GL_SwapWindow(m_WindowHandle);
 	}
 

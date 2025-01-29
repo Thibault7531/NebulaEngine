@@ -16,16 +16,22 @@ namespace Nebula {
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		NB_PROFILE_FUNCTION();
+
 		WindowsWindow::Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
+		NB_PROFILE_FUNCTION();
+
 		WindowsWindow::Shutdown();
 	}
 
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+		NB_PROFILE_FUNCTION();
+
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -34,6 +40,8 @@ namespace Nebula {
 		NB_CORE_INFO("Creating window: {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 		if (!s_SDLInitialized) {
+			NB_PROFILE_SCOPE("SDL_Init");
+
 			int success = SDL_Init(SDL_INIT_VIDEO);
 			NB_CORE_ASSERT(success, "Could not initialize SDL!");
 
@@ -44,9 +52,12 @@ namespace Nebula {
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-		m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
-		SDL_PropertiesID windowProps = SDL_GetWindowProperties(m_Window);
-		SDL_SetPointerProperty(windowProps, "windowProps", &m_Data);
+		{
+			NB_PROFILE_SCOPE("SDL_CreateWindow");
+			m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+			SDL_PropertiesID windowProps = SDL_GetWindowProperties(m_Window);
+			SDL_SetPointerProperty(windowProps, "windowProps", &m_Data);
+		}
 
 		m_Context = new OpenGLContext(m_Window);
 		m_Context->Init();
@@ -269,16 +280,22 @@ namespace Nebula {
 
 	void WindowsWindow::Shutdown()
 	{
+		NB_PROFILE_FUNCTION();
+
 		SDL_DestroyWindow(m_Window);
 	}
 
 	void WindowsWindow::OnUpdate()
 	{
+		NB_PROFILE_FUNCTION();
+
 		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
+		NB_PROFILE_FUNCTION();
+
 		if (enabled)
 			SDL_GL_SetSwapInterval(1);
 		else

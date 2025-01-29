@@ -32,8 +32,8 @@ namespace Nebula {
 
 		void SetProjection(float left, float right, float bottom, float top);
 
-		const float getRotation() const { return m_Rotation; }
-		void setRotation(const float rotation) { m_Rotation = rotation; RecalculateViewMatrix(); }
+		const float GetRotation() const { return m_Rotation; }
+		void SetRotation(const float rotation) { m_Rotation = rotation; RecalculateViewMatrix(); }
 
 	private:
 		void RecalculateViewMatrix() override;
@@ -47,16 +47,16 @@ namespace Nebula {
 	public:
 		PerspectiveCamera(const float FOV, const float aspectRatio);
 
-		void SetProjection(const float aspectRatio);
+		void SetProjection(const float FOV, const float aspectRatio);
 
-		const float getAspectRatio() const { return m_AspectRatio; }
-		void setAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; RecalculateProjectionMatrix(); }
+		const float GetAspectRatio() const { return m_AspectRatio; }
+		void SetAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; RecalculateProjectionMatrix(); }
 
-		float getFOV() const { return m_FOV; }
-		void setFOV(const float FOV) { m_FOV = FOV; RecalculateProjectionMatrix(); }
+		float GetFOV() const { return m_FOV; }
+		void SetFOV(const float FOV) { m_FOV = FOV; RecalculateProjectionMatrix(); }
 
-		const glm::vec3& getRotation() const { return m_Rotation; }
-		void setRotation(const glm::vec3& rotation);
+		const glm::vec3& GetRotation() const { return m_Rotation; }
+		void SetRotation(const glm::vec3& rotation);
 
 	private:
 		void RecalculateViewMatrix() override;

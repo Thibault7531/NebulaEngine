@@ -20,6 +20,8 @@ namespace Nebula
 
     void Renderer2D::Init()
     {
+        NB_PROFILE_FUNCTION();
+
         s_Data = new Renderer2DStorage;
 
         s_Data->QuadVertexArray = VertexArray::Create();
@@ -55,17 +57,23 @@ namespace Nebula
 
     void Renderer2D::Shutdown()
     {
+        NB_PROFILE_FUNCTION();
+
         delete s_Data;
     }
 
     void Renderer2D::BeginScene(const OrthographicCamera& camera)
     {
+        NB_PROFILE_FUNCTION();
+
         s_Data->Shader2D->Bind();
         s_Data->Shader2D->SetMat4("u_ViewProjection", camera.getViewProjectionMatrix());
     }
 
     void Renderer2D::EndScene()
     {
+        NB_PROFILE_FUNCTION();
+
         s_Data->Shader2D->Unbind();
     }
 
@@ -76,6 +84,8 @@ namespace Nebula
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const float& rotation, const glm::vec2& size, const glm::vec4& color)
     {
+        NB_PROFILE_FUNCTION();
+
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
         s_Data->Shader2D->SetMat4("u_Transform", transform);
@@ -94,6 +104,8 @@ namespace Nebula
 
     void Renderer2D::DrawQuad(const glm::vec3& position, const float& rotation, const glm::vec2& size, const glm::vec4& color, const Ref<Texture2D>& texture)
     {
+        NB_PROFILE_FUNCTION();
+
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(rotation), {0.0f, 0.0f, 1.0f}) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
         texture->Bind(1);

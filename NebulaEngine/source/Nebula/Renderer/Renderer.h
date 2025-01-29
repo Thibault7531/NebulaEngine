@@ -15,6 +15,7 @@ namespace Nebula {
 		 * Initializes the renderer with the correct settings.
 		 */
 		static void Init();
+		static void Shutdown();
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
 		/**

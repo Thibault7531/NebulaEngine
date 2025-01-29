@@ -6,6 +6,8 @@ namespace Nebula {
 
 	OrthographicCamera::OrthographicCamera(const float left, const float right, const float bottom, const float top)
 	{
+		NB_PROFILE_FUNCTION();
+
 		m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
 		m_ViewMatrix = 1.0f;
 		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
@@ -13,12 +15,16 @@ namespace Nebula {
 
 	void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
 	{
+		NB_PROFILE_FUNCTION();
+
 		m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
 		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
 	void OrthographicCamera::RecalculateViewMatrix()
 	{
+		NB_PROFILE_FUNCTION();
+
 		const glm::mat4 transform = glm::translate(glm::mat4(1.0f), m_Position) * glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation), glm::vec3(0, 0, 1));
 
 		m_ViewMatrix = glm::inverse(transform);
@@ -28,37 +34,44 @@ namespace Nebula {
 	PerspectiveCamera::PerspectiveCamera(const float FOV, const float aspectRatio)
 		: m_AspectRatio(aspectRatio), m_FOV(FOV)
 	{
-		m_ProjectionMatrix = glm::perspective(glm::radians(FOV), aspectRatio, 0.1f, 100.0f);
+		NB_PROFILE_FUNCTION();
+
+		RecalculateProjectionMatrix();
 		PerspectiveCamera::RecalculateViewMatrix();
 	}
 
-	void PerspectiveCamera::SetProjection(const float aspectRatio)
+	void PerspectiveCamera::SetProjection(const float FOV, const float aspectRatio)
 	{
-		m_ProjectionMatrix = glm::perspective(glm::radians(m_FOV), aspectRatio, 0.1f, 100.0f);
-		RecalculateViewMatrix();
-	}
+		NB_PROFILE_FUNCTION();
 
-	void PerspectiveCamera::RecalculateProjectionMatrix()
-	{
-		m_ProjectionMatrix = glm::perspective(m_FOV, m_AspectRatio, 0.1f, 100.0f);
+		m_ProjectionMatrix = glm::perspective(glm::radians(FOV), aspectRatio, 0.1f, 100.0f);
 		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
-	void PerspectiveCamera::setRotation(const glm::vec3& rotation)
+	void PerspectiveCamera::SetRotation(const glm::vec3& rotation)
 	{
+		NB_PROFILE_FUNCTION();
+
 		m_Rotation = rotation;
 
 		m_Rotation.x = std::max(m_Rotation.x, -89.9f);
 		m_Rotation.x = std::min(m_Rotation.x, 89.9f);
 
-		if (m_Rotation.x > 89.9f) m_Rotation.x = 89.9f;
-		if (m_Rotation.x < -89.9f) m_Rotation.x = -89.9f;
-
 		RecalculateViewMatrix();
+	}
+
+	void PerspectiveCamera::RecalculateProjectionMatrix()
+	{
+		NB_PROFILE_FUNCTION();
+
+		m_ProjectionMatrix = glm::perspective(m_FOV, m_AspectRatio, 0.1f, 100.0f);
+		m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 	}
 
 	void PerspectiveCamera::RecalculateViewMatrix()
 	{
+		NB_PROFILE_FUNCTION();
+
 		glm::vec3 direction;
 		direction.x = cos(glm::radians(m_Rotation.y)) * cos(glm::radians(m_Rotation.x));
 		direction.y = sin(glm::radians(m_Rotation.x));

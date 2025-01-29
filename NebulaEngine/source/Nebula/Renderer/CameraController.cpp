@@ -13,6 +13,8 @@ namespace Nebula
 
     void OrthographicCameraController::OnUpdate(const Timestep ts)
     {
+        NB_PROFILE_FUNCTION();
+
         if (Input::IsKeyPressed(NB_KEY_Z)) {
             m_CameraPosition.y += m_CameraTranslationSpeed * ts;
         }
@@ -35,7 +37,7 @@ namespace Nebula
                 m_CameraRotation -= m_CameraRotationSpeed * ts;
             }
 
-            m_Camera.setRotation(m_CameraRotation);
+            m_Camera.SetRotation(m_CameraRotation);
         }
 
         m_Camera.setPosition(m_CameraPosition);
@@ -43,6 +45,8 @@ namespace Nebula
 
     void OrthographicCameraController::OnEvent(Event& e)
     {
+        NB_PROFILE_FUNCTION();
+
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<MouseScrolledEvent>(NB_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
         dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(OrthographicCameraController::OnWindowResize));
@@ -50,6 +54,8 @@ namespace Nebula
 
     bool OrthographicCameraController::OnMouseScrolled(const MouseScrolledEvent& e)
     {
+        NB_PROFILE_FUNCTION();
+
         m_zoomLevel -= e.GetYOffset() * 0.25f;
         m_zoomLevel = std::max(m_zoomLevel, 0.25f);
         m_Camera.SetProjection(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel);
@@ -59,6 +65,8 @@ namespace Nebula
 
     bool OrthographicCameraController::OnWindowResize(const WindowResizeEvent& e)
     {
+        NB_PROFILE_FUNCTION();
+
         m_aspectRatio = static_cast<float>(e.GetWidth()) / static_cast<float>(e.GetHeight());
         m_Camera.SetProjection(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel);
 
@@ -72,6 +80,8 @@ namespace Nebula
 
     void PerspectiveCameraController::OnUpdate(const Timestep ts)
     {
+        NB_PROFILE_FUNCTION();
+
         if (Input::IsKeyPressed(NB_KEY_Z)) {
             m_CameraPosition += glm::vec3(2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts, 0.0f, 2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts);
         }
@@ -96,6 +106,8 @@ namespace Nebula
 
     void PerspectiveCameraController::OnEvent(Event& e)
     {
+        NB_PROFILE_FUNCTION();
+
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<MouseMovedEvent>(NB_BIND_EVENT_FN(PerspectiveCameraController::OnMouseMoveEvent));
         dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(PerspectiveCameraController::OnWindowResize));
@@ -105,10 +117,12 @@ namespace Nebula
 
     bool PerspectiveCameraController::OnMouseMoveEvent(const MouseMovedEvent& e)
     {
+        NB_PROFILE_FUNCTION();
+
         if (Input::IsMouseButtonPressed(NB_BUTTON_LEFT))
         {
             m_cameraRotation += glm::vec3(m_PreviousMousePosition.y - e.GetY(), e.GetX() - m_PreviousMousePosition.x, 0.0f) * 0.1f;
-            m_Camera.setRotation(m_cameraRotation);
+            m_Camera.SetRotation(m_cameraRotation);
         }
 
         return false;
@@ -116,8 +130,10 @@ namespace Nebula
 
     bool PerspectiveCameraController::OnWindowResize(const WindowResizeEvent& e)
     {
+        NB_PROFILE_FUNCTION();
+
         m_aspectRatio = static_cast<float>(e.GetWidth()) / static_cast<float>(e.GetHeight());
-        m_Camera.SetProjection(m_aspectRatio);
+        m_Camera.SetAspectRatio(m_aspectRatio);
 
         return false;
     }

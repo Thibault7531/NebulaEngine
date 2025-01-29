@@ -8,6 +8,8 @@ namespace Nebula
     OpenGLTexture2D::OpenGLTexture2D(const uint32_t width, const uint32_t height)
         : m_Width(width), m_Height(height)
     {
+        NB_PROFILE_FUNCTION();
+
         m_InternalFormat = GL_RGBA8, m_DataFormat = GL_RGBA;
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
@@ -20,9 +22,15 @@ namespace Nebula
     OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
         : m_Path(path)
     {
+        NB_PROFILE_FUNCTION();
+
         int width, height, channels;
         stbi_set_flip_vertically_on_load(1);
-        stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        stbi_uc* data = nullptr;
+        {
+            NB_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
+            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        }
         NB_CORE_ASSERT(data, "Failed to load image!");
         m_Width = width;
         m_Height = height;
@@ -50,16 +58,22 @@ namespace Nebula
 
     OpenGLTexture2D::~OpenGLTexture2D()
     {
+        NB_PROFILE_FUNCTION();
+
         glDeleteTextures(1, &m_RendererID);
     }
 
     void OpenGLTexture2D::SetData(void *data, uint32_t size)
     {
+        NB_PROFILE_FUNCTION();
+
         glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
     }
 
     void OpenGLTexture2D::Bind(uint32_t slot) const
     {
+        NB_PROFILE_FUNCTION();
+
         glBindTextureUnit(slot, m_RendererID);
     }
 }

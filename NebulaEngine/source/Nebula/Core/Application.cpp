@@ -1,6 +1,6 @@
 #include "Application.h"
 
-#include "../Renderer/Renderer.h"
+#include "Nebula/Renderer/Renderer.h"
 
 namespace Nebula
 {
@@ -10,6 +10,8 @@ namespace Nebula
 
 	Application::Application()
 	{
+		NB_PROFILE_FUNCTION();
+
 		NB_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
@@ -25,22 +27,32 @@ namespace Nebula
 	}
 
 	Application::~Application()
-	= default;
+	{
+		NB_PROFILE_FUNCTION();
+
+		Renderer::Shutdown();
+	}
 
 	void Application::PushLayer(Layer* layer)
 	{
+		NB_PROFILE_FUNCTION();
+
 		m_LayerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* layer)
 	{
+		NB_PROFILE_FUNCTION();
+
 		m_LayerStack.PushOverlay(layer);
 		layer->OnAttach();
 	}
 
 	void Application::OnEvent(Event& e)
 	{
+		NB_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
@@ -57,21 +69,31 @@ namespace Nebula
 
 	void Application::Run()
 	{
+		NB_PROFILE_FUNCTION();
+
 		while (m_Running) {
+			NB_PROFILE_SCOPE("RunLoop");
+
 			const float time = static_cast<float>(m_Window->GetTime()) / 1000.0f;
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
 			if (!m_Minimized)
 			{
-				for (Layer* layer : m_LayerStack)
-					layer->OnUpdate(timestep);
-			}
+				{
+					NB_PROFILE_SCOPE("LayerStack::OnUpdate");
+					for (Layer* layer : m_LayerStack)
+						layer->OnUpdate(timestep);
+				}
 
-			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
-				layer->OnImGuiRender();
-			m_ImGuiLayer->End();
+				m_ImGuiLayer->Begin();
+				{
+					NB_PROFILE_SCOPE("LayerStack::OnImGuiRender");
+					for (Layer* layer : m_LayerStack)
+						layer->OnImGuiRender();
+				}
+				m_ImGuiLayer->End();
+			}
 
 			m_Window->OnUpdate();
 		}
@@ -85,6 +107,8 @@ namespace Nebula
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
+		NB_PROFILE_FUNCTION();
+
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;

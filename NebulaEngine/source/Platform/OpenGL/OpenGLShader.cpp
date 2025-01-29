@@ -18,6 +18,8 @@ namespace Nebula {
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const SOURCE_TYPE sourceType)
 		: m_Name(name)
 	{
+		NB_PROFILE_FUNCTION();
+
 		std::string VertexSource;
 		std::string FragmentSource;
 		if (sourceType == SOURCE_TYPE::NB_SHADER_FILE)
@@ -39,6 +41,8 @@ namespace Nebula {
 
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
+		NB_PROFILE_FUNCTION();
+
 		std::string shaderSource = ReadFile(filepath);
         auto shaderSources = PreProcess(shaderSource);
 		Compile(shaderSources);
@@ -52,36 +56,50 @@ namespace Nebula {
 
 	OpenGLShader::~OpenGLShader()
 	{
+		NB_PROFILE_FUNCTION();
+
 		glDeleteProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Bind() const
 	{
+		NB_PROFILE_FUNCTION();
+
 		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Unbind() const
 	{
+		NB_PROFILE_FUNCTION();
+
 		glUseProgram(0);
 	}
 
 	void OpenGLShader::SetInt(const std::string& name, const int value)
 	{
+		NB_PROFILE_FUNCTION();
+
 		UploadUniformInt(name, value);
 	}
 
 	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
+		NB_PROFILE_FUNCTION();
+
 		UploadUniformFloat3(name, value);
 	}
 
 	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value)
 	{
+		NB_PROFILE_FUNCTION();
+
 		UploadUniformFloat4(name, value);
 	}
 
 	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 	{
+		NB_PROFILE_FUNCTION();
+
 		UploadUniformMat4(name, value);
 	}
 
@@ -129,6 +147,8 @@ namespace Nebula {
 
 	std::string OpenGLShader::ReadFile(const std::string& filepath)
 	{
+		NB_PROFILE_FUNCTION();
+
 		std::string result;
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
 		if (in)
@@ -149,6 +169,8 @@ namespace Nebula {
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
 	{
+		NB_PROFILE_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> result;
 
 		const char* typeToken = "#type";
@@ -172,6 +194,8 @@ namespace Nebula {
 
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
+		NB_PROFILE_FUNCTION();
+
 		GLuint program = glCreateProgram();
 		NB_CORE_ASSERT(shaderSources.size() <= 2, "Only 2 shaders are supported in a program")
 		std::array<GLenum, 2> glShaderIDs;
