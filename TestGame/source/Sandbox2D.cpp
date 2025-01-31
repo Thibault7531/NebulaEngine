@@ -35,9 +35,9 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
         NB_PROFILE_SCOPE("Render");
         Nebula::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-        Nebula::Renderer2D::DrawQuad({-1.0f, 0.0f}, 45.0f, {1.0f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f});
-        Nebula::Renderer2D::DrawQuad({0.5f, -0.5f}, 10.0f, {0.5f, 0.8f}, m_SquareColor);
-        Nebula::Renderer2D::DrawQuad({1.0f, 0.5f}, 0.0f, {1.0f, 0.8f}, {1.0f, 1.0f, 1.0f, 1.0f}, m_Craft);
+        Nebula::Renderer2D::DrawQuad( { .position = {-1.0f, 0.0f, 0.0f}, .rotation = glm::radians(45.0f), .size = {1.0f, 0.8f}, .color = {0.8f, 0.2f, 0.3f, 1.0f} } );
+        Nebula::Renderer2D::DrawQuad( { .position = {0.5f, -0.5f, 0.0f}, .rotation = glm::radians(10.0f), .size = {0.5f, 0.8f}, .color = m_SquareColor } );
+        Nebula::Renderer2D::DrawQuad( { .position = {1.0f, 0.5f, 0.0f}, .size = {1.0f, 0.8f}, .texture = m_Craft, .color = {0.8f, 1.0f, 1.0f, 1.0f}, .tilingFactor = 10.0f } );
 
         Nebula::Renderer2D::EndScene();
     }
@@ -55,5 +55,7 @@ void Sandbox2D::OnImGuiRender()
 
 void Sandbox2D::OnEvent(Nebula::Event& e)
 {
+    NB_PROFILE_FUNCTION();
+
     m_CameraController.OnEvent(e);
 }
