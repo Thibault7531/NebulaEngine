@@ -15,6 +15,9 @@ namespace Nebula {
 
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
+
+		SDL_GLContext GetContext() { return m_Context; }
+
 	private:
 		SDL_Window* m_WindowHandle;
 		SDL_GLContext m_Context;

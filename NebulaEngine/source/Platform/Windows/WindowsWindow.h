@@ -3,7 +3,7 @@
 #include <SDL.h>
 
 #include "../../Nebula/Core/Window.h"
-#include "Nebula/Renderer/GraphicsContext.h"
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Nebula {
 	/**
@@ -26,7 +26,13 @@ namespace Nebula {
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 
+		virtual void SetCurrentContext() override;
+
 		inline virtual void* GetNativeWindow() const override { return m_Window; }
+		inline virtual uint32_t GetID() const override { return SDL_GetWindowID(m_Window); }
+
+		static bool OnEvent(void* userdata, SDL_Event* e);
+
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
@@ -34,7 +40,7 @@ namespace Nebula {
 		SDL_Window* m_Window;
 		SDL_Event m_Event;
 
-		GraphicsContext* m_Context;
+		OpenGLContext* m_Context;
 
 		struct WindowData
 		{

@@ -11,6 +11,7 @@ list(APPEND NebulaSourceFiles
         source/Nebula/Core/Layer.cpp
         source/Nebula/Core/LayerStack.cpp
         source/Nebula/Core/Log.cpp
+        source/Nebula/Core/Window.cpp
         source/Nebula/ImGui/ImGuiLayer.cpp
         source/Nebula/Renderer/Buffer.cpp
         source/Nebula/Renderer/Camera.cpp

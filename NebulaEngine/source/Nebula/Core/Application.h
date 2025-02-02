@@ -60,7 +60,7 @@ namespace Nebula {
 		bool OnWindowMaximize(WindowMaximizeEvent& e);
 
 	private:
-		Scope<Window> m_Window;
+		Ref<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		bool m_Minimized = false;

@@ -17,7 +17,7 @@ namespace Nebula
 
 		NB_CORE_INFO("Application started");
 
-		m_Window = Scope<Window>(Window::Create());
+		m_Window = Window::Create();
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
 		Renderer::Init();
@@ -73,6 +73,8 @@ namespace Nebula
 
 		while (m_Running) {
 			NB_PROFILE_SCOPE("RunLoop");
+
+			m_Window->SetCurrentContext();
 
 			const float time = static_cast<float>(m_Window->GetTime()) / 1000.0f;
 			Timestep timestep = time - m_LastFrameTime;
