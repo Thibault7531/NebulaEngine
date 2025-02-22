@@ -82,6 +82,13 @@ namespace Nebula {
 		UploadUniformInt(name, value);
 	}
 
+	void OpenGLShader::SetIntArray(const std::string &name, int *value, const uint32_t count)
+	{
+		NB_PROFILE_FUNCTION();
+
+		UploadUniformIntArray(name, value, count);
+	}
+
 	void OpenGLShader::SetFloat(const std::string &name, const float value)
 	{
 		NB_PROFILE_FUNCTION();
@@ -110,10 +117,16 @@ namespace Nebula {
 		UploadUniformMat4(name, value);
 	}
 
-	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
+	void OpenGLShader::UploadUniformInt(const std::string& name, int value) const
 	{
 		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);
+	}
+
+	void OpenGLShader::UploadUniformIntArray(const std::string &name, const int *value, const uint32_t count) const
+	{
+		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1iv(location, count, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value) const

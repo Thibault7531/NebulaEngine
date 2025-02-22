@@ -1,19 +1,12 @@
 #pragma once
 
 namespace Nebula {
-	/**
-	 * Class listing all possible data types that can be input into a shader.
-	 */
+
 	enum class ShaderDataType
 	{
 		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool
 	};
 
-	/**
-	 * Gets the size of any Shader data type.
-	 * @param type Shader data type
-	 * @return Size of the data type
-	 */
 	static uint32_t ShaderDataTypeSize(ShaderDataType type)
 	{
 		switch (type)
@@ -36,9 +29,6 @@ namespace Nebula {
 		return 0;
 	}
 
-	/**
-	 * Information about data to input inside a shader.
-	 */
 	struct BufferElement
 	{
 		std::string Name;
@@ -54,11 +44,7 @@ namespace Nebula {
 		{
 		}
 
-		/**
-		 * Gets the amount of component inside a data type.
-		 * @return Amount of component inside a data type
-		 */
-		uint32_t GetComponentCount() const
+		[[nodiscard]] uint32_t GetComponentCount() const
 		{
 			switch (Type)
 			{
@@ -81,9 +67,6 @@ namespace Nebula {
 		}
 	};
 
-	/**
-	 * Class laying out all the data being inputted inside a shader.
-	 */
 	class BufferLayout
 	{
 	public:
@@ -95,21 +78,13 @@ namespace Nebula {
 			CalculateOffsetsAndStride();
 		}
 
-		/**
-		 * Gets all the elements being inputted inside a shader.
-		 * @return Vector with all the elements
-		 */
-		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
-		/**
-		 * Gets the stride of the data being inputted inside a shader.
-		 * @return Stride of the data
-		 */
-		inline uint32_t GetStride() const { return m_Stride; }
+		[[nodiscard]] inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }
+		[[nodiscard]] inline uint32_t GetStride() const { return m_Stride; }
 
 		std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
 		std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-		std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
-		std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
+		[[nodiscard]] std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
+		[[nodiscard]] std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
 
 	private:
 		void CalculateOffsetsAndStride()
@@ -129,60 +104,33 @@ namespace Nebula {
 		uint32_t m_Stride;
 	};
 
-	/**
-	 * Class representing a Vertex buffer object.
-	 */
 	class VertexBuffer
 	{
 	public:
-		virtual ~VertexBuffer() {}
+		virtual ~VertexBuffer() = default;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		/**
-		 * Gets the layout of the vertex buffer.
-		 * @return Layout of the vertex buffer
-		 */
-		virtual const BufferLayout& GetLayout() const = 0;
-		/**
-		 * Sets the layout of the vertex buffer.
-		 * @param layout Layout of the vertex buffer
-		 */
+		virtual void SetData(const void* data, uint32_t size) = 0;
+
+		[[nodiscard]] virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
-		/**
-		 * Creates a vertex buffer with the inputted vertices.
-		 * @param vertices Table with all the vertices
-		 * @param size size of the table
-		 * @return Pointer to the generated vertex buffer
-		 */
+		static Ref<VertexBuffer> Create(uint32_t size);
 		static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
 	};
 
-	/**
-	 * Class representing an index buffer object.
-	 */
 	class IndexBuffer
 	{
 	public:
-		virtual ~IndexBuffer() {}
+		virtual ~IndexBuffer() = default;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		/**
-		 * Gets the amount of indices inside the index buffer.
-		 * @return Amount of indices
-		 */
-		virtual uint32_t GetCount() const = 0;
+		[[nodiscard]] virtual uint32_t GetCount() const = 0;
 
-		/**
-		 * Creates an index buffer object with the inputted indices.
-		 * @param Indices Table with all the indices
-		 * @param count Amount of indices
-		 * @return Pointer to the generated index buffer
-		 */
 		static Ref<IndexBuffer> Create(uint32_t* Indices, uint32_t count);
 	};
 

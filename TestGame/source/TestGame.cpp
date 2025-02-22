@@ -315,7 +315,7 @@ public:
 		//PushLayer(new TestCube());
 		//PushLayer(new Cube3D());
 		PushLayer(new Sandbox2D);
-		this->GetWindow().SetVSync(true);
+		this->GetWindow().SetVSync(false);
 	}
 
 	~TestGame() override

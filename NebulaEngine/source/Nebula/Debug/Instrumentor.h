@@ -125,8 +125,7 @@ namespace Nebula
     };
 }
 
-#define NB_PROFILE 1
-#if NB_PROFILE
+#ifdef NB_DEBUG
     #define NB_PROFILE_BEGIN_SESSION(name, filepath) ::Nebula::Instrumentor::Get().BeginSession(name, filepath)
     #define NB_PROFILE_END_SESSION() ::Nebula::Instrumentor::Get().EndSession()
     #define NB_PROFILE_SCOPE(name) ::Nebula::InstrumentationTimer timer##__LINE__(name)

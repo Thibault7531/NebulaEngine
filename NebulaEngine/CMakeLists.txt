@@ -130,12 +130,12 @@ target_link_libraries(Nebula PRIVATE
         SDL3-shared
         GLAD
         spdlog::spdlog_header_only
-        glm
 )
 target_include_directories(Nebula PRIVATE
         source
         vendor
         vendor/Glad/include
+        vendor/glm
         vendor/glm/glm
         vendor/imgui
         vendor/SDL3/include
