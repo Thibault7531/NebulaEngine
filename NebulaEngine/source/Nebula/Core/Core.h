@@ -37,7 +37,7 @@
 
 
 // Debug
-#ifdef NB_DEBUG
+#ifdef NB_ENGINE_DEBUG
 	#define NB_ENABLE_ASSERTS
 #endif
 

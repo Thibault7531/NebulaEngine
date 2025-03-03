@@ -13,6 +13,10 @@ namespace Nebula {
 		glEnable(GL_DEPTH_TEST);
 
 		glEnable(GL_CULL_FACE);
+
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(MessageCallback, nullptr);
 	}
 
 	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
@@ -30,9 +34,20 @@ namespace Nebula {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray)
+	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, const uint32_t indexCount)
 	{
-		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		uint32_t count = indexCount == 0 ? vertexArray->GetIndexBuffer()->GetCount() : indexCount;
+		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
 
+	void OpenGLRendererAPI::MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+		const GLchar *message, const void *userParam)
+	{
+		NB_PROFILE_FUNCTION();
+
+		if (id == 131185) return;
+
+		if (type == GL_DEBUG_TYPE_ERROR) NB_CORE_ERROR("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n", ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message);
+		NB_CORE_DEBUG("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n", ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message);
+	}
 }

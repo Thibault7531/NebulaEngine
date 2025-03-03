@@ -3,15 +3,10 @@
 #include "RendererAPI.h"
 
 namespace Nebula {
-	/**
-	 * Static class to send render commands.
-	 */
+
 	class RenderCommand
 	{
 	public:
-		/**
-		 * Initializes the renderer with correct settings.
-		 */
 		inline static void Init()
 		{
 			s_RendererAPI->Init();
@@ -22,29 +17,18 @@ namespace Nebula {
 			s_RendererAPI->SetViewport(x, y, width, height);
 		}
 
-		/**
-		 * Sets the color of the background.
-		 * @param color Color for the background
-		 */
 		inline static void SetClearColor(const glm::vec4& color)
 		{
 			s_RendererAPI->SetClearColor(color);
 		}
-		/**
-		 * Clears the viewport.
-		 */
 		inline static void Clear()
 		{
 			s_RendererAPI->Clear();
 		}
 
-		/**
-		 * Draws the specified vertex array on the screen.
-		 * @param vertexArray Vertex array to be drawn on the screen
-		 */
-		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray)
+		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0)
 		{
-			s_RendererAPI->DrawIndexed(vertexArray);
+			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
 	private:
 		static RendererAPI* s_RendererAPI;
