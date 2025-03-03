@@ -100,7 +100,7 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
         for (int x = 0; x < 100; x++) {
             for (int y = 0; y < 100; y++) {
                 NB_PROFILE_SCOPE("LOOP");
-                Nebula::Renderer2D::DrawQuad({x, y, 0.0f}, {1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f});
+                Nebula::Renderer2D::DrawQuad({ .position = {x, y, 0.0f}, .texture = m_Dirt});
             }
         }
         Nebula::Renderer2D::EndScene();

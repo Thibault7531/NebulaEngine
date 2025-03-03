@@ -115,7 +115,7 @@ endif ()
 target_compile_definitions(Nebula PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 if (CMAKE_BUILD_TYPE EQUAL "Debug")
-    target_compile_definitions(Nebula PRIVATE NB_DEBUG)
+    target_compile_definitions(Nebula PRIVATE NB_ENGINE_DEBUG)
 elseif (CMAKE_BUILD_TYPE EQUAL "Release")
     target_compile_definitions(Nebula PRIVATE NB_RELEASE)
 else ()

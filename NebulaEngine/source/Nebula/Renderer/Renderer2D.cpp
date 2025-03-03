@@ -4,7 +4,7 @@
 #include "Shader.h"
 #include "VertexArray.h"
 #include "glm/gtc/matrix_transform.hpp"
-#include "gtc/type_ptr.inl"
+#include "gtc/type_ptr.hpp"
 
 namespace Nebula
 {
@@ -303,7 +303,7 @@ namespace Nebula
 
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), properties.position);
         if (properties.rotation != 0.0f) transform *= glm::rotate(glm::mat4(1.0f), properties.rotation, {0.0f, 0.0f, 1.0f});
-        transform *= glm::scale(glm::mat4(1.0f), { properties.size.x, properties.size.y, 1.0f });
+        if (properties.size != glm::vec2(1.0f)) transform *= glm::scale(glm::mat4(1.0f), { properties.size.x, properties.size.y, 1.0f });
 
         float textureIndex = 0.0f;
         if (properties.texture != nullptr) {
