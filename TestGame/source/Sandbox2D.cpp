@@ -122,6 +122,14 @@ void Sandbox2D::OnImGuiRender()
 {
     NB_PROFILE_FUNCTION();
 
+    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGui::BeginMainMenuBar();
+    if (ImGui::BeginMenu("Dockspace", false)) {
+        ImGui::MenuItem("Test");
+        ImGui::EndMenu();
+    }
+    ImGui::EndMainMenuBar();
+
     ImGui::Begin("Settings");
     ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
     ImGui::End();
