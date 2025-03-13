@@ -31,6 +31,8 @@ private:
 
     std::array<std::array<Nebula::Ref<Nebula::Texture2D>, 32>, 32> m_World;
 
+    Nebula::Ref<Nebula::Framebuffer> m_Framebuffer;
+
     struct ProfileResult
     {
         const char* Name;

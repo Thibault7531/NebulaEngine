@@ -16,6 +16,7 @@ list(APPEND NebulaSourceFiles
         source/Nebula/Renderer/Buffer.cpp
         source/Nebula/Renderer/Camera.cpp
         source/Nebula/Renderer/CameraController.cpp
+        source/Nebula/Renderer/Framebuffer.cpp
         source/Nebula/Renderer/RenderCommand.cpp
         source/Nebula/Renderer/Renderer.cpp
         source/Nebula/Renderer/Renderer2D.cpp
@@ -47,6 +48,7 @@ list(APPEND NebulaHeaderFiles
         source/Nebula/Renderer/Buffer.h
         source/Nebula/Renderer/Camera.h
         source/Nebula/Renderer/CameraController.h
+        source/Nebula/Renderer/Framebuffer.h
         source/Nebula/Renderer/GraphicsContext.h
         source/Nebula/Renderer/RenderCommand.h
         source/Nebula/Renderer/Renderer.h
@@ -63,6 +65,7 @@ if (nebula_cmake_platform STREQUAL Windows)
     list(APPEND NebulaSourceFiles
             source/Platform/OpenGL/OpenGLBuffer.cpp
             source/Platform/OpenGL/OpenGLContext.cpp
+            source/Platform/OpenGL/OpenGLFramebuffer.cpp
             source/Platform/OpenGL/OpenGLRendererAPI.cpp
             source/Platform/OpenGL/OpenGLShader.cpp
             source/Platform/OpenGL/OpenGLTexture.cpp
@@ -75,6 +78,7 @@ if (nebula_cmake_platform STREQUAL Windows)
     list(APPEND NebulaHeaderFiles
             source/Platform/OpenGL/OpenGLBuffer.h
             source/Platform/OpenGL/OpenGLContext.h
+            source/Platform/OpenGL/OpenGLFramebuffer.h
             source/Platform/OpenGL/OpenGLRendererAPI.h
             source/Platform/OpenGL/OpenGLShader.h
             source/Platform/OpenGL/OpenGLTexture.h
