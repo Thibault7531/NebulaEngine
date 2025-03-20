@@ -67,7 +67,7 @@ namespace Nebula
 		ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
 		ImGui_ImplOpenGL3_Init("#version 410");
 
-		ImFont* font = io.Fonts->AddFontFromFileTTF("assets/fonts/JetBrainsMono-Regular.ttf", 17);
+		ImFont* font = io.Fonts->AddFontFromFileTTF("assets/NebulaEngine/fonts/JetBrainsMono-Regular.ttf", 17);
 		io.Fonts->Build();
 	}
 

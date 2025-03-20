@@ -101,6 +101,11 @@ namespace Nebula
 		}
 	}
 
+	void Application::Shutdown()
+	{
+		m_Running = false;
+	}
+
 	bool Application::OnWindowClosed(WindowCloseEvent& e)
 	{
 		m_Running = false;

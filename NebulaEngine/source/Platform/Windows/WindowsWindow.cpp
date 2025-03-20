@@ -80,7 +80,7 @@ namespace Nebula {
 		m_Context->SwapBuffers();
 	}
 
-	void WindowsWindow::SetVSync(bool enabled)
+	void WindowsWindow::SetVSync(const bool enabled)
 	{
 		NB_PROFILE_FUNCTION();
 
@@ -104,6 +104,7 @@ namespace Nebula {
 
 	bool WindowsWindow::OnEvent(void *userdata, SDL_Event *e)
 	{
+		if (GetWindow(e->window.windowID) == nullptr) return false;
 		if (GetWindow(e->window.windowID) != nullptr)
 		{
 			switch (e->type) {

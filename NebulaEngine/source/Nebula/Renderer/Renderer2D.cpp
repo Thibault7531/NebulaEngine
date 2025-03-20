@@ -81,7 +81,7 @@ namespace Nebula
         for (uint32_t i = 0; i < Nebula::Renderer2DData::MaxTextureSlots; i++)
             samplers[i] = i;
 
-        s_Data.QuadShader = Shader::Create("assets/shaders/Renderer2D.glsl");
+        s_Data.QuadShader = Shader::Create("assets/NebulaEngine/shaders/Renderer2D.glsl");
 
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetIntArray("u_Textures", samplers, Nebula::Renderer2DData::MaxTextureSlots);

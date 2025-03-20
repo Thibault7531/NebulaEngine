@@ -15,7 +15,13 @@ add_custom_command(
         TARGET TestGame
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:TestGame>/assets"
+        ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:TestGame>/assets/TestGame"
+)
+add_custom_command(
+        TARGET TestGame
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+        ARGS -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_FILE_DIR:TestGame>/assets/NebulaEngine"
 )
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET TestGame PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")

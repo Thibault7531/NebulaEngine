@@ -33,13 +33,13 @@ endif ()
 
 
 # Compiler arguments
-set(CMAKE_C_FLAGS "/Wall /std:c11")
-set(CMAKE_C_FLAGS_DEBUG "/O0")
+set(CMAKE_C_FLAGS "/std:c11")
+set(CMAKE_C_FLAGS_DEBUG "")
 set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG")
 set(CMAKE_C_FLAGS_DIST "/O2 /Ob2 /DNDEBUG")
 
-set(CMAKE_CXX_FLAGS "/Wall /std:c++latest")
-set(CMAKE_CXX_FLAGS_DEBUG "/O0")
+set(CMAKE_CXX_FLAGS "/std:c++latest")
+set(CMAKE_CXX_FLAGS_DEBUG "")
 set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG")
 set(CMAKE_CXX_FLAGS_DIST "/O2 /Ob2 /DNDEBUG")
 
@@ -49,6 +49,7 @@ set(CMAKE_SHARED_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
 
 # Targets
 add_subdirectory(NebulaEngine)
+add_subdirectory(NebulaEditor)
 add_subdirectory(TestGame)
 
 

@@ -14,16 +14,16 @@ void Sandbox2D::OnAttach()
 {
     m_Framebuffer = Nebula::Framebuffer::Create({ 1920, 1080 });
 
-    m_Dirt = Nebula::Texture2D::Create("assets/textures/dirt.png");
-    m_Grass = Nebula::Texture2D::Create("assets/textures/grass_block_side.png");
-    m_Stone = Nebula::Texture2D::Create("assets/textures/stone.png");
-    m_Craft = Nebula::Texture2D::Create("assets/textures/crafting_table_front.png");
-    m_Deepslate = Nebula::Texture2D::Create("assets/textures/deepslate.png");
-    m_Bedrock = Nebula::Texture2D::Create("assets/textures/bedrock.png");
-    m_Diamond = Nebula::Texture2D::Create("assets/textures/diamond_ore.png");
-    m_Iron = Nebula::Texture2D::Create("assets/textures/iron_ore.png");
-    m_Coal = Nebula::Texture2D::Create("assets/textures/coal_ore.png");
-    m_Rainbow = Nebula::Texture2D::Create("assets/textures/furnace_front.png");
+    m_Dirt = Nebula::Texture2D::Create("assets/TestGame/textures/dirt.png");
+    m_Grass = Nebula::Texture2D::Create("assets/TestGame/textures/grass_block_side.png");
+    m_Stone = Nebula::Texture2D::Create("assets/TestGame/textures/stone.png");
+    m_Craft = Nebula::Texture2D::Create("assets/TestGame/textures/crafting_table_front.png");
+    m_Deepslate = Nebula::Texture2D::Create("assets/TestGame/textures/deepslate.png");
+    m_Bedrock = Nebula::Texture2D::Create("assets/TestGame/textures/bedrock.png");
+    m_Diamond = Nebula::Texture2D::Create("assets/TestGame/textures/diamond_ore.png");
+    m_Iron = Nebula::Texture2D::Create("assets/TestGame/textures/iron_ore.png");
+    m_Coal = Nebula::Texture2D::Create("assets/TestGame/textures/coal_ore.png");
+    m_Rainbow = Nebula::Texture2D::Create("assets/TestGame/textures/furnace_front.png");
 
     for (int Y = 0; Y < 32; Y++) {
         for (int X = 0; X < 32; X++) {
