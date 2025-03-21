@@ -18,7 +18,10 @@ namespace Nebula {
     void Window::DestroyWindow(Ref<Window> window)
     {
         auto it = std::ranges::find(m_Windows, window);
-        if (it == m_Windows.end()) m_Windows.erase(it);
+        if (it != m_Windows.end()) {
+            delete it->get();
+            m_Windows.erase(it);
+        }
     }
 
     Ref<Window> Window::Create(const WindowProps& props)

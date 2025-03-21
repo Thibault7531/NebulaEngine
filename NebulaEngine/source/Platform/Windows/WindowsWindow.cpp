@@ -13,7 +13,7 @@ namespace Nebula {
 	{
 		NB_PROFILE_FUNCTION();
 
-		WindowsWindow::Init(props);
+		WindowsWindow::InitWindow(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
@@ -25,13 +25,15 @@ namespace Nebula {
 		DestroyWindow(Ref<Window>(this));
 	}
 
-	void WindowsWindow::Init(const WindowProps& props)
+	void WindowsWindow::InitWindow(const WindowProps& props)
 	{
 		NB_PROFILE_FUNCTION();
 
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
+		m_Data.Fullscreen = props.Fullscreen;
+		m_Data.API = props.API;
 		m_Data.EventCallback = std::bind([]{});
 
 		NB_CORE_INFO("Creating window: {0} ({1}, {2})", props.Title, props.Width, props.Height);
@@ -47,18 +49,26 @@ namespace Nebula {
 			s_SDLInitialized = true;
 		}
 
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
 		{
 			NB_PROFILE_SCOPE("SDL_CreateWindow");
-			m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+
+			SDL_WindowFlags flags = SDL_WINDOW_RESIZABLE;
+			if (!props.Border) flags |= SDL_WINDOW_BORDERLESS;
+			if (props.Fullscreen) flags |= SDL_WINDOW_FULLSCREEN;
+			if (props.API == RendererAPI::API::OpenGL) flags |= SDL_WINDOW_OPENGL;
+
+			m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, flags);
 			SDL_PropertiesID windowProps = SDL_GetWindowProperties(m_Window);
 			SDL_SetPointerProperty(windowProps, "windowProps", &m_Data);
 		}
 
-		m_Context = new OpenGLContext(m_Window);
+		if (m_Data.API == RendererAPI::API::OpenGL) {
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+			m_Context = new OpenGLContext(m_Window);
+		}
 		m_Context->Init();
 
 		SDL_StartTextInput(m_Window);
@@ -95,6 +105,22 @@ namespace Nebula {
 	bool WindowsWindow::IsVSync() const
 	{
 		return m_Data.VSync;
+	}
+
+	void WindowsWindow::SetFullscreen(bool enabled)
+	{
+		m_Data.Fullscreen = enabled;
+		SDL_SetWindowFullscreen(m_Window, enabled);
+	}
+
+	bool WindowsWindow::IsFullscreen() const
+	{
+		return m_Data.Fullscreen;
+	}
+
+	void WindowsWindow::Flash() const
+	{
+		SDL_FlashWindow(m_Window, SDL_FLASH_UNTIL_FOCUSED);
 	}
 
 	void WindowsWindow::SetCurrentContext()

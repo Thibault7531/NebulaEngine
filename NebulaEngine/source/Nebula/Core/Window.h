@@ -1,20 +1,21 @@
 #pragma once
 
 #include "../Events/Event.h"
+#include "Nebula/Renderer/RendererAPI.h"
 
 namespace Nebula {
+
 	struct WindowProps
 	{
-		std::string Title;
-		unsigned int Width;
-		unsigned int Height;
+		std::string Title = "NebulaTech";
 
-		WindowProps(const std::string& title = "Nebula Engine",
-			unsigned int width = 1920,
-			unsigned int height = 1080)
-			: Title(title), Width(width), Height(height)
-		{
-		}
+		unsigned int Width = 1920;
+		unsigned int Height = 1080;
+
+		bool Border = true;
+		bool Fullscreen = false;
+
+		RendererAPI::API API = RendererAPI::API::OpenGL;
 	};
 
 	class Window
@@ -33,6 +34,10 @@ namespace Nebula {
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
+		virtual void SetFullscreen(bool enabled) = 0;
+		virtual bool IsFullscreen() const = 0;
+
+		virtual void Flash() const = 0;
 
 		virtual void SetCurrentContext() = 0;
 

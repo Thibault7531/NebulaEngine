@@ -25,6 +25,10 @@ namespace Nebula {
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+		void SetFullscreen(bool enabled) override;
+		bool IsFullscreen() const override;
+
+		virtual void Flash() const override;
 
 		virtual void SetCurrentContext() override;
 
@@ -34,7 +38,7 @@ namespace Nebula {
 		static bool OnEvent(void* userdata, SDL_Event* e);
 
 	private:
-		virtual void Init(const WindowProps& props);
+		virtual void InitWindow(const WindowProps& props);
 		virtual void Shutdown();
 	private:
 		SDL_Window* m_Window;
@@ -47,6 +51,8 @@ namespace Nebula {
 			std::string Title;
 			unsigned int Width, Height;
 			bool VSync;
+			bool Fullscreen;
+			RendererAPI::API API;
 
 			EventCallbackFn EventCallback;
 		};

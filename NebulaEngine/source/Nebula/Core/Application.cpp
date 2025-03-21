@@ -8,7 +8,7 @@ namespace Nebula
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const WindowProps& props)
 	{
 		NB_PROFILE_FUNCTION();
 
@@ -17,13 +17,15 @@ namespace Nebula
 
 		NB_CORE_INFO("Application started");
 
-		m_Window = Window::Create();
+		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
 		Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
+
+		m_Window->Flash();
 	}
 
 	Application::~Application()
