@@ -133,7 +133,7 @@ target_link_libraries(Nebula PRIVATE
         ImGui
         SDL3-shared
         GLAD
-        spdlog::spdlog_header_only
+        spdlog
 )
 target_include_directories(Nebula PRIVATE
         source

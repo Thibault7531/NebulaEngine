@@ -2,8 +2,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "spdlog/fmt/bundled/ranges.h"
-
 namespace Nebula {
 
 	static GLenum ShaderTypeFromString(const std::string& type)

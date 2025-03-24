@@ -1,4 +1,4 @@
-#include <../../../vendor/spdlog/include/spdlog/sinks/stdout_color_sinks.h>
+#include <../../../vendor/spdlog/include/spdlog/sinks/stdout_sinks.h>
 
 namespace Nebula {
 	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;

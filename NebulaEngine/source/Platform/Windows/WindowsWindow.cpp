@@ -130,7 +130,7 @@ namespace Nebula {
 
 	bool WindowsWindow::OnEvent(void *userdata, SDL_Event *e)
 	{
-		if (GetWindow(e->window.windowID) == nullptr) return false;
+		if (GetWindow(e->window.windowID) == nullptr) return true;
 		if (GetWindow(e->window.windowID) != nullptr)
 		{
 			switch (e->type) {
