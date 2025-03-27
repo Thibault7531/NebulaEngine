@@ -9,9 +9,7 @@
 
 namespace Nebula
 {
-	/**
-	 * Base ImGui Layer to allow ImGui rendering and interaction.
-	 */
+
 	class ImGuiLayer : public Layer
 	{
 	public:
@@ -23,14 +21,10 @@ namespace Nebula
 		virtual void OnEvent(Event& event) override;
 		virtual void OnImGuiRender() override;
 
-		/**
-		 * Allows to begin ImGui rendering.
-		 */
 		void Begin();
-		/**
-		 * Allows to stop ImGui rendering.
-		 */
 		void End();
+
+		void BlockEvents(const bool block) { m_BlockEvents = block; }
 
 	private:
 		bool OnMouseButtonPressedEvent(const MouseButtonPressedEvent& event);
@@ -46,6 +40,10 @@ namespace Nebula
 
 	private:
 		ImGuiKey getImGuiKey(int keycode);
+
+	private:
+		bool m_BlockEvents = true;
+
 	};
 
 }

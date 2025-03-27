@@ -15,7 +15,7 @@ namespace Nebula {
 
     void EditorLayer::OnUpdate(Timestep ts)
     {
-        m_Camera.OnUpdate(ts);
+        if (IsViewportFocused) m_Camera.OnUpdate(ts);
 
         RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
         RenderCommand::Clear();
@@ -38,7 +38,7 @@ namespace Nebula {
 
     void EditorLayer::OnEvent(Event &event)
     {
-        m_Camera.OnEvent(event);
+        if (IsViewportFocused) m_Camera.OnEvent(event);
 
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnKeyPressedEvent));
@@ -72,10 +72,17 @@ namespace Nebula {
                 m_Camera.OnResize(m_ViewportSize.x, m_ViewportSize.y);
             }
 
+            IsViewportFocused = ImGui::IsWindowFocused();
+            IsViewportHovered = ImGui::IsWindowHovered();
+            Application::Get().GetImGuiLayer()->BlockEvents(!IsViewportFocused || !IsViewportHovered);
+
             ImGui::Image(m_Framebuffer->GetColorAttachmentRendererID(), { m_ViewportSize.x, m_ViewportSize.y }, {0, 1}, {1, 0});
         }
         ImGui::End();
         ImGui::PopStyleVar();
+
+        ImGui::Begin("Properties");
+        ImGui::End();
     }
 
     bool EditorLayer::OnKeyPressedEvent(const KeyPressedEvent& event)

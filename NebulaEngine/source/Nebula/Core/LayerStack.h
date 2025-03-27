@@ -13,29 +13,20 @@ namespace Nebula
 		LayerStack();
 		~LayerStack();
 
-		/**
-		 * Adds a layer to the layer stack.
-		 * @param layer Layer to be added to the layer stack
-		 */
 		void PushLayer(Layer* layer);
-		/**
-		 * Adds a layer on top of the layer stack.
-		 * @param overlay Layer to be added on top of the layer stack
-		 */
 		void PushOverlay(Layer* overlay);
-		/**
-		 * Removes the specified layer.
-		 * @param layer Layer to be removed.
-		 */
 		void PopLayer(const Layer* layer);
-		/**
-		 * Removes the specified layer.
-		 * @param overlay Layer to be removed
-		 */
 		void PopOverlay(const Layer* overlay);
 
 		std::vector<Layer*>::iterator begin() { return m_Layers.begin(); }
 		std::vector<Layer*>::iterator end() { return m_Layers.end(); }
+		std::vector<Layer*>::reverse_iterator rbegin() { return m_Layers.rbegin(); }
+		std::vector<Layer*>::reverse_iterator rend() { return m_Layers.rend(); }
+
+		std::vector<Layer*>::const_iterator cbegin() { return m_Layers.cbegin(); }
+		std::vector<Layer*>::const_iterator cend() { return m_Layers.cend(); }
+		std::vector<Layer*>::const_reverse_iterator crbegin() { return m_Layers.crbegin(); }
+		std::vector<Layer*>::const_reverse_iterator crend() { return m_Layers.crend(); }
 	private:
 		std::vector<Layer*> m_Layers;
 		unsigned int m_LayerInsertIndex = 0;

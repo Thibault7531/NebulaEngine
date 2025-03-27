@@ -20,6 +20,8 @@ namespace Nebula {
         bool OnKeyPressedEvent(const KeyPressedEvent& event);
 
     private:
+        bool IsViewportFocused = false;
+        bool IsViewportHovered = false;
         glm::vec2 m_ViewportSize = { 1920.0f, 1080.0f };
         Ref<Framebuffer> m_Framebuffer;
 
