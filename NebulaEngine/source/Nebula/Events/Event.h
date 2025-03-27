@@ -6,9 +6,7 @@
 
 namespace Nebula
 {
-	/**
-	 * Type of the event.
-	 */
+
 	enum class EventType
 	{
 		None = 0,
@@ -18,9 +16,6 @@ namespace Nebula
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
-	/**
-	 * Categories of the event.
-	 */
 	enum EventCategory
 	{
 		None = 0,
@@ -37,35 +32,17 @@ namespace Nebula
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
-	/**
-	 * Basics of an event.
-	 */
 	class Event
 	{
 		friend class EventDispatcher;
 	public:
-		/**
-		 * Gets the type of the event.
-		 * @return Type of the event
-		 */
+		virtual ~Event() = default;
+
 		virtual EventType GetEventType() const = 0;
-		/**
-		 * Gets the name of the event.
-		 * @return Name of the event
-		 */
 		virtual const char* GetName() const = 0;
-		/**
-		 * Gets the category flags of the event.
-		 * @return Categories of the event
-		 */
 		virtual int GetCategoryFlags() const = 0;
 		virtual std::string ToString() const { return GetName(); }
 
-		/**
-		 * If the event is in the specified category.
-		 * @param category Category to be tested with
-		 * @return If the event is in the specified category
-		 */
 		inline bool IsInCategory(EventCategory category) const
 		{
 			return GetCategoryFlags() & category;
@@ -74,9 +51,6 @@ namespace Nebula
 		bool Handled = false;
 	};
 
-	/**
-	 * Class to dispatch events depending on their type.
-	 */
 	class EventDispatcher
 	{
 		template<typename T>
@@ -87,12 +61,6 @@ namespace Nebula
 		{
 		}
 
-		/**
-		 * Dispatches an event depending on its type.
-		 * @tparam T Event class
-		 * @param func Function to be called with the event
-		 * @return If the event has been handled by func
-		 */
 		template<typename T>
 		bool Dispatch(EventFn<T> func)
 		{

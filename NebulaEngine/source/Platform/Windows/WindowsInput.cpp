@@ -1,36 +1,33 @@
-#include "WindowsInput.h"
-
 #include <SDL.h>
 
-#include "../../Nebula/Core/Application.h"
+#include "Nebula/Core/Input.h"
 
 namespace Nebula {
 
-	Input* Input::s_Instance = new WindowsInput();
-
-	bool WindowsInput::IsKeyPressedImpl(int keycode)
+	bool Input::IsKeyPressed(int keycode)
 	{
-		return m_KeyboardState[SDL_GetScancodeFromKey(keycode, nullptr)];
+		const bool* KeyboardState = SDL_GetKeyboardState(nullptr);
+		return KeyboardState[SDL_GetScancodeFromKey(keycode, nullptr)];
 	}
 
-	bool WindowsInput::IsMouseButtonPressedImpl(int button)
+	bool Input::IsMouseButtonPressed(int button)
 	{
 		return SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_MASK(button);
 	}
 
-	float WindowsInput::GetMouseXImpl()
+	float Input::GetMouseX()
 	{
-		auto[x, y] = GetMousePositionImpl();
+		auto[x, y] = GetMousePosition();
 		return x;
 	}
 
-	float WindowsInput::GetMouseYImpl()
+	float Input::GetMouseY()
 	{
-		auto[x, y] = GetMousePositionImpl();
+		auto[x, y] = GetMousePosition();
 		return y;
 	}
 
-	std::pair<float, float> WindowsInput::GetMousePositionImpl()
+	std::pair<float, float> Input::GetMousePosition()
 	{
 		float posX, posY;
 		SDL_GetMouseState(&posX, &posY);

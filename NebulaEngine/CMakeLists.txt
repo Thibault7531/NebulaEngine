@@ -84,7 +84,6 @@ if (nebula_cmake_platform STREQUAL Windows)
             source/Platform/OpenGL/OpenGLTexture.h
             source/Platform/OpenGL/OpenGLVertexArray.h
             source/Platform/Windows/WindowsWindow.h
-            source/Platform/Windows/WindowsInput.h
             vendor/imgui/backends/imgui_impl_sdl3.h
             vendor/imgui/backends/imgui_impl_opengl3.h
     )
