@@ -40,4 +40,5 @@ target_include_directories(TestGame PRIVATE
         ../NebulaEngine/vendor/imgui
         ../NebulaEngine/vendor/Glad/include
         ../NebulaEngine/vendor/glm
+        ../NebulaEngine/vendor/glm/glm
 )

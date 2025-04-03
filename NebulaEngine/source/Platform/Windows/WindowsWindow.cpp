@@ -1,5 +1,6 @@
 #include "WindowsWindow.h"
 
+#include "Nebula/Core/Application.h"
 #include "Nebula/Events/ApplicationEvent.h"
 #include "Nebula/Events/KeyEvent.h"
 #include "Nebula/Events/MouseEvent.h"
@@ -88,6 +89,10 @@ namespace Nebula {
 		NB_PROFILE_FUNCTION();
 
 		m_Context->SwapBuffers();
+
+		if (Application::Get().IsMinimized()) {
+			SDL_PumpEvents();
+		}
 	}
 
 	void WindowsWindow::SetVSync(const bool enabled)
@@ -161,7 +166,7 @@ namespace Nebula {
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
-						WindowMinimizeEvent event{};
+						WindowMinimizeEvent event{SDL_GetWindowFlags(SDL_GetWindowFromEvent(e)) && SDL_WINDOW_MINIMIZED == 1};
 						data.EventCallback(event);
 
 						return false;
@@ -176,7 +181,7 @@ namespace Nebula {
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
-						WindowMaximizeEvent event{};
+						WindowMaximizeEvent event{SDL_GetWindowFlags(SDL_GetWindowFromEvent(e)) && SDL_WINDOW_MAXIMIZED == 1};
 						data.EventCallback(event);
 
 						return false;

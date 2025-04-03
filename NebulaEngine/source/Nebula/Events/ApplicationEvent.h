@@ -56,19 +56,31 @@ namespace Nebula
 	class WindowMinimizeEvent : public Event
 	{
 	public:
-		WindowMinimizeEvent() = default;
+		WindowMinimizeEvent(bool minimized)
+			: m_Minimized(minimized) {}
+
+		inline bool IsMinimized() const { return m_Minimized; }
 
 		EVENT_CLASS_TYPE(WindowMinimize)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+		bool m_Minimized;
 	};
 
 	class WindowMaximizeEvent : public Event
 	{
 	public:
-		WindowMaximizeEvent() = default;
+		WindowMaximizeEvent(bool maximized)
+			: m_Maximized(maximized) {}
+
+		inline bool IsMaximized() const { return m_Maximized; }
 
 		EVENT_CLASS_TYPE(WindowMaximize)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+		bool m_Maximized;
 	};
 
 	class AppTickEvent : public Event

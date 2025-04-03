@@ -29,13 +29,14 @@ namespace Nebula {
 
 		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 
+		bool IsMinimized() const { return m_Minimized; }
+
 		inline static Application& Get() { return *s_Instance; }
 
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 		bool OnWindowMinimize(WindowMinimizeEvent& e);
-		bool OnWindowMaximize(WindowMaximizeEvent& e);
 
 	private:
 		Ref<Window> m_Window;
