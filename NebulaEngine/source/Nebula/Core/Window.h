@@ -45,7 +45,7 @@ namespace Nebula {
 		virtual uint32_t GetID() const = 0;
 
 		static Ref<Window> GetWindow(uint32_t windowID);
-		static void DestroyWindow(Ref<Window> window);
+		static void DestroyWindow(uint32_t windowID);
 
 		static Ref<Window> Create(const WindowProps& props = WindowProps());
 

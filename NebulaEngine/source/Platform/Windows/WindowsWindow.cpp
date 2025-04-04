@@ -21,9 +21,8 @@ namespace Nebula {
 	{
 		NB_PROFILE_FUNCTION();
 
+		DestroyWindow(SDL_GetWindowID(m_Window));
 		WindowsWindow::Shutdown();
-
-		DestroyWindow(Ref<Window>(this));
 	}
 
 	void WindowsWindow::InitWindow(const WindowProps& props)

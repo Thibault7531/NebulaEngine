@@ -15,12 +15,13 @@ namespace Nebula {
         return nullptr;
     }
 
-    void Window::DestroyWindow(Ref<Window> window)
+    void Window::DestroyWindow(uint32_t windowID)
     {
-        auto it = std::ranges::find(m_Windows, window);
-        if (it != m_Windows.end()) {
-            delete it->get();
-            m_Windows.erase(it);
+        for (const auto& window : m_Windows) {
+            if (window->GetID() == windowID) {
+                auto it = std::ranges::find(m_Windows, window);
+                m_Windows.erase(it);
+            };
         }
     }
 
