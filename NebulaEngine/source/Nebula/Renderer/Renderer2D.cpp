@@ -349,6 +349,56 @@ namespace Nebula
         s_Data.Stats.QuadCount++;
     }
 
+    void Renderer2D::DrawQuad(const QuadPropertiesAdvanced& properties)
+    {
+        NB_PROFILE_FUNCTION();
+
+        if (s_Data.QuadIndexCount == Renderer2DData::MaxIndices || s_Data.TextureSlotIndex == Renderer2DData::MaxTextureSlots) NextBash();
+
+        float textureIndex = 0.0f;
+        if (properties.texture != nullptr) {
+            for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) {
+                if (*s_Data.TextureSlots[i] == *properties.texture) {
+                    textureIndex = static_cast<float>(i);
+                    break;
+                }
+            }
+            if (textureIndex == 0.0f) {
+                textureIndex = static_cast<float>(s_Data.TextureSlotIndex);
+                s_Data.TextureSlots[s_Data.TextureSlotIndex] = properties.texture;
+                s_Data.TextureSlotIndex++;
+            }
+        }
+
+        s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4(-0.5f, -0.5f, 0.0f, 1.0f);
+        s_Data.QuadVertexBufferPtr->Color = properties.color;
+        s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr++;
+
+        s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->Color = properties.color;
+        s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr++;
+
+        s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( 0.5f, 0.5f, 0.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->Color = properties.color;
+        s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr++;
+
+        s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( -0.5f, 0.5f, 0.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->Color = properties.color;
+        s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+        s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr++;
+
+        s_Data.QuadIndexCount += 6;
+
+        s_Data.Stats.QuadCount++;
+    }
+
     Renderer2D::Statistics Renderer2D::GetStatistics()
     {
         return s_Data.Stats;

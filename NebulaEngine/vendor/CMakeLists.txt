@@ -1,3 +1,8 @@
+# EnTT
+
+add_subdirectory(entt)
+
+
 # GLAD
 
 add_library(GLAD STATIC Glad/src/glad.c Glad/include/glad/glad.h Glad/include/KHR/khrplatform.h)

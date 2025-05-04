@@ -1,9 +1,8 @@
 #pragma once
-#include "glm/vec2.hpp"
-#include "Nebula/Core/Layer.h"
-#include "Nebula/Events/KeyEvent.h"
-#include "Nebula/Renderer/CameraController.h"
-#include "Nebula/Renderer/Framebuffer.h"
+
+#include <glm.hpp>
+
+#include "Nebula.h"
 
 namespace Nebula {
 
@@ -11,6 +10,8 @@ namespace Nebula {
     public:
         EditorLayer();
         ~EditorLayer() override = default;
+
+        virtual void OnAttach() override;
 
         void OnUpdate(Timestep ts) override;
         void OnEvent(Event &event) override;
@@ -26,6 +27,9 @@ namespace Nebula {
         Ref<Framebuffer> m_Framebuffer;
 
         OrthographicCameraController m_Camera;
+
+        Ref<Scene> m_Scene;
+        Entity m_SquareEntity;
 
     };
 

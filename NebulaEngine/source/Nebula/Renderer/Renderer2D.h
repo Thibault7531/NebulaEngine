@@ -18,6 +18,13 @@ namespace Nebula
             glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
             float tilingFactor = 1.0f;
         };
+        struct QuadPropertiesAdvanced
+        {
+            glm::mat4 transform = glm::mat4(1.0f);
+            Ref<Texture2D> texture = nullptr;
+            glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
+            float tilingFactor = 1.0f;
+        };
 
     public:
         static void Init();
@@ -39,6 +46,7 @@ namespace Nebula
         [[deprecated]] static void DrawRotatedQuad(const glm::vec3& position, const float& rotation, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float tilingFactor = 1.0f);
 
         static void DrawQuad(const QuadProperties& properties);
+        static void DrawQuad(const QuadPropertiesAdvanced& properties);
 
         struct Statistics
         {

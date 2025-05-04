@@ -25,3 +25,8 @@
 #include "Nebula/Renderer/Renderer2D.h"
 #include "Nebula/Renderer/Shader.h"
 #include "Nebula/Renderer/Texture.h"
+
+// Scene
+#include "Nebula/Scene/Components.h"
+#include "Nebula/Scene/Entity.h"
+#include "Nebula/Scene/Scene.h"

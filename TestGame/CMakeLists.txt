@@ -38,6 +38,7 @@ target_include_directories(TestGame PRIVATE
         ../NebulaEngine/vendor/SDL3/include/SDL3
         ../NebulaEngine/vendor/SDL3/include
         ../NebulaEngine/vendor/imgui
+        ../NebulaEngine/vendor/entt/single_include
         ../NebulaEngine/vendor/Glad/include
         ../NebulaEngine/vendor/glm
         ../NebulaEngine/vendor/glm/glm

@@ -12,8 +12,6 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
-    m_Framebuffer = Nebula::Framebuffer::Create({ 1920, 1080 });
-
     m_Dirt = Nebula::Texture2D::Create("assets/TestGame/textures/dirt.png");
     m_Grass = Nebula::Texture2D::Create("assets/TestGame/textures/grass_block_side.png");
     m_Stone = Nebula::Texture2D::Create("assets/TestGame/textures/stone.png");
@@ -83,9 +81,6 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
         NB_PROFILE_SCOPE("Viewport clear");
         Nebula::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
         Nebula::RenderCommand::Clear();
-        m_Framebuffer->Bind();
-        Nebula::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-        Nebula::RenderCommand::Clear();
     }
 
     {
@@ -120,8 +115,6 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
         }
         Nebula::Renderer2D::EndScene();
         */
-
-        m_Framebuffer->Unbind();
     }
 }
 
@@ -129,26 +122,7 @@ void Sandbox2D::OnImGuiRender()
 {
     NB_PROFILE_FUNCTION();
 
-    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
-    ImGui::BeginMainMenuBar();
-    if (ImGui::BeginMenu("Dockspace", false)) {
-        ImGui::MenuItem("Test");
-        ImGui::EndMenu();
-    }
-    ImGui::EndMainMenuBar();
 
-    ImGui::Begin("Settings");
-    ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
-    ImGui::End();
-
-    ImGui::Begin("Scene statistics");
-    ImGui::Text("Quad Count: %u", Nebula::Renderer2D::GetStatistics().QuadCount);
-    ImGui::Text("Draw Calls: %u", Nebula::Renderer2D::GetStatistics().DrawCalls);
-    ImGui::End();
-
-    ImGui::Begin("Scene");
-    ImGui::Image(m_Framebuffer->GetColorAttachmentRendererID(), {1920, 1080}, {0, 1}, {1, 0});
-    ImGui::End();
 }
 
 void Sandbox2D::OnEvent(Nebula::Event& e)

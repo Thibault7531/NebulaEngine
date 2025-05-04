@@ -1,6 +1,8 @@
 #include "EditorLayer.h"
 
-#include "imgui.h"
+#include <gtc/type_ptr.hpp>
+#include <imgui.h>
+
 #include "Nebula/Core/Application.h"
 #include "Nebula/Core/KeyCodes.h"
 #include "Nebula/Renderer/RenderCommand.h"
@@ -8,9 +10,18 @@
 
 namespace Nebula {
     EditorLayer::EditorLayer()
-        : m_Camera(16.0f/9.0f)
+        : Layer("EditorLayer"), m_Camera(16.0f/9.0f)
+    {
+    }
+
+    void EditorLayer::OnAttach()
     {
         m_Framebuffer = Framebuffer::Create({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y)});
+
+        m_Scene = CreateRef<Scene>();
+
+        m_SquareEntity = m_Scene->CreateEntity("Square");
+        m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
     }
 
     void EditorLayer::OnUpdate(Timestep ts)
@@ -28,7 +39,8 @@ namespace Nebula {
         {
             Renderer2D::BeginScene(m_Camera.GetCamera());
 
-            Renderer2D::DrawQuad({ .position = {-.5f, .2f, .0f}, .rotation = glm::radians(40.f), .color = {.0f, 1.f, 1.f, 1.f} });
+            Renderer2D::DrawQuad({ .position = {-.5f, .2f, -.1f}, .rotation = glm::radians(40.f), .color = {.0f, 1.f, 1.f, 1.f} });
+            m_Scene->OnUpdate(ts);
 
             Renderer2D::EndScene();
         }
@@ -82,6 +94,15 @@ namespace Nebula {
         ImGui::PopStyleVar();
 
         ImGui::Begin("Properties");
+        {
+            if (m_SquareEntity)
+            {
+                ImGui::SeparatorText(std::string(m_SquareEntity.GetComponent<TagComponent>().Tag).c_str());
+
+                auto& SquareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
+                ImGui::ColorEdit4("Square Color", glm::value_ptr(SquareColor));
+            }
+        }
         ImGui::End();
     }
 

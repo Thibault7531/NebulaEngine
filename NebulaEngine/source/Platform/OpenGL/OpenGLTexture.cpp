@@ -43,7 +43,7 @@ namespace Nebula
             m_DataFormat = GL_RGB;
         }
 
-        NB_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
+        NB_CORE_ASSERT(m_InternalFormat & m_DataFormat, "Format not supported!");
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
         glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
