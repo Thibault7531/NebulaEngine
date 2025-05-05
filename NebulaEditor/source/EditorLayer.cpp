@@ -26,6 +26,11 @@ namespace Nebula {
 
     void EditorLayer::OnUpdate(Timestep ts)
     {
+        if (!DoesViewportFit) {
+            m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+            m_Camera.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+        }
+
         if (IsViewportFocused) m_Camera.OnUpdate(ts);
 
         RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
@@ -80,8 +85,7 @@ namespace Nebula {
             ImVec2 size = ImGui::GetContentRegionAvail();
             if (m_ViewportSize != *(glm::vec2*)&size) {
                 m_ViewportSize = { size.x, size.y };
-                m_Framebuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
-                m_Camera.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+                DoesViewportFit = false;
             }
 
             IsViewportFocused = ImGui::IsWindowFocused();

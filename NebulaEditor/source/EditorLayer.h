@@ -23,6 +23,7 @@ namespace Nebula {
     private:
         bool IsViewportFocused = false;
         bool IsViewportHovered = false;
+        bool DoesViewportFit = false;
         glm::vec2 m_ViewportSize = { 1920.0f, 1080.0f };
         Ref<Framebuffer> m_Framebuffer;
 
