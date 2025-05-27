@@ -27,10 +27,10 @@ namespace Nebula {
         glm::vec2 m_ViewportSize = { 1920.0f, 1080.0f };
         Ref<Framebuffer> m_Framebuffer;
 
-        OrthographicCameraController m_Camera;
-
         Ref<Scene> m_Scene;
         Entity m_SquareEntity;
+        Entity m_Square2Entity;
+        Entity m_CameraEntity;
 
     };
 

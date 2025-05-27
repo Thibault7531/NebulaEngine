@@ -25,7 +25,7 @@ namespace Nebula {
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginScene(Camera& camera)
+	void Renderer::BeginScene(PerspectiveCamera& camera)
 	{
 		m_SceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
 	}

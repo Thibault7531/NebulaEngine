@@ -1,8 +1,9 @@
 #include "CameraController.h"
 
-#include "../Core/Input.h"
-#include "../Core/KeyCodes.h"
-#include "../Core/MouseButtonCodes.h"
+#include "Nebula/Core/Input.h"
+#include "Nebula/Core/KeyCodes.h"
+#include "Nebula/Core/MouseButtonCodes.h"
+#include "OrthographicCamera.h"
 
 namespace Nebula
 {

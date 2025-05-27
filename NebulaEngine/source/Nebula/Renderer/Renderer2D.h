@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Camera.h"
-#include "Texture.h"
+#include "Nebula/Renderer/OrthographicCamera.h"
+#include "Nebula/Renderer/Texture.h"
 
 namespace Nebula
 {
@@ -31,6 +32,7 @@ namespace Nebula
         static void Shutdown();
 
         static void BeginScene(const OrthographicCamera& camera);
+        static void BeginScene(const Camera& camera, const glm::mat4& transform);
         static void EndScene();
         static void NextBash();
         static void Flush();

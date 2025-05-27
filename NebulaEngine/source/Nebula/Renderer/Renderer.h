@@ -1,44 +1,23 @@
 #pragma once
 
-#include "Camera.h"
+#include "PerspectiveCamera.h"
 #include "RendererAPI.h"
 #include "Shader.h"
 
 namespace Nebula {
-	/**
-	 * Static class to send commands to the renderer.
-	 */
+
 	class Renderer
 	{
 	public:
-		/**
-		 * Initializes the renderer with the correct settings.
-		 */
 		static void Init();
 		static void Shutdown();
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
-		/**
-		 * Begins the rendering process.
-		 */
-		static void BeginScene(Camera& camera);
-		/**
-		 * Ends the rendering process.
-		 */
+		static void BeginScene(PerspectiveCamera& camera);
 		static void EndScene();
 
-		/**
-		 * Submits a vertex array to be drawn on the screen.
-		 * @param shader Shader used to draw Vertex array
-		 * @param vertexArray Vertex array to be drawn on the screen
-		 * @param transform Transform matrix to move the object
-		 */
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
-		/**
-		 * Gets the Graphics API being used.
-		 * @return Graphics API
-		 */
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
 	private:

@@ -9,7 +9,7 @@ namespace Nebula {
     {
     public:
         NebulaEditor()
-            : Application({ .Title = "NebulaEditor", .Border = false })
+            : Application({ .Title = "NebulaEditor", .Border = true })
         {
             PushLayer(new EditorLayer());
         }

@@ -6,11 +6,10 @@
 #include "Nebula/Core/Application.h"
 #include "Nebula/Core/KeyCodes.h"
 #include "Nebula/Renderer/RenderCommand.h"
-#include "Nebula/Renderer/Renderer2D.h"
 
 namespace Nebula {
     EditorLayer::EditorLayer()
-        : Layer("EditorLayer"), m_Camera(16.0f/9.0f)
+        : Layer("EditorLayer")
     {
     }
 
@@ -22,16 +21,22 @@ namespace Nebula {
 
         m_SquareEntity = m_Scene->CreateEntity("Square");
         m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+
+        m_Square2Entity = m_Scene->CreateEntity("Square2");
+        m_Square2Entity.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 1.0f, 1.0f});
+        m_Square2Entity.GetComponent<TransformComponent>().Transform = glm::translate(glm::mat4(1.0f), glm::vec3{-1.0f, 0.0f, -.1f}) * glm::rotate(glm::mat4(1.0f), glm::radians(40.0f), glm::vec3{0.0f, 0.0f, 1.0f});
+
+        m_CameraEntity = m_Scene->CreateEntity("Camera");
+        m_CameraEntity.AddComponent<CameraComponent>();
     }
 
     void EditorLayer::OnUpdate(Timestep ts)
     {
         if (!DoesViewportFit) {
             m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
-            m_Camera.OnResize(m_ViewportSize.x, m_ViewportSize.y);
-        }
 
-        if (IsViewportFocused) m_Camera.OnUpdate(ts);
+            m_Scene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+        }
 
         RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
         RenderCommand::Clear();
@@ -41,22 +46,13 @@ namespace Nebula {
         RenderCommand::SetClearColor({ .3f, .3f, .3f, 1.f });
         RenderCommand::Clear();
 
-        {
-            Renderer2D::BeginScene(m_Camera.GetCamera());
-
-            Renderer2D::DrawQuad({ .position = {-.5f, .2f, -.1f}, .rotation = glm::radians(40.f), .color = {.0f, 1.f, 1.f, 1.f} });
-            m_Scene->OnUpdate(ts);
-
-            Renderer2D::EndScene();
-        }
+        m_Scene->OnUpdate(ts);
 
         m_Framebuffer->Unbind();
     }
 
     void EditorLayer::OnEvent(Event &event)
     {
-        if (IsViewportFocused) m_Camera.OnEvent(event);
-
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnKeyPressedEvent));
     }
@@ -83,7 +79,7 @@ namespace Nebula {
         ImGui::Begin("Scene");
         {
             ImVec2 size = ImGui::GetContentRegionAvail();
-            if (m_ViewportSize != *(glm::vec2*)&size) {
+            if (m_ViewportSize != *reinterpret_cast<glm::vec2*>(&size)) {
                 m_ViewportSize = { size.x, size.y };
                 DoesViewportFit = false;
             }
@@ -105,6 +101,20 @@ namespace Nebula {
 
                 auto& SquareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
                 ImGui::ColorEdit4("Square Color", glm::value_ptr(SquareColor));
+            }
+            if (m_CameraEntity)
+            {
+                ImGui::SeparatorText(std::string(m_CameraEntity.GetComponent<TagComponent>().Tag).c_str());
+
+                auto& cameraTransform = m_CameraEntity.GetComponent<TransformComponent>().Transform;
+                ImGui::DragFloat3("Camera Position", glm::value_ptr(cameraTransform[3]));
+
+                auto& camera = m_CameraEntity.GetComponent<CameraComponent>().Camera;
+                float orthoSize = camera.GetOrthographicSize();
+                if (ImGui::DragFloat("Camera Zoom", &orthoSize))
+                {
+                    camera.SetOrthographicSize(orthoSize);
+                }
             }
         }
         ImGui::End();

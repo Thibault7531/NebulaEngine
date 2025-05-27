@@ -20,6 +20,8 @@
 // Renderer
 #include "Nebula/Renderer/Camera.h"
 #include "Nebula/Renderer/Framebuffer.h"
+#include "Nebula/Renderer/OrthographicCamera.h"
+#include "Nebula/Renderer/PerspectiveCamera.h"
 #include "Nebula/Renderer/RenderCommand.h"
 #include "Nebula/Renderer/Renderer.h"
 #include "Nebula/Renderer/Renderer2D.h"

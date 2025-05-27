@@ -2,6 +2,8 @@
 
 #include <glm.hpp>
 
+#include "Nebula/Renderer/SceneCamera.h"
+
 namespace Nebula
 {
 
@@ -36,6 +38,16 @@ namespace Nebula
         SpriteRendererComponent(const SpriteRendererComponent&) = default;
         SpriteRendererComponent(const glm::vec4& color)
             : Color(color) {}
+    };
+
+    struct CameraComponent
+    {
+        SceneCamera Camera;
+        bool Primary = true;
+        bool FixedAspectRatio = false;
+
+        CameraComponent() = default;
+        CameraComponent(const CameraComponent&) = default;
     };
 
 }

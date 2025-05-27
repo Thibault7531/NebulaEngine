@@ -21,12 +21,51 @@ namespace Nebula
 
     void Scene::OnUpdate(Timestep ts)
     {
-        auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-        for (auto entity : group)
+        Camera* primaryCamera = nullptr;
+        glm::mat4 cameraTransform;
         {
-            auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+            auto view = m_Registry.view<TransformComponent, CameraComponent>();
+            for (auto entity : view)
+            {
+                auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
 
-            Renderer2D::DrawQuad({.transform = transform, .color = sprite.Color});
+                if (camera.Primary)
+                {
+                    primaryCamera = &camera.Camera;
+                    cameraTransform = transform.Transform;
+                    break;
+                }
+            }
+        }
+
+        if (primaryCamera)
+        {
+            Renderer2D::BeginScene(*primaryCamera, cameraTransform);
+
+            for (const auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>(); const auto entity : view)
+            {
+                auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
+
+                Renderer2D::DrawQuad({.transform = transform, .color = sprite.Color});
+            }
+
+            Renderer2D::EndScene();
+        }
+    }
+
+    void Scene::OnViewportResize(uint32_t width, uint32_t height)
+    {
+        m_viewportWidth = width;
+        m_viewportHeight = height;
+
+        auto view = m_Registry.view<CameraComponent>();
+        for (auto entity : view)
+        {
+            auto& cameraComponent = view.get<CameraComponent>(entity);
+            if (!cameraComponent.FixedAspectRatio)
+            {
+                cameraComponent.Camera.SetViewportSize(width, height);
+            }
         }
     }
 
