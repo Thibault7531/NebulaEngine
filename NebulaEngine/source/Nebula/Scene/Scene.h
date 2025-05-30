@@ -2,7 +2,6 @@
 
 #include <entt/entt.hpp>
 
-#include "Components.h"
 #include "Nebula/Core/Timestep.h"
 
 namespace Nebula

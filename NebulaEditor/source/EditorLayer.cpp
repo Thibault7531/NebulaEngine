@@ -3,9 +3,8 @@
 #include <gtc/type_ptr.hpp>
 #include <imgui.h>
 
-#include "Nebula/Core/Application.h"
 #include "Nebula/Core/KeyCodes.h"
-#include "Nebula/Renderer/RenderCommand.h"
+#include "Nebula.h"
 
 namespace Nebula {
     EditorLayer::EditorLayer()
@@ -28,6 +27,27 @@ namespace Nebula {
 
         m_CameraEntity = m_Scene->CreateEntity("Camera");
         m_CameraEntity.AddComponent<CameraComponent>();
+
+        class CameraController : public ScriptableEntity
+        {
+        public:
+            void OnCreate() {}
+            void OnUpdate(Timestep ts)
+            {
+                auto& transform = GetComponent<TransformComponent>().Transform;
+
+                if (Input::IsKeyPressed(NB_KEY_Q))
+                    transform[3][0] -= ts * 2;
+                if (Input::IsKeyPressed(NB_KEY_D))
+                    transform[3][0] += ts * 2;
+                if (Input::IsKeyPressed(NB_KEY_S))
+                    transform[3][1] -= ts * 2;
+                if (Input::IsKeyPressed(NB_KEY_Z))
+                    transform[3][1] += ts * 2;
+            }
+            void OnDestroy() {}
+        };
+        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
     }
 
     void EditorLayer::OnUpdate(Timestep ts)

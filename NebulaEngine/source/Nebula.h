@@ -32,3 +32,4 @@
 #include "Nebula/Scene/Components.h"
 #include "Nebula/Scene/Entity.h"
 #include "Nebula/Scene/Scene.h"
+#include "Nebula/Scene/ScriptableEntity.h"

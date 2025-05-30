@@ -14,7 +14,7 @@
 # Build directories
 /bin
 /bin-int
-/cmake*
+#/cmake*
 /out
 
 # Additional Runtime Files

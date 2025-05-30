@@ -3,6 +3,8 @@
 #include <glm.hpp>
 
 #include "Nebula/Renderer/SceneCamera.h"
+#include "Nebula/Scene/ScriptableEntity.h"
+#include "Nebula/Core/Timestep.h"
 
 namespace Nebula
 {
@@ -48,6 +50,21 @@ namespace Nebula
 
         CameraComponent() = default;
         CameraComponent(const CameraComponent&) = default;
+    };
+
+    struct NativeScriptComponent
+    {
+        ScriptableEntity* Instance = nullptr;
+
+        ScriptableEntity* (*InstanciateScript)();
+        void (*DestroyScript)(NativeScriptComponent*);
+
+        template<typename T>
+        void Bind()
+        {
+            InstanciateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+            DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
+        }
     };
 
 }

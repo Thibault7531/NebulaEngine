@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Entity.h"
+#include "Components.h"
 #include "Nebula/Renderer/Renderer2D.h"
 
 namespace Nebula
@@ -21,6 +21,20 @@ namespace Nebula
 
     void Scene::OnUpdate(Timestep ts)
     {
+        {
+            m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
+            {
+                if (!nsc.Instance)
+                {
+                    nsc.Instance = nsc.InstanciateScript();
+                    nsc.Instance->m_Entity = Entity{ entity, this };
+                    nsc.Instance->OnCreate();
+                }
+
+                nsc.Instance->OnUpdate(ts);
+            });
+        }
+
         Camera* primaryCamera = nullptr;
         glm::mat4 cameraTransform;
         {
