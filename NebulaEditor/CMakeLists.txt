@@ -2,15 +2,14 @@
 
 
 # Source files
-list(APPEND EditorSourceList
-        source/NebulaEditorApp.cpp
-        source/EditorLayer.cpp
+file(GLOB_RECURSE EditorSourceList
+        "source/*.cpp"
 )
 
 
 # Header files
-list(APPEND EditorHeaderList
-        source/EditorLayer.h
+file(GLOB_RECURSE EditorHeaderList
+        "source/*.h"
 )
 
 

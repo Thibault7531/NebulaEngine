@@ -12,9 +12,22 @@ namespace Nebula
 
     void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
     {
+        m_ProjectionType = ProjectionType::Orthographic;
+
         m_OrthographicSize = size;
         m_OrthographicNear = nearClip;
         m_OrthographicFar = farClip;
+
+        RecalculateProjection();
+    }
+
+    void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farClip)
+    {
+        m_ProjectionType = ProjectionType::Perspective;
+
+        m_PerspectiveVerticalFOV = verticalFOV;
+        m_PerspectiveNear = nearClip;
+        m_PerspectiveFar = farClip;
 
         RecalculateProjection();
     }
@@ -28,7 +41,19 @@ namespace Nebula
 
     void SceneCamera::RecalculateProjection()
     {
-        m_ProjectionMatrix = glm::ortho(-.5f * m_AspectRatio * m_OrthographicSize, .5f * m_AspectRatio * m_OrthographicSize, -.5f * m_OrthographicSize, .5f * m_OrthographicSize, m_OrthographicNear, m_OrthographicFar);
+        switch (m_ProjectionType)
+        {
+            case ProjectionType::Orthographic:
+                {
+                    m_ProjectionMatrix = glm::ortho(-.5f * m_AspectRatio * m_OrthographicSize, .5f * m_AspectRatio * m_OrthographicSize, -.5f * m_OrthographicSize, .5f * m_OrthographicSize, m_OrthographicNear, m_OrthographicFar);
+                    break;
+                }
+            case ProjectionType::Perspective:
+                {
+                    m_ProjectionMatrix = glm::perspective(m_PerspectiveVerticalFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+                    break;
+                }
+        }
     }
 
 }

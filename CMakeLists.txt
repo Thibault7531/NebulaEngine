@@ -34,12 +34,12 @@ endif ()
 
 # Compiler arguments
 set(CMAKE_C_FLAGS "/std:c11")
-set(CMAKE_C_FLAGS_DEBUG "/EHsc")
+set(CMAKE_C_FLAGS_DEBUG "/EHsc /Od")
 set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG")
 set(CMAKE_C_FLAGS_DIST "/O2 /Ob2 /DNDEBUG")
 
 set(CMAKE_CXX_FLAGS "/std:c++latest")
-set(CMAKE_CXX_FLAGS_DEBUG "/EHsc")
+set(CMAKE_CXX_FLAGS_DEBUG "/EHsc /Od")
 set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG")
 set(CMAKE_CXX_FLAGS_DIST "/O2 /Ob2 /DNDEBUG")
 

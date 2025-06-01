@@ -43,21 +43,30 @@ namespace Nebula
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+			style.FrameRounding = 4.0f;
+
 			style.WindowPadding = ImVec2(8, 8);
+			style.FramePadding = ImVec2(3, 3);
+			style.GrabMinSize = 6.f;
+
 			style.WindowRounding = 8.0f;
-			style.WindowBorderSize = 0.0f;
-			style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
 			style.ChildRounding = 8.0f;
+			style.GrabRounding = 4.0f;
+			style.TabRounding = 4.0f;
+
+			style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+			style.WindowMenuButtonPosition = ImGuiDir_None;
+			style.ColorButtonPosition = ImGuiDir_Left;
+			style.SeparatorTextAlign = ImVec2(0.0f, 0.5f);
+			style.SeparatorTextPadding = ImVec2(15.f, 3.f);
+			style.DockingSeparatorSize = 1.0f;
+
+			style.WindowBorderSize = 0.0f;
 			style.ChildBorderSize = 0.0f;
 			style.PopupRounding = 8.0f;
 			style.PopupBorderSize = 0.0f;
-			style.FramePadding = ImVec2(5, 5);
-			style.FrameRounding = 8.0f;
 			style.FrameBorderSize = 0.0f;
-			style.TabRounding = 4.0f;
-			style.SeparatorTextAlign = ImVec2(0.0f, 0.5f);
-			style.DockingSeparatorSize = 1.0f;
-			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
 		Application& app = Application::Get();

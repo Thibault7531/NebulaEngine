@@ -48,6 +48,8 @@ namespace Nebula {
             void OnDestroy() {}
         };
         m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
+        m_SceneHierarchyPanel.SetContext(m_Scene);
     }
 
     void EditorLayer::OnUpdate(Timestep ts)
@@ -113,31 +115,7 @@ namespace Nebula {
         ImGui::End();
         ImGui::PopStyleVar();
 
-        ImGui::Begin("Properties");
-        {
-            if (m_SquareEntity)
-            {
-                ImGui::SeparatorText(std::string(m_SquareEntity.GetComponent<TagComponent>().Tag).c_str());
-
-                auto& SquareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
-                ImGui::ColorEdit4("Square Color", glm::value_ptr(SquareColor));
-            }
-            if (m_CameraEntity)
-            {
-                ImGui::SeparatorText(std::string(m_CameraEntity.GetComponent<TagComponent>().Tag).c_str());
-
-                auto& cameraTransform = m_CameraEntity.GetComponent<TransformComponent>().Transform;
-                ImGui::DragFloat3("Camera Position", glm::value_ptr(cameraTransform[3]));
-
-                auto& camera = m_CameraEntity.GetComponent<CameraComponent>().Camera;
-                float orthoSize = camera.GetOrthographicSize();
-                if (ImGui::DragFloat("Camera Zoom", &orthoSize))
-                {
-                    camera.SetOrthographicSize(orthoSize);
-                }
-            }
-        }
-        ImGui::End();
+        m_SceneHierarchyPanel.OnImGuiRender();
     }
 
     bool EditorLayer::OnKeyPressedEvent(const KeyPressedEvent& event)

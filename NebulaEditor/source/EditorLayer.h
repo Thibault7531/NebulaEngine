@@ -3,6 +3,7 @@
 #include <glm.hpp>
 
 #include "Nebula.h"
+#include "Panels/SceneHierarchyPanel.h"
 
 namespace Nebula {
 
@@ -32,6 +33,8 @@ namespace Nebula {
         Entity m_Square2Entity;
         Entity m_CameraEntity;
 
+        // Panels
+        SceneHierarchyPanel m_SceneHierarchyPanel;
     };
 
 }
