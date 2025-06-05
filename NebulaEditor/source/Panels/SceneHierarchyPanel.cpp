@@ -25,7 +25,7 @@ namespace Nebula
         {
             for (auto entityID : m_Context->m_Registry.view<entt::entity>())
             {
-                if (entityID == entt::null || static_cast<int>(entityID) == 0) break;
+                if (entityID == entt::null) break;
 
                 Entity entity{entityID, m_Context.get()};
 
@@ -35,11 +35,34 @@ namespace Nebula
 
         if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) m_SelectedEntity = {};
 
+        ImGuiPopupFlags popupFlags = ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_NoOpenOverExistingPopup | ImGuiPopupFlags_MouseButtonRight;
+        if (ImGui::BeginPopupContextWindow(nullptr, popupFlags))
+        {
+            if (ImGui::MenuItem("Create Empty Entity")) m_Context->CreateEntity("Empty Entity");
+            ImGui::EndPopup();
+        }
+
         ImGui::End();
 
         ImGui::Begin("Properties");
         {
-            if (m_SelectedEntity) DrawComponents(m_SelectedEntity);
+            if (m_SelectedEntity)
+            {
+                DrawComponents(m_SelectedEntity);
+
+                if (ImGui::Button("Add Component"))
+                {
+                    ImGui::OpenPopup("Add Component");
+                }
+
+                if (ImGui::BeginPopup("Add Component"))
+                {
+                    if (ImGui::MenuItem("Camera")) m_SelectedEntity.AddComponent<CameraComponent>();
+                    if (ImGui::MenuItem("Sprite Renderer")) m_SelectedEntity.AddComponent<SpriteRendererComponent>();
+
+                    ImGui::EndPopup();
+                }
+            }
         }
         ImGui::End();
     }
@@ -48,16 +71,30 @@ namespace Nebula
     {
         auto& tag = entity.GetComponent<TagComponent>().Tag;
 
-        ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding;
+        ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth;
         bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, tag.c_str());
         if (ImGui::IsItemClicked())
         {
             m_SelectedEntity = entity;
         }
 
+        bool entityDeleted = false;
+        ImGuiPopupFlags popupFlags = ImGuiPopupFlags_NoOpenOverExistingPopup | ImGuiPopupFlags_MouseButtonRight;
+        if (ImGui::BeginPopupContextItem(nullptr, popupFlags))
+        {
+            if (ImGui::MenuItem("Delete Entity")) entityDeleted = true;
+            ImGui::EndPopup();
+        }
+
         if (opened)
         {
             ImGui::TreePop();
+        }
+
+        if (entityDeleted)
+        {
+            if (m_SelectedEntity == entity) m_SelectedEntity = {};
+            m_Context->DestroyEntity(entity);
         }
     }
 
@@ -74,7 +111,7 @@ namespace Nebula
             ImGui::NextColumn();
             {
                 ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5.0f, 5.0f));
 
                 float lineHeight = GImGui->FontSize + GImGui->Style.FramePadding.y * 2.0f;
                 ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
@@ -136,9 +173,11 @@ namespace Nebula
             }
         }
 
+        const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap;
+
         if (entity.HasComponent<TransformComponent>())
         {
-            if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
+            if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), flags, "Transform"))
             {
                 auto& tc = entity.GetComponent<TransformComponent>();
                 DrawVec3Control("Translation", tc.Translation);
@@ -153,7 +192,24 @@ namespace Nebula
 
         if (entity.HasComponent<CameraComponent>())
         {
-            if (ImGui::TreeNodeEx((void*)typeid(CameraComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Camera"))
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2.0f, 2.0f});
+            bool open = ImGui::TreeNodeEx((void*)typeid(CameraComponent).hash_code(), flags, "Camera");
+            ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
+            if (ImGui::Button("+", {20.f, 20.f}))
+            {
+                ImGui::OpenPopup("ComponentSettings");
+            }
+            ImGui::PopStyleVar();
+
+            bool removeComponent = false;
+            if (ImGui::BeginPopup("ComponentSettings"))
+            {
+                if (ImGui::MenuItem("Delete Component")) removeComponent = true;
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
             {
                 auto& cameraComponent = entity.GetComponent<CameraComponent>();
                 auto& camera = cameraComponent.Camera;
@@ -226,11 +282,28 @@ namespace Nebula
 
                 ImGui::TreePop();
             }
+
+            if (removeComponent) entity.RemoveComponent<CameraComponent>();
         }
 
         if (entity.HasComponent<SpriteRendererComponent>())
         {
-            if (ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Sprite Renderer"))
+            bool open = ImGui::TreeNodeEx((void*)typeid(SpriteRendererComponent).hash_code(), flags, "Sprite Renderer");
+            ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
+            if (ImGui::Button("+", {20.f, 20.f}))
+            {
+                ImGui::OpenPopup("ComponentSettings");
+            }
+
+            bool removeComponent = false;
+            if (ImGui::BeginPopup("ComponentSettings"))
+            {
+                if (ImGui::MenuItem("Delete Component")) removeComponent = true;
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
             {
                 auto& src = entity.GetComponent<SpriteRendererComponent>();
 
@@ -238,6 +311,8 @@ namespace Nebula
 
                 ImGui::TreePop();
             }
+
+            if (removeComponent) entity.RemoveComponent<SpriteRendererComponent>();
         }
     }
 

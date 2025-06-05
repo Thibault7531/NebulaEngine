@@ -58,6 +58,8 @@ namespace Nebula {
             m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 
             m_Scene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+
+            DoesViewportFit = true;
         }
 
         RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
