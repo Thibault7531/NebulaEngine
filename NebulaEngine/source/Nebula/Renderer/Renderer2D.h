@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera.h"
+#include "Nebula/Core/Core.h"
 #include "Nebula/Renderer/OrthographicCamera.h"
 #include "Nebula/Renderer/Texture.h"
 

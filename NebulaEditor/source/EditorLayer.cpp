@@ -23,7 +23,7 @@ namespace Nebula {
 
         m_Square2Entity = m_Scene->CreateEntity("Square2");
         m_Square2Entity.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 1.0f, 1.0f});
-        m_Square2Entity.GetComponent<TransformComponent>().Transform = glm::translate(glm::mat4(1.0f), glm::vec3{-1.0f, 0.0f, -.1f}) * glm::rotate(glm::mat4(1.0f), glm::radians(40.0f), glm::vec3{0.0f, 0.0f, 1.0f});
+        m_Square2Entity.GetComponent<TransformComponent>() = { glm::vec3{-1.0f, 0.0f, -.1f}, glm::vec3{0.f, 0.f, glm::radians(40.0f)}, glm::vec3{1.0f} };
 
         m_CameraEntity = m_Scene->CreateEntity("Camera");
         m_CameraEntity.AddComponent<CameraComponent>();
@@ -34,16 +34,16 @@ namespace Nebula {
             void OnCreate() {}
             void OnUpdate(Timestep ts)
             {
-                auto& transform = GetComponent<TransformComponent>().Transform;
+                auto& tc = GetComponent<TransformComponent>();
 
                 if (Input::IsKeyPressed(NB_KEY_Q))
-                    transform[3][0] -= ts * 2;
+                    tc.Translation.x -= ts * 2;
                 if (Input::IsKeyPressed(NB_KEY_D))
-                    transform[3][0] += ts * 2;
+                    tc.Translation.x += ts * 2;
                 if (Input::IsKeyPressed(NB_KEY_S))
-                    transform[3][1] -= ts * 2;
+                    tc.Translation.y -= ts * 2;
                 if (Input::IsKeyPressed(NB_KEY_Z))
-                    transform[3][1] += ts * 2;
+                    tc.Translation.y += ts * 2;
             }
             void OnDestroy() {}
         };

@@ -11,7 +11,7 @@ namespace Nebula
     Scene::Scene()
     {
         const entt::entity entity = m_Registry.create();
-        m_Registry.emplace<TransformComponent>(entity, glm::mat4(1.0f));
+        m_Registry.emplace<TransformComponent>(entity, glm::vec3(1.0f));
     }
 
     Scene::~Scene()
@@ -46,7 +46,7 @@ namespace Nebula
                 if (camera.Primary)
                 {
                     primaryCamera = &camera.Camera;
-                    cameraTransform = transform.Transform;
+                    cameraTransform = transform.GetTransform();
                     break;
                 }
             }
@@ -60,7 +60,7 @@ namespace Nebula
             {
                 auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
-                Renderer2D::DrawQuad({.transform = transform, .color = sprite.Color});
+                Renderer2D::DrawQuad({.transform = transform.GetTransform(), .color = sprite.Color});
             }
 
             Renderer2D::EndScene();
