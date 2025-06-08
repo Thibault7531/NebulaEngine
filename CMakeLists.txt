@@ -3,7 +3,7 @@
 
 # CMake requirement
 cmake_minimum_required(VERSION 3.30.3)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Project Specification
 project(NebulaEngine LANGUAGES CXX C VERSION 0.0)

@@ -21,6 +21,7 @@ namespace Nebula {
             if (window->GetID() == windowID) {
                 auto it = std::ranges::find(m_Windows, window);
                 m_Windows.erase(it);
+                return;
             };
         }
     }

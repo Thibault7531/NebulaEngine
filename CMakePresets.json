@@ -5,11 +5,11 @@
       "name": "Debug-Windows-AMD64",
       "displayName": "Windows x86 - Debug",
       "description": "Windows Desktop Compiling",
-      "generator": "Visual Studio 17 2022",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
       },
       "hidden": false,
       "architecture": {
@@ -26,11 +26,11 @@
       "name": "Release-Windows-AMD64",
       "displayName": "Windows x86 - Release",
       "description": "Windows Desktop Compiling",
-      "generator": "Visual Studio 17 2022",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
       },
       "hidden": false,
       "architecture": {
@@ -47,11 +47,11 @@
       "name": "Dist-Windows-AMD64",
       "displayName": "Windows x86 - Dist",
       "description": "Windows Desktop Compiling",
-      "generator": "Visual Studio 17 2022",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Dist",
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
       },
       "hidden": false,
       "architecture": {
