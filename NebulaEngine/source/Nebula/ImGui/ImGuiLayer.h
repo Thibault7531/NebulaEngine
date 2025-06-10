@@ -27,6 +27,9 @@ namespace Nebula
 		void BlockEvents(const bool block) { m_BlockEvents = block; }
 
 	private:
+		void SetDarkTheme();
+
+	private:
 		bool OnMouseButtonPressedEvent(const MouseButtonPressedEvent& event);
 		bool OnMouseButtonReleasedEvent(const MouseButtonReleasedEvent& event);
 		bool OnMouseMovedEvent(const MouseMovedEvent& event);

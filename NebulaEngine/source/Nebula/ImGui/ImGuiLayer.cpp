@@ -69,6 +69,8 @@ namespace Nebula
 			style.FrameBorderSize = 0.0f;
 		}
 
+		SetDarkTheme();
+
 		Application& app = Application::Get();
 		auto* window = static_cast<SDL_Window*>(app.GetWindow().GetNativeWindow());
 		SDL_GLContext gl_context = SDL_GL_GetCurrentContext();
@@ -76,7 +78,8 @@ namespace Nebula
 		ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
 		ImGui_ImplOpenGL3_Init("#version 410");
 
-		io.Fonts->AddFontFromFileTTF("assets/NebulaEngine/fonts/JetBrainsMono-Regular.ttf", 17);
+		io.Fonts->AddFontFromFileTTF("assets/NebulaEngine/fonts/JetBrainsMono-Bold.ttf", 17);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/NebulaEngine/fonts/JetBrainsMono-Regular.ttf", 17);
 		io.Fonts->Build();
 	}
 
@@ -151,6 +154,50 @@ namespace Nebula
 			ImGui::RenderPlatformWindowsDefault();
 			SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
 		}
+	}
+
+	void ImGuiLayer::SetDarkTheme()
+	{
+		auto& colors = ImGui::GetStyle().Colors;
+
+		colors[ImGuiCol_FrameBg] = ImVec4(0.16f, 0.16f, 0.16f, 0.54f);
+		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.9f, 0.98f, 0.40f);
+		colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.9f, 0.98f, 0.67f);
+
+		colors[ImGuiCol_TitleBg] = ImVec4(0.f, 0.0f, 0.0f, 1.00f);
+		colors[ImGuiCol_TitleBgActive] = ImVec4(0.16f, 0.44f, 0.48f, 1.00f);
+
+		colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.9f, 0.98f, 1.00f);
+		colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.81f, 0.88f, 1.00f);
+		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.9f, 0.98f, 1.00f);
+		colors[ImGuiCol_Button] = ImVec4(0.26f, 0.9f, 0.98f, 0.4f);
+		colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.9f, 0.98f, 1.0f);
+		colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.88f, 0.98f, 1.0f);
+
+		colors[ImGuiCol_Header] = ImVec4(0.26f, 0.9f, 0.98f, 0.31f);
+		colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.9f, 0.98f, 0.8f);
+		colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.9f, 0.98f, 1.0f);
+
+		colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.68f, 0.75f, 0.78f);
+		colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.68f, 0.75f, 1.00f);
+
+		colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.9f, 0.98f, 0.2f);
+		colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.9f, 0.98f, 0.67f);
+		colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.9f, 0.98f, 0.95f);
+
+		colors[ImGuiCol_TabHovered] = ImVec4(0.26f, 0.9f, 0.98f, 0.8f);
+		colors[ImGuiCol_Tab] = ImVec4(0.18f, 0.54f, 0.58f, 0.86f);
+		colors[ImGuiCol_TabSelected] = ImVec4(0.20f, 0.63f, 0.68f, 1.0f);
+		colors[ImGuiCol_TabSelectedOverline] = ImVec4(0.26f, 0.9f, 0.98f, 1.0f);
+		colors[ImGuiCol_TabDimmed] = ImVec4(0.07f, 0.14f, 0.15f, 0.97f);
+		colors[ImGuiCol_TabDimmedSelected] = ImVec4(0.13f, 0.39f, 0.42f, 1.0f);
+
+		colors[ImGuiCol_DockingPreview] = ImVec4(0.26f, 0.9f, 0.98f, 0.70f);
+
+		colors[ImGuiCol_TextLink] = ImVec4(0.26f, 0.9f, 0.98f, 0.70f);
+		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.9f, 0.98f, 0.35f);
+
+		colors[ImGuiCol_NavCursor] = ImVec4(0.26f, 0.9f, 0.98f, 1.0f);
 	}
 
 	bool ImGuiLayer::OnMouseButtonPressedEvent(const MouseButtonPressedEvent& event)

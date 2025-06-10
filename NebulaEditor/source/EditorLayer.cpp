@@ -84,6 +84,11 @@ namespace Nebula {
     void EditorLayer::OnImGuiRender()
     {
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
+        ImGuiIO& io = ImGui::GetIO();
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.WindowMinSize.x = 400.0f;
+
         ImGui::BeginMainMenuBar();
             ImGui::BeginMenu("NebulaEditor", false);
             if (ImGui::BeginMenu("File")) {
@@ -92,8 +97,8 @@ namespace Nebula {
             }
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 42);
             if (ImGui::MenuItem("o")) {
-                if (Application::Get().GetWindow().IsFullscreen()) Application::Get().GetWindow().SetFullscreen(false);
-                else Application::Get().GetWindow().SetFullscreen(true);
+                if (Application::Get().GetWindow().IsMaximized()) Application::Get().GetWindow().SetMaximized(false);
+                else Application::Get().GetWindow().SetMaximized(true);
             };
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 16);
             if (ImGui::MenuItem("x")) Application::Get().Shutdown();

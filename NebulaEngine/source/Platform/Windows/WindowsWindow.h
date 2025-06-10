@@ -27,6 +27,8 @@ namespace Nebula {
 		bool IsVSync() const override;
 		void SetFullscreen(bool enabled) override;
 		bool IsFullscreen() const override;
+		void SetMaximized(bool enabled) override;
+		bool IsMaximized() const override { return m_Data.Maximized; }
 
 		virtual void Flash() const override;
 
@@ -51,6 +53,7 @@ namespace Nebula {
 			std::string Title;
 			unsigned int Width, Height;
 			bool VSync;
+			bool Maximized;
 			bool Fullscreen;
 			RendererAPI::API API;
 

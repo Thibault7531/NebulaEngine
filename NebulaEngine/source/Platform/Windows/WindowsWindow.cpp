@@ -32,6 +32,7 @@ namespace Nebula {
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
+		m_Data.Maximized = props.Maximized;
 		m_Data.Fullscreen = props.Fullscreen;
 		m_Data.API = props.API;
 		m_Data.EventCallback = std::bind([]{});
@@ -54,6 +55,7 @@ namespace Nebula {
 
 			SDL_WindowFlags flags = SDL_WINDOW_RESIZABLE;
 			if (!props.Border) flags |= SDL_WINDOW_BORDERLESS;
+			if (props.Maximized) flags |= SDL_WINDOW_MAXIMIZED;
 			if (props.Fullscreen) flags |= SDL_WINDOW_FULLSCREEN;
 			if (props.API == RendererAPI::API::OpenGL) flags |= SDL_WINDOW_OPENGL;
 
@@ -120,6 +122,13 @@ namespace Nebula {
 	bool WindowsWindow::IsFullscreen() const
 	{
 		return m_Data.Fullscreen;
+	}
+
+	void WindowsWindow::SetMaximized(bool enabled)
+	{
+		m_Data.Maximized = enabled;
+		if (enabled) SDL_MaximizeWindow(m_Window);
+		else SDL_RestoreWindow(m_Window);
 	}
 
 	void WindowsWindow::Flash() const

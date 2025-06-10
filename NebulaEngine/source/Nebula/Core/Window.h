@@ -13,6 +13,7 @@ namespace Nebula {
 		unsigned int Height = 1080;
 
 		bool Border = true;
+		bool Maximized = false;
 		bool Fullscreen = false;
 
 		RendererAPI::API API = RendererAPI::API::OpenGL;
@@ -36,6 +37,8 @@ namespace Nebula {
 		virtual bool IsVSync() const = 0;
 		virtual void SetFullscreen(bool enabled) = 0;
 		virtual bool IsFullscreen() const = 0;
+		virtual void SetMaximized(bool enabled) = 0;
+		virtual bool IsMaximized() const = 0;
 
 		virtual void Flash() const = 0;
 
