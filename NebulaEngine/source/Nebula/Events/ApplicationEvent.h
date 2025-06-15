@@ -83,6 +83,42 @@ namespace Nebula
 		bool m_Maximized;
 	};
 
+	class WindowMovedEvent : public Event
+	{
+	public:
+		WindowMovedEvent() = default;
+
+		EVENT_CLASS_TYPE(WindowMoved)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class WindowFocusedEvent : public Event
+	{
+	public:
+		WindowFocusedEvent() = default;
+
+		EVENT_CLASS_TYPE(WindowFocused)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class WindowLostFocusEvent : public Event
+	{
+	public:
+		WindowLostFocusEvent() = default;
+
+		EVENT_CLASS_TYPE(WindowLostFocus)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
+	class MonitorsChangedEvent : public Event
+	{
+	public:
+		MonitorsChangedEvent() = default;
+
+		EVENT_CLASS_TYPE(MonitorsChanged)
+		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+	};
+
 	class AppTickEvent : public Event
 	{
 	public:

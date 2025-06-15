@@ -17,14 +17,6 @@ namespace Nebula {
 		WindowsWindow::InitWindow(props);
 	}
 
-	WindowsWindow::~WindowsWindow()
-	{
-		NB_PROFILE_FUNCTION();
-
-		DestroyWindow(SDL_GetWindowID(m_Window));
-		WindowsWindow::Shutdown();
-	}
-
 	void WindowsWindow::InitWindow(const WindowProps& props)
 	{
 		NB_PROFILE_FUNCTION();
@@ -57,6 +49,10 @@ namespace Nebula {
 			if (!props.Border) flags |= SDL_WINDOW_BORDERLESS;
 			if (props.Maximized) flags |= SDL_WINDOW_MAXIMIZED;
 			if (props.Fullscreen) flags |= SDL_WINDOW_FULLSCREEN;
+			if (props.isResizable) flags |= SDL_WINDOW_RESIZABLE;
+			if (props.AlwaysOnTop) flags |= SDL_WINDOW_ALWAYS_ON_TOP;
+			if (props.HighDPI) flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
+			if (props.isUtility) flags |= SDL_WINDOW_UTILITY;
 			if (props.API == RendererAPI::API::OpenGL) flags |= SDL_WINDOW_OPENGL;
 
 			m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, flags);
@@ -94,6 +90,9 @@ namespace Nebula {
 		if (Application::Get().IsMinimized()) {
 			SDL_PumpEvents();
 		}
+
+		SDL_Event e;
+		while (SDL_PollEvent(&e)) {}
 	}
 
 	void WindowsWindow::SetVSync(const bool enabled)
@@ -143,14 +142,16 @@ namespace Nebula {
 
 	bool WindowsWindow::OnEvent(void *userdata, SDL_Event *e)
 	{
-		if (GetWindow(e->window.windowID) == nullptr) return true;
-		if (GetWindow(e->window.windowID) != nullptr)
+		Ref<Window> window = GetWindow(e->window.windowID);
+		if (window == nullptr) return true;
+		if (window != nullptr)
 		{
-			switch (e->type) {
-				case SDL_EVENT_WINDOW_RESIZED:
+			switch (e->type)
+			{
+			case SDL_EVENT_WINDOW_RESIZED:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
@@ -158,6 +159,7 @@ namespace Nebula {
 						data.Height = e->window.data2;
 
 						WindowResizeEvent event(data.Width, data.Height);
+						event.Window = window.get();
 						data.EventCallback(event);
 
 						return false;
@@ -166,45 +168,16 @@ namespace Nebula {
 					return true;
 				}
 
-				case SDL_EVENT_WINDOW_MINIMIZED:
+			case SDL_EVENT_WINDOW_MINIMIZED:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
 						WindowMinimizeEvent event{SDL_GetWindowFlags(SDL_GetWindowFromEvent(e)) && SDL_WINDOW_MINIMIZED == 1};
-						data.EventCallback(event);
-
-						return false;
-					}
-				}
-
-				case SDL_EVENT_WINDOW_MAXIMIZED:
-				{
-					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
-
-					if (props != nullptr) {
-						WindowData &data = *static_cast<WindowData *>(props);
-
-						WindowMaximizeEvent event{SDL_GetWindowFlags(SDL_GetWindowFromEvent(e)) && SDL_WINDOW_MAXIMIZED == 1};
-						data.EventCallback(event);
-
-						return false;
-					}
-				}
-
-				case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-				{
-					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
-
-					if (props != nullptr) {
-						WindowData &data = *static_cast<WindowData *>(props);
-
-						WindowCloseEvent event;
+						event.Window = window.get();
 						data.EventCallback(event);
 
 						return false;
@@ -213,27 +186,119 @@ namespace Nebula {
 					return true;
 				}
 
-				case SDL_EVENT_KEY_DOWN:
+			case SDL_EVENT_WINDOW_MAXIMIZED:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
-						switch (e->key.repeat) {
-							case false:
-							{
-								KeyPressedEvent event(e->key.key, 0);
-								data.EventCallback(event);
-								break;
-							}
-							case true:
-							{
-								KeyPressedEvent event(e->key.key, 1);
-								data.EventCallback(event);
-								break;
-							}
+						WindowMaximizeEvent event{SDL_GetWindowFlags(SDL_GetWindowFromEvent(e)) && SDL_WINDOW_MAXIMIZED == 1};
+						event.Window = window.get();
+						data.EventCallback(event);
+
+						return false;
+					}
+
+					return true;
+				}
+
+			case SDL_EVENT_WINDOW_MOVED:
+				{
+					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
+														 "windowProps", nullptr);
+
+					if (props != nullptr) {
+						WindowData &data = *static_cast<WindowData *>(props);
+
+						WindowMovedEvent event;
+						event.Window = window.get();
+						data.EventCallback(event);
+
+						return false;
+					}
+
+					return true;
+				}
+
+			case SDL_EVENT_WINDOW_FOCUS_GAINED:
+				{
+					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
+														 "windowProps", nullptr);
+
+					if (props != nullptr) {
+						WindowData &data = *static_cast<WindowData *>(props);
+
+						WindowFocusedEvent event;
+						event.Window = window.get();
+						data.EventCallback(event);
+
+						return false;
+					}
+
+					return true;
+				}
+
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+				{
+					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
+														 "windowProps", nullptr);
+
+					if (props != nullptr) {
+						WindowData &data = *static_cast<WindowData *>(props);
+
+						WindowCloseEvent event;
+						event.Window = window.get();
+						data.EventCallback(event);
+
+						return false;
+					}
+
+					return true;
+				}
+
+			case SDL_EVENT_DISPLAY_ORIENTATION:
+			case SDL_EVENT_DISPLAY_ADDED:
+			case SDL_EVENT_DISPLAY_REMOVED:
+			case SDL_EVENT_DISPLAY_MOVED:
+			case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED:
+				{
+					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
+														 "windowProps", nullptr);
+
+					if (props != nullptr)
+					{
+						WindowData &data = *static_cast<WindowData *>(props);
+
+						MonitorsChangedEvent event;
+						event.Window = window.get();
+						data.EventCallback(event);
+
+						return false;
+					}
+
+					return true;
+				}
+
+			case SDL_EVENT_KEY_DOWN:
+				{
+					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
+														 "windowProps", nullptr);
+
+					if (props != nullptr) {
+						WindowData &data = *static_cast<WindowData *>(props);
+
+						if (e->key.repeat)
+						{
+							KeyPressedEvent event(e->key.key, 1);
+							event.Window = window.get();
+							data.EventCallback(event);
+						} else
+						{
+							KeyPressedEvent event(e->key.key, 0);
+							event.Window = window.get();
+							data.EventCallback(event);
 						}
 
 						return false;
@@ -242,15 +307,16 @@ namespace Nebula {
 					return true;
 				}
 
-				case SDL_EVENT_KEY_UP:
+			case SDL_EVENT_KEY_UP:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
 						KeyReleasedEvent event(e->key.key);
+						event.Window = window.get();
 						data.EventCallback(event);
 
 						return false;
@@ -259,15 +325,16 @@ namespace Nebula {
 					return true;
 				}
 
-				case SDL_EVENT_TEXT_INPUT:
+			case SDL_EVENT_TEXT_INPUT:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
 						KeyTypedEvent event(*e->text.text);
+						event.Window = window.get();
 						data.EventCallback(event);
 
 						return false;
@@ -276,15 +343,16 @@ namespace Nebula {
 					return true;
 				}
 
-				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
 						MouseButtonPressedEvent event(e->button.button);
+						event.Window = window.get();
 						data.EventCallback(event);
 
 						return false;
@@ -293,15 +361,16 @@ namespace Nebula {
 					return true;
 				}
 
-				case SDL_EVENT_MOUSE_BUTTON_UP:
+			case SDL_EVENT_MOUSE_BUTTON_UP:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
 						MouseButtonReleasedEvent event(e->button.button);
+						event.Window = window.get();
 						data.EventCallback(event);
 
 						return false;
@@ -310,15 +379,16 @@ namespace Nebula {
 					return true;
 				}
 
-				case SDL_EVENT_MOUSE_WHEEL:
+			case SDL_EVENT_MOUSE_WHEEL:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
 						MouseScrolledEvent event(e->wheel.x, e->wheel.y);
+						event.Window = window.get();
 						data.EventCallback(event);
 
 						return false;
@@ -327,15 +397,16 @@ namespace Nebula {
 					return true;
 				}
 
-				case SDL_EVENT_MOUSE_MOTION:
+			case SDL_EVENT_MOUSE_MOTION:
 				{
 					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
-					                                     "windowProps", nullptr);
+														 "windowProps", nullptr);
 
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
 						MouseMovedEvent event(e->motion.x, e->motion.y);
+						event.Window = window.get();
 						data.EventCallback(event);
 
 						return false;
@@ -343,6 +414,44 @@ namespace Nebula {
 
 					return true;
 				}
+
+			case SDL_EVENT_WINDOW_MOUSE_ENTER:
+				{
+					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
+														 "windowProps", nullptr);
+
+					if (props != nullptr)
+					{
+						WindowData &data = *static_cast<WindowData *>(props);
+
+						MouseEnteredEvent event;
+						event.Window = window.get();
+						data.EventCallback(event);
+
+						return false;
+					}
+
+					return true;
+				}
+
+			case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+			{
+				void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
+												 "windowProps", nullptr);
+
+				if (props != nullptr)
+				{
+					WindowData &data = *static_cast<WindowData *>(props);
+
+					MouseLeftEvent event;
+					event.Window = window.get();
+					data.EventCallback(event);
+
+					return false;
+				}
+
+				return true;
+			}
 
 				default:
 					return true;

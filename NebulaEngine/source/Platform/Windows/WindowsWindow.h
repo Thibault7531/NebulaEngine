@@ -13,7 +13,9 @@ namespace Nebula {
 	{
 	public:
 		WindowsWindow(const WindowProps& props);
-		virtual ~WindowsWindow() override;
+		virtual ~WindowsWindow() override = default;
+
+		virtual void Shutdown() override;
 
 		void OnUpdate() override;
 
@@ -41,7 +43,6 @@ namespace Nebula {
 
 	private:
 		virtual void InitWindow(const WindowProps& props);
-		virtual void Shutdown();
 	private:
 		SDL_Window* m_Window;
 		SDL_Event m_Event;
@@ -61,6 +62,8 @@ namespace Nebula {
 		};
 
 		WindowData m_Data;
+
+		friend class WindowsImGuiPlatform;
 	};
 
 }

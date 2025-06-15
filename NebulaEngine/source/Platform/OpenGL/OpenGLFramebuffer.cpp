@@ -25,6 +25,12 @@ namespace Nebula {
             glDeleteTextures(1, &m_DepthAttachment);
         }
 
+        if (m_Specification.width == 0 || m_Specification.height == 0)
+        {
+            m_Specification.width = 1;
+            m_Specification.height = 1;
+        }
+
         glCreateFramebuffers(1, &m_RendererID);
         glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 

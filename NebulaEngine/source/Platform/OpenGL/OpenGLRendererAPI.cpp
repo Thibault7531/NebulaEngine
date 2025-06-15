@@ -47,7 +47,14 @@ namespace Nebula {
 
 		if (id == 131185) return;
 
-		if (type == GL_DEBUG_TYPE_ERROR) NB_CORE_ERROR("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n", ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message);
-		else NB_CORE_DEBUG("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n", ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message);
+		if (type == GL_DEBUG_TYPE_ERROR)
+		{
+			NB_CORE_ERROR("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n", ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message);
+			NB_CORE_ASSERT(false);
+		}
+		else
+		{
+			NB_CORE_DEBUG("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n", ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ), type, severity, message);
+		}
 	}
 }

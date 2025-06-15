@@ -8,6 +8,11 @@
 #include "Nebula/Core/Log.h"
 #include "Nebula/Core/Timestep.h"
 
+// Events system
+#include "Nebula/Events/ApplicationEvent.h"
+#include "Nebula/Events/KeyEvent.h"
+#include "Nebula/Events/MouseEvent.h"
+
 // Input system
 #include "Nebula/Renderer/CameraController.h"
 #include "Nebula/Core/Input.h"

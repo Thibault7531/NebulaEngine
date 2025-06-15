@@ -33,6 +33,7 @@ namespace Nebula
 		NB_PROFILE_FUNCTION();
 
 		Renderer::Shutdown();
+		m_LayerStack.PopOverlay(m_ImGuiLayer);
 	}
 
 	void Application::PushLayer(Layer* layer)

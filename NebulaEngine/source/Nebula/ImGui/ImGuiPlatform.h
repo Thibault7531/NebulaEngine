@@ -1,0 +1,26 @@
+#pragma once
+
+#include "Nebula/Core/Window.h"
+#include "Nebula/Events/Event.h"
+
+namespace Nebula
+{
+
+    class ImGuiPlatform
+    {
+    public:
+        virtual ~ImGuiPlatform() {}
+
+        virtual void Init(Window* window) = 0;
+        virtual void Shutdown() = 0;
+
+        virtual void NewFrame() = 0;
+
+        virtual void OnEvent(Event& event) = 0;
+
+        virtual void SetInputStatus() = 0;
+
+        static Ref<ImGuiPlatform> Create();
+    };
+
+}

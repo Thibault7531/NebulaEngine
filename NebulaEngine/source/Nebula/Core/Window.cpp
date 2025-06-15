@@ -8,8 +8,8 @@ namespace Nebula {
 
     Ref<Window> Window::GetWindow(uint32_t windowId)
     {
-        for (auto window : m_Windows) {
-            if (window->GetID() == windowId) return window;
+        for (int i = m_Windows.size() - 1; i >= 0; --i) {
+            if (m_Windows[i]->GetID() == windowId) return m_Windows[i];
         }
 
         return nullptr;
@@ -17,9 +17,9 @@ namespace Nebula {
 
     void Window::DestroyWindow(uint32_t windowID)
     {
-        for (const auto& window : m_Windows) {
-            if (window->GetID() == windowID) {
-                auto it = std::ranges::find(m_Windows, window);
+        for (auto it = m_Windows.begin(); it != m_Windows.end(); ++it) {
+            if ((*it)->GetID() == windowID) {
+                (*it)->Shutdown();
                 m_Windows.erase(it);
                 return;
             };

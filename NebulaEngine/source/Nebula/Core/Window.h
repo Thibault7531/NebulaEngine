@@ -16,6 +16,11 @@ namespace Nebula {
 		bool Maximized = false;
 		bool Fullscreen = false;
 
+		bool isResizable = true;
+		bool AlwaysOnTop = false;
+		bool HighDPI = false;
+		bool isUtility = false;
+
 		RendererAPI::API API = RendererAPI::API::OpenGL;
 	};
 
@@ -27,6 +32,8 @@ namespace Nebula {
 		virtual ~Window() {}
 
 		virtual void OnUpdate() = 0;
+
+		virtual void Shutdown() = 0;
 
 		virtual unsigned int GetWidth() const = 0;
 		virtual unsigned int GetHeight() const = 0;

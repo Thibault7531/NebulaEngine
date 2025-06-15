@@ -59,7 +59,7 @@ namespace Nebula
         auto& tag = entity.GetComponent<TagComponent>().Tag;
 
         ImGuiTreeNodeFlags flags = ((m_SelectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_SpanAvailWidth;
-        bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, tag.c_str());
+        bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint64_t>(static_cast<uint32_t>(entity))), flags, "%s", tag.c_str());
         if (ImGui::IsItemClicked())
         {
             m_SelectedEntity = entity;
@@ -96,7 +96,7 @@ namespace Nebula
         {
             ImGui::SetColumnWidth(0, columnWidth);
             {
-                ImGui::Text(label.c_str());
+                ImGui::Text("%s", label.c_str());
             }
             ImGui::NextColumn();
             {
@@ -170,7 +170,7 @@ namespace Nebula
             ImGui::PushFont(boldFont);
             float lineHeigth = GImGui->FontSize + GImGui->Style.FramePadding.y * 2.0f;
             ImGui::Separator();
-            bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, name.c_str());
+            bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s", name.c_str());
 
             ImGui::SameLine(contentRegionAvail.x - lineHeigth * .5f);
             if (ImGui::Button("+", {lineHeigth, lineHeigth}))

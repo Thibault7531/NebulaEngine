@@ -94,4 +94,22 @@ namespace Nebula
 		EVENT_CLASS_TYPE(MouseButtonReleased)
 	};
 
+	class MouseEnteredEvent : public Event
+	{
+	public:
+		MouseEnteredEvent() = default;
+
+		EVENT_CLASS_TYPE(MouseEntered)
+		EVENT_CLASS_CATEGORY(EventCategoryMouse)
+	};
+
+	class MouseLeftEvent : public Event
+	{
+	public:
+		MouseLeftEvent() = default;
+
+		EVENT_CLASS_TYPE(MouseLeft)
+		EVENT_CLASS_CATEGORY(EventCategoryMouse)
+	};
+
 }

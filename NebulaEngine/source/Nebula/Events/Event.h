@@ -2,18 +2,19 @@
 
 #include "nbpch.h"
 
-#include "../Core/Core.h"
+#include "Nebula/Core/Core.h"
 
 namespace Nebula
 {
+	class Window;
 
 	enum class EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowMinimize, WindowMaximize, WindowFocus, WindowLostFocus, WindowMoved,
+		WindowClose, WindowResize, WindowMinimize, WindowMaximize, WindowFocused, WindowLostFocus, WindowMoved, MonitorsChanged,
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased, KeyTyped,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled, MouseEntered, MouseLeft,
 	};
 
 	enum EventCategory
@@ -49,6 +50,7 @@ namespace Nebula
 		}
 
 		bool Handled = false;
+		Window* Window = nullptr;
 	};
 
 	class EventDispatcher

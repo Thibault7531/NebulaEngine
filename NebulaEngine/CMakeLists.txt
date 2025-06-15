@@ -21,16 +21,12 @@ if (nebula_cmake_platform STREQUAL Windows)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
             "source/Platform/Windows/*.cpp"
             "source/Platform/OpenGL/*.cpp"
-            vendor/imgui/backends/imgui_impl_sdl3.cpp
-            vendor/imgui/backends/imgui_impl_opengl3.cpp
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
             "source/Platform/Windows/*.hpp"
             "source/Platform/Windows/*.h"
             "source/Platform/OpenGL/*.hpp"
             "source/Platform/OpenGL/*.h"
-            vendor/imgui/backends/imgui_impl_sdl3.h
-            vendor/imgui/backends/imgui_impl_opengl3.h
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
