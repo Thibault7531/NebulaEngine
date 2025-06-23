@@ -5,6 +5,8 @@ namespace Nebula
 
     void OpenGLImGuiRenderer::Init()
     {
+        NB_CORE_DEBUG("Initializing Nebula::Renderer::OpenGL for ImGui");
+
         // Setup backend capabilities flags
         renderer_data = new RendererData();
         io.BackendRendererUserData = static_cast<void*>(renderer_data);
@@ -57,6 +59,8 @@ namespace Nebula
 
     void OpenGLImGuiRenderer::Shutdown()
     {
+        NB_CORE_DEBUG("Shutting down {0}", io.BackendRendererName);
+
         ShutdownMultipleViewports();
 
         DestroyDeviceObjects();

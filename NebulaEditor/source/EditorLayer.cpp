@@ -50,6 +50,8 @@ namespace Nebula {
         m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         m_SceneHierarchyPanel.SetContext(m_Scene);
+
+        NB_INFO("Nebula Editor Loaded");
     }
 
     void EditorLayer::OnUpdate(Timestep ts)

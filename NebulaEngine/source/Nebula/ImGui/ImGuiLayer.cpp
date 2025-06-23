@@ -1,7 +1,6 @@
 #include "ImGuiLayer.h"
 
 #include <SDL_events.h>
-#include <SDL_video.h>
 
 #include "Nebula/Core/Application.h"
 
@@ -9,10 +8,7 @@ namespace Nebula
 {
 
 	ImGuiLayer::ImGuiLayer()
-		: Layer("ImGuiLayer")
-	{
-		NB_CORE_INFO("Creating ImGui Layer");
-	}
+		: Layer("ImGuiLayer") {}
 
 	ImGuiLayer::~ImGuiLayer()
 	= default;
@@ -20,6 +16,8 @@ namespace Nebula
 	void ImGuiLayer::OnAttach()
 	{
 		NB_PROFILE_FUNCTION();
+
+		NB_CORE_INFO("Initializing ImGui");
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -86,6 +84,8 @@ namespace Nebula
 	void ImGuiLayer::OnDetach()
 	{
 		NB_PROFILE_FUNCTION();
+
+		NB_CORE_INFO("Shutting down ImGui");
 
 		m_ImGuiRenderer->Shutdown();
 		m_ImGuiPlatform->Shutdown();

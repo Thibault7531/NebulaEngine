@@ -7,6 +7,11 @@ namespace Nebula {
 	{
 		NB_PROFILE_FUNCTION();
 
+		NB_CORE_INFO("OpenGL Info:");
+		NB_CORE_INFO("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));
+		NB_CORE_INFO("  Renderer: {0}", (const char*)glGetString(GL_RENDERER));
+		NB_CORE_INFO("  Version: {0}", (const char*)glGetString(GL_VERSION));
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

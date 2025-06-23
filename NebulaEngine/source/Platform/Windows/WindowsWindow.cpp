@@ -78,6 +78,8 @@ namespace Nebula {
 	{
 		NB_PROFILE_FUNCTION();
 
+		NB_CORE_INFO("Closing window: {0}", m_Data.Title);
+
 		SDL_DestroyWindow(m_Window);
 	}
 

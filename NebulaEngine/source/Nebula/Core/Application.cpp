@@ -15,7 +15,7 @@ namespace Nebula
 		NB_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		NB_CORE_INFO("Application started");
+		NB_CORE_INFO("Engine starting");
 
 		m_Window = Window::Create(props);
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
@@ -32,13 +32,18 @@ namespace Nebula
 	{
 		NB_PROFILE_FUNCTION();
 
+		NB_CORE_INFO("Engine shutting down");
+
 		Renderer::Shutdown();
 		m_LayerStack.PopOverlay(m_ImGuiLayer);
+		m_ImGuiLayer->OnDetach();
 	}
 
 	void Application::PushLayer(Layer* layer)
 	{
 		NB_PROFILE_FUNCTION();
+
+		NB_CORE_DEBUG("Layer added to stack: {0}", layer->GetName());
 
 		m_LayerStack.PushLayer(layer);
 		layer->OnAttach();
@@ -47,6 +52,8 @@ namespace Nebula
 	void Application::PushOverlay(Layer* layer)
 	{
 		NB_PROFILE_FUNCTION();
+
+		NB_CORE_DEBUG("Overlay added to stack: {0}", layer->GetName());
 
 		m_LayerStack.PushOverlay(layer);
 		layer->OnAttach();

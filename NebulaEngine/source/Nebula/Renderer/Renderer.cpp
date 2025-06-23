@@ -11,6 +11,8 @@ namespace Nebula {
 	{
 		NB_PROFILE_FUNCTION();
 
+		NB_CORE_INFO("Initializing Nebula Renderer");
+
 		RenderCommand::Init();
 		Renderer2D::Init();
 	}
@@ -18,6 +20,8 @@ namespace Nebula {
 	void Renderer::Shutdown()
 	{
 		NB_PROFILE_FUNCTION();
+
+		NB_CORE_INFO("Shutting down Nebula Renderer");
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)

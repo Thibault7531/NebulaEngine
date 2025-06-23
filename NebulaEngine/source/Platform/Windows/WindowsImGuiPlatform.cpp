@@ -13,6 +13,8 @@ namespace Nebula
 
     void WindowsImGuiPlatform::Init(Window* window)
     {
+        NB_CORE_DEBUG("Initializing Nebula::Platform::Windows for ImGui");
+
         // Bind Event Callback
         s_EventCallback = NB_BIND_EVENT_FN(WindowsImGuiPlatform::OnEvent);
 
@@ -64,6 +66,8 @@ namespace Nebula
 
     void WindowsImGuiPlatform::Shutdown()
     {
+        NB_CORE_DEBUG("Shutting down {0}", io.BackendPlatformName);
+
         ShutdownMultipleViewports();
 
         if (platform_data.ClipboardTextData) SDL_free(platform_data.ClipboardTextData);
