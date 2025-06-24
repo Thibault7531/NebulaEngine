@@ -4,6 +4,7 @@
 #include <imgui_internal.h>
 #include <gtc/type_ptr.hpp>
 
+#include "Nebula/ImGui/ImGuiLayer.h"
 #include "Nebula/Scene/Components.h"
 
 namespace Nebula
@@ -88,7 +89,7 @@ namespace Nebula
     static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
     {
         ImGuiIO& io = ImGui::GetIO();
-        auto boldFont = io.Fonts->Fonts[0];
+        auto boldFont = ImGuiLayer::s_Fonts.Bold;
 
         ImGui::PushID(label.c_str());
 
@@ -159,7 +160,7 @@ namespace Nebula
     static void DrawComponent(const std::string& name, Entity entity, UIFonction uiFunction)
     {
         ImGuiIO& io = ImGui::GetIO();
-        auto boldFont = io.Fonts->Fonts[0];
+        auto boldFont = ImGuiLayer::s_Fonts.Bold;
         const ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding | ImGuiTreeNodeFlags_AllowItemOverlap;
 
         if (entity.HasComponent<T>())
@@ -172,7 +173,7 @@ namespace Nebula
             ImGui::Separator();
             bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), flags, "%s", name.c_str());
 
-            ImGui::SameLine(contentRegionAvail.x - lineHeigth * .5f);
+            ImGui::SameLine(contentRegionAvail.x - lineHeigth * .5f + GImGui->Style.FramePadding.x * .5f);
             if (ImGui::Button("+", {lineHeigth, lineHeigth}))
             {
                 ImGui::OpenPopup("ComponentSettings");

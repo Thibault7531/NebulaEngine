@@ -98,12 +98,12 @@ namespace Nebula {
                 ImGui::EndMenu();
             }
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 42);
-            if (ImGui::MenuItem("o")) {
+            if (ImGui::MenuItem("O")) {
                 if (Application::Get().GetWindow().IsMaximized()) Application::Get().GetWindow().SetMaximized(false);
                 else Application::Get().GetWindow().SetMaximized(true);
             };
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 16);
-            if (ImGui::MenuItem("x")) Application::Get().Shutdown();
+            if (ImGui::MenuItem("X")) Application::Get().Shutdown();
         ImGui::EndMainMenuBar();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});

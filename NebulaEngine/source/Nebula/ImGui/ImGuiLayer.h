@@ -6,6 +6,13 @@
 
 namespace Nebula
 {
+	struct ImGuiFonts
+	{
+		ImFont* Regular = nullptr;
+		ImFont* Bold = nullptr;
+		ImFont* Large = nullptr;
+		ImFont* Small = nullptr;
+	};
 
 	class ImGuiLayer : public Layer
 	{
@@ -31,6 +38,9 @@ namespace Nebula
 
 		Ref<ImGuiPlatform> m_ImGuiPlatform;
 		Ref<ImGuiRenderer> m_ImGuiRenderer;
+
+	public:
+		static ImGuiFonts s_Fonts;
 	};
 
 }
