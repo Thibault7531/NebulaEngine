@@ -3,6 +3,7 @@
 #include <gtc/type_ptr.hpp>
 #include <imgui.h>
 
+#include "imgui_internal.h"
 #include "Nebula/Core/KeyCodes.h"
 #include "Nebula.h"
 
@@ -31,8 +32,8 @@ namespace Nebula {
         class CameraController : public ScriptableEntity
         {
         public:
-            void OnCreate() {}
-            void OnUpdate(Timestep ts)
+            virtual void OnCreate() override {}
+            virtual void OnUpdate(Timestep ts) override
             {
                 auto& tc = GetComponent<TransformComponent>();
 
@@ -45,11 +46,39 @@ namespace Nebula {
                 if (Input::IsKeyPressed(NB_KEY_Z))
                     tc.Translation.y += ts * 2;
             }
-            void OnDestroy() {}
+            virtual void OnDestroy() override {}
         };
         m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         m_SceneHierarchyPanel.SetContext(m_Scene);
+
+        Application::Get().GetImGuiLayer()->BlockEvents(false);
+
+        Application::Get().GetWindow().SetWindowHitTest([&](int x, int y)
+        {
+            ImGuiIO& io = ImGui::GetIO();
+
+            if (ImGui::GetMousePos().y >= Application::Get().GetWindow().GetPosY() & ImGui::GetMousePos().y <= Application::Get().GetWindow().GetPosY() + 5)
+            {
+                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + 5) return Window::HitTest::ResizeTopLeft;
+                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5) return Window::HitTest::ResizeTop;
+                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeTopRight;
+            }
+            if (ImGui::GetMousePos().y >= Application::Get().GetWindow().GetPosY() + 5 & ImGui::GetMousePos().y <= Application::Get().GetWindow().GetPosY() + io.DisplaySize.y - 5)
+            {
+                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + 5) return Window::HitTest::ResizeLeft;
+                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeRight;
+            }
+            if (ImGui::GetMousePos().y >= Application::Get().GetWindow().GetPosY() + io.DisplaySize.y - 5 & ImGui::GetMousePos().y <= Application::Get().GetWindow().GetPosY() + io.DisplaySize.y)
+            {
+                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + 5) return Window::HitTest::ResizeBottomLeft;
+                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5) return Window::HitTest::ResizeBottom;
+                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeBottomRight;
+            }
+
+            if (IsTitleBarHovered) return Window::HitTest::Draggable;
+            return Window::HitTest::None;
+        });
 
         NB_INFO("Nebula Editor Loaded");
     }
@@ -92,18 +121,36 @@ namespace Nebula {
         style.WindowMinSize.x = 400.0f;
 
         ImGui::BeginMainMenuBar();
+        {
+            IsTitleBarHovered = ImGui::IsWindowHovered();
+
             ImGui::BeginMenu("NebulaEditor", false);
+            IsTitleBarHovered &= !ImGui::IsItemHovered();
+
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Exit", "Alt + F4")) Application::Get().Shutdown();
                 ImGui::EndMenu();
             }
+            IsTitleBarHovered &= !ImGui::IsItemHovered();
+
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 68);
+            if (ImGui::MenuItem("_"))
+            {
+                Application::Get().GetWindow().Minimize();
+            }
+            IsTitleBarHovered &= !ImGui::IsItemHovered();
+
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 42);
             if (ImGui::MenuItem("O")) {
                 if (Application::Get().GetWindow().IsMaximized()) Application::Get().GetWindow().SetMaximized(false);
                 else Application::Get().GetWindow().SetMaximized(true);
-            };
+            }
+            IsTitleBarHovered &= !ImGui::IsItemHovered();
+
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 16);
             if (ImGui::MenuItem("X")) Application::Get().Shutdown();
+            IsTitleBarHovered &= !ImGui::IsItemHovered();
+        }
         ImGui::EndMainMenuBar();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});

@@ -9,7 +9,7 @@ namespace Nebula {
     {
     public:
         NebulaEditor()
-            : Application({ .Title = "NebulaEditor", .Border = true })
+            : Application({ .Title = "NebulaEditor", .Border = false})
         {
             NB_INFO("Launching Nebula Editor");
 

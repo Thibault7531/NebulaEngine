@@ -35,6 +35,8 @@ namespace Nebula {
 
         // Panels
         SceneHierarchyPanel m_SceneHierarchyPanel;
+
+        bool IsTitleBarHovered = false;
     };
 
 }

@@ -67,6 +67,7 @@ namespace Nebula
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
 		dispatcher.Dispatch<WindowMinimizeEvent>(BIND_EVENT_FN(OnWindowMinimize));
+		dispatcher.Dispatch<WindowRestoredEvent>(BIND_EVENT_FN(OnWindowRestored));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
@@ -132,7 +133,13 @@ namespace Nebula
 
 	bool Application::OnWindowMinimize(WindowMinimizeEvent& e)
 	{
-		m_Minimized = e.IsMinimized();
+		m_Minimized = true;
+		return false;
+	}
+
+	bool Application::OnWindowRestored(WindowRestoredEvent& e)
+	{
+		m_Minimized = false;
 		return false;
 	}
 

@@ -37,6 +37,7 @@ namespace Nebula {
 		bool OnWindowClosed(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 		bool OnWindowMinimize(WindowMinimizeEvent& e);
+		bool OnWindowRestored(WindowRestoredEvent& e);
 
 	private:
 		Ref<Window> m_Window;

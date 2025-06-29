@@ -45,7 +45,7 @@ namespace Nebula {
 		{
 			NB_PROFILE_SCOPE("SDL_CreateWindow");
 
-			SDL_WindowFlags flags = SDL_WINDOW_RESIZABLE;
+			SDL_WindowFlags flags = 0;
 			if (!props.Border) flags |= SDL_WINDOW_BORDERLESS;
 			if (props.Maximized) flags |= SDL_WINDOW_MAXIMIZED;
 			if (props.Fullscreen) flags |= SDL_WINDOW_FULLSCREEN;
@@ -58,6 +58,8 @@ namespace Nebula {
 			m_Window = SDL_CreateWindow(props.Title.c_str(), props.Width, props.Height, flags);
 			SDL_PropertiesID windowProps = SDL_GetWindowProperties(m_Window);
 			SDL_SetPointerProperty(windowProps, "windowProps", &m_Data);
+
+			SDL_SetWindowHitTest(m_Window, OnHitTest, nullptr);
 		}
 
 		if (m_Data.API == RendererAPI::API::OpenGL) {
@@ -97,6 +99,20 @@ namespace Nebula {
 		while (SDL_PollEvent(&e)) {}
 	}
 
+	unsigned int WindowsWindow::GetPosX() const
+	{
+		int x, y;
+		SDL_GetWindowPosition(m_Window, &x, &y);
+		return x;
+	}
+
+	unsigned int WindowsWindow::GetPosY() const
+	{
+		int x, y;
+		SDL_GetWindowPosition(m_Window, &x, &y);
+		return y;
+	}
+
 	void WindowsWindow::SetVSync(const bool enabled)
 	{
 		NB_PROFILE_FUNCTION();
@@ -130,6 +146,12 @@ namespace Nebula {
 		m_Data.Maximized = enabled;
 		if (enabled) SDL_MaximizeWindow(m_Window);
 		else SDL_RestoreWindow(m_Window);
+	}
+
+	void WindowsWindow::Minimize()
+	{
+		m_Data.Minimized = true;
+		SDL_MinimizeWindow(m_Window);
 	}
 
 	void WindowsWindow::Flash() const
@@ -178,7 +200,9 @@ namespace Nebula {
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
-						WindowMinimizeEvent event{SDL_GetWindowFlags(SDL_GetWindowFromEvent(e)) && SDL_WINDOW_MINIMIZED == 1};
+						data.Minimized = true;
+
+						WindowMinimizeEvent event{};
 						event.Window = window.get();
 						data.EventCallback(event);
 
@@ -196,7 +220,31 @@ namespace Nebula {
 					if (props != nullptr) {
 						WindowData &data = *static_cast<WindowData *>(props);
 
-						WindowMaximizeEvent event{SDL_GetWindowFlags(SDL_GetWindowFromEvent(e)) && SDL_WINDOW_MAXIMIZED == 1};
+						data.Maximized = true;
+
+						WindowMaximizeEvent event{};
+						event.Window = window.get();
+						data.EventCallback(event);
+
+						return false;
+					}
+
+					return true;
+				}
+
+			case SDL_EVENT_WINDOW_RESTORED:
+				{
+					void *props = SDL_GetPointerProperty(SDL_GetWindowProperties(SDL_GetWindowFromEvent(e)),
+														 "windowProps", nullptr);
+
+					if (props != nullptr) {
+						WindowData &data = *static_cast<WindowData *>(props);
+
+						data.Maximized = false;
+						data.Minimized = false;
+						data.Fullscreen = false;
+
+						WindowRestoredEvent event{};
 						event.Window = window.get();
 						data.EventCallback(event);
 
@@ -460,6 +508,50 @@ namespace Nebula {
 			}
 		}
 		return true;
+	}
+
+	SDL_HitTestResult WindowsWindow::OnHitTest(SDL_Window* window, const SDL_Point* points, void* data)
+	{
+		void* props = SDL_GetPointerProperty(SDL_GetWindowProperties(window), "windowProps", nullptr);
+		WindowData* windowData = static_cast<WindowData*>(props);
+		if (windowData->HitTestCallback == nullptr) return SDL_HITTEST_NORMAL;
+
+		HitTest test = windowData->HitTestCallback(points->x, points->y);
+		switch (test)
+		{
+		case HitTest::None:
+			return SDL_HITTEST_NORMAL;
+
+		case HitTest::Draggable:
+			return SDL_HITTEST_DRAGGABLE;
+
+		case HitTest::ResizeTopLeft:
+			return SDL_HITTEST_RESIZE_TOPLEFT;
+
+		case HitTest::ResizeTop:
+			return SDL_HITTEST_RESIZE_TOP;
+
+		case HitTest::ResizeTopRight:
+			return SDL_HITTEST_RESIZE_TOPRIGHT;
+
+		case HitTest::ResizeRight:
+			return SDL_HITTEST_RESIZE_RIGHT;
+
+		case HitTest::ResizeBottomRight:
+			return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
+
+		case HitTest::ResizeBottom:
+			return SDL_HITTEST_RESIZE_BOTTOM;
+
+		case HitTest::ResizeBottomLeft:
+			return SDL_HITTEST_RESIZE_BOTTOMLEFT;
+
+		case HitTest::ResizeLeft:
+			return SDL_HITTEST_RESIZE_LEFT;
+
+		default:
+			return SDL_HITTEST_NORMAL;
+		}
 	}
 
 }

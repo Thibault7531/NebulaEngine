@@ -27,6 +27,20 @@ namespace Nebula {
 	class Window
 	{
 	public:
+		enum class HitTest
+		{
+			None,
+			Draggable,
+			ResizeTopLeft,
+			ResizeTop,
+			ResizeTopRight,
+			ResizeRight,
+			ResizeBottomRight,
+			ResizeBottom,
+			ResizeBottomLeft,
+			ResizeLeft
+		};
+
 		using EventCallbackFn = std::function<void(Event&)>;
 
 		virtual ~Window() {}
@@ -37,15 +51,19 @@ namespace Nebula {
 
 		virtual unsigned int GetWidth() const = 0;
 		virtual unsigned int GetHeight() const = 0;
+		virtual unsigned int GetPosX() const = 0;
+		virtual unsigned int GetPosY() const = 0;
 		virtual unsigned int GetTime() const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+		virtual void SetWindowHitTest(std::function<HitTest(int, int)> callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 		virtual void SetFullscreen(bool enabled) = 0;
 		virtual bool IsFullscreen() const = 0;
 		virtual void SetMaximized(bool enabled) = 0;
 		virtual bool IsMaximized() const = 0;
+		virtual void Minimize() = 0;
 
 		virtual void Flash() const = 0;
 

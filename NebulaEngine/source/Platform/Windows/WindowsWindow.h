@@ -6,9 +6,7 @@
 #include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Nebula {
-	/**
-	 * Windows window.
-	 */
+
 	class WindowsWindow : public Window
 	{
 	public:
@@ -17,29 +15,34 @@ namespace Nebula {
 
 		virtual void Shutdown() override;
 
-		void OnUpdate() override;
+		virtual void OnUpdate() override;
 
-		inline unsigned int GetWidth() const override { return m_Data.Width; }
-		inline unsigned int GetHeight() const override { return m_Data.Height; }
+		[[nodiscard]] virtual inline unsigned int GetWidth() const override { return m_Data.Width; }
+		[[nodiscard]] virtual inline unsigned int GetHeight() const override { return m_Data.Height; }
+		[[nodiscard]] virtual unsigned int GetPosX() const override;
+		[[nodiscard]] virtual unsigned int GetPosY() const override;
 
-		inline unsigned int GetTime() const override { return SDL_GetTicks(); }
+		[[nodiscard]] virtual inline unsigned int GetTime() const override { return SDL_GetTicks(); }
 
-		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
-		void SetVSync(bool enabled) override;
-		bool IsVSync() const override;
-		void SetFullscreen(bool enabled) override;
-		bool IsFullscreen() const override;
-		void SetMaximized(bool enabled) override;
-		bool IsMaximized() const override { return m_Data.Maximized; }
+		virtual inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+		virtual inline void SetWindowHitTest(std::function<HitTest(int, int)> callback) override {m_Data.HitTestCallback = callback;};
+		virtual void SetVSync(bool enabled) override;
+		[[nodiscard]] virtual bool IsVSync() const override;
+		virtual void SetFullscreen(bool enabled) override;
+		[[nodiscard]] virtual bool IsFullscreen() const override;
+		virtual void SetMaximized(bool enabled) override;
+		[[nodiscard]] virtual bool IsMaximized() const override { return m_Data.Maximized; }
+		virtual void Minimize() override;
 
 		virtual void Flash() const override;
 
 		virtual void SetCurrentContext() override;
 
-		inline virtual void* GetNativeWindow() const override { return m_Window; }
-		inline virtual uint32_t GetID() const override { return SDL_GetWindowID(m_Window); }
+		[[nodiscard]] inline virtual void* GetNativeWindow() const override { return m_Window; }
+		[[nodiscard]] inline virtual uint32_t GetID() const override { return SDL_GetWindowID(m_Window); }
 
 		static bool OnEvent(void* userdata, SDL_Event* e);
+		static SDL_HitTestResult OnHitTest(SDL_Window* window, const SDL_Point* points, void* data);
 
 	private:
 		virtual void InitWindow(const WindowProps& props);
@@ -55,10 +58,12 @@ namespace Nebula {
 			unsigned int Width, Height;
 			bool VSync;
 			bool Maximized;
+			bool Minimized = false;
 			bool Fullscreen;
 			RendererAPI::API API;
 
 			EventCallbackFn EventCallback;
+			std::function<HitTest(int, int)> HitTestCallback = nullptr;
 		};
 
 		WindowData m_Data;
