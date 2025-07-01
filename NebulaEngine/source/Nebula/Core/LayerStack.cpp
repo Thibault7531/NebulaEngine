@@ -29,7 +29,6 @@ namespace Nebula
 		auto it = std::ranges::find(m_Layers, layer);
 		if (it != m_Layers.end())
 		{
-			(*it)->OnDetach();
 			m_Layers.erase(it);
 			m_LayerInsertIndex--;
 		}

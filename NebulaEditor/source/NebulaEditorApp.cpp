@@ -13,12 +13,19 @@ namespace Nebula {
         {
             NB_INFO("Launching Nebula Editor");
 
-            PushLayer(new EditorLayer());
+            m_EditorLayer = new EditorLayer();
+            PushLayer(m_EditorLayer);
         }
         ~NebulaEditor() override
         {
             NB_INFO("Closing Nebula Editor");
+
+            PopLayer(m_EditorLayer);
+            delete m_EditorLayer;
         };
+
+    private:
+        Layer* m_EditorLayer;
     };
 
     Application* CreateApplication()

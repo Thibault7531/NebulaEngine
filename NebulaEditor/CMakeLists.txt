@@ -61,4 +61,5 @@ target_include_directories(NebulaEditor PRIVATE
         ../NebulaEngine/vendor/Glad/include
         ../NebulaEngine/vendor/glm
         ../NebulaEngine/vendor/glm/glm
+        ../NebulaEngine/vendor/yaml-cpp/include
 )

@@ -13,6 +13,7 @@ namespace Nebula {
         ~EditorLayer() override = default;
 
         virtual void OnAttach() override;
+        virtual void OnDetach() override;
 
         void OnUpdate(Timestep ts) override;
         void OnEvent(Event &event) override;

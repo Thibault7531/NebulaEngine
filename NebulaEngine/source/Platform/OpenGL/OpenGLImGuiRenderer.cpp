@@ -34,8 +34,8 @@ namespace Nebula
 
         // Store GLSL version string so we can refer to it later in case we recreate shaders.
         // Note: GLSL version is NOT the same as GL version. Leave this to nullptr if unsure.
-        strcpy(renderer_data->GlslVersionString, "#version 460");
-        strcat(renderer_data->GlslVersionString, "\n");
+        strcpy_s(renderer_data->GlslVersionString, "#version 460");
+        strcat_s(renderer_data->GlslVersionString, "\n");
 
         // Make an arbitrary GL call (we don't actually need the result)
         // IF YOU GET A CRASH HERE: it probably means the OpenGL function loader didn't do its job. Let us know!

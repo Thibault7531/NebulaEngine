@@ -35,8 +35,7 @@ namespace Nebula
 		NB_CORE_INFO("Engine shutting down");
 
 		Renderer::Shutdown();
-		m_LayerStack.PopOverlay(m_ImGuiLayer);
-		m_ImGuiLayer->OnDetach();
+		PopOverlay(m_ImGuiLayer);
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -49,6 +48,16 @@ namespace Nebula
 		layer->OnAttach();
 	}
 
+	void Application::PopLayer(Layer* layer)
+	{
+		NB_PROFILE_FUNCTION();
+
+		NB_CORE_DEBUG("Layer removed from stack: {0}", layer->GetName());
+
+		m_LayerStack.PopLayer(layer);
+		layer->OnDetach();
+	}
+
 	void Application::PushOverlay(Layer* layer)
 	{
 		NB_PROFILE_FUNCTION();
@@ -57,6 +66,16 @@ namespace Nebula
 
 		m_LayerStack.PushOverlay(layer);
 		layer->OnAttach();
+	}
+
+	void Application::PopOverlay(Layer* layer)
+	{
+		NB_PROFILE_FUNCTION();
+
+		NB_CORE_DEBUG("Overlay removed from stack: {0}", layer->GetName());
+
+		m_LayerStack.PopOverlay(layer);
+		layer->OnDetach();
 	}
 
 	void Application::OnEvent(Event& e)

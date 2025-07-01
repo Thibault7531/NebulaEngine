@@ -54,3 +54,9 @@ add_subdirectory(SDL3)
 # spdlog
 
 add_subdirectory(spdlog)
+
+
+# YAML
+
+option(YAML_MSVC_SHARED_RT "" OFF)
+add_subdirectory(yaml-cpp)

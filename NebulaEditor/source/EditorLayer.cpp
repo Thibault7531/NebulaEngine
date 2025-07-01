@@ -6,6 +6,7 @@
 #include "imgui_internal.h"
 #include "Nebula/Core/KeyCodes.h"
 #include "Nebula.h"
+#include "Nebula/Scene/SceneSerializer.h"
 
 namespace Nebula {
     EditorLayer::EditorLayer()
@@ -19,6 +20,7 @@ namespace Nebula {
 
         m_Scene = CreateRef<Scene>();
 
+        /*
         m_SquareEntity = m_Scene->CreateEntity("Square");
         m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
 
@@ -49,6 +51,9 @@ namespace Nebula {
             virtual void OnDestroy() override {}
         };
         m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+*/
+        SceneSerializer serializer(m_Scene);
+        serializer.Deserialize("./assets/NebulaEditor/Scenes/TestScene.nbscene");
 
         m_SceneHierarchyPanel.SetContext(m_Scene);
 
@@ -81,6 +86,12 @@ namespace Nebula {
         });
 
         NB_INFO("Nebula Editor Loaded");
+    }
+
+    void EditorLayer::OnDetach()
+    {
+        SceneSerializer serializer(m_Scene);
+        serializer.Serialize("./assets/NebulaEditor/Scenes/TestScene.nbscene");
     }
 
     void EditorLayer::OnUpdate(Timestep ts)

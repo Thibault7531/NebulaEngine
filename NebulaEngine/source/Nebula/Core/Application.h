@@ -23,7 +23,9 @@ namespace Nebula {
 		void OnEvent(Event& e);
 
 		void PushLayer(Layer* layer);
+		void PopLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
+		void PopOverlay(Layer* layer);
 
 		inline Window& GetWindow() const { return *m_Window; }
 

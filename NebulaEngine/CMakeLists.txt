@@ -77,6 +77,7 @@ target_link_libraries(Nebula PRIVATE
         GLAD
         spdlog::spdlog_header_only
         EnTT::EnTT
+        yaml-cpp::yaml-cpp
 )
 target_include_directories(Nebula PRIVATE
         source
@@ -89,4 +90,5 @@ target_include_directories(Nebula PRIVATE
         vendor/SDL3/include
         vendor/SDL3/include/SDL3
         vendor/stb_image
+        vendor/yaml-cpp/include
 )
