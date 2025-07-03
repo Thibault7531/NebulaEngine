@@ -191,7 +191,7 @@ namespace Nebula
     {
         out << YAML::BeginMap;
         {
-            out << YAML::Key << "Entity" << YAML::Value << "NOID";
+            out << YAML::Key << "Entity" << YAML::Value << "0";
 
             if (entity.HasComponent<TagComponent>())
             {
