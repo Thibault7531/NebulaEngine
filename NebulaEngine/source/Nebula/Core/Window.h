@@ -43,34 +43,34 @@ namespace Nebula {
 
 		using EventCallbackFn = std::function<void(Event&)>;
 
-		virtual ~Window() {}
+		virtual ~Window() = default;
 
 		virtual void OnUpdate() = 0;
 
 		virtual void Shutdown() = 0;
 
-		virtual unsigned int GetWidth() const = 0;
-		virtual unsigned int GetHeight() const = 0;
-		virtual unsigned int GetPosX() const = 0;
-		virtual unsigned int GetPosY() const = 0;
-		virtual unsigned int GetTime() const = 0;
+		[[nodiscard]] virtual unsigned int GetWidth() const = 0;
+		[[nodiscard]] virtual unsigned int GetHeight() const = 0;
+		[[nodiscard]] virtual unsigned int GetPosX() const = 0;
+		[[nodiscard]] virtual unsigned int GetPosY() const = 0;
+		[[nodiscard]] virtual unsigned int GetTime() const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetWindowHitTest(std::function<HitTest(int, int)> callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
-		virtual bool IsVSync() const = 0;
+		[[nodiscard]] virtual bool IsVSync() const = 0;
 		virtual void SetFullscreen(bool enabled) = 0;
-		virtual bool IsFullscreen() const = 0;
+		[[nodiscard]] virtual bool IsFullscreen() const = 0;
 		virtual void SetMaximized(bool enabled) = 0;
-		virtual bool IsMaximized() const = 0;
+		[[nodiscard]] virtual bool IsMaximized() const = 0;
 		virtual void Minimize() = 0;
 
 		virtual void Flash() const = 0;
 
 		virtual void SetCurrentContext() = 0;
 
-		virtual void* GetNativeWindow() const = 0;
-		virtual uint32_t GetID() const = 0;
+		[[nodiscard]] virtual void* GetNativeWindow() const = 0;
+		[[nodiscard]] virtual uint32_t GetID() const = 0;
 
 		static Ref<Window> GetWindow(uint32_t windowID);
 		static void DestroyWindow(uint32_t windowID);

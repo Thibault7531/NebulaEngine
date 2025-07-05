@@ -7,6 +7,7 @@
 #include "Nebula/Core/KeyCodes.h"
 #include "Nebula.h"
 #include "Nebula/Scene/SceneSerializer.h"
+#include "Nebula/Utils/PlatformUtils.h"
 
 namespace Nebula {
     EditorLayer::EditorLayer()
@@ -16,44 +17,11 @@ namespace Nebula {
 
     void EditorLayer::OnAttach()
     {
+        Application::Get().GetImGuiLayer()->BlockEvents(false);
+
         m_Framebuffer = Framebuffer::Create({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y)});
 
         m_Scene = CreateRef<Scene>();
-
-        /*
-        m_SquareEntity = m_Scene->CreateEntity("Square");
-        m_SquareEntity.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-
-        m_Square2Entity = m_Scene->CreateEntity("Square2");
-        m_Square2Entity.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 1.0f, 1.0f});
-        m_Square2Entity.GetComponent<TransformComponent>() = { glm::vec3{-1.0f, 0.0f, -.1f}, glm::vec3{0.f, 0.f, glm::radians(40.0f)}, glm::vec3{1.0f} };
-
-        m_CameraEntity = m_Scene->CreateEntity("Camera");
-        m_CameraEntity.AddComponent<CameraComponent>();
-
-        class CameraController : public ScriptableEntity
-        {
-        public:
-            virtual void OnCreate() override {}
-            virtual void OnUpdate(Timestep ts) override
-            {
-                auto& tc = GetComponent<TransformComponent>();
-
-                if (Input::IsKeyPressed(NB_KEY_Q))
-                    tc.Translation.x -= ts * 2;
-                if (Input::IsKeyPressed(NB_KEY_D))
-                    tc.Translation.x += ts * 2;
-                if (Input::IsKeyPressed(NB_KEY_S))
-                    tc.Translation.y -= ts * 2;
-                if (Input::IsKeyPressed(NB_KEY_Z))
-                    tc.Translation.y += ts * 2;
-            }
-            virtual void OnDestroy() override {}
-        };
-        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-*/
-        SceneSerializer serializer(m_Scene);
-        serializer.Deserialize("./assets/NebulaEditor/Scenes/TestScene.nbscene");
 
         m_SceneHierarchyPanel.SetContext(m_Scene);
 
@@ -90,8 +58,6 @@ namespace Nebula {
 
     void EditorLayer::OnDetach()
     {
-        SceneSerializer serializer(m_Scene);
-        serializer.Serialize("./assets/NebulaEditor/Scenes/TestScene.nbscene");
     }
 
     void EditorLayer::OnUpdate(Timestep ts)
@@ -139,7 +105,14 @@ namespace Nebula {
             IsTitleBarHovered &= !ImGui::IsItemHovered();
 
             if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("New Scene", "Ctrl+N")) NewScene();
+                if (ImGui::MenuItem("Open Scene...", "Ctrl+O")) OpenScene();
+                if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S")) SaveSceneAs();
+
+                ImGui::Separator();
+
                 if (ImGui::MenuItem("Exit", "Alt + F4")) Application::Get().Shutdown();
+
                 ImGui::EndMenu();
             }
             IsTitleBarHovered &= !ImGui::IsItemHovered();
@@ -175,7 +148,6 @@ namespace Nebula {
 
             IsViewportFocused = ImGui::IsWindowFocused();
             IsViewportHovered = ImGui::IsWindowHovered();
-            Application::Get().GetImGuiLayer()->BlockEvents(!IsViewportFocused || !IsViewportHovered);
 
             ImGui::Image(m_Framebuffer->GetColorAttachmentRendererID(), { m_ViewportSize.x, m_ViewportSize.y }, {0, 1}, {1, 0});
         }
@@ -185,13 +157,43 @@ namespace Nebula {
         m_SceneHierarchyPanel.OnImGuiRender();
     }
 
+    void EditorLayer::NewScene()
+    {
+        m_Scene = CreateRef<Scene>();
+        m_Scene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+        m_SceneHierarchyPanel.SetContext(m_Scene);
+    }
+
+    void EditorLayer::OpenScene()
+    {
+        std::string path = FileDialogs::OpenFile({ FileDialogs::FileType::NebulaScene });
+        if (!path.empty()) {
+            NewScene();
+
+            SceneSerializer serializer(m_Scene);
+            serializer.Deserialize(path);
+        }
+    }
+
+    void EditorLayer::SaveSceneAs()
+    {
+        std::string path = FileDialogs::SaveFile("Nebula Scene (*.nbscene)\0*.nbscene\0");
+        if (!path.empty()) {
+            SceneSerializer serializer(m_Scene);
+            serializer.Serialize(path);
+        }
+    }
+
     bool EditorLayer::OnKeyPressedEvent(const KeyPressedEvent& event)
     {
-        if (event.GetKeyCode() == NB_KEY_F) {
-            if (Application::Get().GetWindow().IsFullscreen()) Application::Get().GetWindow().SetFullscreen(false);
-            else Application::Get().GetWindow().SetFullscreen(true);
-            return true;
-        }
+        // Shortcuts
+        if (event.GetRepeatCount() > 0) return false;
+        bool control = Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL);
+        bool shift = Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT);
+
+        if (event.GetKeyCode() == NB_KEY_N && control) NewScene();
+        if (event.GetKeyCode() == NB_KEY_O && control) OpenScene();
+        if (event.GetKeyCode() == NB_KEY_S && control && shift) SaveSceneAs();
         return false;
     }
 }

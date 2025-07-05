@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Put key into enum class for easier understanding
+
 // From SDL_mouse.h
 #define NB_BUTTON_LEFT     1
 #define NB_BUTTON_MIDDLE   2

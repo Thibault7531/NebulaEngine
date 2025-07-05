@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Put key into enum class for easier understanding
+
 // From SDL_keycode.h
 #define NB_KEY_UNKNOWN                0x00000000u /**< 0 */
 #define NB_KEY_RETURN                 0x0000000du /**< '\r' */

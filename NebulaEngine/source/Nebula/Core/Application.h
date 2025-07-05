@@ -11,6 +11,7 @@
 
 namespace Nebula {
 
+	//TODO: Clean application class for more modularity and easier maintenance
 	class Application
 	{
 	public:

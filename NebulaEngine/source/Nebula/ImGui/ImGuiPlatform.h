@@ -6,6 +6,7 @@
 namespace Nebula
 {
 
+    // TODO: Make this class platform-agnostic
     class ImGuiPlatform
     {
     public:

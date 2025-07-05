@@ -15,9 +15,13 @@ namespace Nebula {
         virtual void OnAttach() override;
         virtual void OnDetach() override;
 
-        void OnUpdate(Timestep ts) override;
-        void OnEvent(Event &event) override;
-        void OnImGuiRender() override;
+        virtual void OnUpdate(Timestep ts) override;
+        virtual void OnEvent(Event &event) override;
+        virtual void OnImGuiRender() override;
+
+        void NewScene();
+        void OpenScene();
+        void SaveSceneAs();
 
     private:
         bool OnKeyPressedEvent(const KeyPressedEvent& event);

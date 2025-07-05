@@ -7,6 +7,7 @@
 
 namespace Nebula {
 
+	// TODO: Migrate to Win32 API
 	class WindowsWindow : public Window
 	{
 	public:
