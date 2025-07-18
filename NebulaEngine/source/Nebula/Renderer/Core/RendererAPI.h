@@ -3,7 +3,7 @@
 #include <memory>
 #include <glm/glm.hpp>
 
-#include "VertexArray.h"
+#include "Nebula/Renderer/Buffers/VertexArray.h"
 
 namespace Nebula {
 

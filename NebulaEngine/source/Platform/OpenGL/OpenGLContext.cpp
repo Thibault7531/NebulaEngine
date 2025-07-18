@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include "Nebula/CoreSystems/Core/Core.h"
+
 namespace Nebula {
 
 	OpenGLContext::OpenGLContext(SDL_Window* windowHandle)
@@ -35,4 +37,8 @@ namespace Nebula {
 		SDL_GL_SwapWindow(m_WindowHandle);
 	}
 
+	void OpenGLContext::SetCurrent()
+	{
+		SDL_GL_MakeCurrent(m_WindowHandle, m_Context);
+	}
 }

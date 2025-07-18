@@ -2,12 +2,10 @@
 
 #include <SDL_video.h>
 
-#include "Nebula/Renderer/GraphicsContext.h"
+#include "Nebula/Renderer/Core/GraphicsContext.h"
 
 namespace Nebula {
-	/**
-	 * OpenGL Context.
-	 */
+
 	class OpenGLContext : public GraphicsContext
 	{
 	public:
@@ -16,7 +14,7 @@ namespace Nebula {
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
 
-		SDL_GLContext GetContext() { return m_Context; }
+		virtual void SetCurrent() override;
 
 	private:
 		SDL_Window* m_WindowHandle;

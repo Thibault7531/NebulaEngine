@@ -1,6 +1,6 @@
 #include "WindowsWindow.h"
 
-#include "Nebula/Core/Application.h"
+#include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/Events/ApplicationEvent.h"
 #include "Nebula/Events/KeyEvent.h"
 #include "Nebula/Events/MouseEvent.h"
@@ -67,9 +67,9 @@ namespace Nebula {
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-			m_Context = new OpenGLContext(m_Window);
+			m_GraphicsContext = new OpenGLContext(m_Window);
 		}
-		m_Context->Init();
+		m_GraphicsContext->Init();
 
 		SDL_StartTextInput(m_Window);
 		
@@ -89,9 +89,9 @@ namespace Nebula {
 	{
 		NB_PROFILE_FUNCTION();
 
-		m_Context->SwapBuffers();
+		m_GraphicsContext->SwapBuffers();
 
-		if (Application::Get().IsMinimized()) {
+		if (m_Data.Minimized) {
 			SDL_PumpEvents();
 		}
 
@@ -161,7 +161,7 @@ namespace Nebula {
 
 	void WindowsWindow::SetCurrentContext()
 	{
-		SDL_GL_MakeCurrent(m_Window, m_Context->GetContext());
+		m_GraphicsContext->SetCurrent();
 	}
 
 	bool WindowsWindow::OnEvent(void *userdata, SDL_Event *e)

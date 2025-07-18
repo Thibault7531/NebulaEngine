@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "Nebula/Renderer/VertexArray.h"
+#include "Nebula/Renderer/Buffers/VertexArray.h"
 
 namespace Nebula {
 	/**

@@ -1,6 +1,6 @@
 #include "Framebuffer.h"
 
-#include "Renderer.h"
+#include "Nebula/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLFramebuffer.h"
 
 namespace Nebula {

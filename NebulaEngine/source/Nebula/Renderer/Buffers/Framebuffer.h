@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vec2.hpp>
+#include "Nebula/CoreSystems/Core/Core.h"
 
 namespace Nebula {
 

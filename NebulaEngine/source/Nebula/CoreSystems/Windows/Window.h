@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Events/Event.h"
-#include "Nebula/Renderer/RendererAPI.h"
+#include "Nebula/Events/Event.h"
+#include "Nebula/Renderer/Core/RendererAPI.h"
 
 namespace Nebula {
 

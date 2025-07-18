@@ -1,6 +1,6 @@
 #include <SDL.h>
 
-#include "Nebula/Core/Input.h"
+#include "Nebula/CoreSystems/Input/Input.h"
 
 namespace Nebula {
 	// TODO: Migrate to Win32 API

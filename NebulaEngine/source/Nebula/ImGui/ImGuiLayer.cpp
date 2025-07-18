@@ -2,7 +2,8 @@
 
 #include <SDL_events.h>
 
-#include "Nebula/Core/Application.h"
+#include "Nebula/CoreSystems/Application/Application.h"
+#include "Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula
 {
@@ -31,7 +32,7 @@ namespace Nebula
 		SetDarkTheme();
 
 		m_ImGuiPlatform = ImGuiPlatform::Create();
-		m_ImGuiPlatform->Init(&Application::Get().GetWindow());
+		m_ImGuiPlatform->Init(WindowManager::Get().GetMainWindow().get());
 
 		m_ImGuiRenderer = ImGuiRenderer::Create();
 		m_ImGuiRenderer->Init();
@@ -92,7 +93,7 @@ namespace Nebula
 	{
 	}
 
-	void ImGuiLayer::Begin()
+	void ImGuiLayer::Begin() const
 	{
 		NB_PROFILE_FUNCTION();
 
@@ -103,7 +104,7 @@ namespace Nebula
 		ImGui::NewFrame();
 	}
 
-	void ImGuiLayer::End()
+	void ImGuiLayer::End() const
 	{
 		NB_PROFILE_FUNCTION();
 
@@ -116,7 +117,7 @@ namespace Nebula
 		{
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			Application::Get().GetWindow().SetCurrentContext();
+			WindowManager::Get().GetMainWindow()->SetCurrentContext();
 		}
 	}
 

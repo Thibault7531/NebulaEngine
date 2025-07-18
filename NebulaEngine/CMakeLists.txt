@@ -92,3 +92,9 @@ target_include_directories(Nebula PRIVATE
         vendor/stb_image
         vendor/yaml-cpp/include
 )
+
+
+# Windows Settings
+if (nebula_cmake_platform STREQUAL Windows)
+    target_compile_definitions(Nebula PUBLIC NB_PLATFORM_WINDOWS)
+endif ()

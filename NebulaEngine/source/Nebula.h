@@ -3,10 +3,10 @@
 // For use by Nebula Application
 
 // Native application
-#include "Nebula/Core/Application.h"
-#include "Nebula/Core/Layer.h"
-#include "Nebula/Core/Log.h"
-#include "Nebula/Core/Timestep.h"
+#include "Nebula/CoreSystems/Application/Application.h"
+#include "Nebula/CoreSystems/Application/Layer.h"
+#include "Nebula/CoreSystems/Core/Log.h"
+#include "Nebula/CoreSystems/Core/Timestep.h"
 
 // Events system
 #include "Nebula/Events/ApplicationEvent.h"
@@ -14,20 +14,20 @@
 #include "Nebula/Events/MouseEvent.h"
 
 // Input system
-#include "Nebula/Renderer/CameraController.h"
-#include "Nebula/Core/Input.h"
-#include "Nebula/Core/KeyCodes.h"
-#include "Nebula/Core/MouseButtonCodes.h"
+#include "Nebula/Renderer/Cameras/CameraController.h"
+#include "Nebula/CoreSystems/Input/Input.h"
+#include "Nebula/CoreSystems/Input/KeyCodes.h"
+#include "Nebula/CoreSystems/Input/MouseButtonCodes.h"
 
 // ImGui
 #include "Nebula/ImGui/ImGuiLayer.h"
 
 // Renderer
-#include "Nebula/Renderer/Camera.h"
-#include "Nebula/Renderer/Framebuffer.h"
-#include "Nebula/Renderer/OrthographicCamera.h"
-#include "Nebula/Renderer/PerspectiveCamera.h"
-#include "Nebula/Renderer/RenderCommand.h"
+#include "Nebula/Renderer/Cameras/Camera.h"
+#include "Nebula/Renderer/Buffers/Framebuffer.h"
+#include "Nebula/Renderer/Cameras/OrthographicCamera.h"
+#include "Nebula/Renderer/Cameras/PerspectiveCamera.h"
+#include "Nebula/Renderer/Core/RenderCommand.h"
 #include "Nebula/Renderer/Renderer.h"
 #include "Nebula/Renderer/Renderer2D.h"
 #include "Nebula/Renderer/Shader.h"

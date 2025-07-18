@@ -1,11 +1,12 @@
 #include "Renderer2D.h"
 
-#include "Camera.h"
-#include "RenderCommand.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
+
 #include "Shader.h"
-#include "VertexArray.h"
-#include "glm/gtc/matrix_transform.hpp"
-#include "gtc/type_ptr.hpp"
+#include "Buffers/VertexArray.h"
+#include "Cameras/Camera.h"
+#include "Core/RenderCommand.h"
 
 namespace Nebula
 {
@@ -130,7 +131,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        auto dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+        auto dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferBase));
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
         Flush();
@@ -140,7 +141,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        auto dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+        auto dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferBase));
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
         Flush();

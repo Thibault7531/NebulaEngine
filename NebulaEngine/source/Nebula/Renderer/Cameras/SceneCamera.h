@@ -17,23 +17,23 @@ namespace Nebula
 
         void SetViewportSize(uint32_t width, uint32_t height);
 
-        ProjectionType GetProjectionType() const { return m_ProjectionType; }
+        [[nodiscard]] ProjectionType GetProjectionType() const { return m_ProjectionType; }
         void SetProjectionType(const ProjectionType type) { m_ProjectionType = type; RecalculateProjection(); }
 
-        float GetOrthographicSize() const { return m_OrthographicSize; }
+        [[nodiscard]] float GetOrthographicSize() const { return m_OrthographicSize; }
         void SetOrthographicSize(const float size) { m_OrthographicSize = size; RecalculateProjection(); }
 
-        float GetOrthographicNearClip() const { return m_OrthographicNear; }
-        float GetOrthographicFarClip() const { return m_OrthographicFar; }
+        [[nodiscard]] float GetOrthographicNearClip() const { return m_OrthographicNear; }
+        [[nodiscard]] float GetOrthographicFarClip() const { return m_OrthographicFar; }
         void SetOrthographicNearClip(const float nearClip) { m_OrthographicNear = nearClip; RecalculateProjection(); }
         void SetOrthographicFarClip(const float farClip) { m_OrthographicFar = farClip; RecalculateProjection(); }
 
 
-        float GetPerspectiveVerticalFOV() const { return m_PerspectiveVerticalFOV; }
+        [[nodiscard]] float GetPerspectiveVerticalFOV() const { return m_PerspectiveVerticalFOV; }
         void SetPerspectiveVerticalFOV(const float fov) { m_PerspectiveVerticalFOV = fov; RecalculateProjection(); }
 
-        float GetPerspectiveNearClip() const { return m_PerspectiveNear; }
-        float GetPerspectiveFarClip() const { return m_PerspectiveFar; }
+        [[nodiscard]] float GetPerspectiveNearClip() const { return m_PerspectiveNear; }
+        [[nodiscard]] float GetPerspectiveFarClip() const { return m_PerspectiveFar; }
         void SetPerspectiveNearClip(const float nearClip) { m_PerspectiveNear = nearClip; RecalculateProjection(); }
         void SetPerspectiveFarClip(const float farClip) { m_PerspectiveFar = farClip; RecalculateProjection(); }
 

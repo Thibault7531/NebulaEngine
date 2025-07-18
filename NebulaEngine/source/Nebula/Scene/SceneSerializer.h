@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+#include "Nebula/CoreSystems/Core/Core.h"
 #include "yaml-cpp/emitter.h"
 
 namespace Nebula
@@ -11,10 +12,10 @@ namespace Nebula
     public:
         SceneSerializer(const Ref<Scene>& scene);
 
-        void Serialize(const std::string& filepath);
-        void SerializeRuntime(const std::string& filepath);
+        void Serialize(const std::string& filepath) const;
+        static void SerializeRuntime(const std::string& filepath);
 
-        bool Deserialize(const std::string& filepath);
+        bool Deserialize(const std::string& filepath) const;
         bool DeserializeRuntime(const std::string& filepath);
 
     public:

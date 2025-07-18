@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-#include "RenderCommand.h"
+#include "Core/RenderCommand.h"
 #include "Renderer2D.h"
 
 namespace Nebula {
@@ -29,7 +29,7 @@ namespace Nebula {
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginScene(PerspectiveCamera& camera)
+	void Renderer::BeginScene(const PerspectiveCamera& camera)
 	{
 		m_SceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
 	}

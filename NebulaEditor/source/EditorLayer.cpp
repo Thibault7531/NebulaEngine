@@ -1,11 +1,12 @@
 #include "EditorLayer.h"
 
-#include <gtc/type_ptr.hpp>
 #include <imgui.h>
+#include <gtc/type_ptr.hpp>
 
 #include "imgui_internal.h"
-#include "Nebula/Core/KeyCodes.h"
 #include "Nebula.h"
+#include "Nebula/CoreSystems/Input/KeyCodes.h"
+#include "Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Nebula/Scene/SceneSerializer.h"
 #include "Nebula/Utils/PlatformUtils.h"
 
@@ -27,26 +28,26 @@ namespace Nebula {
 
         Application::Get().GetImGuiLayer()->BlockEvents(false);
 
-        Application::Get().GetWindow().SetWindowHitTest([&](int x, int y)
+        WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
         {
             ImGuiIO& io = ImGui::GetIO();
 
-            if (ImGui::GetMousePos().y >= Application::Get().GetWindow().GetPosY() & ImGui::GetMousePos().y <= Application::Get().GetWindow().GetPosY() + 5)
+            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPosY() & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPosY() + 5)
             {
-                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + 5) return Window::HitTest::ResizeTopLeft;
-                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5) return Window::HitTest::ResizeTop;
-                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeTopRight;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + 5) return Window::HitTest::ResizeTopLeft;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5) return Window::HitTest::ResizeTop;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeTopRight;
             }
-            if (ImGui::GetMousePos().y >= Application::Get().GetWindow().GetPosY() + 5 & ImGui::GetMousePos().y <= Application::Get().GetWindow().GetPosY() + io.DisplaySize.y - 5)
+            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPosY() + 5 & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPosY() + io.DisplaySize.y - 5)
             {
-                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + 5) return Window::HitTest::ResizeLeft;
-                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeRight;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + 5) return Window::HitTest::ResizeLeft;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeRight;
             }
-            if (ImGui::GetMousePos().y >= Application::Get().GetWindow().GetPosY() + io.DisplaySize.y - 5 & ImGui::GetMousePos().y <= Application::Get().GetWindow().GetPosY() + io.DisplaySize.y)
+            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPosY() + io.DisplaySize.y - 5 & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPosY() + io.DisplaySize.y)
             {
-                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + 5) return Window::HitTest::ResizeBottomLeft;
-                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5) return Window::HitTest::ResizeBottom;
-                if (ImGui::GetMousePos().x >= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= Application::Get().GetWindow().GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeBottomRight;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + 5) return Window::HitTest::ResizeBottomLeft;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5) return Window::HitTest::ResizeBottom;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeBottomRight;
             }
 
             if (IsTitleBarHovered) return Window::HitTest::Draggable;
@@ -120,14 +121,14 @@ namespace Nebula {
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 68);
             if (ImGui::MenuItem("_"))
             {
-                Application::Get().GetWindow().Minimize();
+                WindowManager::Get().GetMainWindow()->Minimize();
             }
             IsTitleBarHovered &= !ImGui::IsItemHovered();
 
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 42);
             if (ImGui::MenuItem("O")) {
-                if (Application::Get().GetWindow().IsMaximized()) Application::Get().GetWindow().SetMaximized(false);
-                else Application::Get().GetWindow().SetMaximized(true);
+                if (WindowManager::Get().GetMainWindow()->IsMaximized()) WindowManager::Get().GetMainWindow()->SetMaximized(false);
+                else WindowManager::Get().GetMainWindow()->SetMaximized(true);
             }
             IsTitleBarHovered &= !ImGui::IsItemHovered();
 

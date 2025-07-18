@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PerspectiveCamera.h"
-#include "RendererAPI.h"
+#include "Cameras/PerspectiveCamera.h"
+#include "Core/RendererAPI.h"
 #include "Shader.h"
 
 namespace Nebula {
@@ -13,7 +13,7 @@ namespace Nebula {
 		static void Shutdown();
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
-		static void BeginScene(PerspectiveCamera& camera);
+		static void BeginScene(const PerspectiveCamera& camera);
 		static void EndScene();
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));

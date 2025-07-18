@@ -1,5 +1,5 @@
 #include <Nebula.h>
-#include <Nebula/Core/EntryPoint.h>
+#include <../../NebulaEngine/source/Nebula/CoreSystems/Core/EntryPoint.h>
 #include <SDL_keycode.h>
 #include <glad/glad.h>
 
@@ -7,7 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Sandbox2D.h"
-#include "Nebula/Renderer/Camera.h"
+#include "../../NebulaEngine/source/Nebula/Renderer/Cameras/Camera.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 class OpenGLDebugWindow : public Nebula::Layer

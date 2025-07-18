@@ -2,7 +2,7 @@
 
 #include "ImGuiPlatform.h"
 #include "ImGuiRenderer.h"
-#include "Nebula/Core/Layer.h"
+#include "Nebula/CoreSystems/Application/Layer.h"
 
 namespace Nebula
 {
@@ -18,20 +18,20 @@ namespace Nebula
 	{
 	public:
 		ImGuiLayer();
-		~ImGuiLayer() override;
+		virtual ~ImGuiLayer();
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
 		virtual void OnEvent(Event& event) override;
 		virtual void OnImGuiRender() override;
 
-		void Begin();
-		void End();
+		void Begin() const;
+		void End() const;
 
 		void BlockEvents(const bool block) { m_BlockEvents = block; }
 
 	private:
-		void SetDarkTheme();
+		static void SetDarkTheme();
 
 	private:
 		bool m_BlockEvents = true;

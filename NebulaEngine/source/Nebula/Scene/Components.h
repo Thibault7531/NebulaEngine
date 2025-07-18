@@ -3,7 +3,7 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
-#include "Nebula/Renderer/SceneCamera.h"
+#include "Nebula/Renderer/Cameras/SceneCamera.h"
 #include "Nebula/Scene/ScriptableEntity.h"
 
 namespace Nebula

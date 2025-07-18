@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include "Nebula/CoreSystems/Core/Timestep.h"
+#include "Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Nebula/Renderer/Renderer.h"
 
 namespace Nebula
@@ -17,15 +19,15 @@ namespace Nebula
 
 		NB_CORE_INFO("Engine starting");
 
-		m_Window = Window::Create(props);
-		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		m_MainWindow = WindowManager::Get().CreateNewMainWindow(props);
+		m_MainWindow->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
 		Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 
-		m_Window->Flash();
+		m_MainWindow->Flash();
 	}
 
 	Application::~Application()
@@ -36,6 +38,9 @@ namespace Nebula
 
 		Renderer::Shutdown();
 		PopOverlay(m_ImGuiLayer);
+
+		WindowManager::Get().DestroyMainWindow();
+		m_MainWindow.reset();
 	}
 
 	void Application::PushLayer(Layer* layer)
@@ -103,10 +108,10 @@ namespace Nebula
 		while (m_Running) {
 			NB_PROFILE_SCOPE("RunLoop");
 
-			m_Window->SetCurrentContext();
+			m_MainWindow->SetCurrentContext();
 
-			const float time = static_cast<float>(m_Window->GetTime()) / 1000.0f;
-			Timestep timestep = time - m_LastFrameTime;
+			std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
+			const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000;
 			m_LastFrameTime = time;
 
 			if (!m_Minimized)
@@ -126,7 +131,7 @@ namespace Nebula
 				m_ImGuiLayer->End();
 			}
 
-			m_Window->OnUpdate();
+			m_MainWindow->OnUpdate();
 		}
 	}
 

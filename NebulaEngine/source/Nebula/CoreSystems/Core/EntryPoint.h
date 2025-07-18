@@ -2,12 +2,9 @@
 
 #ifdef NB_PLATFORM_WINDOWS
 
-/**
- * Creates the application.
- * @return Pointer to the application
- */
 extern Nebula::Application* Nebula::CreateApplication();
 
+// ReSharper disable once CppNonInlineFunctionDefinitionInHeaderFile
 int main(int argc, char** argv)
 {
 	Nebula::Log::Init();

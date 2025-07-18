@@ -3,12 +3,14 @@
 #include <string>
 #include <glm/glm.hpp>
 
+#include "Nebula/CoreSystems/Core/Core.h"
+
 namespace Nebula {
 
 	class Shader
 	{
 	public:
-		enum class SOURCE_TYPE { NB_SHADER_STRING, NB_SHADER_FILE};
+		enum class SOURCE_TYPE { NB_SHADER_STRING, NB_SHADER_FILE };
 	public:
 		virtual ~Shader() = default;
 

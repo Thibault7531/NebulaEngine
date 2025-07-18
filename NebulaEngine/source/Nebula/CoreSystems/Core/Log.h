@@ -1,30 +1,15 @@
 #pragma once
 
-#include "Core.h"
-#include "../../../vendor/spdlog/include/spdlog/spdlog.h"
-#include "../../../vendor/spdlog/include/spdlog/fmt/ostr.h"
+#include <spdlog/spdlog.h>
 
 namespace Nebula {
-	/**
-	 * Log class
-	 */
+
 	class Log
 	{
 	public:
-		/**
-		 * Initializes the logging system.
-		 */
 		static void Init();
 
-		/**
-		 * Gets the Core logger.
-		 * @return Pointer to the Core logger
-		 */
 		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
-		/**
-		 * Gets the Client logger.
-		 * @return Pointer to the Client logger
-		 */
 		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
 
 	private:

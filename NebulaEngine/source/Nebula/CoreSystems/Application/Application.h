@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Core.h"
+#include "Nebula/CoreSystems/Core/Core.h"
 
-#include "Window.h"
-#include "Timestep.h"
-#include "../Events/ApplicationEvent.h"
-#include "../Events/Event.h"
-#include "../ImGui/ImGuiLayer.h"
 #include "LayerStack.h"
+#include "Nebula/CoreSystems/Windows/Window.h"
+#include "Nebula/Events/ApplicationEvent.h"
+#include "Nebula/Events/Event.h"
+#include "Nebula/ImGui/ImGuiLayer.h"
 
 namespace Nebula {
 
@@ -28,11 +27,7 @@ namespace Nebula {
 		void PushOverlay(Layer* layer);
 		void PopOverlay(Layer* layer);
 
-		inline Window& GetWindow() const { return *m_Window; }
-
-		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
-
-		bool IsMinimized() const { return m_Minimized; }
+		ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
 
 		inline static Application& Get() { return *s_Instance; }
 
@@ -43,20 +38,16 @@ namespace Nebula {
 		bool OnWindowRestored(WindowRestoredEvent& e);
 
 	private:
-		Ref<Window> m_Window;
+		Ref<Window> m_MainWindow;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		bool m_Minimized = false;
 		LayerStack m_LayerStack;
-		float m_LastFrameTime = 0.0f;
+		std::chrono::steady_clock::time_point m_LastFrameTime{};
 
 	private:
 		static  Application* s_Instance;
 	};
 
-	/**
-	 * Creates the application.
-	 * @return Pointer to the application
-	 */
 	Application* CreateApplication();
 }

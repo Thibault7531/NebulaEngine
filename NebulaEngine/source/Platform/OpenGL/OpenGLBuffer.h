@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "Nebula/Renderer/Buffer.h"
+#include "Nebula/Renderer/Buffers/Buffer.h"
 
 namespace Nebula {
 	/**

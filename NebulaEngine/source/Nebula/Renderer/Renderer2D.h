@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Camera.h"
-#include "Nebula/Core/Core.h"
-#include "Nebula/Renderer/OrthographicCamera.h"
+#include "Cameras/Camera.h"
+#include "Nebula/CoreSystems/Core/Core.h"
+#include "Cameras/OrthographicCamera.h"
 #include "Nebula/Renderer/Texture.h"
 
 namespace Nebula
@@ -56,8 +56,8 @@ namespace Nebula
             uint32_t DrawCalls = 0;
             uint32_t QuadCount = 0;
 
-            uint32_t GetTotalVertexCount() { return QuadCount * 4; }
-            uint32_t GetTotalIndexCount() { return QuadCount * 6; }
+            uint32_t GetTotalVertexCount() const { return QuadCount * 4; }
+            uint32_t GetTotalIndexCount() const { return QuadCount * 6; }
         };
         static Statistics GetStatistics();
         static void ResetStats();

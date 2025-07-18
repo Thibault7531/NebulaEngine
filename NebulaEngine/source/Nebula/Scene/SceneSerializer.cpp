@@ -1,11 +1,11 @@
 #include "SceneSerializer.h"
 
 #include <filesystem>
+#include <yaml-cpp/emittermanip.h>
 #include <yaml-cpp/yaml.h>
 
 #include "Components.h"
 #include "Entity.h"
-#include "yaml-cpp/emittermanip.h"
 
 namespace YAML
 {
@@ -84,7 +84,7 @@ namespace Nebula
     {
     }
 
-    void SceneSerializer::Serialize(const std::string& filepath)
+    void SceneSerializer::Serialize(const std::string& filepath) const
     {
         YAML::Emitter out;
         out << YAML::BeginMap;
@@ -115,7 +115,7 @@ namespace Nebula
         NB_CORE_ASSERT(false);
     }
 
-    bool SceneSerializer::Deserialize(const std::string& filepath)
+    bool SceneSerializer::Deserialize(const std::string& filepath) const
     {
         std::ifstream stream(filepath);
         std::stringstream strStream;

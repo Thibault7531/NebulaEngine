@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
-#include <chrono>
 #include <algorithm>
+#include <chrono>
 #include <fstream>
+#include <string>
 
 #include <thread>
 
@@ -56,7 +56,7 @@ namespace Nebula
                 m_OutputStream << ",";
 
             std::string name = result.name;
-            std::replace(name.begin(), name.end(), '"', '\'');
+            std::ranges::replace(name, '"', '\'');
 
             m_OutputStream << "{";
             m_OutputStream << "\"cat\":\"function\",";

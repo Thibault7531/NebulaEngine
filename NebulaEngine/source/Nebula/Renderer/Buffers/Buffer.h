@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Nebula/CoreSystems/Core/Core.h"
+
 namespace Nebula {
 
 	enum class ShaderDataType

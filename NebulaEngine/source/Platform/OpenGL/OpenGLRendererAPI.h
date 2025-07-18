@@ -1,13 +1,11 @@
 #pragma once
 
-#include "Nebula/Renderer/RendererAPI.h"
+#include "Nebula/Renderer/Core/RendererAPI.h"
 
 #include <glad/glad.h>
 
 namespace Nebula {
-	/**
-	 * OpenGL API.
-	 */
+
 	class OpenGLRendererAPI : public RendererAPI
 	{
 	public:

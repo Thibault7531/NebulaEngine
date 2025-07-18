@@ -3,8 +3,8 @@
 #include <imgui_internal.h>
 
 #include "WindowsWindow.h"
-#include "Nebula/Core/Input.h"
-#include "Nebula/Core/KeyCodes.h"
+#include "Nebula/CoreSystems/Input/Input.h"
+#include "Nebula/CoreSystems/Input/KeyCodes.h"
 #include "Nebula/Events/ApplicationEvent.h"
 
 namespace Nebula

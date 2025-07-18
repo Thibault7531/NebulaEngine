@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Nebula/Core/Window.h"
+#include "Nebula/CoreSystems/Windows/Window.h"
 #include "Nebula/Events/Event.h"
 
 namespace Nebula

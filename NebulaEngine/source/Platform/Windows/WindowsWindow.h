@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 
-#include "../../Nebula/Core/Window.h"
+#include "Nebula/CoreSystems/Windows/Window.h"
 #include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Nebula {
@@ -51,7 +51,7 @@ namespace Nebula {
 		SDL_Window* m_Window;
 		SDL_Event m_Event;
 
-		OpenGLContext* m_Context;
+		GraphicsContext* m_GraphicsContext;
 
 		struct WindowData
 		{

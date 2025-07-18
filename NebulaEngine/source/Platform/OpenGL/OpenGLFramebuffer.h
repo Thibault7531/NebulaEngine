@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Nebula/Renderer/Framebuffer.h"
+#include "Nebula/Renderer/Buffers/Framebuffer.h"
 
 namespace Nebula {
 
@@ -15,9 +15,9 @@ namespace Nebula {
         virtual void Bind() override;
         virtual void Unbind() override;
 
-        virtual uint32_t GetColorAttachmentRendererID() const override { return m_ColorAttachment; }
+        [[nodiscard]] virtual uint32_t GetColorAttachmentRendererID() const override { return m_ColorAttachment; }
 
-        virtual const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
+        [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 
         virtual void Resize(uint32_t width, uint32_t height) override;
 

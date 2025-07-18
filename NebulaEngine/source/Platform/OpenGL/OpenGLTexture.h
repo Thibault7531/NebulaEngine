@@ -6,9 +6,7 @@
 
 namespace Nebula
 {
-    /**
-     * OpenGL Texture2D
-     */
+
     class OpenGLTexture2D : public Texture2D
     {
     public:
