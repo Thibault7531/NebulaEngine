@@ -36,7 +36,7 @@ namespace Nebula
 
     Ref<Window> WindowManager::GetWindow(int WindowID)
     {
-        for (int i = m_Windows.size() - 1; i >= 0; --i) {
+        for (int i =0; i < m_Windows.size(); i++) {
             if (m_Windows[i]->GetID() == WindowID) return m_Windows[i];
         }
 

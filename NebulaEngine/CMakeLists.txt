@@ -61,16 +61,16 @@ endif ()
 target_compile_definitions(Nebula PRIVATE IMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(Nebula PRIVATE NB_ENGINE_DEBUG)
+    target_compile_definitions(Nebula PUBLIC NB_ENGINE_DEBUG)
 elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(Nebula PRIVATE NB_RELEASE)
+    target_compile_definitions(Nebula PUBLIC NB_RELEASE)
 else ()
-    target_compile_definitions(Nebula PRIVATE NB_DIST)
+    target_compile_definitions(Nebula PUBLIC NB_DIST)
 endif ()
 
 
 #Libraries
-target_precompile_headers(Nebula PRIVATE source/nbpch.h)
+target_precompile_headers(Nebula PUBLIC source/nbpch.h)
 target_link_libraries(Nebula PRIVATE
         ImGui
         SDL3-shared

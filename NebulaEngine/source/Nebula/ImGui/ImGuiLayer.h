@@ -25,7 +25,7 @@ namespace Nebula
 		virtual void OnEvent(Event& event) override;
 		virtual void OnImGuiRender() override;
 
-		void Begin() const;
+		void Begin(Timestep ts) const;
 		void End() const;
 
 		void BlockEvents(const bool block) { m_BlockEvents = block; }

@@ -10,6 +10,7 @@ namespace Nebula {
 	{
 	public:
 		OpenGLContext(SDL_Window* windowHandle);
+		virtual ~OpenGLContext();
 
 		virtual void Init() override;
 		virtual void SwapBuffers() override;

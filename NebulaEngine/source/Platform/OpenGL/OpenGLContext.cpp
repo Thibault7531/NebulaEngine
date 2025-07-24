@@ -11,6 +11,11 @@ namespace Nebula {
 	{
 	}
 
+	OpenGLContext::~OpenGLContext()
+	{
+		SDL_GL_DestroyContext(m_Context);
+	}
+
 	void OpenGLContext::Init()
 	{
 		NB_PROFILE_FUNCTION();
@@ -19,6 +24,8 @@ namespace Nebula {
 
 		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress));
 		NB_CORE_ASSERT(status, "Failed to initialize Glad!");
+
+		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
 	#ifdef NB_ENABLE_ASSERTS
 		int versionMajor;

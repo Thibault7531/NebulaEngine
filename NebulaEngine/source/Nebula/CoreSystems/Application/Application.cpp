@@ -122,7 +122,7 @@ namespace Nebula
 						layer->OnUpdate(timestep);
 				}
 
-				m_ImGuiLayer->Begin();
+				m_ImGuiLayer->Begin(timestep);
 				{
 					NB_PROFILE_SCOPE("LayerStack::OnImGuiRender");
 					for (Layer* layer : m_LayerStack)

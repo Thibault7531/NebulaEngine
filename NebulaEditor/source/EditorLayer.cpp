@@ -32,22 +32,22 @@ namespace Nebula {
         {
             ImGuiIO& io = ImGui::GetIO();
 
-            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPosY() & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPosY() + 5)
+            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPos().second & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPos().second + 5)
             {
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + 5) return Window::HitTest::ResizeTopLeft;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5) return Window::HitTest::ResizeTop;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeTopRight;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5) return Window::HitTest::ResizeTopLeft;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5) return Window::HitTest::ResizeTop;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x) return Window::HitTest::ResizeTopRight;
             }
-            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPosY() + 5 & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPosY() + io.DisplaySize.y - 5)
+            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPos().second + 5 & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5)
             {
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + 5) return Window::HitTest::ResizeLeft;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeRight;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5) return Window::HitTest::ResizeLeft;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x) return Window::HitTest::ResizeRight;
             }
-            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPosY() + io.DisplaySize.y - 5 & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPosY() + io.DisplaySize.y)
+            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5 & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y)
             {
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + 5) return Window::HitTest::ResizeBottomLeft;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5) return Window::HitTest::ResizeBottom;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPosX() + io.DisplaySize.x) return Window::HitTest::ResizeBottomRight;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5) return Window::HitTest::ResizeBottomLeft;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5) return Window::HitTest::ResizeBottom;
+                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x) return Window::HitTest::ResizeBottomRight;
             }
 
             if (IsTitleBarHovered) return Window::HitTest::Draggable;

@@ -31,8 +31,8 @@ namespace Nebula
 		ImGui::StyleColorsDark();
 		SetDarkTheme();
 
-		m_ImGuiPlatform = ImGuiPlatform::Create();
-		m_ImGuiPlatform->Init(WindowManager::Get().GetMainWindow().get());
+		m_ImGuiPlatform = CreateRef<ImGuiPlatform>();
+		m_ImGuiPlatform->Init(WindowManager::Get().GetMainWindow());
 
 		m_ImGuiRenderer = ImGuiRenderer::Create();
 		m_ImGuiRenderer->Init();
@@ -93,14 +93,14 @@ namespace Nebula
 	{
 	}
 
-	void ImGuiLayer::Begin() const
+	void ImGuiLayer::Begin(Timestep ts) const
 	{
 		NB_PROFILE_FUNCTION();
 
 		m_ImGuiPlatform->SetInputStatus();
 
 		m_ImGuiRenderer->NewFrame();
-		m_ImGuiPlatform->NewFrame();
+		m_ImGuiPlatform->NewFrame(ts);
 		ImGui::NewFrame();
 	}
 

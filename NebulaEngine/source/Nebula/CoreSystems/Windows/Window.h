@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Nebula/Events/Event.h"
+#include "Nebula/Renderer/Core/GraphicsContext.h"
 #include "Nebula/Renderer/Core/RendererAPI.h"
 
 namespace Nebula {
@@ -49,11 +50,14 @@ namespace Nebula {
 
 		virtual void Shutdown() = 0;
 
-		[[nodiscard]] virtual unsigned int GetWidth() const = 0;
-		[[nodiscard]] virtual unsigned int GetHeight() const = 0;
-		[[nodiscard]] virtual unsigned int GetPosX() const = 0;
-		[[nodiscard]] virtual unsigned int GetPosY() const = 0;
+		[[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetSize() const = 0;
+		virtual void SetSize(int w, int h) = 0;
+		[[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetPixelSize() const = 0;
+		[[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetPos() const = 0;
+		virtual void SetPos(int x, int y) = 0;
 		[[nodiscard]] virtual unsigned int GetTime() const = 0;
+
+		virtual void SetMousePos(int x, int y) const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetWindowHitTest(std::function<HitTest(int, int)> callback) = 0;
@@ -64,21 +68,35 @@ namespace Nebula {
 		virtual void SetMaximized(bool enabled) = 0;
 		[[nodiscard]] virtual bool IsMaximized() const = 0;
 		virtual void Minimize() = 0;
+		[[nodiscard]] virtual bool IsMinimized() const = 0;
+		[[nodiscard]] virtual bool IsHighDPI() const = 0;
+		[[nodiscard]] virtual bool IsFocused() const = 0;
+		virtual void Raise() const = 0;
+		virtual std::string GetTitle() const = 0;
+		virtual void SetTitle(const std::string& title) = 0;
+		virtual void SetAlpha(float alpha) = 0;
+		virtual void SetParentWindow(Ref<Window> parent) const = 0;
+
+		virtual void Show() const = 0;
+		virtual void Hide() const = 0;
+
+		virtual void StartTextInput() const = 0;
+		virtual void SetInputArea(int x, int y, int width, int height) const = 0;
+		virtual void EndTextInput() const = 0;
 
 		virtual void Flash() const = 0;
 
+		[[nodiscard]] virtual Ref<GraphicsContext> GetContext() const = 0;
 		virtual void SetCurrentContext() = 0;
 
 		[[nodiscard]] virtual void* GetNativeWindow() const = 0;
+		[[nodiscard]] virtual void* GetHWND() const = 0; //TODO: REMOVE AFTER WIN32 TRANSITION
 		[[nodiscard]] virtual uint32_t GetID() const = 0;
 
 		static Ref<Window> GetWindow(uint32_t windowID);
 		static void DestroyWindow(uint32_t windowID);
 
 		static Ref<Window> Create(const WindowProps& props = WindowProps());
-
-	private:
-		static std::vector<Ref<Window>> m_Windows;
 	};
 
 }

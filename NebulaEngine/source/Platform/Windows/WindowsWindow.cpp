@@ -1,6 +1,7 @@
 #include "WindowsWindow.h"
 
 #include "Nebula/CoreSystems/Application/Application.h"
+#include "Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Nebula/Events/ApplicationEvent.h"
 #include "Nebula/Events/KeyEvent.h"
 #include "Nebula/Events/MouseEvent.h"
@@ -26,6 +27,7 @@ namespace Nebula {
 		m_Data.Height = props.Height;
 		m_Data.Maximized = props.Maximized;
 		m_Data.Fullscreen = props.Fullscreen;
+		m_Data.HighDPI = props.HighDPI;
 		m_Data.API = props.API;
 		m_Data.EventCallback = std::bind([]{});
 
@@ -40,6 +42,10 @@ namespace Nebula {
 			SDL_SetEventFilter(OnEvent, nullptr);
 
 			s_SDLInitialized = true;
+
+			SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+			SDL_SetHint(SDL_HINT_MOUSE_AUTO_CAPTURE, "0");
+			SDL_SetHint("SDL_BORDERLESS_WINDOWED_STYLE", "0");
 		}
 
 		{
@@ -67,11 +73,9 @@ namespace Nebula {
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-			m_GraphicsContext = new OpenGLContext(m_Window);
+			m_GraphicsContext = CreateRef<OpenGLContext>(m_Window);
 		}
 		m_GraphicsContext->Init();
-
-		SDL_StartTextInput(m_Window);
 		
 		SetVSync(true);
 	}
@@ -99,18 +103,33 @@ namespace Nebula {
 		while (SDL_PollEvent(&e)) {}
 	}
 
-	unsigned int WindowsWindow::GetPosX() const
+	void WindowsWindow::SetSize(int w, int h)
 	{
-		int x, y;
-		SDL_GetWindowPosition(m_Window, &x, &y);
-		return x;
+		SDL_SetWindowSize(m_Window, w, h);
 	}
 
-	unsigned int WindowsWindow::GetPosY() const
+	inline std::pair<unsigned int, unsigned int> WindowsWindow::GetPixelSize() const
+	{
+		int x, y;
+		SDL_GetWindowSizeInPixels(m_Window, &x, &y);
+		return {x, y};
+	}
+
+	inline std::pair<unsigned int, unsigned int> WindowsWindow::GetPos() const
 	{
 		int x, y;
 		SDL_GetWindowPosition(m_Window, &x, &y);
-		return y;
+		return {x, y};
+	}
+
+	void WindowsWindow::SetPos(const int x, const int y)
+	{
+		SDL_SetWindowPosition(m_Window, x, y);
+	}
+
+	void WindowsWindow::SetMousePos(int x, int y) const
+	{
+		SDL_WarpMouseInWindow(m_Window, x, y);
 	}
 
 	void WindowsWindow::SetVSync(const bool enabled)
@@ -154,6 +173,58 @@ namespace Nebula {
 		SDL_MinimizeWindow(m_Window);
 	}
 
+	bool WindowsWindow::IsFocused() const
+	{
+		return (SDL_GetWindowFlags(m_Window) & SDL_WINDOW_INPUT_FOCUS) == SDL_WINDOW_INPUT_FOCUS;
+	}
+
+	void WindowsWindow::Raise() const
+	{
+		SDL_RaiseWindow(m_Window);
+	}
+
+	void WindowsWindow::SetTitle(const std::string& title)
+	{
+		m_Data.Title = title;
+		SDL_SetWindowTitle(m_Window, title.c_str());
+	}
+
+	void WindowsWindow::SetAlpha(float alpha)
+	{
+		SDL_SetWindowOpacity(m_Window, alpha);
+	}
+
+	void WindowsWindow::SetParentWindow(Ref<Window> parent) const
+	{
+		SDL_SetWindowParent(m_Window, static_cast<SDL_Window*>(parent->GetNativeWindow()));
+	}
+
+	void WindowsWindow::Show() const
+	{
+		SDL_ShowWindow(m_Window);
+	}
+
+	void WindowsWindow::Hide() const
+	{
+		SDL_HideWindow(m_Window);
+	}
+
+	void WindowsWindow::StartTextInput() const
+	{
+		SDL_StartTextInput(m_Window);
+	}
+
+	void WindowsWindow::SetInputArea(int x, int y, int width, int height) const
+	{
+		SDL_Rect r = {x, y, width, height};
+		SDL_SetTextInputArea(m_Window, &r, 0);
+	}
+
+	void WindowsWindow::EndTextInput() const
+	{
+		SDL_StopTextInput(m_Window);
+	}
+
 	void WindowsWindow::Flash() const
 	{
 		SDL_FlashWindow(m_Window, SDL_FLASH_UNTIL_FOCUSED);
@@ -166,7 +237,7 @@ namespace Nebula {
 
 	bool WindowsWindow::OnEvent(void *userdata, SDL_Event *e)
 	{
-		Ref<Window> window = GetWindow(e->window.windowID);
+		Ref<Window> window = WindowManager::Get().GetWindow(e->window.windowID);
 		if (window == nullptr) return true;
 		if (window != nullptr)
 		{
