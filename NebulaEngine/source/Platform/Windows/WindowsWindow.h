@@ -20,8 +20,8 @@ namespace Nebula {
 
 		[[nodiscard]] virtual inline std::pair<unsigned int, unsigned int> GetSize() const override { return { m_Data.Width, m_Data.Height }; }
 		virtual void SetSize(int w, int h) override;
-		[[nodiscard]] virtual inline std::pair<unsigned int, unsigned int> GetPixelSize() const override;
-		[[nodiscard]] virtual inline std::pair<unsigned int, unsigned int> GetPos() const override;
+		[[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetPixelSize() const override;
+		[[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetPos() const override;
 		virtual void SetPos(int x, int y) override;
 
 		virtual void SetMousePos(int x, int y) const override;
