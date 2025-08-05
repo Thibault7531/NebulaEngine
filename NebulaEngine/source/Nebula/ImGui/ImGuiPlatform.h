@@ -16,7 +16,6 @@ namespace Nebula
     struct PlatformData
     {
         Ref<Window> Window{};
-        Ref<Nebula::Window> ImeWindow{};
 
         bool WantUpdateMonitors = true;
 
@@ -55,8 +54,6 @@ namespace Nebula
 
         void OnEvent(Event& event);
 
-        void SetInputStatus() const;
-
     private:
         void initMultipleViewports() const;
         void ShutdownMultipleViewports() const;
@@ -84,11 +81,10 @@ namespace Nebula
 
         static void SetClipboardText(ImGuiContext*, const char* text);
         static const char* GetClipboardText(ImGuiContext*);
-        static void SetIMEData(ImGuiContext*, ImGuiViewport* viewport, ImGuiPlatformImeData* IMEData);
 
         static Ref<Window> GetWindowFromViewportID(ImGuiID viewport_id);
 
-        static ImGuiKey getImGuiKey(int keycode);
+        static ImGuiKey getImGuiKey(KeyboardKey key);
 
     private:
         static void CreateImGuiWindow(ImGuiViewport* viewport);

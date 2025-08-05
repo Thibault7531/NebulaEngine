@@ -44,12 +44,6 @@ set_target_properties(Nebula PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE
 
 # Compilation Options
 set_target_properties(Nebula PROPERTIES COMPILE_OPTIONS "/utf-8")
-add_custom_command(
-        TARGET Nebula
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy $<TARGET_FILE:SDL3-shared> $<TARGET_FILE_DIR:TestGame>/$<TARGET_FILE_NAME:SDL3-shared>
-)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET Nebula PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
 else ()
@@ -72,11 +66,10 @@ endif ()
 #Libraries
 target_precompile_headers(Nebula PUBLIC source/nbpch.h)
 target_link_libraries(Nebula PRIVATE
-        ImGui
-        SDL3-shared
-        GLAD
-        spdlog::spdlog_header_only
         EnTT::EnTT
+        GLAD
+        ImGui
+        spdlog::spdlog_header_only
         yaml-cpp::yaml-cpp
 )
 target_include_directories(Nebula PRIVATE
@@ -87,8 +80,6 @@ target_include_directories(Nebula PRIVATE
         vendor/glm
         vendor/glm/glm
         vendor/imgui
-        vendor/SDL3/include
-        vendor/SDL3/include/SDL3
         vendor/stb_image
         vendor/yaml-cpp/include
 )
@@ -97,4 +88,10 @@ target_include_directories(Nebula PRIVATE
 # Windows Settings
 if (nebula_cmake_platform STREQUAL Windows)
     target_compile_definitions(Nebula PUBLIC NB_PLATFORM_WINDOWS)
+    set(WIN32 True)
+
+    target_link_libraries(Nebula PRIVATE
+            dwmapi
+            opengl32
+    )
 endif ()

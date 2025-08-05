@@ -7,6 +7,7 @@ namespace Nebula
     Ref<Window> WindowManager::CreateNewMainWindow(const WindowProps& props)
     {
         m_MainWindow = Window::Create(props);
+        m_MainWindow->SetID(m_Windows.size());
         m_Windows.push_back(m_MainWindow);
         return m_MainWindow;
     }
@@ -21,7 +22,6 @@ namespace Nebula
         auto it = std::ranges::find(m_Windows, m_MainWindow);
         if (it != m_Windows.end())
         {
-            (*it)->Shutdown();
             m_Windows.erase(it);
         }
         m_MainWindow.reset();
@@ -30,6 +30,7 @@ namespace Nebula
     Ref<Window> WindowManager::CreateNewWindow(const WindowProps& props)
     {
         auto window = Window::Create(props);
+        window->SetID(m_Windows.size());
         m_Windows.push_back(window);
         return window;
     }
@@ -43,12 +44,20 @@ namespace Nebula
         return nullptr;
     }
 
+    Ref<Window> WindowManager::GetWindow(void* platformHandle)
+    {
+        for (int i =0; i < m_Windows.size(); i++) {
+            if (m_Windows[i]->GetHandle() == platformHandle) return m_Windows[i];
+        }
+
+        return nullptr;
+    }
+
     void WindowManager::DestroyWindow(Ref<Window> window)
     {
         auto it = std::ranges::find(m_Windows, window);
         if (it != m_Windows.end())
         {
-            (*it)->Shutdown();
             m_Windows.erase(it);
         }
     }

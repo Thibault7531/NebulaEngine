@@ -1,7 +1,5 @@
 #include "ImGuiLayer.h"
 
-#include <SDL_events.h>
-
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/CoreSystems/Windows/WindowManager.h"
 
@@ -96,8 +94,6 @@ namespace Nebula
 	void ImGuiLayer::Begin(Timestep ts) const
 	{
 		NB_PROFILE_FUNCTION();
-
-		m_ImGuiPlatform->SetInputStatus();
 
 		m_ImGuiRenderer->NewFrame();
 		m_ImGuiPlatform->NewFrame(ts);

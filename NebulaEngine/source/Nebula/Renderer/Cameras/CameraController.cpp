@@ -22,25 +22,25 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        if (Input::IsKeyPressed(NB_KEY_Z)) {
+        if (Input::IsKeyPressed(KeyboardKey::Z)) {
             m_CameraPosition.y += m_CameraTranslationSpeed * ts;
         }
-        if (Input::IsKeyPressed(NB_KEY_S)) {
+        if (Input::IsKeyPressed(KeyboardKey::S)) {
             m_CameraPosition.y -= m_CameraTranslationSpeed * ts;
         }
-        if (Input::IsKeyPressed(NB_KEY_D)) {
+        if (Input::IsKeyPressed(KeyboardKey::D)) {
             m_CameraPosition.x += m_CameraTranslationSpeed * ts;
         }
-        if (Input::IsKeyPressed(NB_KEY_Q)) {
+        if (Input::IsKeyPressed(KeyboardKey::Q)) {
             m_CameraPosition.x -= m_CameraTranslationSpeed * ts;
         }
 
         if (m_Rotation)
         {
-            if (Input::IsKeyPressed(NB_KEY_A)) {
+            if (Input::IsKeyPressed(KeyboardKey::A)) {
                 m_CameraRotation += m_CameraRotationSpeed * ts;
             }
-            if (Input::IsKeyPressed(NB_KEY_E)) {
+            if (Input::IsKeyPressed(KeyboardKey::E)) {
                 m_CameraRotation -= m_CameraRotationSpeed * ts;
             }
 
@@ -88,22 +88,22 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        if (Input::IsKeyPressed(NB_KEY_Z)) {
+        if (Input::IsKeyPressed(KeyboardKey::Z)) {
             m_CameraPosition += glm::vec3(2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts, 0.0f, 2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts);
         }
-        if (Input::IsKeyPressed(NB_KEY_S)) {
+        if (Input::IsKeyPressed(KeyboardKey::S)) {
             m_CameraPosition += glm::vec3(-2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts, 0.0f, -2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts);
         }
-        if (Input::IsKeyPressed(NB_KEY_D)) {
+        if (Input::IsKeyPressed(KeyboardKey::D)) {
             m_CameraPosition += glm::vec3(-2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts, 0.0f, 2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts);
         }
-        if (Input::IsKeyPressed(NB_KEY_Q)) {
+        if (Input::IsKeyPressed(KeyboardKey::Q)) {
             m_CameraPosition += glm::vec3(2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts, 0.0f, -2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts);
         }
-        if (Input::IsKeyPressed(NB_KEY_SPACE)) {
+        if (Input::IsKeyPressed(KeyboardKey::Space)) {
             m_CameraPosition += glm::vec3(0.0f, 2.0f * ts, 0.0f);
         }
-        if (Input::IsKeyPressed(NB_KEY_LSHIFT)) {
+        if (Input::IsKeyPressed(KeyboardKey::LeftShift)) {
             m_CameraPosition += glm::vec3(0.0f, -2.0f * ts, 0.0f);
         }
 
@@ -125,7 +125,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        if (Input::IsMouseButtonPressed(NB_BUTTON_LEFT))
+        if (Input::IsMouseButtonPressed(MouseButton::Left))
         {
             m_cameraRotation += glm::vec3(m_PreviousMousePosition.y - e.GetY(), e.GetX() - m_PreviousMousePosition.x, 0.0f) * 0.1f;
             m_Camera.SetRotation(m_cameraRotation);

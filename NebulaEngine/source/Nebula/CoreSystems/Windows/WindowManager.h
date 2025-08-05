@@ -18,6 +18,7 @@ namespace Nebula
 
         Ref<Window> CreateNewWindow(const WindowProps& props);
         Ref<Window> GetWindow(int WindowID);
+        Ref<Window> GetWindow(void* platformHandle);
         void DestroyWindow(Ref<Window> window);
 
         static WindowManager& Get() { return *s_Instance; }

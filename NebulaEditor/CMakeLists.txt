@@ -36,12 +36,6 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND}
         ARGS -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_FILE_DIR:NebulaEditor>/assets/NebulaEngine"
 )
-add_custom_command(
-        TARGET NebulaEditor
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy $<TARGET_FILE:SDL3-shared> $<TARGET_FILE_DIR:NebulaEditor>/$<TARGET_FILE_NAME:SDL3-shared>
-)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET NebulaEditor PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
 else ()

@@ -1,254 +1,271 @@
 #pragma once
 
-// TODO: Put key into enum class for easier understanding
+enum class KeyboardKey
+{
+    Unknown = 0,
+    Return = 1,
+    Escape = 2,
+    Backspace = 3,
+    Tab = 4,
+    Space = 5,
+    Exclaim = 6,
+    DoubleQuote = 7,
+    Hash = 8,
+    Dollar = 9,
+    Percent = 10,
+    Ampersand = 11,
+    Apostrophe = 12,
+    LeftParen = 13,
+    RightParen = 14,
+    Asterisk = 15,
+    Plus = 16,
+    Comma = 17,
+    Minus = 18,
+    Period = 19,
+    Slash = 20,
+    Num0 = 21,
+    Num1 = 22,
+    Num2 = 23,
+    Num3 = 24,
+    Num4 = 25,
+    Num5 = 26,
+    Num6 = 27,
+    Num7 = 28,
+    Num8 = 29,
+    Num9 = 30,
+    Colon = 31,
+    Semicolon = 32,
+    Less = 33,
+    Equals = 34,
+    Greater = 35,
+    Question = 36,
+    At = 37,
+    LeftBracket = 38,
+    Backslash = 39,
+    RightBracket = 40,
+    Caret = 41,
+    Underscore = 42,
+    GraveAccent = 43,
+    A = 44,
+    B = 45,
+    C = 46,
+    D = 47,
+    E = 48,
+    F = 49,
+    G = 50,
+    H = 51,
+    I = 52,
+    J = 53,
+    K = 54,
+    L = 55,
+    M = 56,
+    N = 57,
+    O = 58,
+    P = 59,
+    Q = 60,
+    R = 61,
+    S = 62,
+    T = 63,
+    U = 64,
+    V = 65,
+    W = 66,
+    X = 67,
+    Y = 68,
+    Z = 69,
+    LeftCurlyBrace = 70,
+    Pipe = 71,
+    RightCurlyBrace = 72,
+    Tilde = 73,
+    Delete = 74,
+    PlusMinus = 75,
+    CapsLock = 76,
+    F1 = 77,
+    F2 = 78,
+    F3 = 79,
+    F4 = 80,
+    F5 = 81,
+    F6 = 82,
+    F7 = 83,
+    F8 = 84,
+    F9 = 85,
+    F10 = 86,
+    F11 = 87,
+    F12 = 88,
+    PrintScreen = 89,
+    ScrollLock = 90,
+    Pause = 91,
+    Insert = 92,
+    Home = 93,
+    PageUp = 94,
+    End = 95,
+    PageDown = 96,
+    RightArrow = 97,
+    LeftArrow = 98,
+    DownArrow = 99,
+    UpArrow = 100,
+    NumLock = 101,
+    KeypadDivide = 102,
+    KeypadMultiply = 103,
+    KeypadMinus = 104,
+    KeypadPlus = 105,
+    KeypadEnter = 106,
+    Keypad1 = 107,
+    Keypad2 = 108,
+    Keypad3 = 109,
+    Keypad4 = 110,
+    Keypad5 = 111,
+    Keypad6 = 112,
+    Keypad7 = 113,
+    Keypad8 = 114,
+    Keypad9 = 115,
+    Keypad0 = 116,
+    KeypadPeriod = 117,
+    Application = 118,
+    Power = 119,
+    KeypadEquals = 120,
+    F13 = 121,
+    F14 = 122,
+    F15 = 123,
+    F16 = 124,
+    F17 = 125,
+    F18 = 126,
+    F19 = 127,
+    F20 = 128,
+    F21 = 129,
+    F22 = 130,
+    F23 = 131,
+    F24 = 132,
+    Execute = 133,
+    Help = 134,
+    Menu = 135,
+    Select = 136,
+    Stop = 137,
+    Again = 138,
+    Undo = 139,
+    Cut = 140,
+    Copy = 141,
+    Paste = 142,
+    Find = 143,
+    Mute = 144,
+    VolumeUp = 145,
+    VolumeDown = 146,
+    KeypadComma = 147,
+    KeypadEqualsAS400 = 148,
+    AltErase = 149,
+    SysReq = 150,
+    Cancel = 151,
+    Clear = 152,
+    Prior = 153,
+    Return2 = 154,
+    Separator = 155,
+    Out = 156,
+    Oper = 157,
+    ClearAgain = 158,
+    CrSel = 159,
+    ExSel = 160,
+    Keypad00 = 161,
+    Keypad000 = 162,
+    ThousandsSeparator = 163,
+    DecimalSeparator = 164,
+    CurrencyUnit = 165,
+    CurrencySubunit = 166,
+    KeypadLeftParen = 167,
+    KeypadRightParen = 168,
+    KeypadLeftBrace = 169,
+    KeypadRightBrace = 170,
+    KeypadTab = 171,
+    KeypadBackspace = 172,
+    KeypadA = 173,
+    KeypadB = 174,
+    KeypadC = 175,
+    KeypadD = 176,
+    KeypadE = 177,
+    KeypadF = 178,
+    KeypadXor = 179,
+    KeypadPower = 180,
+    KeypadPercent = 181,
+    KeypadLess = 182,
+    KeypadGreater = 183,
+    KeypadAmpersand = 184,
+    KeypadDoubleAmpersand = 185,
+    KeypadVerticalBar = 186,
+    KeypadDoubleVerticalBar = 187,
+    KeypadColon = 188,
+    KeypadHash = 189,
+    KeypadSpace = 190,
+    KeypadAt = 191,
+    KeypadExclam = 192,
+    KeypadMemStore = 193,
+    KeypadMemRecall = 194,
+    KeypadMemClear = 195,
+    KeypadMemAdd = 196,
+    KeypadMemSubtract = 197,
+    KeypadMemMultiply = 198,
+    KeypadMemDivide = 199,
+    KeypadPlusMinus = 200,
+    KeypadClear = 201,
+    KeypadClearEntry = 202,
+    KeypadBinary = 203,
+    KeypadOctal = 204,
+    KeypadDecimal = 205,
+    KeypadHexadecimal = 206,
+    LeftControl = 207,
+    LeftShift = 208,
+    LeftAlt = 209,
+    LeftGUI = 210,
+    RightControl = 211,
+    RightShift = 212,
+    RightAlt = 213,
+    RightGUI = 214,
+    Mode = 215,
+    Sleep = 216,
+    Wake = 217,
+    AudioNext = 218,
+    AudioPrev = 219,
+    AudioPlay = 220,
+    AudioPause = 221,
+    AudioRecord = 222,
+    AudioFastForward = 223,
+    AudioRewind = 224,
+    AudioNextTrack = 225,
+    AudioPreviousTrack = 226,
+    AudioStop = 227,
+    AudioEject = 228,
+    AudioPlayPause = 229,
+    AudioSelect = 230,
+    ACNew = 231,
+    ACOpen = 232,
+    ACClose = 233,
+    ACExit = 234,
+    ACSave = 235,
+    ACPrint = 236,
+    ACProperties = 237,
+    ACSearch = 238,
+    ACHome = 239,
+    ACBack = 240,
+    ACForward = 241,
+    ACStop = 242,
+    ACRefresh = 243,
+    ACFavorites = 244,
+    ACBookmarks = 245,
+    SoftLeft = 246,
+    SoftRight = 247,
+    Call = 248,
+    EndCall = 249,
+};
 
-// From SDL_keycode.h
-#define NB_KEY_UNKNOWN                0x00000000u /**< 0 */
-#define NB_KEY_RETURN                 0x0000000du /**< '\r' */
-#define NB_KEY_ESCAPE                 0x0000001bu /**< '\x1B' */
-#define NB_KEY_BACKSPACE              0x00000008u /**< '\b' */
-#define NB_KEY_TAB                    0x00000009u /**< '\t' */
-#define NB_KEY_SPACE                  0x00000020u /**< ' ' */
-#define NB_KEY_EXCLAIM                0x00000021u /**< '!' */
-#define NB_KEY_DBLAPOSTROPHE          0x00000022u /**< '"' */
-#define NB_KEY_HASH                   0x00000023u /**< '#' */
-#define NB_KEY_DOLLAR                 0x00000024u /**< '$' */
-#define NB_KEY_PERCENT                0x00000025u /**< '%' */
-#define NB_KEY_AMPERSAND              0x00000026u /**< '&' */
-#define NB_KEY_APOSTROPHE             0x00000027u /**< '\'' */
-#define NB_KEY_LEFTPAREN              0x00000028u /**< '(' */
-#define NB_KEY_RIGHTPAREN             0x00000029u /**< ')' */
-#define NB_KEY_ASTERISK               0x0000002au /**< '*' */
-#define NB_KEY_PLUS                   0x0000002bu /**< '+' */
-#define NB_KEY_COMMA                  0x0000002cu /**< ',' */
-#define NB_KEY_MINUS                  0x0000002du /**< '-' */
-#define NB_KEY_PERIOD                 0x0000002eu /**< '.' */
-#define NB_KEY_SLASH                  0x0000002fu /**< '/' */
-#define NB_KEY_0                      0x00000030u /**< '0' */
-#define NB_KEY_1                      0x00000031u /**< '1' */
-#define NB_KEY_2                      0x00000032u /**< '2' */
-#define NB_KEY_3                      0x00000033u /**< '3' */
-#define NB_KEY_4                      0x00000034u /**< '4' */
-#define NB_KEY_5                      0x00000035u /**< '5' */
-#define NB_KEY_6                      0x00000036u /**< '6' */
-#define NB_KEY_7                      0x00000037u /**< '7' */
-#define NB_KEY_8                      0x00000038u /**< '8' */
-#define NB_KEY_9                      0x00000039u /**< '9' */
-#define NB_KEY_COLON                  0x0000003au /**< ':' */
-#define NB_KEY_SEMICOLON              0x0000003bu /**< ';' */
-#define NB_KEY_LESS                   0x0000003cu /**< '<' */
-#define NB_KEY_EQUALS                 0x0000003du /**< '=' */
-#define NB_KEY_GREATER                0x0000003eu /**< '>' */
-#define NB_KEY_QUESTION               0x0000003fu /**< '?' */
-#define NB_KEY_AT                     0x00000040u /**< '@' */
-#define NB_KEY_LEFTBRACKET            0x0000005bu /**< '[' */
-#define NB_KEY_BACKSLASH              0x0000005cu /**< '\\' */
-#define NB_KEY_RIGHTBRACKET           0x0000005du /**< ']' */
-#define NB_KEY_CARET                  0x0000005eu /**< '^' */
-#define NB_KEY_UNDERSCORE             0x0000005fu /**< '_' */
-#define NB_KEY_GRAVE                  0x00000060u /**< '`' */
-#define NB_KEY_A                      0x00000061u /**< 'a' */
-#define NB_KEY_B                      0x00000062u /**< 'b' */
-#define NB_KEY_C                      0x00000063u /**< 'c' */
-#define NB_KEY_D                      0x00000064u /**< 'd' */
-#define NB_KEY_E                      0x00000065u /**< 'e' */
-#define NB_KEY_F                      0x00000066u /**< 'f' */
-#define NB_KEY_G                      0x00000067u /**< 'g' */
-#define NB_KEY_H                      0x00000068u /**< 'h' */
-#define NB_KEY_I                      0x00000069u /**< 'i' */
-#define NB_KEY_J                      0x0000006au /**< 'j' */
-#define NB_KEY_K                      0x0000006bu /**< 'k' */
-#define NB_KEY_L                      0x0000006cu /**< 'l' */
-#define NB_KEY_M                      0x0000006du /**< 'm' */
-#define NB_KEY_N                      0x0000006eu /**< 'n' */
-#define NB_KEY_O                      0x0000006fu /**< 'o' */
-#define NB_KEY_P                      0x00000070u /**< 'p' */
-#define NB_KEY_Q                      0x00000071u /**< 'q' */
-#define NB_KEY_R                      0x00000072u /**< 'r' */
-#define NB_KEY_S                      0x00000073u /**< 's' */
-#define NB_KEY_T                      0x00000074u /**< 't' */
-#define NB_KEY_U                      0x00000075u /**< 'u' */
-#define NB_KEY_V                      0x00000076u /**< 'v' */
-#define NB_KEY_W                      0x00000077u /**< 'w' */
-#define NB_KEY_X                      0x00000078u /**< 'x' */
-#define NB_KEY_Y                      0x00000079u /**< 'y' */
-#define NB_KEY_Z                      0x0000007au /**< 'z' */
-#define NB_KEY_LEFTBRACE              0x0000007bu /**< '{' */
-#define NB_KEY_PIPE                   0x0000007cu /**< '|' */
-#define NB_KEY_RIGHTBRACE             0x0000007du /**< '}' */
-#define NB_KEY_TILDE                  0x0000007eu /**< '~' */
-#define NB_KEY_DELETE                 0x0000007fu /**< '\x7F' */
-#define NB_KEY_PLUSMINUS              0x000000b1u /**< '\xB1' */
-#define NB_KEY_CAPSLOCK               0x40000039u
-#define NB_KEY_F1                     0x4000003au
-#define NB_KEY_F2                     0x4000003bu
-#define NB_KEY_F3                     0x4000003cu
-#define NB_KEY_F4                     0x4000003du
-#define NB_KEY_F5                     0x4000003eu
-#define NB_KEY_F6                     0x4000003fu
-#define NB_KEY_F7                     0x40000040u
-#define NB_KEY_F8                     0x40000041u
-#define NB_KEY_F9                     0x40000042u
-#define NB_KEY_F10                    0x40000043u
-#define NB_KEY_F11                    0x40000044u
-#define NB_KEY_F12                    0x40000045u
-#define NB_KEY_PRINTSCREEN            0x40000046u
-#define NB_KEY_SCROLLLOCK             0x40000047u
-#define NB_KEY_PAUSE                  0x40000048u
-#define NB_KEY_INSERT                 0x40000049u
-#define NB_KEY_HOME                   0x4000004au
-#define NB_KEY_PAGEUP                 0x4000004bu
-#define NB_KEY_END                    0x4000004du
-#define NB_KEY_PAGEDOWN               0x4000004eu
-#define NB_KEY_RIGHT                  0x4000004fu
-#define NB_KEY_LEFT                   0x40000050u
-#define NB_KEY_DOWN                   0x40000051u
-#define NB_KEY_UP                     0x40000052u
-#define NB_KEY_NUMLOCKCLEAR           0x40000053u
-#define NB_KEY_KP_DIVIDE              0x40000054u
-#define NB_KEY_KP_MULTIPLY            0x40000055u
-#define NB_KEY_KP_MINUS               0x40000056u
-#define NB_KEY_KP_PLUS                0x40000057u
-#define NB_KEY_KP_ENTER               0x40000058u
-#define NB_KEY_KP_1                   0x40000059u
-#define NB_KEY_KP_2                   0x4000005au
-#define NB_KEY_KP_3                   0x4000005bu
-#define NB_KEY_KP_4                   0x4000005cu
-#define NB_KEY_KP_5                   0x4000005du
-#define NB_KEY_KP_6                   0x4000005eu
-#define NB_KEY_KP_7                   0x4000005fu
-#define NB_KEY_KP_8                   0x40000060u
-#define NB_KEY_KP_9                   0x40000061u
-#define NB_KEY_KP_0                   0x40000062u
-#define NB_KEY_KP_PERIOD              0x40000063u
-#define NB_KEY_APPLICATION            0x40000065u
-#define NB_KEY_POWER                  0x40000066u
-#define NB_KEY_KP_EQUALS              0x40000067u
-#define NB_KEY_F13                    0x40000068u
-#define NB_KEY_F14                    0x40000069u
-#define NB_KEY_F15                    0x4000006au
-#define NB_KEY_F16                    0x4000006bu
-#define NB_KEY_F17                    0x4000006cu
-#define NB_KEY_F18                    0x4000006du
-#define NB_KEY_F19                    0x4000006eu
-#define NB_KEY_F20                    0x4000006fu
-#define NB_KEY_F21                    0x40000070u
-#define NB_KEY_F22                    0x40000071u
-#define NB_KEY_F23                    0x40000072u
-#define NB_KEY_F24                    0x40000073u
-#define NB_KEY_EXECUTE                0x40000074u
-#define NB_KEY_HELP                   0x40000075u
-#define NB_KEY_MENU                   0x40000076u
-#define NB_KEY_SELECT                 0x40000077u
-#define NB_KEY_STOP                   0x40000078u
-#define NB_KEY_AGAIN                  0x40000079u
-#define NB_KEY_UNDO                   0x4000007au
-#define NB_KEY_CUT                    0x4000007bu
-#define NB_KEY_COPY                   0x4000007cu
-#define NB_KEY_PASTE                  0x4000007du
-#define NB_KEY_FIND                   0x4000007eu
-#define NB_KEY_MUTE                   0x4000007fu
-#define NB_KEY_VOLUMEUP               0x40000080u
-#define NB_KEY_VOLUMEDOWN             0x40000081u
-#define NB_KEY_KP_COMMA               0x40000085u
-#define NB_KEY_KP_EQUALSAS400         0x40000086u
-#define NB_KEY_ALTERASE               0x40000099u
-#define NB_KEY_SYSREQ                 0x4000009au
-#define NB_KEY_CANCEL                 0x4000009bu
-#define NB_KEY_CLEAR                  0x4000009cu
-#define NB_KEY_PRIOR                  0x4000009du
-#define NB_KEY_RETURN2                0x4000009eu
-#define NB_KEY_SEPARATOR              0x4000009fu
-#define NB_KEY_OUT                    0x400000a0u
-#define NB_KEY_OPER                   0x400000a1u
-#define NB_KEY_CLEARAGAIN             0x400000a2u
-#define NB_KEY_CRSEL                  0x400000a3u
-#define NB_KEY_EXSEL                  0x400000a4u
-#define NB_KEY_KP_00                  0x400000b0u
-#define NB_KEY_KP_000                 0x400000b1u
-#define NB_KEY_THOUSANDSSEPARATOR     0x400000b2u
-#define NB_KEY_DECIMALSEPARATOR       0x400000b3u
-#define NB_KEY_CURRENCYUNIT           0x400000b4u
-#define NB_KEY_CURRENCYSUBUNIT        0x400000b5u
-#define NB_KEY_KP_LEFTPAREN           0x400000b6u
-#define NB_KEY_KP_RIGHTPAREN          0x400000b7u
-#define NB_KEY_KP_LEFTBRACE           0x400000b8u
-#define NB_KEY_KP_RIGHTBRACE          0x400000b9u
-#define NB_KEY_KP_TAB                 0x400000bau
-#define NB_KEY_KP_BACKSPACE           0x400000bbu
-#define NB_KEY_KP_A                   0x400000bcu
-#define NB_KEY_KP_B                   0x400000bdu
-#define NB_KEY_KP_C                   0x400000beu
-#define NB_KEY_KP_D                   0x400000bfu
-#define NB_KEY_KP_E                   0x400000c0u
-#define NB_KEY_KP_F                   0x400000c1u
-#define NB_KEY_KP_XOR                 0x400000c2u
-#define NB_KEY_KP_POWER               0x400000c3u
-#define NB_KEY_KP_PERCENT             0x400000c4u
-#define NB_KEY_KP_LESS                0x400000c5u
-#define NB_KEY_KP_GREATER             0x400000c6u
-#define NB_KEY_KP_AMPERSAND           0x400000c7u
-#define NB_KEY_KP_DBLAMPERSAND        0x400000c8u
-#define NB_KEY_KP_VERTICALBAR         0x400000c9u
-#define NB_KEY_KP_DBLVERTICALBAR      0x400000cau
-#define NB_KEY_KP_COLON               0x400000cbu
-#define NB_KEY_KP_HASH                0x400000ccu
-#define NB_KEY_KP_SPACE               0x400000cdu
-#define NB_KEY_KP_AT                  0x400000ceu
-#define NB_KEY_KP_EXCLAM              0x400000cfu
-#define NB_KEY_KP_MEMSTORE            0x400000d0u
-#define NB_KEY_KP_MEMRECALL           0x400000d1u
-#define NB_KEY_KP_MEMCLEAR            0x400000d2u
-#define NB_KEY_KP_MEMADD              0x400000d3u
-#define NB_KEY_KP_MEMSUBTRACT         0x400000d4u
-#define NB_KEY_KP_MEMMULTIPLY         0x400000d5u
-#define NB_KEY_KP_MEMDIVIDE           0x400000d6u
-#define NB_KEY_KP_PLUSMINUS           0x400000d7u
-#define NB_KEY_KP_CLEAR               0x400000d8u
-#define NB_KEY_KP_CLEARENTRY          0x400000d9u
-#define NB_KEY_KP_BINARY              0x400000dau
-#define NB_KEY_KP_OCTAL               0x400000dbu
-#define NB_KEY_KP_DECIMAL             0x400000dcu
-#define NB_KEY_KP_HEXADECIMAL         0x400000ddu
-#define NB_KEY_LCTRL                  0x400000e0u
-#define NB_KEY_LSHIFT                 0x400000e1u
-#define NB_KEY_LALT                   0x400000e2u
-#define NB_KEY_LGUI                   0x400000e3u
-#define NB_KEY_RCTRL                  0x400000e4u
-#define NB_KEY_RSHIFT                 0x400000e5u
-#define NB_KEY_RALT                   0x400000e6u
-#define NB_KEY_RGUI                   0x400000e7u
-#define NB_KEY_MODE                   0x40000101u
-#define NB_KEY_SLEEP                  0x40000102u
-#define NB_KEY_WAKE                   0x40000103u
-#define NB_KEY_CHANNEL_INCREMENT      0x40000104u
-#define NB_KEY_CHANNEL_DECREMENT      0x40000105u
-#define NB_KEY_MEDIA_PLAY             0x40000106u
-#define NB_KEY_MEDIA_PAUSE            0x40000107u
-#define NB_KEY_MEDIA_RECORD           0x40000108u
-#define NB_KEY_MEDIA_FAST_FORWARD     0x40000109u
-#define NB_KEY_MEDIA_REWIND           0x4000010au
-#define NB_KEY_MEDIA_NEXT_TRACK       0x4000010bu
-#define NB_KEY_MEDIA_PREVIOUS_TRACK   0x4000010cu
-#define NB_KEY_MEDIA_STOP             0x4000010du
-#define NB_KEY_MEDIA_EJECT            0x4000010eu
-#define NB_KEY_MEDIA_PLAY_PAUSE       0x4000010fu
-#define NB_KEY_MEDIA_SELECT           0x40000110u
-#define NB_KEY_AC_NEW                 0x40000111u
-#define NB_KEY_AC_OPEN                0x40000112u
-#define NB_KEY_AC_CLOSE               0x40000113u
-#define NB_KEY_AC_EXIT                0x40000114u
-#define NB_KEY_AC_SAVE                0x40000115u
-#define NB_KEY_AC_PRINT               0x40000116u
-#define NB_KEY_AC_PROPERTIES          0x40000117u
-#define NB_KEY_AC_SEARCH              0x40000118u
-#define NB_KEY_AC_HOME                0x40000119u
-#define NB_KEY_AC_BACK                0x4000011au
-#define NB_KEY_AC_FORWARD             0x4000011bu
-#define NB_KEY_AC_STOP                0x4000011cu
-#define NB_KEY_AC_REFRESH             0x4000011du
-#define NB_KEY_AC_BOOKMARKS           0x4000011eu
-#define NB_KEY_SOFTLEFT               0x4000011fu
-#define NB_KEY_SOFTRIGHT              0x40000120u
-#define NB_KEY_CALL                   0x40000121u
-#define NB_KEY_ENDCALL                0x40000122u
+inline std::string to_string(const KeyboardKey key)
+{
+    // TODO: Add all keys
+    switch (key)
+    {
+    case KeyboardKey::Unknown:
+        return "Unknown";
+    case KeyboardKey::Return:
+        return "Return";
+    case KeyboardKey::Escape:
+        return "Escape";
+    default: break;
+    }
+    return "";
+}

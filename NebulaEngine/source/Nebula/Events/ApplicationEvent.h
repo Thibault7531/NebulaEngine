@@ -11,10 +11,10 @@ namespace Nebula
 		WindowResizeEvent(unsigned int width, unsigned int height)
 			: m_Width(width), m_Height(height) {}
 
-		inline unsigned int GetWidth() const { return m_Width; }
-		inline unsigned int GetHeight() const { return m_Height; }
+		[[nodiscard]] inline unsigned int GetWidth() const { return m_Width; }
+		[[nodiscard]] inline unsigned int GetHeight() const { return m_Height; }
 
-		virtual std::string ToString() const override
+		[[nodiscard]] virtual std::string ToString() const override
 		{
 			std::stringstream ss;
 			ss << "WindowsResizeEvent: " << m_Width << ", " << m_Height;
@@ -66,10 +66,17 @@ namespace Nebula
 	class WindowMovedEvent : public Event
 	{
 	public:
-		WindowMovedEvent() = default;
+		WindowMovedEvent(int x, int y)
+			: m_X(x), m_Y(y) {}
+
+		[[nodiscard]] inline int GetX() const { return m_X; }
+		[[nodiscard]] inline int GetY() const { return m_Y; }
 
 		EVENT_CLASS_TYPE(WindowMoved)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+	private:
+		int m_X, m_Y;
 	};
 
 	class WindowFocusedEvent : public Event

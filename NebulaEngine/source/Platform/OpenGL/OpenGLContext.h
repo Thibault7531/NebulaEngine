@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL_video.h>
+#include <Windows.h>
 
 #include "Nebula/Renderer/Core/GraphicsContext.h"
 
@@ -9,17 +9,29 @@ namespace Nebula {
 	class OpenGLContext : public GraphicsContext
 	{
 	public:
-		OpenGLContext(SDL_Window* windowHandle);
+		OpenGLContext(HWND windowHandle);
 		virtual ~OpenGLContext();
 
 		virtual void Init() override;
-		virtual void SwapBuffers() override;
 
 		virtual void SetCurrent() override;
+		virtual void SwapBuffers() override;
+
+		virtual void SetVSync(bool enabled) override;
+		virtual bool GetVSync() override;
+
+		virtual void* GetContext() const override { return m_Context; }
 
 	private:
-		SDL_Window* m_WindowHandle;
-		SDL_GLContext m_Context;
+		static void InitOpenGL();
+		static void InitGLExtensions();
+
+	private:
+		HWND m_WindowHandle;
+		HDC m_DeviceContext;
+		HGLRC m_Context;
+
+		static bool s_GLInitialized;
 	};
 
 }

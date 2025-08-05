@@ -1,13 +1,15 @@
 #pragma once
+#include "KeyCodes.h"
+#include "MouseButtonCodes.h"
 
 namespace Nebula {
 
     class Input
     {
     public:
-        static bool IsKeyPressed(int keycode);
+        static bool IsKeyPressed(KeyboardKey keycode);
 
-        static bool IsMouseButtonPressed(int button);
+        static bool IsMouseButtonPressed(MouseButton button);
         static std::pair<float, float> GetMousePosition();
         static float GetMouseX();
         static float GetMouseY();

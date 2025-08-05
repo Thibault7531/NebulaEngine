@@ -1,10 +1,13 @@
 #include <commdlg.h>
 #include <ranges>
-#include <SDL.h>
+#include <shcore.h>
+#include <shellscalingapi.h>
 
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Nebula/Utils/PlatformUtils.h"
+
+typedef HRESULT(WINAPI* PFN_GetDpiForMonitor)(HMONITOR, MONITOR_DPI_TYPE, UINT*, UINT*);
 
 namespace Nebula
 {
@@ -15,8 +18,7 @@ namespace Nebula
         // TODO: Run in seperate thread
         char filter[260] = { 0 };
         ConvertFilter(fileTypes, filter);
-        SDL_PropertiesID props = SDL_GetWindowProperties(static_cast<SDL_Window*>(WindowManager::Get().GetMainWindow()->GetNativeWindow()));
-        const auto hwnd = static_cast<HWND>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+        const auto hwnd = static_cast<HWND>(WindowManager::Get().GetMainWindow()->GetNativeWindow());
         OPENFILENAMEA ofn;
         CHAR szFile[260] = { 0 };
 
@@ -39,8 +41,7 @@ namespace Nebula
     {
         // TODO: Update to common item dialog
         // TODO: Run in seperate thread
-        SDL_PropertiesID props = SDL_GetWindowProperties(static_cast<SDL_Window*>(WindowManager::Get().GetMainWindow()->GetNativeWindow()));
-        const auto hwnd = static_cast<HWND>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+        const auto hwnd = static_cast<HWND>(WindowManager::Get().GetMainWindow()->GetNativeWindow());
         std::string extension = filter + strlen(filter) + 1;
         std::string defExt = extension.substr(2, extension.find_first_of(';'));
         OPENFILENAMEA ofn;
@@ -75,65 +76,88 @@ namespace Nebula
         }
     }
 
+    BOOL CALLBACK GetDisplay(HMONITOR monitor, HDC, LPRECT, LPARAM lparam)
+    {
+        std::vector<Displays::display>* displays = reinterpret_cast<std::vector<Displays::display>*>(lparam);
+
+        MONITORINFOEX monitorInfo;
+        monitorInfo.cbSize = sizeof(monitorInfo);
+        GetMonitorInfo(monitor, &monitorInfo);
+
+        Displays::display display;
+        display.x = monitorInfo.rcMonitor.left;
+        display.y = monitorInfo.rcMonitor.top;
+        display.width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+        display.height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+        display.workX = monitorInfo.rcWork.left;
+        display.workY = monitorInfo.rcWork.top;
+        display.workWidth = monitorInfo.rcWork.right - monitorInfo.rcWork.left;
+        display.workHeight = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+
+        UINT xdpi = 96, ydpi = 96;
+        {
+            // For some reason the GetDpiForMonitor function is not linked and needs to be imported manually. F*** Microsoft
+            static HINSTANCE shcore_dll = ::LoadLibraryA("shcore.dll"); // Reference counted per-process
+            static PFN_GetDpiForMonitor GetDpiForMonitorFn = nullptr;
+            if (shcore_dll != nullptr)
+                GetDpiForMonitorFn = (PFN_GetDpiForMonitor)::GetProcAddress(shcore_dll, "GetDpiForMonitor");
+            if (GetDpiForMonitorFn != nullptr)
+            {
+                GetDpiForMonitorFn((HMONITOR)monitor, MDT_EFFECTIVE_DPI, &xdpi, &ydpi);
+                display.dpi = xdpi / 96.0f;
+            }
+        }
+
+        display.nativeDisplay = monitor;
+
+        display.primary = monitorInfo.dwFlags & MONITORINFOF_PRIMARY;
+
+        if (display.primary) displays->insert(displays->begin(), display);
+        else displays->push_back(display);
+
+        return TRUE;
+    }
+
     std::vector<Displays::display> Displays::GetDisplays()
     {
         std::vector<display> displays;
-        int display_count;
-        SDL_DisplayID* display_ids = SDL_GetDisplays(&display_count);
 
-        for (int n = 0; n < display_count; n++)
-        {
-            SDL_DisplayID display_id = display_ids[n];
-            display display;
+        EnumDisplayMonitors(nullptr, nullptr, GetDisplay, reinterpret_cast<LPARAM>(&displays));
 
-            SDL_Rect r;
-
-            SDL_GetDisplayBounds(display_id, &r);
-            display.x = r.x;
-            display.y = r.y;
-            display.width = r.w;
-            display.height = r.h;
-
-            SDL_GetDisplayUsableBounds(display_id, &r);
-            display.workX = r.x;
-            display.workY = r.y;
-            display.workWidth = r.w;
-            display.workHeight = r.h;
-
-            display.dpi = SDL_GetDisplayContentScale(display_id);
-
-            displays.push_back(display);
-        }
-
-        SDL_free(display_ids);
         return displays;
+    }
+
+    Ref<Window> WindowUtils::GetForegroundWindow()
+    {
+        HWND hwnd = ::GetForegroundWindow();
+        return WindowManager::Get().GetWindow(hwnd);
     }
 
     void Mouse::ShowCursor()
     {
-        SDL_ShowCursor();
+        ::ShowCursor(TRUE);
     }
 
     void Mouse::HideCursor()
     {
-        SDL_HideCursor();
+        ::ShowCursor(FALSE);
     }
 
     void Mouse::CaptureMouse(const bool enable)
     {
-        SDL_CaptureMouse(enable);
+        SetCapture(enable ? static_cast<HWND>(WindowManager::Get().GetMainWindow()->GetNativeWindow()) : nullptr);
     }
 
     void Mouse::SetMousePosGlobal(int x, int y)
     {
-        SDL_WarpMouseGlobal(x, y);
+        SetCursorPos(x, y);
     }
 
     std::pair<float, float> Mouse::GetMousePos()
     {
-        float x, y;
-        SDL_GetGlobalMouseState(&x, &y);
-        return { x, y };
+        POINT cursorPos;
+        GetCursorPos(&cursorPos);
+        return { cursorPos.x, cursorPos.y };
     }
 
     Cursor::Cursor(CursorType type)
@@ -141,69 +165,86 @@ namespace Nebula
         switch (type)
         {
         case CursorType::Arrow:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
+            m_Cursor = LoadCursor(nullptr, IDC_ARROW);
             return;
 
         case CursorType::TextInput:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_TEXT);
+            m_Cursor = LoadCursor(nullptr, IDC_IBEAM);
             return;
 
         case CursorType::Move:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_MOVE);
+            m_Cursor = LoadCursor(nullptr, IDC_SIZEALL);
             return;
 
         case CursorType::ResizeNS:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NS_RESIZE);
+            m_Cursor = LoadCursor(nullptr, IDC_SIZENS);
             return;
 
         case CursorType::ResizeEW:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_EW_RESIZE);
+            m_Cursor = LoadCursor(nullptr, IDC_SIZEWE);
             return;
 
         case CursorType::ResizeNESW:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NESW_RESIZE);
+            m_Cursor = LoadCursor(nullptr, IDC_SIZENESW);
             return;
 
         case CursorType::ResizeNWSE:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NWSE_RESIZE);
+            m_Cursor = LoadCursor(nullptr, IDC_SIZENWSE);
             return;
 
         case CursorType::Hand:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_POINTER);
+            m_Cursor = LoadCursor(nullptr, IDC_HAND);
             return;
 
         case CursorType::NotAllowed:
-            m_Cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NOT_ALLOWED);
+            m_Cursor = LoadCursor(nullptr, IDC_NO);
             return;
         }
     }
 
-    void Cursor::Show()
+    void Cursor::Show() const
     {
-        SDL_SetCursor(static_cast<SDL_Cursor*>(m_Cursor));
+        SetCursor(static_cast<HCURSOR>(m_Cursor));
     }
 
     Ref<Window> Keyboard::GetCapturingWindow()
     {
-        if (SDL_WindowID windowID = SDL_GetWindowID(SDL_GetKeyboardFocus()))
+        if (HWND window = GetFocus())
         {
-            return WindowManager::Get().GetWindow(windowID);
+            return WindowManager::Get().GetWindow(GetWindowLongPtr(window, GWLP_ID));
         }
         return nullptr;
     }
 
-    int Keyboard::GetScancodeFromKeycode(int keycode)
+    int Keyboard::GetScancodeFromKeycode(KeyboardKey keycode)
     {
-        return SDL_GetScancodeFromKey(keycode, nullptr);
+        return MapVirtualKeyA(static_cast<UINT>(keycode), MAPVK_VK_TO_VSC);
     }
 
     void Clipboard::SetText(const std::string& text)
     {
-        SDL_SetClipboardText(text.c_str());
+        OpenClipboard(nullptr);
+
+        SetClipboardData(CF_TEXT, (HANDLE)text.c_str());
+        SetClipboardData(CF_UNICODETEXT, (HANDLE)text.c_str());
+
+        CloseClipboard();
     }
 
     std::string Clipboard::GetText()
     {
-        return SDL_GetClipboardText();
+        HANDLE h;
+
+        if (!OpenClipboard(nullptr))
+            return "";
+
+        h = GetClipboardData(CF_TEXT);
+
+        std::string text;
+        strcpy_s(text.data(), 1024, static_cast<const char*>(h));
+
+        CloseClipboard();
+
+        return text;
     }
 }

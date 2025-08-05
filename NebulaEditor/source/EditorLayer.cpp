@@ -28,30 +28,91 @@ namespace Nebula {
 
         Application::Get().GetImGuiLayer()->BlockEvents(false);
 
+        WindowManager::Get().GetMainWindow()->SetVSync(false);
         WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
         {
             ImGuiIO& io = ImGui::GetIO();
 
-            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPos().second & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPos().second + 5)
+            auto [window_x, window_y] = WindowManager::Get().GetMainWindow()->GetPos();
+
+            io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+            if (y >= WindowManager::Get().GetMainWindow()->GetPos().second & y <= WindowManager::Get().GetMainWindow()->GetPos().second + 5)
             {
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5) return Window::HitTest::ResizeTopLeft;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5) return Window::HitTest::ResizeTop;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x) return Window::HitTest::ResizeTopRight;
+                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first & x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5)
+                {
+                    auto cursor = Cursor(Cursor::CursorType::ResizeNWSE);
+                    cursor.Show();
+                    m_MouseCursorChanged = true;
+                    return Window::HitTest::ResizeTopLeft;
+                }
+                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5)
+                {
+                    auto cursor = Cursor(Cursor::CursorType::ResizeNS);
+                    cursor.Show();
+                    m_MouseCursorChanged = true;
+                    return Window::HitTest::ResizeTop;
+                }
+                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
+                {
+                    auto cursor = Cursor(Cursor::CursorType::ResizeNESW);
+                    cursor.Show();
+                    m_MouseCursorChanged = true;
+                    return Window::HitTest::ResizeTopRight;
+                }
             }
-            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPos().second + 5 & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5)
+            if (y >= WindowManager::Get().GetMainWindow()->GetPos().second + 5 & y <= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5)
             {
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5) return Window::HitTest::ResizeLeft;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x) return Window::HitTest::ResizeRight;
+                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first & x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5)
+                {
+                    auto cursor = Cursor(Cursor::CursorType::ResizeEW);
+                    cursor.Show();
+                    m_MouseCursorChanged = true;
+                    return Window::HitTest::ResizeLeft;
+                }
+                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
+                {
+                    auto cursor = Cursor(Cursor::CursorType::ResizeEW);
+                    cursor.Show();
+                    m_MouseCursorChanged = true;
+                    return Window::HitTest::ResizeRight;
+                }
             }
-            if (ImGui::GetMousePos().y >= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5 & ImGui::GetMousePos().y <= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y)
+            if (y >= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5 & y <= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y)
             {
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5) return Window::HitTest::ResizeBottomLeft;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5) return Window::HitTest::ResizeBottom;
-                if (ImGui::GetMousePos().x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & ImGui::GetMousePos().x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x) return Window::HitTest::ResizeBottomRight;
+                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first & x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5)
+                {
+                    auto cursor = Cursor(Cursor::CursorType::ResizeNESW);
+                    cursor.Show();
+                    m_MouseCursorChanged = true;
+                    return Window::HitTest::ResizeBottomLeft;
+                }
+                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5)
+                {
+                    auto cursor = Cursor(Cursor::CursorType::ResizeNS);
+                    cursor.Show();
+                    m_MouseCursorChanged = true;
+                    return Window::HitTest::ResizeBottom;
+                }
+                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
+                {
+                    auto cursor = Cursor(Cursor::CursorType::ResizeNWSE);
+                    cursor.Show();
+                    m_MouseCursorChanged = true;
+                    return Window::HitTest::ResizeBottomRight;
+                }
             }
 
-            if (IsTitleBarHovered) return Window::HitTest::Draggable;
-            return Window::HitTest::None;
+            io.ConfigFlags &= ~(ImGuiConfigFlags_NoMouseCursorChange);
+            if (m_MouseCursorChanged)
+            {
+                auto cursor = Cursor(Cursor::CursorType::Arrow);
+                cursor.Show();
+                m_MouseCursorChanged = false;
+            }
+
+            if (IsTitleBarHovered) return Window::HitTest::TitleBar;
+
+            return Window::HitTest::Client;
         });
 
         NB_INFO("Nebula Editor Loaded");
@@ -156,6 +217,8 @@ namespace Nebula {
         ImGui::PopStyleVar();
 
         m_SceneHierarchyPanel.OnImGuiRender();
+
+        // TODO: Add Standard Debug Window
     }
 
     void EditorLayer::NewScene()
@@ -189,12 +252,12 @@ namespace Nebula {
     {
         // Shortcuts
         if (event.GetRepeatCount() > 0) return false;
-        bool control = Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL);
-        bool shift = Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT);
+        bool control = Input::IsKeyPressed(KeyboardKey::LeftControl) || Input::IsKeyPressed(KeyboardKey::RightControl);
+        bool shift = Input::IsKeyPressed(KeyboardKey::LeftShift) || Input::IsKeyPressed(KeyboardKey::RightShift);
 
-        if (event.GetKeyCode() == NB_KEY_N && control) NewScene();
-        if (event.GetKeyCode() == NB_KEY_O && control) OpenScene();
-        if (event.GetKeyCode() == NB_KEY_S && control && shift) SaveSceneAs();
+        if (event.GetKeyCode() == KeyboardKey::N && control) NewScene();
+        if (event.GetKeyCode() == KeyboardKey::O && control) OpenScene();
+        if (event.GetKeyCode() == KeyboardKey::S && control && shift) SaveSceneAs();
         return false;
     }
 }

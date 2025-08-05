@@ -29,7 +29,6 @@ namespace Nebula
         // Sets backendio
         platform_io.Platform_SetClipboardTextFn = SetClipboardText;
         platform_io.Platform_GetClipboardTextFn = GetClipboardText;
-        platform_io.Platform_SetImeDataFn = SetIMEData;
 
         // UpdateMonitors()
         UpdateMonitors();
@@ -48,7 +47,7 @@ namespace Nebula
         // SetupPlatformHandles
         ImGuiViewport* mainViewport = ImGui::GetMainViewport();
         mainViewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(platform_data.Window->GetID()));
-        mainViewport->PlatformHandleRaw = static_cast<HWND>(platform_data.Window->GetHWND());
+        mainViewport->PlatformHandleRaw = platform_data.Window->GetHandle();
 
         // initMultipleViewports
         initMultipleViewports();
@@ -123,15 +122,6 @@ namespace Nebula
         dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(OnWindowResizedEvent));
     }
 
-    void ImGuiPlatform::SetInputStatus() const
-    {
-        if (io.WantTextInput) {
-            platform_data.Window->StartTextInput();
-        } else {
-            platform_data.Window->EndTextInput();
-        }
-    }
-
     void ImGuiPlatform::initMultipleViewports() const
     {
         NB_PROFILE_FUNCTION();
@@ -204,11 +194,11 @@ namespace Nebula
         if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
 
         int mouse_button = -1;
-        if (event.GetMouseButton() == NB_BUTTON_LEFT) { mouse_button = 0; }
-        if (event.GetMouseButton() == NB_BUTTON_RIGHT) { mouse_button = 1; }
-        if (event.GetMouseButton() == NB_BUTTON_MIDDLE) { mouse_button = 2; }
-        if (event.GetMouseButton() == NB_BUTTON_X1) { mouse_button = 3; }
-        if (event.GetMouseButton() == NB_BUTTON_X2) { mouse_button = 4; }
+        if (event.GetMouseButton() == MouseButton::Left) { mouse_button = 0; }
+        if (event.GetMouseButton() == MouseButton::Right) { mouse_button = 1; }
+        if (event.GetMouseButton() == MouseButton::Middle) { mouse_button = 2; }
+        if (event.GetMouseButton() == MouseButton::X1) { mouse_button = 3; }
+        if (event.GetMouseButton() == MouseButton::X2) { mouse_button = 4; }
         if (mouse_button == -1)
             return false;
 
@@ -223,11 +213,11 @@ namespace Nebula
         if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
 
         int mouse_button = -1;
-        if (event.GetMouseButton() == NB_BUTTON_LEFT) { mouse_button = 0; }
-        if (event.GetMouseButton() == NB_BUTTON_RIGHT) { mouse_button = 1; }
-        if (event.GetMouseButton() == NB_BUTTON_MIDDLE) { mouse_button = 2; }
-        if (event.GetMouseButton() == NB_BUTTON_X1) { mouse_button = 3; }
-        if (event.GetMouseButton() == NB_BUTTON_X2) { mouse_button = 4; }
+        if (event.GetMouseButton() == MouseButton::Left) { mouse_button = 0; }
+        if (event.GetMouseButton() == MouseButton::Right) { mouse_button = 1; }
+        if (event.GetMouseButton() == MouseButton::Middle) { mouse_button = 2; }
+        if (event.GetMouseButton() == MouseButton::X1) { mouse_button = 3; }
+        if (event.GetMouseButton() == MouseButton::X2) { mouse_button = 4; }
         if (mouse_button == -1)
             return false;
 
@@ -260,9 +250,8 @@ namespace Nebula
     {
         if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
 
-        int keycode = event.GetKeyCode();
-        if (keycode > 0 && keycode < 0x10000)
-            io.AddInputCharacter(keycode);
+        int keycode = event.GetKeyChar();
+        io.AddInputCharacter(keycode);
         return true;
     }
 
@@ -270,14 +259,14 @@ namespace Nebula
     {
         if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
 
-        io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL));
-        io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT));
-        io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(NB_KEY_LALT) || Input::IsKeyPressed(NB_KEY_RALT));
-        io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(NB_KEY_LGUI) || Input::IsKeyPressed(NB_KEY_RGUI));
+        io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(KeyboardKey::LeftControl) || Input::IsKeyPressed(KeyboardKey::RightControl));
+        io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(KeyboardKey::LeftShift) || Input::IsKeyPressed(KeyboardKey::RightShift));
+        io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(KeyboardKey::LeftAlt) || Input::IsKeyPressed(KeyboardKey::RightAlt));
+        io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(KeyboardKey::LeftGUI) || Input::IsKeyPressed(KeyboardKey::RightGUI));
 
         ImGuiKey key = getImGuiKey(event.GetKeyCode());
         io.AddKeyEvent(key, true);
-        io.SetKeyEventNativeData(key, event.GetKeyCode(), Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
+        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
 
         return false;
     }
@@ -286,14 +275,14 @@ namespace Nebula
     {
         if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
 
-        io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(NB_KEY_LCTRL) || Input::IsKeyPressed(NB_KEY_RCTRL));
-        io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(NB_KEY_LSHIFT) || Input::IsKeyPressed(NB_KEY_RSHIFT));
-        io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(NB_KEY_LALT) || Input::IsKeyPressed(NB_KEY_RALT));
-        io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(NB_KEY_LGUI) || Input::IsKeyPressed(NB_KEY_RGUI));
+        io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(KeyboardKey::LeftControl) || Input::IsKeyPressed(KeyboardKey::RightControl));
+        io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(KeyboardKey::LeftShift) || Input::IsKeyPressed(KeyboardKey::RightShift));
+        io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(KeyboardKey::LeftAlt) || Input::IsKeyPressed(KeyboardKey::RightAlt));
+        io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(KeyboardKey::LeftGUI) || Input::IsKeyPressed(KeyboardKey::RightGUI));
 
         ImGuiKey key = getImGuiKey(event.GetKeyCode());
         io.AddKeyEvent(key, false);
-        io.SetKeyEventNativeData(key, event.GetKeyCode(), Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
+        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
 
         return false;
     }
@@ -385,7 +374,7 @@ namespace Nebula
         // We forward mouse input when hovered or captured (via SDL_EVENT_MOUSE_MOTION) or when focused (below)
         // SDL_CaptureMouse() let the OS know e.g. that our imgui drag outside the SDL window boundaries shouldn't e.g. trigger other operations outside
         Mouse::CaptureMouse(platform_data.MouseButtonsDown != 0);
-        Ref<Window> focused_window = Keyboard::GetCapturingWindow();
+        Ref<Window> focused_window = WindowUtils::GetForegroundWindow();
 
 
         if (focused_window && (platform_data.Window == focused_window || ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(focused_window->GetID()))) != nullptr))
@@ -472,27 +461,6 @@ namespace Nebula
         return backend_data->ClipboardTextData;
     }
 
-    void ImGuiPlatform::SetIMEData(ImGuiContext*, ImGuiViewport* viewport, ImGuiPlatformImeData* IMEData)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        auto* backend_data = static_cast<PlatformData*>(io.BackendPlatformUserData);
-        Ref<Window> window = backend_data->Window;
-
-        if ((IMEData->WantVisible == false || backend_data->ImeWindow != window) && backend_data->ImeWindow != nullptr)
-        {
-            backend_data->ImeWindow->EndTextInput();
-            backend_data->ImeWindow = nullptr;
-        }
-
-        if (IMEData->WantVisible)
-        {
-            window->SetInputArea(IMEData->InputPos.x, IMEData->InputPos.y, 1, IMEData->InputLineHeight);
-            window->StartTextInput();
-
-            backend_data->ImeWindow = window;
-        }
-    }
-
     Ref<Window> ImGuiPlatform::GetWindowFromViewportID(ImGuiID viewport_id)
     {
         if (viewport_id != 0)
@@ -503,113 +471,130 @@ namespace Nebula
         return nullptr;
     }
 
-    ImGuiKey ImGuiPlatform::getImGuiKey(int keycode)
+    ImGuiKey ImGuiPlatform::getImGuiKey(KeyboardKey key)
     {
-        switch (keycode)
+        switch (key)
         {
-        case NB_KEY_TAB: return ImGuiKey_Tab;
-        case NB_KEY_LEFT: return ImGuiKey_LeftArrow;
-        case NB_KEY_RIGHT: return ImGuiKey_RightArrow;
-        case NB_KEY_UP: return ImGuiKey_UpArrow;
-        case NB_KEY_DOWN: return ImGuiKey_DownArrow;
-        case NB_KEY_PAGEUP: return ImGuiKey_PageUp;
-        case NB_KEY_PAGEDOWN: return ImGuiKey_PageDown;
-        case NB_KEY_HOME: return ImGuiKey_Home;
-        case NB_KEY_END: return ImGuiKey_End;
-        case NB_KEY_INSERT: return ImGuiKey_Insert;
-        case NB_KEY_DELETE: return ImGuiKey_Delete;
-        case NB_KEY_BACKSPACE: return ImGuiKey_Backspace;
-        case NB_KEY_SPACE: return ImGuiKey_Space;
-        case NB_KEY_RETURN: return ImGuiKey_Enter;
-        case NB_KEY_ESCAPE: return ImGuiKey_Escape;
-        case NB_KEY_APOSTROPHE: return ImGuiKey_Apostrophe;
-        case NB_KEY_COMMA: return ImGuiKey_Comma;
-        case NB_KEY_MINUS: return ImGuiKey_Minus;
-        case NB_KEY_PERIOD: return ImGuiKey_Period;
-        case NB_KEY_SLASH: return ImGuiKey_Slash;
-        case NB_KEY_SEMICOLON: return ImGuiKey_Semicolon;
-        case NB_KEY_EQUALS: return ImGuiKey_Equal;
-        case NB_KEY_LEFTBRACKET: return ImGuiKey_LeftBracket;
-        case NB_KEY_BACKSLASH: return ImGuiKey_Backslash;
-        case NB_KEY_RIGHTBRACKET: return ImGuiKey_RightBracket;
-        case NB_KEY_GRAVE: return ImGuiKey_GraveAccent;
-        case NB_KEY_CAPSLOCK: return ImGuiKey_CapsLock;
-        case NB_KEY_SCROLLLOCK: return ImGuiKey_ScrollLock;
-        case NB_KEY_NUMLOCKCLEAR: return ImGuiKey_NumLock;
-        case NB_KEY_PRINTSCREEN: return ImGuiKey_PrintScreen;
-        case NB_KEY_PAUSE: return ImGuiKey_Pause;
-        case NB_KEY_LCTRL: return ImGuiKey_LeftCtrl;
-        case NB_KEY_LSHIFT: return ImGuiKey_LeftShift;
-        case NB_KEY_LALT: return ImGuiKey_LeftAlt;
-        case NB_KEY_LGUI: return ImGuiKey_LeftSuper;
-        case NB_KEY_RCTRL: return ImGuiKey_RightCtrl;
-        case NB_KEY_RSHIFT: return ImGuiKey_RightShift;
-        case NB_KEY_RALT: return ImGuiKey_RightAlt;
-        case NB_KEY_RGUI: return ImGuiKey_RightSuper;
-        case NB_KEY_APPLICATION: return ImGuiKey_Menu;
-        case NB_KEY_0: return ImGuiKey_0;
-        case NB_KEY_1: return ImGuiKey_1;
-        case NB_KEY_2: return ImGuiKey_2;
-        case NB_KEY_3: return ImGuiKey_3;
-        case NB_KEY_4: return ImGuiKey_4;
-        case NB_KEY_5: return ImGuiKey_5;
-        case NB_KEY_6: return ImGuiKey_6;
-        case NB_KEY_7: return ImGuiKey_7;
-        case NB_KEY_8: return ImGuiKey_8;
-        case NB_KEY_9: return ImGuiKey_9;
-        case NB_KEY_A: return ImGuiKey_A;
-        case NB_KEY_B: return ImGuiKey_B;
-        case NB_KEY_C: return ImGuiKey_C;
-        case NB_KEY_D: return ImGuiKey_D;
-        case NB_KEY_E: return ImGuiKey_E;
-        case NB_KEY_F: return ImGuiKey_F;
-        case NB_KEY_G: return ImGuiKey_G;
-        case NB_KEY_H: return ImGuiKey_H;
-        case NB_KEY_I: return ImGuiKey_I;
-        case NB_KEY_J: return ImGuiKey_J;
-        case NB_KEY_K: return ImGuiKey_K;
-        case NB_KEY_L: return ImGuiKey_L;
-        case NB_KEY_M: return ImGuiKey_M;
-        case NB_KEY_N: return ImGuiKey_N;
-        case NB_KEY_O: return ImGuiKey_O;
-        case NB_KEY_P: return ImGuiKey_P;
-        case NB_KEY_Q: return ImGuiKey_Q;
-        case NB_KEY_R: return ImGuiKey_R;
-        case NB_KEY_S: return ImGuiKey_S;
-        case NB_KEY_T: return ImGuiKey_T;
-        case NB_KEY_U: return ImGuiKey_U;
-        case NB_KEY_V: return ImGuiKey_V;
-        case NB_KEY_W: return ImGuiKey_W;
-        case NB_KEY_X: return ImGuiKey_X;
-        case NB_KEY_Y: return ImGuiKey_Y;
-        case NB_KEY_Z: return ImGuiKey_Z;
-        case NB_KEY_F1: return ImGuiKey_F1;
-        case NB_KEY_F2: return ImGuiKey_F2;
-        case NB_KEY_F3: return ImGuiKey_F3;
-        case NB_KEY_F4: return ImGuiKey_F4;
-        case NB_KEY_F5: return ImGuiKey_F5;
-        case NB_KEY_F6: return ImGuiKey_F6;
-        case NB_KEY_F7: return ImGuiKey_F7;
-        case NB_KEY_F8: return ImGuiKey_F8;
-        case NB_KEY_F9: return ImGuiKey_F9;
-        case NB_KEY_F10: return ImGuiKey_F10;
-        case NB_KEY_F11: return ImGuiKey_F11;
-        case NB_KEY_F12: return ImGuiKey_F12;
-        case NB_KEY_F13: return ImGuiKey_F13;
-        case NB_KEY_F14: return ImGuiKey_F14;
-        case NB_KEY_F15: return ImGuiKey_F15;
-        case NB_KEY_F16: return ImGuiKey_F16;
-        case NB_KEY_F17: return ImGuiKey_F17;
-        case NB_KEY_F18: return ImGuiKey_F18;
-        case NB_KEY_F19: return ImGuiKey_F19;
-        case NB_KEY_F20: return ImGuiKey_F20;
-        case NB_KEY_F21: return ImGuiKey_F21;
-        case NB_KEY_F22: return ImGuiKey_F22;
-        case NB_KEY_F23: return ImGuiKey_F23;
-        case NB_KEY_F24: return ImGuiKey_F24;
-        case NB_KEY_AC_BACK: return ImGuiKey_AppBack;
-        case NB_KEY_AC_FORWARD: return ImGuiKey_AppForward;
-        default: break;
+            case KeyboardKey::Tab: return ImGuiKey_Tab;
+            case KeyboardKey::LeftArrow: return ImGuiKey_LeftArrow;
+            case KeyboardKey::RightArrow: return ImGuiKey_RightArrow;
+            case KeyboardKey::UpArrow: return ImGuiKey_UpArrow;
+            case KeyboardKey::DownArrow: return ImGuiKey_DownArrow;
+            case KeyboardKey::PageUp: return ImGuiKey_PageUp;
+            case KeyboardKey::PageDown: return ImGuiKey_PageDown;
+            case KeyboardKey::Home: return ImGuiKey_Home;
+            case KeyboardKey::End: return ImGuiKey_End;
+            case KeyboardKey::Insert: return ImGuiKey_Insert;
+            case KeyboardKey::Delete: return ImGuiKey_Delete;
+            case KeyboardKey::Backspace: return ImGuiKey_Backspace;
+            case KeyboardKey::Space: return ImGuiKey_Space;
+            case KeyboardKey::Return: return ImGuiKey_Enter;
+            case KeyboardKey::Escape: return ImGuiKey_Escape;
+            case KeyboardKey::LeftControl: return ImGuiKey_LeftCtrl;
+            case KeyboardKey::LeftShift: return ImGuiKey_LeftShift;
+            case KeyboardKey::LeftAlt: return ImGuiKey_LeftAlt;
+            case KeyboardKey::LeftGUI: return ImGuiKey_LeftSuper;
+            case KeyboardKey::RightControl: return ImGuiKey_RightCtrl;
+            case KeyboardKey::RightShift: return ImGuiKey_RightShift;
+            case KeyboardKey::RightAlt: return ImGuiKey_RightAlt;
+            case KeyboardKey::RightGUI: return ImGuiKey_RightSuper;
+            case KeyboardKey::Menu: return ImGuiKey_Menu;
+            case KeyboardKey::Num0: return ImGuiKey_0;
+            case KeyboardKey::Num1: return ImGuiKey_1;
+            case KeyboardKey::Num2: return ImGuiKey_2;
+            case KeyboardKey::Num3: return ImGuiKey_3;
+            case KeyboardKey::Num4: return ImGuiKey_4;
+            case KeyboardKey::Num5: return ImGuiKey_5;
+            case KeyboardKey::Num6: return ImGuiKey_6;
+            case KeyboardKey::Num7: return ImGuiKey_7;
+            case KeyboardKey::Num8: return ImGuiKey_8;
+            case KeyboardKey::Num9: return ImGuiKey_9;
+            case KeyboardKey::A: return ImGuiKey_A;
+            case KeyboardKey::B: return ImGuiKey_B;
+            case KeyboardKey::C: return ImGuiKey_C;
+            case KeyboardKey::D: return ImGuiKey_D;
+            case KeyboardKey::E: return ImGuiKey_E;
+            case KeyboardKey::F: return ImGuiKey_F;
+            case KeyboardKey::G: return ImGuiKey_G;
+            case KeyboardKey::H: return ImGuiKey_H;
+            case KeyboardKey::I: return ImGuiKey_I;
+            case KeyboardKey::J: return ImGuiKey_J;
+            case KeyboardKey::K: return ImGuiKey_K;
+            case KeyboardKey::L: return ImGuiKey_L;
+            case KeyboardKey::M: return ImGuiKey_M;
+            case KeyboardKey::N: return ImGuiKey_N;
+            case KeyboardKey::O: return ImGuiKey_O;
+            case KeyboardKey::P: return ImGuiKey_P;
+            case KeyboardKey::Q: return ImGuiKey_Q;
+            case KeyboardKey::R: return ImGuiKey_R;
+            case KeyboardKey::S: return ImGuiKey_S;
+            case KeyboardKey::T: return ImGuiKey_T;
+            case KeyboardKey::U: return ImGuiKey_U;
+            case KeyboardKey::V: return ImGuiKey_V;
+            case KeyboardKey::W: return ImGuiKey_W;
+            case KeyboardKey::X: return ImGuiKey_X;
+            case KeyboardKey::Y: return ImGuiKey_Y;
+            case KeyboardKey::Z: return ImGuiKey_Z;
+            case KeyboardKey::F1: return ImGuiKey_F1;
+            case KeyboardKey::F2: return ImGuiKey_F2;
+            case KeyboardKey::F3: return ImGuiKey_F3;
+            case KeyboardKey::F4: return ImGuiKey_F4;
+            case KeyboardKey::F5: return ImGuiKey_F5;
+            case KeyboardKey::F6: return ImGuiKey_F6;
+            case KeyboardKey::F7: return ImGuiKey_F7;
+            case KeyboardKey::F8: return ImGuiKey_F8;
+            case KeyboardKey::F9: return ImGuiKey_F9;
+            case KeyboardKey::F10: return ImGuiKey_F10;
+            case KeyboardKey::F11: return ImGuiKey_F11;
+            case KeyboardKey::F12: return ImGuiKey_F12;
+            case KeyboardKey::F13: return ImGuiKey_F13;
+            case KeyboardKey::F14: return ImGuiKey_F14;
+            case KeyboardKey::F15: return ImGuiKey_F15;
+            case KeyboardKey::F16: return ImGuiKey_F16;
+            case KeyboardKey::F17: return ImGuiKey_F17;
+            case KeyboardKey::F18: return ImGuiKey_F18;
+            case KeyboardKey::F19: return ImGuiKey_F19;
+            case KeyboardKey::F20: return ImGuiKey_F20;
+            case KeyboardKey::F21: return ImGuiKey_F21;
+            case KeyboardKey::F22: return ImGuiKey_F22;
+            case KeyboardKey::F23: return ImGuiKey_F23;
+            case KeyboardKey::F24: return ImGuiKey_F24;
+            case KeyboardKey::Apostrophe: return ImGuiKey_Apostrophe;
+            case KeyboardKey::Comma: return ImGuiKey_Comma;
+            case KeyboardKey::Minus: return ImGuiKey_Minus;
+            case KeyboardKey::Period: return ImGuiKey_Period;
+            case KeyboardKey::Slash: return ImGuiKey_Slash;
+            case KeyboardKey::Semicolon: return ImGuiKey_Semicolon;
+            case KeyboardKey::Equals: return ImGuiKey_Equal;
+            case KeyboardKey::LeftBracket: return ImGuiKey_LeftBracket;
+            case KeyboardKey::Backslash: return ImGuiKey_Backslash;
+            case KeyboardKey::RightBracket: return ImGuiKey_RightBracket;
+            case KeyboardKey::GraveAccent: return ImGuiKey_GraveAccent;
+            case KeyboardKey::CapsLock: return ImGuiKey_CapsLock;
+            case KeyboardKey::ScrollLock: return ImGuiKey_ScrollLock;
+            case KeyboardKey::NumLock: return ImGuiKey_NumLock;
+            case KeyboardKey::PrintScreen: return ImGuiKey_PrintScreen;
+            case KeyboardKey::Pause: return ImGuiKey_Pause;
+            case KeyboardKey::Keypad0: return ImGuiKey_Keypad0;
+            case KeyboardKey::Keypad1: return ImGuiKey_Keypad1;
+            case KeyboardKey::Keypad2: return ImGuiKey_Keypad2;
+            case KeyboardKey::Keypad3: return ImGuiKey_Keypad3;
+            case KeyboardKey::Keypad4: return ImGuiKey_Keypad4;
+            case KeyboardKey::Keypad5: return ImGuiKey_Keypad5;
+            case KeyboardKey::Keypad6: return ImGuiKey_Keypad6;
+            case KeyboardKey::Keypad7: return ImGuiKey_Keypad7;
+            case KeyboardKey::Keypad8: return ImGuiKey_Keypad8;
+            case KeyboardKey::Keypad9: return ImGuiKey_Keypad9;
+            case KeyboardKey::KeypadDecimal: return ImGuiKey_KeypadDecimal;
+            case KeyboardKey::KeypadDivide: return ImGuiKey_KeypadDivide;
+            case KeyboardKey::KeypadMultiply: return ImGuiKey_KeypadMultiply;
+            case KeyboardKey::KeypadMinus: return ImGuiKey_KeypadSubtract;
+            case KeyboardKey::KeypadPlus: return ImGuiKey_KeypadAdd;
+            case KeyboardKey::KeypadEnter: return ImGuiKey_KeypadEnter;
+            case KeyboardKey::KeypadEquals: return ImGuiKey_KeypadEqual;
+            case KeyboardKey::ACBack: return ImGuiKey_AppBack;
+            case KeyboardKey::ACForward: return ImGuiKey_AppForward;
+            default: break;
         }
         return ImGuiKey_None;
     }
@@ -636,17 +621,19 @@ namespace Nebula
         props.Title = "No Title Yet";
         props.Width = viewport->Size.x;
         props.Height = viewport->Size.y;
+        props.x = viewport->Pos.x;
+        props.y = viewport->Pos.y;
         props.isResizable = !(viewport->Flags & ImGuiViewportFlags_NoDecoration);
         props.AlwaysOnTop = (viewport->Flags & ImGuiViewportFlags_TopMost);
         props.HighDPI = platform_data->Window->IsHighDPI();
         props.isUtility = (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon);
         props.Border = !(viewport->Flags & ImGuiViewportFlags_NoDecoration);
+        props.isImGui = true;
         props.API = RendererAPI::GetAPI();
         const Ref<Window> window = WindowManager::Get().CreateNewWindow(props);
         window->SetEventCallback(s_EventCallback);
         viewport_data->Window = window;
 
-        viewport_data->Window->SetParentWindow(viewport_data->ParentWindow);
         viewport_data->Window->SetPos(viewport->Pos.x, viewport->Pos.y);
         viewport_data->WindowOwned = true;
         if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
@@ -657,7 +644,10 @@ namespace Nebula
         }
 
         viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(viewport_data->Window->GetID()));
-        viewport->PlatformHandleRaw = static_cast<HWND>(viewport_data->Window->GetHWND());
+        viewport->PlatformHandleRaw = viewport_data->Window->GetHandle();
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddFocusEvent(true);
     }
 
     void ImGuiPlatform::DestroyImGuiWindow(ImGuiViewport* viewport)

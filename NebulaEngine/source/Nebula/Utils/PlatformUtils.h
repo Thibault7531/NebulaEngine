@@ -1,4 +1,5 @@
 #pragma once
+#include "Nebula/CoreSystems/Input/KeyCodes.h"
 
 namespace Nebula
 {
@@ -28,12 +29,21 @@ namespace Nebula
             int workX, workY;
             int workWidth, workHeight;
             float dpi;
+            bool primary;
+
+            void* nativeDisplay;
 
             display() { memset(this, 0, sizeof(*this)); }
         };
 
     public:
         static std::vector<display> GetDisplays();
+    };
+
+    class WindowUtils
+    {
+    public:
+        static Ref<Window> GetForegroundWindow();
     };
 
     class Mouse
@@ -59,7 +69,7 @@ namespace Nebula
     public:
         Cursor(CursorType type);
 
-        void Show();
+        void Show() const;
 
     private:
         void* m_Cursor;
@@ -70,7 +80,7 @@ namespace Nebula
     public:
         static Ref<Window> GetCapturingWindow();
 
-        static int GetScancodeFromKeycode(int keycode);
+        static int GetScancodeFromKeycode(KeyboardKey keycode);
     };
 
     class Clipboard

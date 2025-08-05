@@ -6,7 +6,6 @@
 
 namespace Nebula
 {
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
 
@@ -20,7 +19,7 @@ namespace Nebula
 		NB_CORE_INFO("Engine starting");
 
 		m_MainWindow = WindowManager::Get().CreateNewMainWindow(props);
-		m_MainWindow->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		m_MainWindow->SetEventCallback(NB_BIND_EVENT_FN(OnEvent));
 
 		Renderer::Init();
 
@@ -88,10 +87,10 @@ namespace Nebula
 		NB_PROFILE_FUNCTION();
 
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClosed));
-		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
-		dispatcher.Dispatch<WindowMinimizeEvent>(BIND_EVENT_FN(OnWindowMinimize));
-		dispatcher.Dispatch<WindowRestoredEvent>(BIND_EVENT_FN(OnWindowRestored));
+		dispatcher.Dispatch<WindowCloseEvent>(NB_BIND_EVENT_FN(OnWindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(OnWindowResize));
+		dispatcher.Dispatch<WindowMinimizeEvent>(NB_BIND_EVENT_FN(OnWindowMinimize));
+		dispatcher.Dispatch<WindowRestoredEvent>(NB_BIND_EVENT_FN(OnWindowRestored));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
@@ -111,7 +110,7 @@ namespace Nebula
 			m_MainWindow->SetCurrentContext();
 
 			std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
-			const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000;
+			const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000.f;
 			m_LastFrameTime = time;
 
 			if (!m_Minimized)
@@ -143,6 +142,7 @@ namespace Nebula
 	bool Application::OnWindowClosed(WindowCloseEvent& e)
 	{
 		m_Running = false;
+		m_MainWindow->Shutdown();
 		return true;
 	}
 

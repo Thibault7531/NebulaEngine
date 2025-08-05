@@ -27,6 +27,8 @@ namespace Nebula {
         bool OnKeyPressedEvent(const KeyPressedEvent& event);
 
     private:
+        bool m_MouseCursorChanged = false;
+
         bool IsViewportFocused = false;
         bool IsViewportHovered = false;
         bool DoesViewportFit = false;

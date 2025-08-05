@@ -46,11 +46,6 @@ else ()
 endif ()
 
 
-# SDL
-
-add_subdirectory(SDL3)
-
-
 # spdlog
 
 add_subdirectory(spdlog)
