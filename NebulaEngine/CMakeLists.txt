@@ -7,26 +7,26 @@ add_subdirectory(vendor)
 
 # Standard Source Files
 file(GLOB_RECURSE NebulaSourceFiles
-        "source/Nebula/*.cpp"
+        "source/Core/Nebula/*.cpp"
 )
 
 file(GLOB_RECURSE NebulaHeaderFiles
-        "source/Nebula/*.h"
-        "source/Nebula/*.hpp"
+        "source/Core/Nebula/*.h"
+        "source/Core/Nebula/*.hpp"
 )
 
 
 # Windows Source Files
 if (nebula_cmake_platform STREQUAL Windows)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
-            "source/Platform/Windows/*.cpp"
-            "source/Platform/OpenGL/*.cpp"
+            "source/Core/Platform/Windows/*.cpp"
+            "source/Core/Platform/OpenGL/*.cpp"
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
-            "source/Platform/Windows/*.hpp"
-            "source/Platform/Windows/*.h"
-            "source/Platform/OpenGL/*.hpp"
-            "source/Platform/OpenGL/*.h"
+            "source/Core/Platform/Windows/*.hpp"
+            "source/Core/Platform/Windows/*.h"
+            "source/Core/Platform/OpenGL/*.hpp"
+            "source/Core/Platform/OpenGL/*.h"
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
@@ -74,6 +74,7 @@ target_link_libraries(Nebula PRIVATE
 )
 target_include_directories(Nebula PRIVATE
         source
+        source/Core
         vendor
         vendor/entt/single_include
         vendor/Glad/include

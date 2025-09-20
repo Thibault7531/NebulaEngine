@@ -13,8 +13,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Nebula/CoreSystems/Core/Log.h"
-#include "Nebula/Debug/Instrumentor.h"
+#include "Core/Nebula/CoreSystems/Core/Log.h"
+#include "Core/Nebula/Debug/Instrumentor.h"
 
 #ifdef NB_PLATFORM_WINDOWS
 	#include <Windows.h>
