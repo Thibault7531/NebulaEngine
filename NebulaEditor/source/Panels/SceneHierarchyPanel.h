@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../NebulaEngine/source/Nebula/CoreSystems/Core/Core.h"
+#include "Nebula/CoreSystems/Core/Core.h"
 #include "Nebula/Scene/Entity.h"
 #include "Nebula/Scene/Scene.h"
 
