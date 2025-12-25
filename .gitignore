@@ -16,6 +16,7 @@
 /bin-int
 #/cmake*
 /out
+/winrt
 
 # Additional Runtime Files
 /TestGame/imgui.ini

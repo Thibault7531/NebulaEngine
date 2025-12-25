@@ -2,7 +2,7 @@
 
 
 # CMake requirement
-cmake_minimum_required(VERSION 3.30.3)
+cmake_minimum_required(VERSION 4.1.2)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Project Specification
@@ -34,15 +34,16 @@ endif ()
 
 # Compiler arguments
 set(CMAKE_C_FLAGS "/std:c11")
-set(CMAKE_C_FLAGS_DEBUG "/EHsc /Od")
+set(CMAKE_C_FLAGS_DEBUG "/EHsc /Od /Zi")
 set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG")
 set(CMAKE_C_FLAGS_DIST "/O2 /Ob2 /DNDEBUG")
 
 set(CMAKE_CXX_FLAGS "")
-set(CMAKE_CXX_FLAGS_DEBUG "/EHsc /Od")
+set(CMAKE_CXX_FLAGS_DEBUG "/EHsc /Od /Zi")
 set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG /EHsc")
 set(CMAKE_CXX_FLAGS_DIST "/O2 /Ob2 /DNDEBUG /EHsc")
 
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG:FULL")
 set(CMAKE_EXE_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
 set(CMAKE_SHARED_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
 
@@ -51,6 +52,7 @@ set(CMAKE_SHARED_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
 add_subdirectory(NebulaEngine)
 add_subdirectory(NebulaEditor)
 add_subdirectory(TestGame)
+add_subdirectory(Exemples/PlatformExemple)
 
 
 # Visual Studio Properties

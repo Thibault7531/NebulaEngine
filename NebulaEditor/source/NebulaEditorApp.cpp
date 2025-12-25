@@ -1,7 +1,10 @@
 #include <Nebula.h>
+
 #include <Nebula/CoreSystems/Core/EntryPoint.h>
 
 #include "EditorLayer.h"
+#include "Nebula/CoreSystems/Application/Application.h"
+#include "Platform/Nebula/CoreSystems/Windows/Window.h"
 
 namespace Nebula {
 
@@ -9,7 +12,7 @@ namespace Nebula {
     {
     public:
         NebulaEditor()
-            : Application({ .Title = "NebulaEditor", .Border = false})
+            : Application({ .Title = "NebulaEditor", .Style = Platform::WindowStyle::BorderlessInteractive})
         {
             NB_INFO("Launching Nebula Editor");
 

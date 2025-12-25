@@ -1,14 +1,14 @@
 #include "ImGuiPlatform.h"
 
-#include "Nebula/CoreSystems/Input/Input.h"
-#include "Nebula/CoreSystems/Input/KeyCodes.h"
-#include "Nebula/CoreSystems/Input/MouseButtonCodes.h"
-#include "Nebula/CoreSystems/Windows/WindowManager.h"
+#include "Nebula/Renderer/Core/RendererAPI.h"
+#include "Platform/Nebula/CoreSystems/Input/Input.h"
+#include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
+
 
 namespace Nebula
 {
 
-    void ImGuiPlatform::Init(const Ref<Window>& window)
+    void ImGuiPlatform::Init(const Ref<Platform::Window>& window)
     {
         NB_PROFILE_FUNCTION();
         NB_CORE_DEBUG("Initializing Nebula::ImGui::Platform");
@@ -34,15 +34,15 @@ namespace Nebula
         UpdateMonitors();
 
         // Load mouse cursors
-        platform_data.MouseCursors[ImGuiMouseCursor_Arrow] = CreateRef<Cursor>(Cursor::CursorType::Arrow);
-        platform_data.MouseCursors[ImGuiMouseCursor_TextInput] = CreateRef<Cursor>(Cursor::CursorType::TextInput);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeAll] = CreateRef<Cursor>(Cursor::CursorType::Move);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNS] = CreateRef<Cursor>(Cursor::CursorType::ResizeNS);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeEW] = CreateRef<Cursor>(Cursor::CursorType::ResizeEW);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNESW] = CreateRef<Cursor>(Cursor::CursorType::ResizeNESW);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNWSE] = CreateRef<Cursor>(Cursor::CursorType::ResizeNWSE);
-        platform_data.MouseCursors[ImGuiMouseCursor_Hand] = CreateRef<Cursor>(Cursor::CursorType::Hand);
-        platform_data.MouseCursors[ImGuiMouseCursor_NotAllowed] = CreateRef<Cursor>(Cursor::CursorType::NotAllowed);
+        platform_data.MouseCursors[ImGuiMouseCursor_Arrow] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::Arrow);
+        platform_data.MouseCursors[ImGuiMouseCursor_TextInput] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::TextInput);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeAll] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::Move);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNS] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::ResizeNS);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeEW] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::ResizeEW);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNESW] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::ResizeNESW);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNWSE] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::ResizeNWSE);
+        platform_data.MouseCursors[ImGuiMouseCursor_Hand] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::Hand);
+        platform_data.MouseCursors[ImGuiMouseCursor_NotAllowed] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::NotAllowed);
 
         // SetupPlatformHandles
         ImGuiViewport* mainViewport = ImGui::GetMainViewport();
@@ -101,25 +101,25 @@ namespace Nebula
         UpdateMouseCursor();
     }
 
-    void ImGuiPlatform::OnEvent(Event& event)
+    void ImGuiPlatform::OnEvent(Platform::Event& event)
     {
-        EventDispatcher dispatcher(event);
+        Platform::EventDispatcher dispatcher(event);
 
-        dispatcher.Dispatch<MouseMovedEvent>(NB_BIND_EVENT_FN(OnMouseMovedEvent));
-        dispatcher.Dispatch<MouseScrolledEvent>(NB_BIND_EVENT_FN(OnMouseScrolledEvent));
-        dispatcher.Dispatch<MouseButtonPressedEvent>(NB_BIND_EVENT_FN(OnMouseButtonPressedEvent));
-        dispatcher.Dispatch<MouseButtonReleasedEvent>(NB_BIND_EVENT_FN(OnMouseButtonReleasedEvent));
-        dispatcher.Dispatch<MouseEnteredEvent>(NB_BIND_EVENT_FN(OnMouseEnteredEvent));
-        dispatcher.Dispatch<MouseLeftEvent>(NB_BIND_EVENT_FN(OnMouseLeftEvent));
-        dispatcher.Dispatch<KeyTypedEvent>(NB_BIND_EVENT_FN(OnKeyTypedEvent));
-        dispatcher.Dispatch<KeyPressedEvent>(NB_BIND_EVENT_FN(OnKeyPressedEvent));
-        dispatcher.Dispatch<KeyReleasedEvent>(NB_BIND_EVENT_FN(OnKeyReleasedEvent));
-        dispatcher.Dispatch<MonitorsChangedEvent>(NB_BIND_EVENT_FN(OnMonitorsChangedEvent));
-        dispatcher.Dispatch<WindowFocusedEvent>(NB_BIND_EVENT_FN(OnWindowFocusedEvent));
-        dispatcher.Dispatch<WindowLostFocusEvent>(NB_BIND_EVENT_FN(OnWindowLostFocusEvent));
-        dispatcher.Dispatch<WindowCloseEvent>(NB_BIND_EVENT_FN(OnWindowClosedEvent));
-        dispatcher.Dispatch<WindowMovedEvent>(NB_BIND_EVENT_FN(OnWindowMovedEvent));
-        dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(OnWindowResizedEvent));
+        dispatcher.Dispatch<Platform::MouseMovedEvent>(NB_BIND_EVENT_FN(OnMouseMovedEvent));
+        dispatcher.Dispatch<Platform::MouseScrolledEvent>(NB_BIND_EVENT_FN(OnMouseScrolledEvent));
+        dispatcher.Dispatch<Platform::MouseButtonPressedEvent>(NB_BIND_EVENT_FN(OnMouseButtonPressedEvent));
+        dispatcher.Dispatch<Platform::MouseButtonReleasedEvent>(NB_BIND_EVENT_FN(OnMouseButtonReleasedEvent));
+        dispatcher.Dispatch<Platform::MouseEnteredEvent>(NB_BIND_EVENT_FN(OnMouseEnteredEvent));
+        dispatcher.Dispatch<Platform::MouseLeftEvent>(NB_BIND_EVENT_FN(OnMouseLeftEvent));
+        dispatcher.Dispatch<Platform::KeyTypedEvent>(NB_BIND_EVENT_FN(OnKeyTypedEvent));
+        dispatcher.Dispatch<Platform::KeyPressedEvent>(NB_BIND_EVENT_FN(OnKeyPressedEvent));
+        dispatcher.Dispatch<Platform::KeyReleasedEvent>(NB_BIND_EVENT_FN(OnKeyReleasedEvent));
+        dispatcher.Dispatch<Platform::MonitorsChangedEvent>(NB_BIND_EVENT_FN(OnMonitorsChangedEvent));
+        dispatcher.Dispatch<Platform::WindowFocusedEvent>(NB_BIND_EVENT_FN(OnWindowFocusedEvent));
+        dispatcher.Dispatch<Platform::WindowLostFocusEvent>(NB_BIND_EVENT_FN(OnWindowLostFocusEvent));
+        dispatcher.Dispatch<Platform::WindowClosedEvent>(NB_BIND_EVENT_FN(OnWindowClosedEvent));
+        dispatcher.Dispatch<Platform::WindowMovedEvent>(NB_BIND_EVENT_FN(OnWindowMovedEvent));
+        dispatcher.Dispatch<Platform::WindowResizedEvent>(NB_BIND_EVENT_FN(OnWindowResizedEvent));
     }
 
     void ImGuiPlatform::initMultipleViewports() const
@@ -160,14 +160,14 @@ namespace Nebula
         ImGui::DestroyPlatformWindows();
     }
 
-    bool ImGuiPlatform::OnMouseMovedEvent(const MouseMovedEvent& event) const
+    bool ImGuiPlatform::OnMouseMovedEvent(const Platform::MouseMovedEvent& event) const
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
         ImVec2 mouse_pos(event.GetX(), event.GetY());
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
-            Window* window = event.Window;
+            Ref<Platform::Window> window = Platform::WindowManager::Get().GetWindowFromID(event.WindowID);
             auto [window_x, window_y] = window->GetPos();
             mouse_pos.x += window_x;
             mouse_pos.y += window_y;
@@ -178,9 +178,9 @@ namespace Nebula
         return false;
     }
 
-    bool ImGuiPlatform::OnMouseScrolledEvent(const MouseScrolledEvent& event) const
+    bool ImGuiPlatform::OnMouseScrolledEvent(const Platform::MouseScrolledEvent& event) const
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
         float wheel_x = event.GetXOffset();
         float wheel_y = event.GetYOffset();
@@ -189,9 +189,9 @@ namespace Nebula
         return false;
     }
 
-    bool ImGuiPlatform::OnMouseButtonPressedEvent(const MouseButtonPressedEvent& event)
+    bool ImGuiPlatform::OnMouseButtonPressedEvent(const Platform::MouseButtonPressedEvent& event)
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
         int mouse_button = -1;
         if (event.GetMouseButton() == MouseButton::Left) { mouse_button = 0; }
@@ -208,9 +208,9 @@ namespace Nebula
         return false;
     }
 
-    bool ImGuiPlatform::OnMouseButtonReleasedEvent(const MouseButtonReleasedEvent& event)
+    bool ImGuiPlatform::OnMouseButtonReleasedEvent(const Platform::MouseButtonReleasedEvent& event)
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
         int mouse_button = -1;
         if (event.GetMouseButton() == MouseButton::Left) { mouse_button = 0; }
@@ -227,92 +227,93 @@ namespace Nebula
         return false;
     }
 
-    bool ImGuiPlatform::OnMouseEnteredEvent(const MouseEnteredEvent& event)
+    bool ImGuiPlatform::OnMouseEnteredEvent(const Platform::MouseEnteredEvent& event)
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
-        platform_data.MouseWindowID = event.Window->GetID();
+        platform_data.MouseWindowID = event.WindowID;
         platform_data.MousePendingLeaveFrame = 0;
 
         return false;
     }
 
-    bool ImGuiPlatform::OnMouseLeftEvent(const MouseLeftEvent& event)
+    bool ImGuiPlatform::OnMouseLeftEvent(const Platform::MouseLeftEvent& event)
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
         platform_data.MousePendingLeaveFrame = ImGui::GetFrameCount();
 
         return false;
     }
 
-    bool ImGuiPlatform::OnKeyTypedEvent(const KeyTypedEvent& event) const
+    bool ImGuiPlatform::OnKeyTypedEvent(const Platform::KeyTypedEvent& event) const
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
         int keycode = event.GetKeyChar();
         io.AddInputCharacter(keycode);
         return true;
     }
 
-    bool ImGuiPlatform::OnKeyPressedEvent(const KeyPressedEvent& event) const
+    bool ImGuiPlatform::OnKeyPressedEvent(const Platform::KeyPressedEvent& event) const
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
-        io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(KeyboardKey::LeftControl) || Input::IsKeyPressed(KeyboardKey::RightControl));
-        io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(KeyboardKey::LeftShift) || Input::IsKeyPressed(KeyboardKey::RightShift));
-        io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(KeyboardKey::LeftAlt) || Input::IsKeyPressed(KeyboardKey::RightAlt));
-        io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(KeyboardKey::LeftGUI) || Input::IsKeyPressed(KeyboardKey::RightGUI));
+        io.AddKeyEvent(ImGuiMod_Ctrl, Platform::Input::IsKeyPressed(KeyboardKey::LeftControl) || Platform::Input::IsKeyPressed(KeyboardKey::RightControl));
+        io.AddKeyEvent(ImGuiMod_Shift, Platform::Input::IsKeyPressed(KeyboardKey::LeftShift) || Platform::Input::IsKeyPressed(KeyboardKey::RightShift));
+        io.AddKeyEvent(ImGuiMod_Alt, Platform::Input::IsKeyPressed(KeyboardKey::LeftAlt) || Platform::Input::IsKeyPressed(KeyboardKey::RightAlt));
+        io.AddKeyEvent(ImGuiMod_Super, Platform::Input::IsKeyPressed(KeyboardKey::LeftGUI) || Platform::Input::IsKeyPressed(KeyboardKey::RightGUI));
 
         ImGuiKey key = getImGuiKey(event.GetKeyCode());
         io.AddKeyEvent(key, true);
-        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
+        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Platform::Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
 
         return false;
     }
 
-    bool ImGuiPlatform::OnKeyReleasedEvent(const KeyReleasedEvent& event) const
+    bool ImGuiPlatform::OnKeyReleasedEvent(const Platform::KeyReleasedEvent& event) const
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
-        io.AddKeyEvent(ImGuiMod_Ctrl, Input::IsKeyPressed(KeyboardKey::LeftControl) || Input::IsKeyPressed(KeyboardKey::RightControl));
-        io.AddKeyEvent(ImGuiMod_Shift, Input::IsKeyPressed(KeyboardKey::LeftShift) || Input::IsKeyPressed(KeyboardKey::RightShift));
-        io.AddKeyEvent(ImGuiMod_Alt, Input::IsKeyPressed(KeyboardKey::LeftAlt) || Input::IsKeyPressed(KeyboardKey::RightAlt));
-        io.AddKeyEvent(ImGuiMod_Super, Input::IsKeyPressed(KeyboardKey::LeftGUI) || Input::IsKeyPressed(KeyboardKey::RightGUI));
+        io.AddKeyEvent(ImGuiMod_Ctrl, Platform::Input::IsKeyPressed(KeyboardKey::LeftControl) || Platform::Input::IsKeyPressed(KeyboardKey::RightControl));
+        io.AddKeyEvent(ImGuiMod_Shift, Platform::Input::IsKeyPressed(KeyboardKey::LeftShift) || Platform::Input::IsKeyPressed(KeyboardKey::RightShift));
+        io.AddKeyEvent(ImGuiMod_Alt, Platform::Input::IsKeyPressed(KeyboardKey::LeftAlt) || Platform::Input::IsKeyPressed(KeyboardKey::RightAlt));
+        io.AddKeyEvent(ImGuiMod_Super, Platform::Input::IsKeyPressed(KeyboardKey::LeftGUI) || Platform::Input::IsKeyPressed(KeyboardKey::RightGUI));
 
         ImGuiKey key = getImGuiKey(event.GetKeyCode());
         io.AddKeyEvent(key, false);
-        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
+        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Platform::Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
 
         return false;
     }
 
-    bool ImGuiPlatform::OnMonitorsChangedEvent(const MonitorsChangedEvent& event)
+    bool ImGuiPlatform::OnMonitorsChangedEvent(const Platform::MonitorsChangedEvent& event)
     {
         platform_data.WantUpdateMonitors = true;
 
         return false;
     }
 
-    bool ImGuiPlatform::OnWindowFocusedEvent(const WindowFocusedEvent& event) const
+    bool ImGuiPlatform::OnWindowFocusedEvent(const Platform::WindowFocusedEvent& event) const
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
+        Ref<Platform::Window> win = Platform::WindowManager::Get().GetWindowFromID(event.WindowID);
 
         io.AddFocusEvent(true);
         return false;
     }
 
-    bool ImGuiPlatform::OnWindowLostFocusEvent(const WindowLostFocusEvent& event) const
+    bool ImGuiPlatform::OnWindowLostFocusEvent(const Platform::WindowLostFocusEvent& event) const
     {
-        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID()))) == nullptr) return false;
+        if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
         io.AddFocusEvent(false);
         return false;
     }
 
-    bool ImGuiPlatform::OnWindowClosedEvent(const WindowCloseEvent& event) const
+    bool ImGuiPlatform::OnWindowClosedEvent(const Platform::WindowClosedEvent& event) const
     {
-        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID())));
+        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID)));
         if (viewport == nullptr)
             return false;
 
@@ -321,9 +322,9 @@ namespace Nebula
         return true;
     }
 
-    bool ImGuiPlatform::OnWindowMovedEvent(const WindowMovedEvent& event) const
+    bool ImGuiPlatform::OnWindowMovedEvent(const Platform::WindowMovedEvent& event) const
     {
-        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID())));
+        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID)));
         if (viewport == nullptr)
             return false;
 
@@ -332,9 +333,9 @@ namespace Nebula
         return true;
     }
 
-    bool ImGuiPlatform::OnWindowResizedEvent(const WindowResizeEvent& event) const
+    bool ImGuiPlatform::OnWindowResizedEvent(const Platform::WindowResizedEvent& event) const
     {
-        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.Window->GetID())));
+        ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID)));
         if (viewport == nullptr)
             return false;
 
@@ -350,16 +351,16 @@ namespace Nebula
         platform_io.Monitors.resize(0);
         platform_data.WantUpdateMonitors = false;
 
-        std::vector<Displays::display> displays = Displays::GetDisplays();
+        std::vector<Platform::Displays::Display> displays = Platform::Displays::GetDisplays();
         for (int n = 0; n < displays.size(); n++)
         {
-            const Displays::display& display = displays[n];
+            const Platform::Displays::Display& display = displays[n];
             ImGuiPlatformMonitor monitor;
             monitor.MainPos = ImVec2(display.x, display.y);
             monitor.MainSize = ImVec2(display.width, display.height);
             monitor.WorkPos = ImVec2(display.workX, display.workY);
             monitor.WorkSize = ImVec2(display.workWidth, display.workHeight);
-            monitor.DpiScale = display.dpi;
+            monitor.DpiScale = 96;
             monitor.PlatformHandle = reinterpret_cast<void*>(n);
             if (monitor.DpiScale <= 0.0f)
                 continue;
@@ -373,8 +374,8 @@ namespace Nebula
 
         // We forward mouse input when hovered or captured (via SDL_EVENT_MOUSE_MOTION) or when focused (below)
         // SDL_CaptureMouse() let the OS know e.g. that our imgui drag outside the SDL window boundaries shouldn't e.g. trigger other operations outside
-        Mouse::CaptureMouse(platform_data.MouseButtonsDown != 0);
-        Ref<Window> focused_window = WindowUtils::GetForegroundWindow();
+        Ref<Platform::Window> focused_window = Platform::WindowManager::Get().GetWindowFromHandle((HWND)Platform::WindowUtils::GetForegroundWindow());
+        if (focused_window) focused_window->CaptureMouse(platform_data.MouseButtonsDown != 0);
 
 
         if (focused_window && (platform_data.Window == focused_window || ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(focused_window->GetID()))) != nullptr))
@@ -382,16 +383,14 @@ namespace Nebula
             // (Optional) Set OS mouse position from Dear ImGui if requested (rarely used, only when io.ConfigNavMoveSetMousePos is enabled by user)
             if (io.WantSetMousePos)
             {
-                if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-                    Mouse::SetMousePosGlobal(io.MousePos.x, io.MousePos.y);
-                else
-                    platform_data.Window->SetMousePos(io.MousePos.x, io.MousePos.y);
+                if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) Platform::Mouse::SetMousePosGlobal(io.MousePos.x, io.MousePos.y);
+                else platform_data.Window->SetMousePos(io.MousePos.x, io.MousePos.y);
             }
 
             // (Optional) Fallback to provide mouse position when focused (SDL_EVENT_MOUSE_MOTION already provides this when hovered or captured)
             if (platform_data.MouseButtonsDown == 0)
             {
-                auto [mouse_x, mouse_y] = Mouse::GetMousePos();
+                auto [mouse_x, mouse_y] = Platform::Input::GetMousePosition();
                 auto [window_x, window_y] = focused_window->GetPos();
                 if (!(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable))
                 {
@@ -430,24 +429,24 @@ namespace Nebula
         if (io.MouseDrawCursor || imgui_cursor == ImGuiMouseCursor_None)
         {
             // Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
-            Mouse::HideCursor();
+            Platform::Mouse::HideCursor();
         }
         else
         {
             // Show OS mouse cursor
-            Ref<Cursor> expected_cursor = platform_data.MouseCursors[imgui_cursor] ? platform_data.MouseCursors[imgui_cursor] : platform_data.MouseCursors[ImGuiMouseCursor_Arrow];
+            Ref<Platform::Cursor> expected_cursor = platform_data.MouseCursors[imgui_cursor] ? platform_data.MouseCursors[imgui_cursor] : platform_data.MouseCursors[ImGuiMouseCursor_Arrow];
             if (platform_data.MouseLastCursor != expected_cursor)
             {
                 expected_cursor->Show();
                 platform_data.MouseLastCursor = expected_cursor;
             }
-            Mouse::ShowCursor();
+            Platform::Mouse::ShowCursor();
         }
     }
 
     void ImGuiPlatform::SetClipboardText(ImGuiContext*, const char* text)
     {
-        Clipboard::SetText(text);
+        Platform::Clipboard::SetText(text);
     }
 
     const char* ImGuiPlatform::GetClipboardText(ImGuiContext*)
@@ -455,18 +454,18 @@ namespace Nebula
         ImGuiIO& io = ImGui::GetIO();
         auto* backend_data = static_cast<PlatformData*>(io.BackendPlatformUserData);
 
-        std::string sdl_clipboard_text = Clipboard::GetText();
+        std::string sdl_clipboard_text = Platform::Clipboard::GetText();
         backend_data->ClipboardTextData = sdl_clipboard_text.data();
 
         return backend_data->ClipboardTextData;
     }
 
-    Ref<Window> ImGuiPlatform::GetWindowFromViewportID(ImGuiID viewport_id)
+    Ref<Platform::Window> ImGuiPlatform::GetWindowFromViewportID(ImGuiID viewport_id)
     {
         if (viewport_id != 0)
             if (ImGuiViewport* viewport = ImGui::FindViewportByID(viewport_id))
             {
-                return WindowManager::Get().GetWindow(reinterpret_cast<uint64_t>(viewport->PlatformHandle));
+                return Platform::WindowManager::Get().GetWindowFromID(reinterpret_cast<uint64_t>(viewport->PlatformHandle));
             }
         return nullptr;
     }
@@ -617,7 +616,7 @@ namespace Nebula
             main_viewport_data->GraphicsContext->SetCurrent();
         }
 
-        WindowProps props = WindowProps();
+        Platform::WindowProperties props = Platform::WindowProperties();
         props.Title = "No Title Yet";
         props.Width = viewport->Size.x;
         props.Height = viewport->Size.y;
@@ -625,12 +624,9 @@ namespace Nebula
         props.y = viewport->Pos.y;
         props.isResizable = !(viewport->Flags & ImGuiViewportFlags_NoDecoration);
         props.AlwaysOnTop = (viewport->Flags & ImGuiViewportFlags_TopMost);
-        props.HighDPI = platform_data->Window->IsHighDPI();
         props.isUtility = (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon);
-        props.Border = !(viewport->Flags & ImGuiViewportFlags_NoDecoration);
-        props.isImGui = true;
-        props.API = RendererAPI::GetAPI();
-        const Ref<Window> window = WindowManager::Get().CreateNewWindow(props);
+        props.Style = (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? Platform::WindowStyle::BorderlessFullscreen : Platform::WindowStyle::Default;
+        const Ref<Platform::Window> window = Platform::WindowManager::Get().CreateWindow(props);
         window->SetEventCallback(s_EventCallback);
         viewport_data->Window = window;
 
@@ -639,7 +635,7 @@ namespace Nebula
         if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
         {
             viewport_data->GraphicsContext = viewport_data->Window->GetContext();
-            viewport_data->Window->SetVSync(false);
+            viewport_data->Window->SetVSync(viewport_data->ParentWindow->IsVSync());
             viewport_data->GraphicsContext->SetCurrent();
         }
 
@@ -658,7 +654,7 @@ namespace Nebula
         {
             if (viewport_data->Window && viewport_data->WindowOwned)
             {
-                WindowManager::Get().DestroyWindow(viewport_data->Window);
+                Platform::WindowManager::Get().DestroyWindow(viewport_data->Window);
             }
             viewport_data->GraphicsContext = nullptr;
             viewport_data->Window = nullptr;
@@ -680,11 +676,10 @@ namespace Nebula
         // Update SDL3 parent if it changed _after_ creation.
         // This is for advanced apps that are manipulating ParentViewportID manually.
         ImGuiViewport* parent_viewport = ImGui::FindViewportByID(viewport->ParentViewportId);
-        Ref<Window> new_parent = WindowManager::Get().GetWindow(reinterpret_cast<uint64_t>(parent_viewport->PlatformHandle));
+        Ref<Platform::Window> new_parent = Platform::WindowManager::Get().GetWindowFromID(reinterpret_cast<uint64_t>(parent_viewport->PlatformHandle));
         if (new_parent != viewport_data->ParentWindow)
         {
             viewport_data->ParentWindow = new_parent;
-            viewport_data->Window->SetParentWindow(viewport_data->ParentWindow);
         }
     }
 
@@ -704,7 +699,7 @@ namespace Nebula
     ImVec2 ImGuiPlatform::GetWindowSize(ImGuiViewport* viewport)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        auto [w, h] = viewport_data->Window->GetSize();
+        auto [w, h] = viewport_data->Window->GetPixelSize();
         return {static_cast<float>(w), static_cast<float>(h)};
     }
 
@@ -757,10 +752,9 @@ namespace Nebula
 
     void ImGuiPlatform::SetWindowAlpha(ImGuiViewport* viewport, float alpha)
     {
-        auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        viewport_data->Window->SetAlpha(alpha);
+        return; //Not supported
     }
 
-    std::function<void(Event&)> ImGuiPlatform::s_EventCallback = nullptr;
+    std::function<void(Platform::Event&)> ImGuiPlatform::s_EventCallback = nullptr;
 
 }

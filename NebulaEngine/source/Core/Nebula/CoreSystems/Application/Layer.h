@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Nebula/CoreSystems/Core/Timestep.h"
-#include "Nebula/Events/Event.h"
+#include "Platform/Nebula/CoreSystems/Events/Event.h"
 
 namespace Nebula
 {
@@ -16,7 +16,7 @@ namespace Nebula
 		virtual void OnDetach() {}
 		virtual void OnUpdate(Timestep ts) {}
 		virtual void OnImGuiRender() {}
-		virtual void OnEvent(Event& event) {}
+		virtual void OnEvent(Platform::Event& event) {}
 
 		inline const std::string& GetName() const { return m_DebugName; }
 	protected:

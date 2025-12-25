@@ -1,15 +1,16 @@
 #include "Application.h"
 
 #include "Nebula/CoreSystems/Core/Timestep.h"
-#include "Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Nebula/Renderer/Renderer.h"
+#include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
+#include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula
 {
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application(const WindowProps& props)
+	Application::Application(const Platform::WindowProperties& props)
 	{
 		NB_PROFILE_FUNCTION();
 
@@ -18,7 +19,9 @@ namespace Nebula
 
 		NB_CORE_INFO("Engine starting");
 
-		m_MainWindow = WindowManager::Get().CreateNewMainWindow(props);
+		Platform::CoreUtils::InitThread();
+
+		m_MainWindow = Platform::WindowManager::Get().CreateMainWindow(props);
 		m_MainWindow->SetEventCallback(NB_BIND_EVENT_FN(OnEvent));
 
 		Renderer::Init();
@@ -38,7 +41,7 @@ namespace Nebula
 		Renderer::Shutdown();
 		PopOverlay(m_ImGuiLayer);
 
-		WindowManager::Get().DestroyMainWindow();
+		Platform::WindowManager::Get().DestroyMainWindow();
 		m_MainWindow.reset();
 	}
 
@@ -82,15 +85,15 @@ namespace Nebula
 		layer->OnDetach();
 	}
 
-	void Application::OnEvent(Event& e)
+	void Application::OnEvent(Platform::Event& e)
 	{
 		NB_PROFILE_FUNCTION();
 
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(NB_BIND_EVENT_FN(OnWindowClosed));
-		dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(OnWindowResize));
-		dispatcher.Dispatch<WindowMinimizeEvent>(NB_BIND_EVENT_FN(OnWindowMinimize));
-		dispatcher.Dispatch<WindowRestoredEvent>(NB_BIND_EVENT_FN(OnWindowRestored));
+		Platform::EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<Platform::WindowClosedEvent>(NB_BIND_EVENT_FN(OnWindowClosed));
+		dispatcher.Dispatch<Platform::WindowResizedEvent>(NB_BIND_EVENT_FN(OnWindowResize));
+		dispatcher.Dispatch<Platform::WindowMinimizedEvent>(NB_BIND_EVENT_FN(OnWindowMinimize));
+		dispatcher.Dispatch<Platform::WindowRestoredEvent>(NB_BIND_EVENT_FN(OnWindowRestored));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
@@ -139,14 +142,13 @@ namespace Nebula
 		m_Running = false;
 	}
 
-	bool Application::OnWindowClosed(WindowCloseEvent& e)
+	bool Application::OnWindowClosed(Platform::WindowClosedEvent& e)
 	{
 		m_Running = false;
-		m_MainWindow->Shutdown();
 		return true;
 	}
 
-	bool Application::OnWindowResize(WindowResizeEvent& e)
+	bool Application::OnWindowResize(Platform::WindowResizedEvent& e)
 	{
 		NB_PROFILE_FUNCTION();
 
@@ -155,13 +157,13 @@ namespace Nebula
 		return false;
 	}
 
-	bool Application::OnWindowMinimize(WindowMinimizeEvent& e)
+	bool Application::OnWindowMinimize(Platform::WindowMinimizedEvent& e)
 	{
 		m_Minimized = true;
 		return false;
 	}
 
-	bool Application::OnWindowRestored(WindowRestoredEvent& e)
+	bool Application::OnWindowRestored(Platform::WindowRestoredEvent& e)
 	{
 		m_Minimized = false;
 		return false;

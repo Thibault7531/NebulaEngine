@@ -3,12 +3,13 @@
 #include <imgui.h>
 #include <gtc/type_ptr.hpp>
 
-#include "imgui_internal.h"
 #include "Nebula.h"
-#include "Nebula/CoreSystems/Input/KeyCodes.h"
-#include "Nebula/CoreSystems/Windows/WindowManager.h"
+#include "Nebula/CoreSystems/Application/Application.h"
+#include "Nebula/Renderer/Buffers/Framebuffer.h"
+#include "Nebula/Renderer/Core/RenderCommand.h"
 #include "Nebula/Scene/SceneSerializer.h"
-#include "Nebula/Utils/PlatformUtils.h"
+#include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
+#include "Platform/Nebula/Dialogs/FileDialogs.h"
 
 namespace Nebula {
     EditorLayer::EditorLayer()
@@ -28,91 +29,91 @@ namespace Nebula {
 
         Application::Get().GetImGuiLayer()->BlockEvents(false);
 
-        WindowManager::Get().GetMainWindow()->SetVSync(false);
-        WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
+        Platform::WindowManager::Get().GetMainWindow()->SetVSync(Platform::VSyncMode::Off);
+        Platform::WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
         {
             ImGuiIO& io = ImGui::GetIO();
 
-            auto [window_x, window_y] = WindowManager::Get().GetMainWindow()->GetPos();
+            auto [window_x, window_y] = Platform::WindowManager::Get().GetMainWindow()->GetPos();
 
             io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-            if (y >= WindowManager::Get().GetMainWindow()->GetPos().second & y <= WindowManager::Get().GetMainWindow()->GetPos().second + 5)
+            if (y >= Platform::WindowManager::Get().GetMainWindow()->GetPos().second & y <= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + 5)
             {
-                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first & x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5)
+                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5)
                 {
-                    auto cursor = Cursor(Cursor::CursorType::ResizeNWSE);
-                    cursor.Show();
+                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNWSE);
+                    Cursor.Show();
                     m_MouseCursorChanged = true;
-                    return Window::HitTest::ResizeTopLeft;
+                    return Platform::HitTest::ResizeTopLeft;
                 }
-                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5)
+                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5)
                 {
-                    auto cursor = Cursor(Cursor::CursorType::ResizeNS);
-                    cursor.Show();
+                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNS);
+                    Cursor.Show();
                     m_MouseCursorChanged = true;
-                    return Window::HitTest::ResizeTop;
+                    return Platform::HitTest::ResizeTop;
                 }
-                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
+                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
                 {
-                    auto cursor = Cursor(Cursor::CursorType::ResizeNESW);
-                    cursor.Show();
+                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNESW);
+                    Cursor.Show();
                     m_MouseCursorChanged = true;
-                    return Window::HitTest::ResizeTopRight;
+                    return Platform::HitTest::ResizeTopRight;
                 }
             }
-            if (y >= WindowManager::Get().GetMainWindow()->GetPos().second + 5 & y <= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5)
+            if (y >= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + 5 & y <= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5)
             {
-                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first & x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5)
+                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5)
                 {
-                    auto cursor = Cursor(Cursor::CursorType::ResizeEW);
-                    cursor.Show();
+                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeEW);
+                    Cursor.Show();
                     m_MouseCursorChanged = true;
-                    return Window::HitTest::ResizeLeft;
+                    return Platform::HitTest::ResizeLeft;
                 }
-                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
+                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
                 {
-                    auto cursor = Cursor(Cursor::CursorType::ResizeEW);
-                    cursor.Show();
+                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeEW);
+                    Cursor.Show();
                     m_MouseCursorChanged = true;
-                    return Window::HitTest::ResizeRight;
+                    return Platform::HitTest::ResizeRight;
                 }
             }
-            if (y >= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5 & y <= WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y)
+            if (y >= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5 & y <= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y)
             {
-                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first & x <= WindowManager::Get().GetMainWindow()->GetPos().first + 5)
+                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5)
                 {
-                    auto cursor = Cursor(Cursor::CursorType::ResizeNESW);
-                    cursor.Show();
+                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNESW);
+                    Cursor.Show();
                     m_MouseCursorChanged = true;
-                    return Window::HitTest::ResizeBottomLeft;
+                    return Platform::HitTest::ResizeBottomLeft;
                 }
-                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5)
+                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5)
                 {
-                    auto cursor = Cursor(Cursor::CursorType::ResizeNS);
-                    cursor.Show();
+                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNS);
+                    Cursor.Show();
                     m_MouseCursorChanged = true;
-                    return Window::HitTest::ResizeBottom;
+                    return Platform::HitTest::ResizeBottom;
                 }
-                if (x >= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
+                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
                 {
-                    auto cursor = Cursor(Cursor::CursorType::ResizeNWSE);
-                    cursor.Show();
+                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNWSE);
+                    Cursor.Show();
                     m_MouseCursorChanged = true;
-                    return Window::HitTest::ResizeBottomRight;
+                    return Platform::HitTest::ResizeBottomRight;
                 }
             }
 
             io.ConfigFlags &= ~(ImGuiConfigFlags_NoMouseCursorChange);
             if (m_MouseCursorChanged)
             {
-                auto cursor = Cursor(Cursor::CursorType::Arrow);
-                cursor.Show();
+                auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::Arrow);
+                Cursor.Show();
                 m_MouseCursorChanged = false;
             }
 
-            if (IsTitleBarHovered) return Window::HitTest::TitleBar;
+            if (IsTitleBarHovered) return Platform::HitTest::TitleBar;
 
-            return Window::HitTest::Client;
+            return Platform::HitTest::Client;
         });
 
         NB_INFO("Nebula Editor Loaded");
@@ -145,10 +146,10 @@ namespace Nebula {
         m_Framebuffer->Unbind();
     }
 
-    void EditorLayer::OnEvent(Event &event)
+    void EditorLayer::OnEvent(Platform::Event &event)
     {
-        EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<KeyPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnKeyPressedEvent));
+        Platform::EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<Platform::KeyPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnKeyPressedEvent));
     }
 
     void EditorLayer::OnImGuiRender()
@@ -182,14 +183,14 @@ namespace Nebula {
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 68);
             if (ImGui::MenuItem("_"))
             {
-                WindowManager::Get().GetMainWindow()->Minimize();
+                Platform::WindowManager::Get().GetMainWindow()->Minimize();
             }
             IsTitleBarHovered &= !ImGui::IsItemHovered();
 
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 42);
             if (ImGui::MenuItem("O")) {
-                if (WindowManager::Get().GetMainWindow()->IsMaximized()) WindowManager::Get().GetMainWindow()->SetMaximized(false);
-                else WindowManager::Get().GetMainWindow()->SetMaximized(true);
+                if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) Platform::WindowManager::Get().GetMainWindow()->SetMaximized(false);
+                else Platform::WindowManager::Get().GetMainWindow()->SetMaximized(true);
             }
             IsTitleBarHovered &= !ImGui::IsItemHovered();
 
@@ -230,30 +231,46 @@ namespace Nebula {
 
     void EditorLayer::OpenScene()
     {
-        std::string path = FileDialogs::OpenFile({ FileDialogs::FileType::NebulaScene });
+        /*
+        std::string path = Platform::FileDialogs::OpenFile({ Platform::FileType::NebulaScene });
         if (!path.empty()) {
             NewScene();
 
             SceneSerializer serializer(m_Scene);
             serializer.Deserialize(path);
         }
+        */
+        Platform::FileDialogs::OpenFile(Platform::FileType::NebulaScene, [&](std::string path)
+        {
+            NewScene();
+
+            SceneSerializer serializer(m_Scene);
+            serializer.Deserialize(path);
+        });
     }
 
     void EditorLayer::SaveSceneAs()
     {
-        std::string path = FileDialogs::SaveFile("Nebula Scene (*.nbscene)\0*.nbscene\0");
+        /*
+        std::string path = Platform::FileDialogs::SaveFile("Nebula Scene (*.nbscene)\0*.nbscene\0");
         if (!path.empty()) {
             SceneSerializer serializer(m_Scene);
             serializer.Serialize(path);
         }
+        */
+        Platform::FileDialogs::SaveFile(Platform::FileType::NebulaScene, [&](std::string path)
+        {
+            SceneSerializer serializer(m_Scene);
+            serializer.Serialize(path);
+        });
     }
 
-    bool EditorLayer::OnKeyPressedEvent(const KeyPressedEvent& event)
+    bool EditorLayer::OnKeyPressedEvent(const Platform::KeyPressedEvent& event)
     {
         // Shortcuts
         if (event.GetRepeatCount() > 0) return false;
-        bool control = Input::IsKeyPressed(KeyboardKey::LeftControl) || Input::IsKeyPressed(KeyboardKey::RightControl);
-        bool shift = Input::IsKeyPressed(KeyboardKey::LeftShift) || Input::IsKeyPressed(KeyboardKey::RightShift);
+        bool control = Platform::Input::IsKeyPressed(KeyboardKey::LeftControl) || Platform::Input::IsKeyPressed(KeyboardKey::RightControl);
+        bool shift = Platform::Input::IsKeyPressed(KeyboardKey::LeftShift) || Platform::Input::IsKeyPressed(KeyboardKey::RightShift);
 
         if (event.GetKeyCode() == KeyboardKey::N && control) NewScene();
         if (event.GetKeyCode() == KeyboardKey::O && control) OpenScene();

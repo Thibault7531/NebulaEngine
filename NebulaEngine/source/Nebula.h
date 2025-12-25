@@ -9,15 +9,15 @@
 #include "Nebula/CoreSystems/Core/Timestep.h"
 
 // Events system
-#include "Nebula/Events/ApplicationEvent.h"
-#include "Nebula/Events/KeyEvent.h"
-#include "Nebula/Events/MouseEvent.h"
+#include "Platform/Nebula/CoreSystems/Events/WindowEvents.h"
+#include "Platform/Nebula/CoreSystems/Events/KeyEvent.h"
+#include "Platform/Nebula/CoreSystems/Events/MouseEvent.h"
 
 // Input system
 #include "Nebula/Renderer/Cameras/CameraController.h"
-#include "Nebula/CoreSystems/Input/Input.h"
-#include "Nebula/CoreSystems/Input/KeyCodes.h"
-#include "Nebula/CoreSystems/Input/MouseButtonCodes.h"
+#include "Platform/Nebula/CoreSystems/Input/Input.h"
+#include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
+#include "Platform/Nebula/CoreSystems/Input/MouseButtonCodes.h"
 
 // ImGui
 #include "Nebula/ImGui/ImGuiLayer.h"

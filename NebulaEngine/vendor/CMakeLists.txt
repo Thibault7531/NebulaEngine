@@ -1,3 +1,8 @@
+# cppwinrt
+
+add_subdirectory(winrt)
+
+
 # EnTT
 
 add_subdirectory(entt)
@@ -6,14 +11,18 @@ add_subdirectory(entt)
 # GLAD
 
 add_library(GLAD STATIC Glad/src/glad.c Glad/include/glad/glad.h Glad/include/KHR/khrplatform.h)
+add_library(GLAD_WGL STATIC Glad/src/glad_wgl.c Glad/include/glad/glad_wgl.h Glad/include/KHR/khrplatform.h)
 
 target_include_directories(GLAD PUBLIC Glad/include)
+target_include_directories(GLAD_WGL PUBLIC Glad/include)
 
 if (MSVC)
     if (CMAKE_BUILD_TYPE EQUAL "Debug")
         set_property(TARGET GLAD PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+        set_property(TARGET GLAD_WGL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
     else ()
         set_property(TARGET GLAD PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+        set_property(TARGET GLAD_WGL PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
     endif ()
 endif ()
 

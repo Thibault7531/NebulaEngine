@@ -3,6 +3,8 @@
 #include <glm.hpp>
 
 #include "Nebula.h"
+#include "Nebula/CoreSystems/Application/Layer.h"
+#include "Nebula/Renderer/Buffers/Framebuffer.h"
 #include "Panels/SceneHierarchyPanel.h"
 
 namespace Nebula {
@@ -16,7 +18,7 @@ namespace Nebula {
         virtual void OnDetach() override;
 
         virtual void OnUpdate(Timestep ts) override;
-        virtual void OnEvent(Event &event) override;
+        virtual void OnEvent(Platform::Event &event) override;
         virtual void OnImGuiRender() override;
 
         void NewScene();
@@ -24,7 +26,7 @@ namespace Nebula {
         void SaveSceneAs();
 
     private:
-        bool OnKeyPressedEvent(const KeyPressedEvent& event);
+        bool OnKeyPressedEvent(const Platform::KeyPressedEvent& event);
 
     private:
         bool m_MouseCursorChanged = false;
