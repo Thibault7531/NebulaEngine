@@ -1,9 +1,7 @@
 #include "CameraController.h"
 
-#include "Nebula/CoreSystems/Input/Input.h"
-#include "Nebula/CoreSystems/Input/KeyCodes.h"
-#include "Nebula/CoreSystems/Input/MouseButtonCodes.h"
 #include "OrthographicCamera.h"
+#include "Platform/Nebula/CoreSystems/Input/Input.h"
 
 namespace Nebula
 {
@@ -22,25 +20,25 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        if (Input::IsKeyPressed(KeyboardKey::Z)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::Z)) {
             m_CameraPosition.y += m_CameraTranslationSpeed * ts;
         }
-        if (Input::IsKeyPressed(KeyboardKey::S)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::S)) {
             m_CameraPosition.y -= m_CameraTranslationSpeed * ts;
         }
-        if (Input::IsKeyPressed(KeyboardKey::D)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::D)) {
             m_CameraPosition.x += m_CameraTranslationSpeed * ts;
         }
-        if (Input::IsKeyPressed(KeyboardKey::Q)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::Q)) {
             m_CameraPosition.x -= m_CameraTranslationSpeed * ts;
         }
 
         if (m_Rotation)
         {
-            if (Input::IsKeyPressed(KeyboardKey::A)) {
+            if (Platform::Input::IsKeyPressed(KeyboardKey::A)) {
                 m_CameraRotation += m_CameraRotationSpeed * ts;
             }
-            if (Input::IsKeyPressed(KeyboardKey::E)) {
+            if (Platform::Input::IsKeyPressed(KeyboardKey::E)) {
                 m_CameraRotation -= m_CameraRotationSpeed * ts;
             }
 
@@ -50,16 +48,16 @@ namespace Nebula
         m_Camera.setPosition(m_CameraPosition);
     }
 
-    void OrthographicCameraController::OnEvent(Event& e)
+    void OrthographicCameraController::OnEvent(Platform::Event& e)
     {
         NB_PROFILE_FUNCTION();
 
-        EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<MouseScrolledEvent>(NB_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
-        dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(OrthographicCameraController::OnWindowResize));
+        Platform::EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<Platform::MouseScrolledEvent>(NB_BIND_EVENT_FN(OrthographicCameraController::OnMouseScrolled));
+        dispatcher.Dispatch<Platform::WindowResizedEvent>(NB_BIND_EVENT_FN(OrthographicCameraController::OnWindowResize));
     }
 
-    bool OrthographicCameraController::OnMouseScrolled(const MouseScrolledEvent& e)
+    bool OrthographicCameraController::OnMouseScrolled(const Platform::MouseScrolledEvent& e)
     {
         NB_PROFILE_FUNCTION();
 
@@ -70,7 +68,7 @@ namespace Nebula
         return false;
     }
 
-    bool OrthographicCameraController::OnWindowResize(const WindowResizeEvent& e)
+    bool OrthographicCameraController::OnWindowResize(const Platform::WindowResizedEvent& e)
     {
         NB_PROFILE_FUNCTION();
 
@@ -88,44 +86,44 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        if (Input::IsKeyPressed(KeyboardKey::Z)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::Z)) {
             m_CameraPosition += glm::vec3(2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts, 0.0f, 2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts);
         }
-        if (Input::IsKeyPressed(KeyboardKey::S)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::S)) {
             m_CameraPosition += glm::vec3(-2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts, 0.0f, -2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts);
         }
-        if (Input::IsKeyPressed(KeyboardKey::D)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::D)) {
             m_CameraPosition += glm::vec3(-2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts, 0.0f, 2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts);
         }
-        if (Input::IsKeyPressed(KeyboardKey::Q)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::Q)) {
             m_CameraPosition += glm::vec3(2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts, 0.0f, -2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts);
         }
-        if (Input::IsKeyPressed(KeyboardKey::Space)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::Space)) {
             m_CameraPosition += glm::vec3(0.0f, 2.0f * ts, 0.0f);
         }
-        if (Input::IsKeyPressed(KeyboardKey::LeftShift)) {
+        if (Platform::Input::IsKeyPressed(KeyboardKey::LeftShift)) {
             m_CameraPosition += glm::vec3(0.0f, -2.0f * ts, 0.0f);
         }
 
         m_Camera.setPosition(m_CameraPosition);
     }
 
-    void PerspectiveCameraController::OnEvent(Event& e)
+    void PerspectiveCameraController::OnEvent(Platform::Event& e)
     {
         NB_PROFILE_FUNCTION();
 
-        EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<MouseMovedEvent>(NB_BIND_EVENT_FN(PerspectiveCameraController::OnMouseMoveEvent));
-        dispatcher.Dispatch<WindowResizeEvent>(NB_BIND_EVENT_FN(PerspectiveCameraController::OnWindowResize));
+        Platform::EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<Platform::MouseMovedEvent>(NB_BIND_EVENT_FN(PerspectiveCameraController::OnMouseMoveEvent));
+        dispatcher.Dispatch<Platform::WindowResizedEvent>(NB_BIND_EVENT_FN(PerspectiveCameraController::OnWindowResize));
 
-        m_PreviousMousePosition = {Input::GetMouseX(), Input::GetMouseY()};
+        m_PreviousMousePosition = {Platform::Input::GetMouseX(), Platform::Input::GetMouseY()};
     }
 
-    bool PerspectiveCameraController::OnMouseMoveEvent(const MouseMovedEvent& e)
+    bool PerspectiveCameraController::OnMouseMoveEvent(const Platform::MouseMovedEvent& e)
     {
         NB_PROFILE_FUNCTION();
 
-        if (Input::IsMouseButtonPressed(MouseButton::Left))
+        if (Platform::Input::IsMouseButtonPressed(MouseButton::Left))
         {
             m_cameraRotation += glm::vec3(m_PreviousMousePosition.y - e.GetY(), e.GetX() - m_PreviousMousePosition.x, 0.0f) * 0.1f;
             m_Camera.SetRotation(m_cameraRotation);
@@ -134,7 +132,7 @@ namespace Nebula
         return false;
     }
 
-    bool PerspectiveCameraController::OnWindowResize(const WindowResizeEvent& e)
+    bool PerspectiveCameraController::OnWindowResize(const Platform::WindowResizedEvent& e)
     {
         NB_PROFILE_FUNCTION();
 

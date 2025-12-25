@@ -1,7 +1,7 @@
 #include "ImGuiLayer.h"
 
 #include "Nebula/CoreSystems/Application/Application.h"
-#include "Nebula/CoreSystems/Windows/WindowManager.h"
+#include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula
 {
@@ -30,7 +30,7 @@ namespace Nebula
 		SetDarkTheme();
 
 		m_ImGuiPlatform = CreateRef<ImGuiPlatform>();
-		m_ImGuiPlatform->Init(WindowManager::Get().GetMainWindow());
+		m_ImGuiPlatform->Init(Platform::WindowManager::Get().GetMainWindow());
 
 		m_ImGuiRenderer = ImGuiRenderer::Create();
 		m_ImGuiRenderer->Init();
@@ -65,14 +65,14 @@ namespace Nebula
 		s_Fonts.Small = fontSmall;
 	}
 
-	void ImGuiLayer::OnEvent(Event& event)
+	void ImGuiLayer::OnEvent(Platform::Event& event)
 	{
 		m_ImGuiPlatform->OnEvent(event);
 
 		if (m_BlockEvents) {
 			ImGuiIO& io = ImGui::GetIO();
-			event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-			event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+			event.Handled |= event.IsInCategory(Platform::EventCategoryMouse) & io.WantCaptureMouse;
+			event.Handled |= event.IsInCategory(Platform::EventCategoryKeyboard) & io.WantCaptureKeyboard;
 		}
 	}
 
@@ -113,7 +113,7 @@ namespace Nebula
 		{
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			WindowManager::Get().GetMainWindow()->SetCurrentContext();
+			Platform::WindowManager::Get().GetMainWindow()->SetCurrentContext();
 		}
 	}
 

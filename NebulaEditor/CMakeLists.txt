@@ -58,3 +58,12 @@ target_include_directories(NebulaEditor PRIVATE
         ../NebulaEngine/vendor/glm/glm
         ../NebulaEngine/vendor/yaml-cpp/include
 )
+
+if (nebula_cmake_platform STREQUAL Windows)
+    add_custom_command(
+            TARGET NebulaEditor
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy "${CMAKE_SOURCE_DIR}/NebulaEngine/vendor/winrt/Microsoft.WindowsAppRuntime.Bootstrap.dll" "$<TARGET_FILE_DIR:NebulaEditor>/Microsoft.WindowsAppRuntime.Bootstrap.dll"
+    )
+endif ()

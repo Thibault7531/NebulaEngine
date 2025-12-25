@@ -3,9 +3,9 @@
 #include "OrthographicCamera.h"
 #include "PerspectiveCamera.h"
 #include "Nebula/CoreSystems/Core/Timestep.h"
-#include "Nebula/Events/ApplicationEvent.h"
-#include "Nebula/Events/Event.h"
-#include "Nebula/Events/MouseEvent.h"
+#include "Platform/Nebula/CoreSystems/Events/Event.h"
+#include "Platform/Nebula/CoreSystems/Events/MouseEvent.h"
+#include "Platform/Nebula/CoreSystems/Events/WindowEvents.h"
 
 
 namespace Nebula
@@ -22,11 +22,11 @@ namespace Nebula
         const OrthographicCamera& GetCamera() const { return m_Camera; }
 
         void OnUpdate(Timestep ts);
-        void OnEvent(Event& e);
+        void OnEvent(Platform::Event& e);
 
     private:
-        bool OnMouseScrolled(const MouseScrolledEvent& e);
-        bool OnWindowResize(const WindowResizeEvent& e);
+        bool OnMouseScrolled(const Platform::MouseScrolledEvent& e);
+        bool OnWindowResize(const Platform::WindowResizedEvent& e);
 
     private:
         float m_aspectRatio;
@@ -49,11 +49,11 @@ namespace Nebula
         const PerspectiveCamera& GetCamera() const { return m_Camera; }
 
         void OnUpdate(Timestep ts);
-        void OnEvent(Event& e);
+        void OnEvent(Platform::Event& e);
 
     private:
-        bool OnMouseMoveEvent(const MouseMovedEvent& e);
-        bool OnWindowResize(const WindowResizeEvent& e);
+        bool OnMouseMoveEvent(const Platform::MouseMovedEvent& e);
+        bool OnWindowResize(const Platform::WindowResizedEvent& e);
 
     private:
         float m_aspectRatio = 16.0f/9.0f;
