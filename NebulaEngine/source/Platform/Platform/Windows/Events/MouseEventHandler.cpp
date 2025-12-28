@@ -29,6 +29,12 @@ namespace Nebula::Platform
         m_InputPointerSource.PointerEntered({ this, &MouseEventHandler::PointerEnteredHandler });
         m_InputPointerSource.PointerExited({ this, &MouseEventHandler::PointerExitedHandler });
 
+        if (m_Window->GetProperties().Style == WindowStyle::BorderlessInteractive)
+        {
+            //m_InputPointerSource.DirectManipulationHitTest({ this, &MouseEventHandler::HitTestHandler });
+            //m_InputPointerSource.ActivationBehavior(winrt::Microsoft::UI::Input::InputPointerActivationBehavior::Activate);
+        }
+
         if (m_Window->GetProperties().Style == WindowStyle::Default || m_Window->GetProperties().Style == WindowStyle::BorderlessInteractive)
         {
             m_InputNonClientPointerSource.PointerMoved({ this, &MouseEventHandler::NonClientPointerMovedHandler });
@@ -42,11 +48,11 @@ namespace Nebula::Platform
     {
         winrt::Microsoft::UI::Windowing::AppWindow* NativeWindow = static_cast<winrt::Microsoft::UI::Windowing::AppWindow*>(m_Window->GetNativeWindow());
 
-        args.Handled(true);
-
         MouseMovedEvent event = MouseMovedEvent(args.CurrentPoint().Position().X, args.CurrentPoint().Position().Y);
         event.WindowID = NativeWindow->Id().Value;
         m_EventCallback(event);
+
+        if (event.Handled) args.Handled(true);
     }
 
     void MouseEventHandler::PointerWheelChangedHandler(winrt::Microsoft::UI::Input::InputPointerSource pointer,
@@ -54,20 +60,20 @@ namespace Nebula::Platform
     {
         winrt::Microsoft::UI::Windowing::AppWindow* NativeWindow = static_cast<winrt::Microsoft::UI::Windowing::AppWindow*>(m_Window->GetNativeWindow());
 
-        args.Handled(true);
-
+        MouseScrolledEvent event = MouseScrolledEvent(0, 0);
         if (args.CurrentPoint().Properties().IsHorizontalMouseWheel())
         {
-            MouseScrolledEvent event = MouseScrolledEvent(0.f, args.CurrentPoint().Properties().MouseWheelDelta());
-            event.WindowID = NativeWindow->Id().Value;
-            m_EventCallback(event);
+            event = MouseScrolledEvent(0.f, args.CurrentPoint().Properties().MouseWheelDelta());
         }
         else
         {
-            MouseScrolledEvent event = MouseScrolledEvent(args.CurrentPoint().Properties().MouseWheelDelta(), 0.f);
-            event.WindowID = NativeWindow->Id().Value;
-            m_EventCallback(event);
+            event = MouseScrolledEvent(args.CurrentPoint().Properties().MouseWheelDelta(), 0.f);
         }
+        
+        event.WindowID = NativeWindow->Id().Value;
+        m_EventCallback(event);
+
+        if (event.Handled) args.Handled(true);
     }
 
     void MouseEventHandler::PointerPressedHandler(winrt::Microsoft::UI::Input::InputPointerSource pointer,
@@ -75,14 +81,13 @@ namespace Nebula::Platform
     {
         winrt::Microsoft::UI::Windowing::AppWindow* NativeWindow = static_cast<winrt::Microsoft::UI::Windowing::AppWindow*>(m_Window->GetNativeWindow());
 
-        args.Handled(true);
-
         if (args.CurrentPoint().Properties().IsLeftButtonPressed() && !m_CurrentState.Left)
         {
             MouseButtonPressedEvent event = MouseButtonPressedEvent(MouseButton::Left);
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.Left = true;
+            if (event.Handled) args.Handled(true);
         }
         if (args.CurrentPoint().Properties().IsRightButtonPressed() && !m_CurrentState.Right)
         {
@@ -90,6 +95,7 @@ namespace Nebula::Platform
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.Right = true;
+            if (event.Handled) args.Handled(true);
         }
         if (args.CurrentPoint().Properties().IsMiddleButtonPressed() && !m_CurrentState.Middle)
         {
@@ -97,6 +103,7 @@ namespace Nebula::Platform
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.Middle = true;
+            if (event.Handled) args.Handled(true);
         }
         if (args.CurrentPoint().Properties().IsXButton1Pressed() && !m_CurrentState.X1)
         {
@@ -104,6 +111,7 @@ namespace Nebula::Platform
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.X1 = true;
+            if (event.Handled) args.Handled(true);
         }
         if (args.CurrentPoint().Properties().IsXButton2Pressed() && !m_CurrentState.X2)
         {
@@ -111,6 +119,7 @@ namespace Nebula::Platform
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.X2 = true;
+            if (event.Handled) args.Handled(true);
         }
     }
 
@@ -119,14 +128,13 @@ namespace Nebula::Platform
     {
         winrt::Microsoft::UI::Windowing::AppWindow* NativeWindow = static_cast<winrt::Microsoft::UI::Windowing::AppWindow*>(m_Window->GetNativeWindow());
 
-        args.Handled(true);
-
         if (!args.CurrentPoint().Properties().IsLeftButtonPressed() && m_CurrentState.Left)
         {
             MouseButtonReleasedEvent event = MouseButtonReleasedEvent(MouseButton::Left);
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.Left = false;
+            if (event.Handled) args.Handled(true);
         }
         if (!args.CurrentPoint().Properties().IsRightButtonPressed() && m_CurrentState.Right)
         {
@@ -134,6 +142,7 @@ namespace Nebula::Platform
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.Right = false;
+            if (event.Handled) args.Handled(true);
         }
         if (!args.CurrentPoint().Properties().IsMiddleButtonPressed() && m_CurrentState.Middle)
         {
@@ -141,6 +150,7 @@ namespace Nebula::Platform
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.Middle = false;
+            if (event.Handled) args.Handled(true);
         }
         if (!args.CurrentPoint().Properties().IsXButton1Pressed() && m_CurrentState.X1)
         {
@@ -148,6 +158,7 @@ namespace Nebula::Platform
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.X1 = false;
+            if (event.Handled) args.Handled(true);
         }
         if (!args.CurrentPoint().Properties().IsXButton2Pressed() && m_CurrentState.X2)
         {
@@ -155,6 +166,7 @@ namespace Nebula::Platform
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
             m_CurrentState.X2 = false;
+            if (event.Handled) args.Handled(true);
         }
     }
 
@@ -163,11 +175,11 @@ namespace Nebula::Platform
     {
         winrt::Microsoft::UI::Windowing::AppWindow* NativeWindow = static_cast<winrt::Microsoft::UI::Windowing::AppWindow*>(m_Window->GetNativeWindow());
 
-        args.Handled(true);
-
         MouseEnteredEvent event = MouseEnteredEvent();
         event.WindowID = NativeWindow->Id().Value;
         m_EventCallback(event);
+
+        if (event.Handled) args.Handled(true);
     }
 
     void MouseEventHandler::PointerExitedHandler(winrt::Microsoft::UI::Input::InputPointerSource pointer,
@@ -175,11 +187,11 @@ namespace Nebula::Platform
     {
         winrt::Microsoft::UI::Windowing::AppWindow* NativeWindow = static_cast<winrt::Microsoft::UI::Windowing::AppWindow*>(m_Window->GetNativeWindow());
 
-        args.Handled(true);
-
         MouseLeftEvent event = MouseLeftEvent();
         event.WindowID = NativeWindow->Id().Value;
         m_EventCallback(event);
+
+        if (event.Handled) args.Handled(true);
     }
 
     void MouseEventHandler::NonClientPointerMovedHandler(
@@ -221,6 +233,18 @@ namespace Nebula::Platform
             MouseButtonReleasedEvent event = MouseButtonReleasedEvent(MouseButton::Left);
             event.WindowID = NativeWindow->Id().Value;
             m_EventCallback(event);
+        }
+    }
+
+    void MouseEventHandler::HitTestHandler(winrt::Microsoft::UI::Input::InputPointerSource pointer,
+        winrt::Microsoft::UI::Input::PointerEventArgs args)
+    {
+        if (m_WindowHitTest)
+        {
+            HitTest test = m_WindowHitTest(args.CurrentPoint().Position().X, args.CurrentPoint().Position().Y);
+
+            if (test == HitTest::Client) args.Handled(true);
+            else args.Handled(false);
         }
     }
 }

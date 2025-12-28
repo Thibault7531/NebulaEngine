@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <gtc/type_ptr.hpp>
 
+#include "imgui_internal.h"
 #include "Nebula.h"
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/Renderer/Buffers/Framebuffer.h"
@@ -34,84 +35,14 @@ namespace Nebula {
         {
             ImGuiIO& io = ImGui::GetIO();
 
-            auto [window_x, window_y] = Platform::WindowManager::Get().GetMainWindow()->GetPos();
-
-            io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-            if (y >= Platform::WindowManager::Get().GetMainWindow()->GetPos().second & y <= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + 5)
+            if (y <= Platform::WindowManager::Get().GetMainWindow()->GetTitlebarHeight())
             {
-                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5)
+                for (auto& button : m_TitleBarButtons)
                 {
-                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNWSE);
-                    Cursor.Show();
-                    m_MouseCursorChanged = true;
-                    return Platform::HitTest::ResizeTopLeft;
+                    if (x >= button.x && x <= button.z && y >= button.y && y <= button.w) return Platform::HitTest::Client;
                 }
-                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5)
-                {
-                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNS);
-                    Cursor.Show();
-                    m_MouseCursorChanged = true;
-                    return Platform::HitTest::ResizeTop;
-                }
-                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
-                {
-                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNESW);
-                    Cursor.Show();
-                    m_MouseCursorChanged = true;
-                    return Platform::HitTest::ResizeTopRight;
-                }
+                return Platform::HitTest::TitleBar;
             }
-            if (y >= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + 5 & y <= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5)
-            {
-                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5)
-                {
-                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeEW);
-                    Cursor.Show();
-                    m_MouseCursorChanged = true;
-                    return Platform::HitTest::ResizeLeft;
-                }
-                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
-                {
-                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeEW);
-                    Cursor.Show();
-                    m_MouseCursorChanged = true;
-                    return Platform::HitTest::ResizeRight;
-                }
-            }
-            if (y >= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y - 5 & y <= Platform::WindowManager::Get().GetMainWindow()->GetPos().second + io.DisplaySize.y)
-            {
-                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5)
-                {
-                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNESW);
-                    Cursor.Show();
-                    m_MouseCursorChanged = true;
-                    return Platform::HitTest::ResizeBottomLeft;
-                }
-                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5)
-                {
-                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNS);
-                    Cursor.Show();
-                    m_MouseCursorChanged = true;
-                    return Platform::HitTest::ResizeBottom;
-                }
-                if (x >= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x - 5 & x <= Platform::WindowManager::Get().GetMainWindow()->GetPos().first + io.DisplaySize.x)
-                {
-                    auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::ResizeNWSE);
-                    Cursor.Show();
-                    m_MouseCursorChanged = true;
-                    return Platform::HitTest::ResizeBottomRight;
-                }
-            }
-
-            io.ConfigFlags &= ~(ImGuiConfigFlags_NoMouseCursorChange);
-            if (m_MouseCursorChanged)
-            {
-                auto Cursor = Platform::Cursor(Platform::Cursor::CursorType::Arrow);
-                Cursor.Show();
-                m_MouseCursorChanged = false;
-            }
-
-            if (IsTitleBarHovered) return Platform::HitTest::TitleBar;
 
             return Platform::HitTest::Client;
         });
@@ -154,18 +85,21 @@ namespace Nebula {
 
     void EditorLayer::OnImGuiRender()
     {
+        m_TitleBarButtons = {};
+
         ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
         ImGuiIO& io = ImGui::GetIO();
         ImGuiStyle& style = ImGui::GetStyle();
         style.WindowMinSize.x = 400.0f;
 
+        int32_t height = Platform::WindowManager::Get().GetMainWindow()->GetTitlebarHeight();
+        height -= GImGui->FontSize;
+        height /= 2;
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0, static_cast<float>(height)});
         ImGui::BeginMainMenuBar();
         {
-            IsTitleBarHovered = ImGui::IsWindowHovered();
-
             ImGui::BeginMenu("NebulaEditor", false);
-            IsTitleBarHovered &= !ImGui::IsItemHovered();
 
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("New Scene", "Ctrl+N")) NewScene();
@@ -178,27 +112,29 @@ namespace Nebula {
 
                 ImGui::EndMenu();
             }
-            IsTitleBarHovered &= !ImGui::IsItemHovered();
+            auto [window_x, window_y] = Platform::WindowManager::Get().GetMainWindow()->GetClientPos();
+            glm::vec4 rect = {ImGui::GetItemRectMin().x - window_x, ImGui::GetItemRectMin().y - window_y, ImGui::GetItemRectMax().x - window_x, ImGui::GetItemRectMax().y - window_y};
+            m_TitleBarButtons.emplace_back(rect);
 
+#ifndef NB_PLATFORM_WINDOWS
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 68);
             if (ImGui::MenuItem("_"))
             {
                 Platform::WindowManager::Get().GetMainWindow()->Minimize();
             }
-            IsTitleBarHovered &= !ImGui::IsItemHovered();
 
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 42);
             if (ImGui::MenuItem("O")) {
                 if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) Platform::WindowManager::Get().GetMainWindow()->SetMaximized(false);
                 else Platform::WindowManager::Get().GetMainWindow()->SetMaximized(true);
             }
-            IsTitleBarHovered &= !ImGui::IsItemHovered();
 
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 16);
             if (ImGui::MenuItem("X")) Application::Get().Shutdown();
-            IsTitleBarHovered &= !ImGui::IsItemHovered();
+#endif
         }
         ImGui::EndMainMenuBar();
+        ImGui::PopStyleVar();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
         ImGui::Begin("Scene");
@@ -218,6 +154,12 @@ namespace Nebula {
         ImGui::PopStyleVar();
 
         m_SceneHierarchyPanel.OnImGuiRender();
+
+        if (IsFirstRender)
+        {
+            Platform::WindowManager::Get().GetMainWindow()->RecalculateHitTest();
+            IsFirstRender = false;
+        }
 
         // TODO: Add Standard Debug Window
     }
