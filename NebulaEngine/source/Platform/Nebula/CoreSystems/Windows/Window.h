@@ -73,6 +73,7 @@ namespace Nebula::Platform
         [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetSize() const = 0;
         virtual void SetSize(uint32_t width, uint32_t height) = 0;
         [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetClientSize() const = 0;
+        virtual void SetClientSize(uint32_t width, uint32_t height) = 0;
         [[nodiscard]] virtual std::pair<int32_t, int32_t> GetPos() const = 0;
         virtual void SetPos(int32_t x, int32_t y) = 0;
         [[nodiscard]] virtual std::pair<int32_t, int32_t> GetClientPos() const = 0;

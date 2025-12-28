@@ -71,7 +71,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
         // Setup display size (every frame to accommodate for window resizing)
-        auto [w, h] = platform_data.Window->GetSize();
+        auto [w, h] = platform_data.Window->GetClientSize();
         auto [display_w, display_h] = platform_data.Window->GetClientSize();
         if (platform_data.Window->IsMinimized()) w = h = 0;
         io.DisplaySize = ImVec2(static_cast<float>(w), static_cast<float>(h));
@@ -168,7 +168,7 @@ namespace Nebula
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             Ref<Platform::Window> window = Platform::WindowManager::Get().GetWindowFromID(event.WindowID);
-            auto [window_x, window_y] = window->GetPos();
+            auto [window_x, window_y] = window->GetClientPos();
             mouse_pos.x += window_x;
             mouse_pos.y += window_y;
         }
@@ -686,7 +686,7 @@ namespace Nebula
     ImVec2 ImGuiPlatform::GetWindowPos(ImGuiViewport* viewport)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        auto [x, y] = viewport_data->Window->GetPos();
+        auto [x, y] = viewport_data->Window->GetClientPos();
         return {static_cast<float>(x), static_cast<float>(y)};
     }
 
@@ -724,7 +724,7 @@ namespace Nebula
     void ImGuiPlatform::SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        viewport_data->Window->SetSize(size.x, size.y);
+        viewport_data->Window->SetClientSize(size.x, size.y);
     }
 
     void ImGuiPlatform::SetWindowTitle(ImGuiViewport* viewport, const char* title)

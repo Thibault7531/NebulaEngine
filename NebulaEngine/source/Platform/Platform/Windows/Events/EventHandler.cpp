@@ -3,6 +3,7 @@
 #include <CommCtrl.h>
 #include <locale>
 
+#include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Nebula/CoreSystems/Events/KeyEvent.h"
 #include "Platform/Nebula/CoreSystems/Events/MouseEvent.h"
 #include "Platform/Nebula/CoreSystems/Events/WindowEvents.h"
@@ -135,6 +136,16 @@ namespace Nebula::Platform
                     break;
                 }
 
+            case WM_NCCALCSIZE:
+                {
+                    if (wParam == TRUE && window->GetProperties().Style == WindowStyle::BorderlessFullscreen)
+                    {
+                        result = 0;
+                        CallSubclassWNDProc = false;
+                        break;
+                    }
+                }
+
             case WM_KEYDOWN:
             case WM_SYSKEYDOWN:
                 {
@@ -212,17 +223,7 @@ namespace Nebula::Platform
                         window->GetEventCallback()(event);
                     }
 
-                    MouseMovedEvent event{static_cast<float>(LOWORD(lParam)), static_cast<float>(HIWORD(lParam))};
-                    event.WindowID = window->GetID();
-                    window->GetEventCallback()(event);
-
-                    CallSubclassWNDProc = true;
-                    break;
-                }
-
-            case WM_NCMOUSEMOVE:
-                {
-                    MouseMovedEvent event{static_cast<float>(LOWORD(lParam)), static_cast<float>(HIWORD(lParam))};
+                    MouseMovedEvent event{static_cast<float>(GET_X_LPARAM(lParam)), static_cast<float>(GET_Y_LPARAM(lParam))};
                     event.WindowID = window->GetID();
                     window->GetEventCallback()(event);
 

@@ -5,9 +5,7 @@
 
 #include "Platform/Nebula/CoreSystems/Rendering/Context.h"
 #include "Platform/Nebula/CoreSystems/Windows/Window.h"
-#include "Platform/Platform/Windows/Events/KeyboardEventHandler.h"
-#include "Platform/Platform/Windows/Events/MouseEventHandler.h"
-#include "Platform/Platform/Windows/Events/WindowEventHandler.h"
+#include "Platform/Platform/Windows/Events/EventHandler.h"
 
 namespace Nebula::Platform
 {
@@ -30,6 +28,7 @@ namespace Nebula::Platform
         [[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetSize() const override;
         virtual void SetSize(uint32_t width, uint32_t height) override;
         [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetClientSize() const override;
+        virtual void SetClientSize(uint32_t width, uint32_t height) override;
         [[nodiscard]] virtual std::pair<int32_t, int32_t> GetPos() const override;
         virtual void SetPos(int32_t x, int32_t y) override;
         [[nodiscard]] virtual std::pair<int32_t, int32_t> GetClientPos() const override;
