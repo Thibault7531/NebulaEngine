@@ -2,6 +2,10 @@
 
 #include <stdint.h>
 #include <Windows.h>
+#include <windowsx.h>
+
+#undef IsMaximized
+#undef IsMinimized
 
 #include "Platform/Nebula/CoreSystems/Windows/Window.h"
 

@@ -1,14 +1,11 @@
 #include "WindowsWindow.h"
 
-#include <Windows.h>
 #include <CommCtrl.h>
+#include <Windows.h>
 #include <windows.ui.interop.h>
 #include <winrt/Microsoft.UI.Dispatching.h>
 #include <winrt/Windows.Foundation.Collections.h>
 
-#include "../../../../../vendor/imgui/imgui.h"
-#include "../Events/EventHandler.h"
-#include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Platform/Windows/Rendering/OpenGLContext.h"
 
 namespace Nebula::Platform
@@ -57,10 +54,7 @@ namespace Nebula::Platform
         m_Window.TitleBar().PreferredTheme(winrt::Microsoft::UI::Windowing::TitleBarTheme::UseDefaultAppMode);
         if (m_Properties.x != -INT_MAX && m_Properties.y != -INT_MAX) m_Window.Move({m_Properties.x, m_Properties.y});
 
-        winrt::Windows::Graphics::SizeInt32 size;
-        size.Width = m_Properties.Width;
-        size.Height = m_Properties.Height;
-        m_Window.ResizeClient(size);
+        GetWindowFromWindowId({m_Window.Id().Value}, &m_Hwnd);
 
         switch (m_Properties.Style)
         {
@@ -70,13 +64,32 @@ namespace Nebula::Platform
                 m_Window.TitleBar().ButtonBackgroundColor(winrt::Microsoft::UI::Colors::Transparent());
                 m_Window.TitleBar().ButtonHoverBackgroundColor(winrt::Microsoft::UI::ColorHelper::FromArgb(50, 0, 0, 0));
 
+                winrt::Windows::Graphics::SizeInt32 size;
+                size.Width = m_Properties.Width;
+                size.Height = m_Properties.Height;
+                m_Window.ResizeClient(size);
+
                 break;
             }
 
-        default: break;
-        }
+        case WindowStyle::BorderlessFullscreen:
+            {
+                winrt::Windows::Graphics::SizeInt32 size;
+                size.Width = m_Properties.Width;
+                size.Height = m_Properties.Height;
+                m_Window.Resize(size);
+                break;
+            }
 
-        GetWindowFromWindowId({m_Window.Id().Value}, &m_Hwnd);
+        default:
+            {
+                winrt::Windows::Graphics::SizeInt32 size;
+                size.Width = m_Properties.Width;
+                size.Height = m_Properties.Height;
+                m_Window.ResizeClient(size);
+                break;
+            }
+        }
 
         SetWindowSubclass(m_Hwnd, EventHandler::SubclassProc, 0, reinterpret_cast<DWORD_PTR>(this));
 
@@ -145,13 +158,19 @@ namespace Nebula::Platform
 
     void WindowsWindow::SetSize(uint32_t width, uint32_t height)
     {
-        m_Window.ResizeClient({static_cast<int32_t>(width), static_cast<int32_t>(height)});
+        m_Window.Resize({static_cast<int32_t>(width), static_cast<int32_t>(height)});
     }
 
     std::pair<uint32_t, uint32_t> WindowsWindow::GetClientSize() const
     {
         auto size = m_Window.ClientSize();
         return {size.Width, size.Height};
+    }
+
+    void WindowsWindow::SetClientSize(uint32_t width, uint32_t height)
+    {
+        if (GetProperties().Style == WindowStyle::BorderlessFullscreen) m_Window.Resize({static_cast<int32_t>(width), static_cast<int32_t>(height)});
+        else m_Window.ResizeClient({static_cast<int32_t>(width), static_cast<int32_t>(height)});
     }
 
     std::pair<int32_t, int32_t> WindowsWindow::GetPos() const
