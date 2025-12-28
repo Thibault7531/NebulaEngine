@@ -72,7 +72,7 @@ namespace Nebula
         NB_PROFILE_FUNCTION();
         // Setup display size (every frame to accommodate for window resizing)
         auto [w, h] = platform_data.Window->GetSize();
-        auto [display_w, display_h] = platform_data.Window->GetPixelSize();
+        auto [display_w, display_h] = platform_data.Window->GetClientSize();
         if (platform_data.Window->IsMinimized()) w = h = 0;
         io.DisplaySize = ImVec2(static_cast<float>(w), static_cast<float>(h));
         if (w > 0 && h > 0) io.DisplayFramebufferScale = ImVec2(static_cast<float>(display_w) / w, static_cast<float>(display_h) / h);
@@ -391,7 +391,7 @@ namespace Nebula
             if (platform_data.MouseButtonsDown == 0)
             {
                 auto [mouse_x, mouse_y] = Platform::Input::GetMousePosition();
-                auto [window_x, window_y] = focused_window->GetPos();
+                auto [window_x, window_y] = focused_window->GetClientPos();
                 if (!(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable))
                 {
                     mouse_x -= window_x;
@@ -699,7 +699,7 @@ namespace Nebula
     ImVec2 ImGuiPlatform::GetWindowSize(ImGuiViewport* viewport)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        auto [w, h] = viewport_data->Window->GetPixelSize();
+        auto [w, h] = viewport_data->Window->GetClientSize();
         return {static_cast<float>(w), static_cast<float>(h)};
     }
 

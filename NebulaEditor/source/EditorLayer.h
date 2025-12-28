@@ -45,7 +45,8 @@ namespace Nebula {
         // Panels
         SceneHierarchyPanel m_SceneHierarchyPanel;
 
-        bool IsTitleBarHovered = false;
+        bool IsFirstRender = true;
+        std::vector<glm::vec4> m_TitleBarButtons{};
     };
 
 }

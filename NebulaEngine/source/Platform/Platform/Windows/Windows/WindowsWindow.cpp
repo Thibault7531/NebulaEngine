@@ -1,17 +1,18 @@
 #include "WindowsWindow.h"
 
 #include <Windows.h>
+#include <CommCtrl.h>
 #include <windows.ui.interop.h>
 #include <winrt/Microsoft.UI.Dispatching.h>
+#include <winrt/Windows.Foundation.Collections.h>
 
 #include "../../../../../vendor/imgui/imgui.h"
+#include "../Events/EventHandler.h"
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Platform/Windows/Rendering/OpenGLContext.h"
 
 namespace Nebula::Platform
 {
-    winrt::Microsoft::UI::Dispatching::DispatcherQueueController WindowsWindow::s_DispatcherQueueController{nullptr};
-    bool WindowsWindow::s_DispatcherQueueControllerInitialized = false;
 
     WindowsWindow::WindowsWindow(const WindowProperties& props)
         : m_Window{nullptr}
@@ -75,24 +76,11 @@ namespace Nebula::Platform
         default: break;
         }
 
-        m_Window.Show(true);
         GetWindowFromWindowId({m_Window.Id().Value}, &m_Hwnd);
 
-        if (!s_DispatcherQueueControllerInitialized)
-        {
-            s_DispatcherQueueController = winrt::Microsoft::UI::Dispatching::DispatcherQueueController::CreateOnCurrentThread();
-            s_DispatcherQueueControllerInitialized = true;
-        }
-        m_Window.AssociateWithDispatcherQueue(s_DispatcherQueueController.DispatcherQueue());
-        //m_DispatcherQueueController.DispatcherQueue().EnqueueEventLoopExit();
-        //m_DispatcherQueueController.DispatcherQueue().RunEventLoop();
+        SetWindowSubclass(m_Hwnd, EventHandler::SubclassProc, 0, reinterpret_cast<DWORD_PTR>(this));
 
-        m_WindowEventHandler = CreateRef<WindowEventHandler>(this);
-        m_WindowEventHandler->InitEventHandlers();
-        m_MouseEventHandler = CreateRef<MouseEventHandler>(this);
-        m_MouseEventHandler->InitEventHandlers();
-        m_KeyboardEventHandler = CreateRef<KeyboardEventHandler>(this);
-        m_KeyboardEventHandler->InitEventHandlers();
+        m_Window.Show(true);
 
         m_Context = CreateRef<OpenGlContext>(this);
         m_Context->Init();
@@ -100,26 +88,36 @@ namespace Nebula::Platform
 
     WindowsWindow::~WindowsWindow()
     {
-        //m_DispatcherQueueController.ShutdownQueue();
-        //s_DispatcherQueueController.DispatcherQueue().EnqueueEventLoopExit();
-        //s_DispatcherQueueController.DispatcherQueue().RunEventLoop();
         m_Context.reset();
         m_Window.Destroy();
-        m_KeyboardEventHandler.reset();
-        m_MouseEventHandler.reset();
-        m_WindowEventHandler.reset();
     }
 
     void WindowsWindow::SetEventCallback(const std::function<void(Event&)>& callback)
     {
-        m_WindowEventHandler->SetEventCallback(callback);
-        m_MouseEventHandler->SetEventCallback(callback);
-        m_KeyboardEventHandler->SetEventCallback(callback);
+        m_EventCallback = callback;
+    }
+
+    const std::function<void(Event&)>& WindowsWindow::GetEventCallback()
+    {
+        return m_EventCallback;
     }
 
     void WindowsWindow::SetWindowHitTest(const std::function<HitTest(int32_t, int32_t)>& func)
     {
-        // NOT SUPPORTED BY WINDOWS APP SDK (yet?)
+        m_WindowHitTest = func;
+        RecalculateHitTest();
+    }
+
+    void WindowsWindow::RecalculateHitTest()
+    {
+        std::vector<winrt::Windows::Graphics::RectInt32> dragRects = FindDragRectsFromHitTest();
+
+        m_Window.TitleBar().SetDragRectangles(dragRects);
+    }
+
+    const std::function<HitTest(int32_t, int32_t)>& WindowsWindow::GetWindowHitTest()
+    {
+        return m_WindowHitTest;
     }
 
     void WindowsWindow::OnUpdate()
@@ -132,8 +130,6 @@ namespace Nebula::Platform
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        //m_DispatcherQueueController.DispatcherQueue().EnqueueEventLoopExit();
-        //m_DispatcherQueueController.DispatcherQueue().RunEventLoop();
     }
 
     void WindowsWindow::SwapBuffers()
@@ -152,7 +148,7 @@ namespace Nebula::Platform
         m_Window.ResizeClient({static_cast<int32_t>(width), static_cast<int32_t>(height)});
     }
 
-    std::pair<uint32_t, uint32_t> WindowsWindow::GetPixelSize() const
+    std::pair<uint32_t, uint32_t> WindowsWindow::GetClientSize() const
     {
         auto size = m_Window.ClientSize();
         return {size.Width, size.Height};
@@ -167,6 +163,20 @@ namespace Nebula::Platform
     void WindowsWindow::SetPos(int32_t x, int32_t y)
     {
         m_Window.Move({x, y});
+    }
+
+    std::pair<int32_t, int32_t> WindowsWindow::GetClientPos() const
+    {
+        RECT rect;
+        GetClientRect(m_Hwnd, &rect);
+        //ClientToScreen(m_Hwnd, reinterpret_cast<LPPOINT>(&rect));
+        MapWindowPoints(m_Hwnd, nullptr, reinterpret_cast<LPPOINT>(&rect), 2);
+        return {rect.left, rect.top};
+    }
+
+    int32_t WindowsWindow::GetTitlebarHeight() const
+    {
+        return m_Window.TitleBar().Height();
     }
 
     void WindowsWindow::SetMousePos(int32_t x, int32_t y) const
@@ -319,5 +329,72 @@ namespace Nebula::Platform
     uint32_t WindowsWindow::GetID() const
     {
         return m_Window.Id().Value;
+    }
+
+    std::vector<winrt::Windows::Graphics::RectInt32> WindowsWindow::FindDragRectsFromHitTest()
+    {
+        struct span
+        {
+            int32_t x_start, x_end;
+            bool merged;
+        };
+        std::vector<winrt::Windows::Graphics::RectInt32> finalRects;
+        std::vector<winrt::Windows::Graphics::RectInt32> activeRects;
+        int32_t width = GetClientSize().first;
+        int32_t height = GetTitlebarHeight();
+
+        for (int32_t y = 0; y < height; y++)
+        {
+            std::vector<span> rowSpans;
+
+            for (int32_t x = 0; x < width; x++)
+            {
+                if (m_WindowHitTest(x, y) == HitTest::TitleBar)
+                {
+                    int32_t x_start = x;
+                    while (x < width && m_WindowHitTest(x, y) == HitTest::TitleBar) x++;
+                    rowSpans.push_back({x_start, x-1, false});
+                }
+            }
+
+            std::vector<winrt::Windows::Graphics::RectInt32> nextActiveRects;
+
+            for (auto& rect : activeRects)
+            {
+                bool foundMatch = false;
+                for (auto& span : rowSpans)
+                {
+                    if (!span.merged && span.x_start == rect.X && (span.x_end - span.x_start + 1) == rect.Width)
+                    {
+                        rect.Height++;
+                        span.merged = true;
+                        nextActiveRects.push_back(rect);
+                        foundMatch = true;
+                        break;
+                    }
+                }
+
+                if (!foundMatch) finalRects.push_back(rect);
+            }
+
+            for (const auto& span : rowSpans)
+            {
+                if (!span.merged)
+                {
+                    nextActiveRects.push_back({
+                        span.x_start,
+                        y,
+                        span.x_end - span.x_start + 1,
+                        1
+                    });
+                }
+            }
+
+            activeRects = nextActiveRects;
+        }
+
+        finalRects.insert(finalRects.end(), activeRects.begin(), activeRects.end());
+
+        return finalRects;
     }
 }

@@ -46,6 +46,13 @@ namespace Nebula::Platform
         SetCursorPos(x, y);
     }
 
+    std::pair<float, float> Mouse::GetMousePos()
+    {
+        POINT pos;
+        GetCursorPos(&pos);
+        return { pos.x, pos.y };
+    }
+
     Cursor::Cursor(CursorType type)
     {
         switch (type)

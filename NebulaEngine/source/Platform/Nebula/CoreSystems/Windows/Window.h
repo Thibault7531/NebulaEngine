@@ -51,6 +51,9 @@ namespace Nebula::Platform
         bool isResizable = true;
         bool AlwaysOnTop = false;
         bool isUtility = false;
+
+        // Don't change
+        bool isMouseHovering = false;
     };
 
     class Window
@@ -59,16 +62,21 @@ namespace Nebula::Platform
         virtual ~Window() = default;
 
         virtual void SetEventCallback(const std::function<void(Event &)>& func) = 0;
+        virtual const std::function<void(Event&)>& GetEventCallback() = 0;
         virtual void SetWindowHitTest(const std::function<HitTest(int32_t, int32_t)>& func) = 0;
+        virtual void RecalculateHitTest() = 0;
+        virtual const std::function<HitTest(int32_t, int32_t)>& GetWindowHitTest() = 0;
 
         virtual void OnUpdate() = 0;
         virtual void SwapBuffers() = 0;
 
         [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetSize() const = 0;
         virtual void SetSize(uint32_t width, uint32_t height) = 0;
-        [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetPixelSize() const = 0;
+        [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetClientSize() const = 0;
         [[nodiscard]] virtual std::pair<int32_t, int32_t> GetPos() const = 0;
         virtual void SetPos(int32_t x, int32_t y) = 0;
+        [[nodiscard]] virtual std::pair<int32_t, int32_t> GetClientPos() const = 0;
+        [[nodiscard]] virtual int32_t GetTitlebarHeight() const = 0;
 
         virtual void SetMousePos(int32_t x, int32_t y) const = 0;
         virtual void CaptureMouse(bool enabled) = 0;

@@ -19,16 +19,21 @@ namespace Nebula::Platform
         virtual ~WindowsWindow();
 
         virtual void SetEventCallback(const std::function<void(Event&)>& func) override;
+        virtual const std::function<void(Event&)>& GetEventCallback() override;
         virtual void SetWindowHitTest(const std::function<HitTest(int32_t, int32_t)>& func) override;
+        virtual void RecalculateHitTest() override;
+        virtual const std::function<HitTest(int32_t, int32_t)>& GetWindowHitTest() override;
 
         virtual void OnUpdate() override;
         virtual void SwapBuffers() override;
 
         [[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetSize() const override;
         virtual void SetSize(uint32_t width, uint32_t height) override;
-        [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetPixelSize() const override;
+        [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetClientSize() const override;
         [[nodiscard]] virtual std::pair<int32_t, int32_t> GetPos() const override;
         virtual void SetPos(int32_t x, int32_t y) override;
+        [[nodiscard]] virtual std::pair<int32_t, int32_t> GetClientPos() const override;
+        [[nodiscard]] virtual int32_t GetTitlebarHeight() const override;
 
         virtual void SetMousePos(int32_t x, int32_t y) const override;
         virtual void CaptureMouse(bool enabled) override;
@@ -60,17 +65,16 @@ namespace Nebula::Platform
         virtual uint32_t GetID() const override;
 
     private:
+        std::vector<winrt::Windows::Graphics::RectInt32> FindDragRectsFromHitTest();
+
+    private:
         winrt::Microsoft::UI::Windowing::AppWindow m_Window;
         HWND m_Hwnd;
 
         Ref<Context> m_Context;
 
-        Ref<WindowEventHandler> m_WindowEventHandler;
-        Ref<MouseEventHandler> m_MouseEventHandler;
-        Ref<KeyboardEventHandler> m_KeyboardEventHandler;
-
-        static bool s_DispatcherQueueControllerInitialized;
-        static winrt::Microsoft::UI::Dispatching::DispatcherQueueController s_DispatcherQueueController;
+        std::function<void(Event&)> m_EventCallback;
+        std::function<HitTest(int32_t, int32_t)> m_WindowHitTest;
     };
 
 }
