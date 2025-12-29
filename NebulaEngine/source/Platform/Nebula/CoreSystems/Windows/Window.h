@@ -54,6 +54,7 @@ namespace Nebula::Platform
 
         // Don't change
         bool isMouseHovering = false;
+        bool isCursorChanged = false;
     };
 
     class Window

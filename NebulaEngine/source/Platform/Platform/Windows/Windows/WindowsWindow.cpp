@@ -352,6 +352,8 @@ namespace Nebula::Platform
 
     std::vector<winrt::Windows::Graphics::RectInt32> WindowsWindow::FindDragRectsFromHitTest()
     {
+        if (!m_WindowHitTest) return {};
+
         struct span
         {
             int32_t x_start, x_end;
