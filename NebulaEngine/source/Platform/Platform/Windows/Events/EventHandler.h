@@ -7,6 +7,7 @@
 #undef IsMaximized
 #undef IsMinimized
 
+#include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
 #include "Platform/Nebula/CoreSystems/Windows/Window.h"
 
 namespace Nebula::Platform
@@ -19,6 +20,7 @@ namespace Nebula::Platform
 
     public:
         static int32_t ConvertHitTestResult(HitTest hittest);
+        static KeyboardKey GetNebulaKeycodeFromNativeKeycode(int32_t keycode);
     };
 
 }
