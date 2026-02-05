@@ -5,15 +5,6 @@
 cmake_minimum_required(VERSION 4.1.2)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Project Specification
-project(NebulaEngine LANGUAGES CXX C VERSION 0.0)
-set(CMAKE_CXX_STANDARD 23)
-
-
-# Multi-config Generators
-set(CMAKE_CONFIGURATION_TYPES Debug Release Dist)
-
-
 # Platforms
 if (WIN32)
     set(nebula_cmake_platform Windows)
@@ -26,26 +17,49 @@ elseif (APPLE)
         message(WARNING "Unknown Apple platform: \"${CMAKE_SYSTEM_NAME}\"")
     endif()
 elseif (LINUX)
+    set(CMAKE_HAVE_THREADS_LIBRARY 1)
+    set(CMAKE_USE_PTHREADS_INIT 1)
+    set(CMAKE_THREAD_LIBS_INIT "-pthread")
     set(nebula_cmake_platform Linux)
 elseif (ANDROID)
     set(nebula_cmake_platform Android)
 endif ()
 
+# Project Specification
+project(NebulaEngine LANGUAGES CXX C VERSION 0.0)
+set(CMAKE_CXX_STANDARD 23)
+
+
+# Multi-config Generators
+set(CMAKE_CONFIGURATION_TYPES Debug Release Dist)
+
 
 # Compiler arguments
-set(CMAKE_C_FLAGS "/std:c11")
-set(CMAKE_C_FLAGS_DEBUG "/EHsc /Od /Zi")
-set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG")
-set(CMAKE_C_FLAGS_DIST "/O2 /Ob2 /DNDEBUG")
+if (nebula_cmake_platform STREQUAL "Windows")
+    set(CMAKE_C_FLAGS "/std:c11")
+    set(CMAKE_C_FLAGS_DEBUG "/EHsc /Od /Zi")
+    set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG")
+    set(CMAKE_C_FLAGS_DIST "/O2 /Ob2 /DNDEBUG")
 
-set(CMAKE_CXX_FLAGS "")
-set(CMAKE_CXX_FLAGS_DEBUG "/EHsc /Od /Zi")
-set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG /EHsc")
-set(CMAKE_CXX_FLAGS_DIST "/O2 /Ob2 /DNDEBUG /EHsc")
+    set(CMAKE_CXX_FLAGS "")
+    set(CMAKE_CXX_FLAGS_DEBUG "/EHsc /Od /Zi")
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG /EHsc")
+    set(CMAKE_CXX_FLAGS_DIST "/O2 /Ob2 /DNDEBUG /EHsc")
 
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG:FULL")
-set(CMAKE_EXE_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
-set(CMAKE_SHARED_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG:FULL")
+    set(CMAKE_EXE_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
+    set(CMAKE_SHARED_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
+else ()
+    set(CMAKE_C_FLAGS "-std=c11")
+    set(CMAKE_C_FLAGS_DEBUG "-O0 -g")
+    set(CMAKE_C_FLAGS_RELEASE "-O2")
+    set(CMAKE_C_FLAGS_DIST "-O3")
+
+    set(CMAKE_CXX_FLAGS "")
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+    set(CMAKE_CXX_FLAGS_DIST "-O3")
+endif ()
 
 
 # Targets

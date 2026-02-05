@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 enum class MouseButton
 {
     Unknown = 0,

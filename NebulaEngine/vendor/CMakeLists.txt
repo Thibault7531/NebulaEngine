@@ -10,11 +10,13 @@ add_subdirectory(entt)
 
 # GLAD
 
-add_library(GLAD STATIC Glad/src/glad.c Glad/include/glad/glad.h Glad/include/KHR/khrplatform.h)
-add_library(GLAD_WGL STATIC Glad/src/glad_wgl.c Glad/include/glad/glad_wgl.h Glad/include/KHR/khrplatform.h)
+add_library(GLAD STATIC Glad/src/gl.c Glad/include/glad/gl.h Glad/include/KHR/khrplatform.h)
+add_library(GLAD_WGL STATIC Glad/src/wgl.c Glad/include/glad/wgl.h Glad/include/KHR/khrplatform.h)
+add_library(GLAD_EGL STATIC Glad/src/egl.c Glad/include/EGL/eglplatform.h Glad/include/glad/egl.h Glad/include/KHR/khrplatform.h)
 
 target_include_directories(GLAD PUBLIC Glad/include)
 target_include_directories(GLAD_WGL PUBLIC Glad/include)
+target_include_directories(GLAD_EGL PUBLIC Glad/include)
 
 if (MSVC)
     if (CMAKE_BUILD_TYPE EQUAL "Debug")
