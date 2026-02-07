@@ -241,7 +241,7 @@ namespace Nebula
     {
         if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
-        platform_data.MousePendingLeaveFrame = ImGui::GetFrameCount();
+        if (platform_data.MouseWindowID == event.WindowID) platform_data.MousePendingLeaveFrame = ImGui::GetFrameCount();
 
         return false;
     }
@@ -374,7 +374,7 @@ namespace Nebula
 
         // We forward mouse input when hovered or captured (via SDL_EVENT_MOUSE_MOTION) or when focused (below)
         // SDL_CaptureMouse() let the OS know e.g. that our imgui drag outside the SDL window boundaries shouldn't e.g. trigger other operations outside
-        Ref<Platform::Window> focused_window = Platform::WindowManager::Get().GetWindowFromHandle((HWND)Platform::WindowUtils::GetForegroundWindow());
+        Ref<Platform::Window> focused_window = Platform::WindowManager::Get().GetWindowFromHandle(Platform::WindowUtils::GetForegroundWindow());
         if (focused_window) focused_window->CaptureMouse(platform_data.MouseButtonsDown != 0);
 
 
