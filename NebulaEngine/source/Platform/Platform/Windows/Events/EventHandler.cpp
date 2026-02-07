@@ -241,50 +241,53 @@ namespace Nebula::Platform
                 {
                     MouseMovedEvent event{static_cast<float>(GET_X_LPARAM(lParam)) - window->GetClientPos().first, static_cast<float>(GET_Y_LPARAM(lParam)) - window->GetClientPos().second};
 
-                    if (event.GetX() < 4.f && event.GetY() < 9.f)
+                    if (window->GetProperties().Style == WindowStyle::BorderlessInteractive)
                     {
-                        SetCursor(LoadCursor(nullptr, IDC_SIZENWSE));
-                        window->GetProperties().isCursorChanged = true;
-                    }
-                    else if (event.GetX() < 0.f && event.GetY() <= window->GetClientSize().second)
-                    {
-                        SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
-                        window->GetProperties().isCursorChanged = true;
-                    }
-                    else if (event.GetX() < 10.f && event.GetY() > window->GetClientSize().second)
-                    {
-                        SetCursor(LoadCursor(nullptr, IDC_SIZENESW));
-                        window->GetProperties().isCursorChanged = true;
-                    }
-                    else if (event.GetX() >= 0.f && event.GetX() <= window->GetClientSize().first && event.GetY() < 4.f)
-                    {
-                        SetCursor(LoadCursor(nullptr, IDC_SIZENS));
-                        window->GetProperties().isCursorChanged = true;
-                    }
-                    else if (event.GetX() >= 0.f && event.GetX() <= window->GetClientSize().first && event.GetY() >= window->GetClientSize().second)
-                    {
-                        SetCursor(LoadCursor(nullptr, IDC_SIZENS));
-                        window->GetProperties().isCursorChanged = true;
-                    }
-                    else if (event.GetX() >= window->GetClientSize().first && event.GetY() < 9.f)
-                    {
-                        SetCursor(LoadCursor(nullptr, IDC_SIZENESW));
-                        window->GetProperties().isCursorChanged = true;
-                    }
-                    else if (event.GetX() >= window->GetClientSize().first && event.GetY() <= window->GetClientSize().second)
-                    {
-                        SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
-                        window->GetProperties().isCursorChanged = true;
-                    }
-                    else if (event.GetX() >= window->GetClientSize().first && event.GetY() >= window->GetClientSize().second)
-                    {
-                        SetCursor(LoadCursor(nullptr, IDC_SIZENWSE));
-                        window->GetProperties().isCursorChanged = true;
-                    }
-                    else
-                    {
-                        SetCursor(LoadCursor(nullptr, IDC_ARROW));
-                        window->GetProperties().isCursorChanged = false;
+                        if (event.GetX() < 4.f && event.GetY() < 9.f)
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_SIZENWSE));
+                            window->GetProperties().isCursorChanged = true;
+                        }
+                        else if (event.GetX() < 0.f && event.GetY() <= window->GetClientSize().second)
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
+                            window->GetProperties().isCursorChanged = true;
+                        }
+                        else if (event.GetX() < 10.f && event.GetY() > window->GetClientSize().second)
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_SIZENESW));
+                            window->GetProperties().isCursorChanged = true;
+                        }
+                        else if (event.GetX() >= 0.f && event.GetX() <= window->GetClientSize().first && event.GetY() < 4.f)
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_SIZENS));
+                            window->GetProperties().isCursorChanged = true;
+                        }
+                        else if (event.GetX() >= 0.f && event.GetX() <= window->GetClientSize().first && event.GetY() >= window->GetClientSize().second)
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_SIZENS));
+                            window->GetProperties().isCursorChanged = true;
+                        }
+                        else if (event.GetX() >= window->GetClientSize().first && event.GetY() < 9.f)
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_SIZENESW));
+                            window->GetProperties().isCursorChanged = true;
+                        }
+                        else if (event.GetX() >= window->GetClientSize().first && event.GetY() <= window->GetClientSize().second)
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_SIZEWE));
+                            window->GetProperties().isCursorChanged = true;
+                        }
+                        else if (event.GetX() >= window->GetClientSize().first && event.GetY() >= window->GetClientSize().second)
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_SIZENWSE));
+                            window->GetProperties().isCursorChanged = true;
+                        }
+                        else
+                        {
+                            SetCursor(LoadCursor(nullptr, IDC_ARROW));
+                            window->GetProperties().isCursorChanged = false;
+                        }
                     }
 
                     CallSubclassWNDProc = true;
@@ -293,7 +296,7 @@ namespace Nebula::Platform
 
             case WM_MOUSEHWHEEL:
                 {
-                    MouseScrolledEvent event{0.f, static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA};
+                    MouseScrolledEvent event{static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA, 0.f};
                     event.WindowID = window->GetID();
                     window->GetEventCallback()(event);
 
@@ -303,7 +306,7 @@ namespace Nebula::Platform
 
             case WM_MOUSEWHEEL:
                 {
-                    MouseScrolledEvent event{static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA, 0.f};
+                    MouseScrolledEvent event{0.f, static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA};
                     event.WindowID = window->GetID();
                     window->GetEventCallback()(event);
 

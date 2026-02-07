@@ -99,7 +99,6 @@ void Sandbox2D::OnUpdate(Nebula::Timestep ts)
         Nebula::Renderer2D::BeginScene(m_CameraController.GetCamera());
         for (int x = 0; x < 100; x++) {
             for (int y = 0; y < 100; y++) {
-                NB_PROFILE_SCOPE("LOOP");
                 Nebula::Renderer2D::DrawQuad({ .position = {x, y, 0.0f}, .texture = m_Dirt});
             }
         }
@@ -125,7 +124,7 @@ void Sandbox2D::OnImGuiRender()
 
 }
 
-void Sandbox2D::OnEvent(Nebula::Event& e)
+void Sandbox2D::OnEvent(Nebula::Platform::Event& e)
 {
     NB_PROFILE_FUNCTION();
 

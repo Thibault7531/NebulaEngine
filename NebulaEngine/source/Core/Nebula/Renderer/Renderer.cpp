@@ -34,6 +34,11 @@ namespace Nebula {
 		m_SceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
 	}
 
+	void Renderer::BeginScene(const OrthographicCamera& camera)
+	{
+		m_SceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
+	}
+
 	void Renderer::EndScene()
 	{
 	}

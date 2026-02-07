@@ -34,6 +34,8 @@ endif ()
 target_link_libraries(TestGame PUBLIC Nebula)
 target_include_directories(TestGame PRIVATE
         ../NebulaEngine/source
+        ../NebulaEngine/source/Core
+        ../NebulaEngine/source/Platform
         ../NebulaEngine/vendor/spdlog/include
         ../NebulaEngine/vendor/SDL3/include/SDL3
         ../NebulaEngine/vendor/SDL3/include
@@ -43,3 +45,12 @@ target_include_directories(TestGame PRIVATE
         ../NebulaEngine/vendor/glm
         ../NebulaEngine/vendor/glm/glm
 )
+
+if (nebula_cmake_platform STREQUAL Windows)
+    add_custom_command(
+            TARGET TestGame
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy "${CMAKE_SOURCE_DIR}/NebulaEngine/vendor/winrt/Microsoft.WindowsAppRuntime.Bootstrap.dll" "$<TARGET_FILE_DIR:TestGame>/Microsoft.WindowsAppRuntime.Bootstrap.dll"
+    )
+endif ()

@@ -2,6 +2,7 @@
 
 #include "OrthographicCamera.h"
 #include "Platform/Nebula/CoreSystems/Input/Input.h"
+#include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula
 {
@@ -86,26 +87,31 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
+        m_LastFrameTime = ts;
+
+        glm::vec3 cameraPos = m_Camera.getPosition();
+        glm::vec3 cameraRotation = m_Camera.GetRotation();
+
         if (Platform::Input::IsKeyPressed(KeyboardKey::Z)) {
-            m_CameraPosition += glm::vec3(2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts, 0.0f, 2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts);
+            cameraPos += glm::vec3(2.0f * glm::cos(glm::radians(cameraRotation.y)) * ts, 0.0f, 2.0f * glm::sin(glm::radians(cameraRotation.y)) * ts);
         }
         if (Platform::Input::IsKeyPressed(KeyboardKey::S)) {
-            m_CameraPosition += glm::vec3(-2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts, 0.0f, -2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts);
+            cameraPos += glm::vec3(-2.0f * glm::cos(glm::radians(cameraRotation.y)) * ts, 0.0f, -2.0f * glm::sin(glm::radians(cameraRotation.y)) * ts);
         }
         if (Platform::Input::IsKeyPressed(KeyboardKey::D)) {
-            m_CameraPosition += glm::vec3(-2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts, 0.0f, 2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts);
+            cameraPos += glm::vec3(-2.0f * glm::sin(glm::radians(cameraRotation.y)) * ts, 0.0f, 2.0f * glm::cos(glm::radians(cameraRotation.y)) * ts);
         }
         if (Platform::Input::IsKeyPressed(KeyboardKey::Q)) {
-            m_CameraPosition += glm::vec3(2.0f * glm::sin(glm::radians(m_cameraRotation.y)) * ts, 0.0f, -2.0f * glm::cos(glm::radians(m_cameraRotation.y)) * ts);
+            cameraPos += glm::vec3(2.0f * glm::sin(glm::radians(cameraRotation.y)) * ts, 0.0f, -2.0f * glm::cos(glm::radians(cameraRotation.y)) * ts);
         }
         if (Platform::Input::IsKeyPressed(KeyboardKey::Space)) {
-            m_CameraPosition += glm::vec3(0.0f, 2.0f * ts, 0.0f);
+            cameraPos += glm::vec3(0.0f, 2.0f * ts, 0.0f);
         }
         if (Platform::Input::IsKeyPressed(KeyboardKey::LeftShift)) {
-            m_CameraPosition += glm::vec3(0.0f, -2.0f * ts, 0.0f);
+            cameraPos += glm::vec3(0.0f, -2.0f * ts, 0.0f);
         }
 
-        m_Camera.setPosition(m_CameraPosition);
+        m_Camera.setPosition(cameraPos);
     }
 
     void PerspectiveCameraController::OnEvent(Platform::Event& e)
@@ -116,7 +122,7 @@ namespace Nebula
         dispatcher.Dispatch<Platform::MouseMovedEvent>(NB_BIND_EVENT_FN(PerspectiveCameraController::OnMouseMoveEvent));
         dispatcher.Dispatch<Platform::WindowResizedEvent>(NB_BIND_EVENT_FN(PerspectiveCameraController::OnWindowResize));
 
-        m_PreviousMousePosition = {Platform::Input::GetMouseX(), Platform::Input::GetMouseY()};
+        m_PreviousMousePosition = {Platform::Input::GetMouseX() - Platform::WindowManager::Get().GetMainWindow()->GetClientPos().first, Platform::Input::GetMouseY() - Platform::WindowManager::Get().GetMainWindow()->GetClientPos().second};
     }
 
     bool PerspectiveCameraController::OnMouseMoveEvent(const Platform::MouseMovedEvent& e)
@@ -125,8 +131,9 @@ namespace Nebula
 
         if (Platform::Input::IsMouseButtonPressed(MouseButton::Left))
         {
-            m_cameraRotation += glm::vec3(m_PreviousMousePosition.y - e.GetY(), e.GetX() - m_PreviousMousePosition.x, 0.0f) * 0.1f;
-            m_Camera.SetRotation(m_cameraRotation);
+            glm::vec3 cameraRotation = m_Camera.GetRotation();
+            cameraRotation += glm::vec3(m_PreviousMousePosition.y - e.GetY(), e.GetX() - m_PreviousMousePosition.x, 0.0f) * static_cast<float>(m_LastFrameTime) * 15.f;
+            m_Camera.SetRotation(cameraRotation);
         }
 
         return false;

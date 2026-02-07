@@ -13,7 +13,7 @@ public:
 
     virtual void OnUpdate(Nebula::Timestep ts) override;
     virtual void OnImGuiRender() override;
-    virtual void OnEvent(Nebula::Event& e) override;
+    virtual void OnEvent(Nebula::Platform::Event& e) override;
 
 private:
     Nebula::OrthographicCameraController m_CameraController;
