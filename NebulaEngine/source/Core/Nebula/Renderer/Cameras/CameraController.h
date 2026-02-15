@@ -63,7 +63,6 @@ namespace Nebula
         float m_CameraTranslationSpeed = 1.0f;
 
         glm::vec2 m_PreviousMousePosition = { 0.0f, 0.0f };
-        Timestep m_LastFrameTime = 0.0f;
     };
 
 }

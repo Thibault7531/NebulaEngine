@@ -7,6 +7,7 @@
 
 #include "Sandbox2D.h"
 #include "Core/Platform/OpenGL/OpenGLShader.h"
+#include "Nebula/Renderer/Model/Model.h"
 
 class OpenGLDebugWindow : public Nebula::Layer
 {
@@ -259,9 +260,12 @@ public:
 		m_VAO->SetIndexBuffer(ibo);
 
 		m_ShaderLibrary.Load("assets/TestGame/shaders/Texture.glsl");
+		m_ShaderLibrary.Load("assets/TestGame/shaders/Model.glsl");
 
 		m_Texture = Nebula::Texture2D::Create("assets/TestGame/textures/crafting_table_front.png");
 		m_Glass = Nebula::Texture2D::Create("assets/TestGame/textures/glass.png");
+
+		m_Backpack = Nebula::Model::Create("assets/TestGame/models/backpack.fbx");
 
 		m_CameraController.GetCamera().setPosition({0.f, 0.f, 3.f});
 	}
@@ -287,6 +291,8 @@ public:
 		std::dynamic_pointer_cast<Nebula::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 1);
 		Nebula::Renderer::Submit(textureShader, m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f)));
 
+		Nebula::Renderer::SubmitModel(m_ShaderLibrary.Get("Model"), m_Backpack, glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f, 0.0f)), glm::vec3(0.01f)));
+
 		Nebula::Renderer::EndScene();
 	}
 
@@ -302,6 +308,8 @@ private:
 	Nebula::Ref<Nebula::Texture2D> m_Texture;
 	Nebula::Ref<Nebula::Texture2D> m_Glass;
 
+	Nebula::Ref<Nebula::Model> m_Backpack;
+
 	Nebula::PerspectiveCameraController m_CameraController;
 };
 
@@ -313,8 +321,8 @@ public:
 	{
 		PushOverlay(new OpenGLDebugWindow());
 		//PushLayer(new TestCube());
-		//PushLayer(new Cube3D());
-		PushLayer(new Sandbox2D);
+		PushLayer(new Cube3D());
+		//PushLayer(new Sandbox2D);
 		Nebula::Platform::WindowManager::Get().GetMainWindow()->SetVSync(Nebula::Platform::VSyncMode::On);
 	}
 

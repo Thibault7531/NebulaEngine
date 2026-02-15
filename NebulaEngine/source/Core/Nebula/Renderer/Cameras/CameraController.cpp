@@ -87,8 +87,6 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        m_LastFrameTime = ts;
-
         glm::vec3 cameraPos = m_Camera.getPosition();
         glm::vec3 cameraRotation = m_Camera.GetRotation();
 
@@ -132,7 +130,7 @@ namespace Nebula
         if (Platform::Input::IsMouseButtonPressed(MouseButton::Left))
         {
             glm::vec3 cameraRotation = m_Camera.GetRotation();
-            cameraRotation += glm::vec3(m_PreviousMousePosition.y - e.GetY(), e.GetX() - m_PreviousMousePosition.x, 0.0f) * static_cast<float>(m_LastFrameTime) * 15.f;
+            cameraRotation += glm::vec3(m_PreviousMousePosition.y - e.GetY(), e.GetX() - m_PreviousMousePosition.x, 0.0f) * 0.1f;
             m_Camera.SetRotation(cameraRotation);
         }
 

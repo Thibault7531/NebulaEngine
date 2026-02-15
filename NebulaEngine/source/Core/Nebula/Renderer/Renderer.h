@@ -5,6 +5,7 @@
 #include "Cameras/OrthographicCamera.h"
 #include "Cameras/PerspectiveCamera.h"
 #include "Core/RendererAPI.h"
+#include "Model/Model.h"
 
 namespace Nebula {
 
@@ -20,6 +21,7 @@ namespace Nebula {
 		static void EndScene();
 
 		static void Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+		static void SubmitModel(const Ref<Shader>& shader, const Ref<Model>& model, const glm::mat4& transform = glm::mat4(1.0f));
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 

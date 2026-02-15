@@ -57,5 +57,14 @@ namespace Nebula {
 		shader->Unbind();
 	}
 
+	void Renderer::SubmitModel(const Ref<Shader>& shader, const Ref<Model>& model, const glm::mat4& transform)
+	{
+		shader->Bind();
+		shader->SetMat4("u_ViewProjection", m_SceneData->viewProjectionMatrix);
+		shader->SetMat4("u_Transform", transform);
 
+		model->Draw();
+
+		shader->Unbind();
+	}
 }

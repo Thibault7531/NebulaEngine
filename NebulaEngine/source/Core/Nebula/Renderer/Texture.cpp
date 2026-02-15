@@ -1,5 +1,6 @@
 #include "Texture.h"
 
+#include "Renderer.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 
 namespace Nebula {

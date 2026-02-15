@@ -62,6 +62,7 @@ endif ()
 target_precompile_headers(Nebula PUBLIC ../nbpch.h)
 target_link_libraries(Nebula PRIVATE
                       Nebula-Platform
+                      assimp::assimp
                       EnTT::EnTT
                       GLAD
                       ImGui
@@ -72,6 +73,8 @@ target_include_directories(Nebula PRIVATE
                            ../
                            ./
                            ../../vendor
+                           ../../vendor/Assimp/include
+                           ${CMAKE_BINARY_DIR}/NebulaEngine/vendor/Assimp/include
                            ../../vendor/entt/single_include
                            ../../vendor/Glad/include
                            ../../vendor/glm

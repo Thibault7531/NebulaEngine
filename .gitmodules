@@ -17,3 +17,6 @@
 [submodule "NebulaEngine/vendor/WindowsAppSDK"]
 	path = NebulaEngine/vendor/WindowsAppSDK
 	url = https://github.com/microsoft/WindowsAppSDK.git
+[submodule "NebulaEngine/vendor/Assimp"]
+	path = NebulaEngine/vendor/Assimp
+	url = https://github.com/assimp/assimp.git
