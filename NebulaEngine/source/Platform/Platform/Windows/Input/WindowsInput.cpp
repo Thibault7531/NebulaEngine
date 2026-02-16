@@ -7,9 +7,7 @@ namespace Nebula::Platform
 
     bool Input::IsKeyPressed(KeyboardKey keycode)
     {
-        BYTE state[256];
-        if (!GetKeyboardState(state)) return false;
-        return state[GetNativeKeyCode(keycode)] != 0;
+    	return GetKeyState(GetNativeKeyCode(keycode)) < 0;
     }
 
     bool Input::IsMouseButtonPressed(MouseButton button)
@@ -25,7 +23,7 @@ namespace Nebula::Platform
         default: break;
         }
         if (nativeButton == -1) return false;
-        return HIWORD(GetKeyState(nativeButton)) == 1;
+        return GetKeyState(nativeButton) < 0;
     }
 
     std::pair<float, float> Input::GetMousePosition()

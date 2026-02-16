@@ -60,8 +60,6 @@ namespace Nebula
         float m_FOV = 60.0f;
         PerspectiveCamera m_Camera;
 
-        glm::vec3 m_CameraPosition = { 0.0f, 0.0f, 0.0f };
-        glm::vec3 m_cameraRotation = { 0.0f, -90.0f, 0.0f };
         float m_CameraTranslationSpeed = 1.0f;
 
         glm::vec2 m_PreviousMousePosition = { 0.0f, 0.0f };

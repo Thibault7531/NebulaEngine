@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Nebula/CoreSystems/Core/Core.h"
 
 #include "LayerStack.h"
+#include "Nebula/CoreSystems/Core/Core.h"
 #include "Nebula/ImGui/ImGuiLayer.h"
 #include "Platform/Nebula/CoreSystems/Events/WindowEvents.h"
 #include "Platform/Nebula/CoreSystems/Windows/Window.h"

@@ -1,3 +1,18 @@
+# Assimp
+
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE INTERNAL "" FORCE)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(Assimp)
+
+if (MSVC)
+    if (CMAKE_BUILD_TYPE EQUAL "Debug")
+        set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+    else ()
+        set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    endif ()
+endif ()
+
 # cppwinrt
 
 add_subdirectory(winrt)

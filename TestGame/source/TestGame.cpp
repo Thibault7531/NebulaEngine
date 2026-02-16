@@ -1,14 +1,13 @@
 #include <Nebula.h>
-#include <../../NebulaEngine/source/Nebula/CoreSystems/Core/EntryPoint.h>
-#include <SDL_keycode.h>
+#include <Core/Nebula/CoreSystems/Core/EntryPoint.h>
 #include <glad/glad.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Sandbox2D.h"
-#include "../../NebulaEngine/source/Nebula/Renderer/Cameras/Camera.h"
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "Core/Platform/OpenGL/OpenGLShader.h"
+#include "Nebula/Renderer/Model/Model.h"
 
 class OpenGLDebugWindow : public Nebula::Layer
 {
@@ -34,11 +33,11 @@ public:
 		ImGui::SeparatorText("Rendering Info:");
 		ImGui::BulletText("Screen Resolution: " );
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(Nebula::Application::Get().GetWindow().GetWidth()).c_str());
+		ImGui::Text(std::to_string(Nebula::Platform::WindowManager::Get().GetMainWindow()->GetClientSize().first).c_str());
 		ImGui::SameLine();
 		ImGui::Text("x");
 		ImGui::SameLine();
-		ImGui::Text(std::to_string(Nebula::Application::Get().GetWindow().GetHeight()).c_str());
+		ImGui::Text(std::to_string(Nebula::Platform::WindowManager::Get().GetMainWindow()->GetClientSize().second).c_str());
 		ImGui::BulletText("Frame Rate");
 		ImGui::SameLine();
 		ImGui::Value("", static_cast<float>(1.0f / (ImGui::GetTime() - m_PreviousTime)));
@@ -96,29 +95,29 @@ public:
 
 		m_VAO->SetIndexBuffer(ibo);
 
-		m_Shader = Nebula::Shader::Create("SolidColor", "assets/shaders/SolidColorVS.glsl", "assets/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
+		m_Shader = Nebula::Shader::Create("SolidColor", "assets/TestGame/shaders/SolidColorVS.glsl", "assets/TestGame/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
 		m_ShaderLibrary.Add("SolidColor", m_Shader);
 
-		m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+		m_ShaderLibrary.Load("assets/TestGame/shaders/Texture.glsl");
 
-		m_Texture = Nebula::Texture2D::Create("assets/textures/crafting_table_front.png");
-		m_Glass = Nebula::Texture2D::Create("assets/textures/glass.png");
+		m_Texture = Nebula::Texture2D::Create("assets/TestGame/textures/crafting_table_front.png");
+		m_Glass = Nebula::Texture2D::Create("assets/TestGame/textures/glass.png");
 	}
 
-	void OnUpdate(Nebula::Timestep ts) override
+	virtual void OnUpdate(Nebula::Timestep ts) override
 	{
 		m_CameraController.OnUpdate(ts);
 
-		if (Nebula::Input::IsKeyPressed(NB_KEY_UP)) {
+		if (Nebula::Platform::Input::IsKeyPressed(KeyboardKey::UpArrow)) {
 			m_Position += glm::vec3(0.0f, 1.0f, 0.0f) * static_cast<float>(ts);
 		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_DOWN)) {
+		if (Nebula::Platform::Input::IsKeyPressed(KeyboardKey::DownArrow)) {
 			m_Position -= glm::vec3(0.0f, 1.0f, 0.0f) * static_cast<float>(ts);
 		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_RIGHT)) {
+		if (Nebula::Platform::Input::IsKeyPressed(KeyboardKey::RightArrow)) {
 			m_Position += glm::vec3(1.0f, 0.0f, 0.0f) * static_cast<float>(ts);
 		}
-		if (Nebula::Input::IsKeyPressed(NB_KEY_LEFT)) {
+		if (Nebula::Platform::Input::IsKeyPressed(KeyboardKey::LeftArrow)) {
 			m_Position -= glm::vec3(1.0f, 0.0f, 0.0f) * static_cast<float>(ts);
 		}
 
@@ -155,7 +154,7 @@ public:
 		Nebula::Renderer::EndScene();
 	}
 
-	virtual void OnEvent(Nebula::Event& event) override
+	virtual void OnEvent(Nebula::Platform::Event& event) override
 	{
 		m_CameraController.OnEvent(event);
 	}
@@ -187,7 +186,7 @@ private:
 class Cube3D : public Nebula::Layer
 {
 public:
-	Cube3D() : m_CameraController(16.0f/9.0f, 60.0f) {}
+	Cube3D() : m_CameraController(16.0f/9.0f, glm::radians(60.0f)) {}
 
 	virtual void OnAttach() override
 	{
@@ -260,10 +259,15 @@ public:
 
 		m_VAO->SetIndexBuffer(ibo);
 
-		m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+		m_ShaderLibrary.Load("assets/TestGame/shaders/Texture.glsl");
+		m_ShaderLibrary.Load("assets/TestGame/shaders/Model.glsl");
 
-		m_Texture = Nebula::Texture2D::Create("assets/textures/crafting_table_front.png");
-		m_Glass = Nebula::Texture2D::Create("assets/textures/glass.png");
+		m_Texture = Nebula::Texture2D::Create("assets/TestGame/textures/crafting_table_front.png");
+		m_Glass = Nebula::Texture2D::Create("assets/TestGame/textures/glass.png");
+
+		m_Backpack = Nebula::Model::Create("assets/TestGame/models/backpack.fbx");
+
+		m_CameraController.GetCamera().setPosition({0.f, 0.f, 3.f});
 	}
 	virtual void OnUpdate(Nebula::Timestep ts) override
 	{
@@ -287,10 +291,12 @@ public:
 		std::dynamic_pointer_cast<Nebula::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 1);
 		Nebula::Renderer::Submit(textureShader, m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f)));
 
+		Nebula::Renderer::SubmitModel(m_ShaderLibrary.Get("Model"), m_Backpack, glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f, 0.0f)), glm::vec3(0.01f)));
+
 		Nebula::Renderer::EndScene();
 	}
 
-	virtual void OnEvent(Nebula::Event& event) override
+	virtual void OnEvent(Nebula::Platform::Event& event)
 	{
 		m_CameraController.OnEvent(event);
 	}
@@ -301,6 +307,8 @@ private:
 	Nebula::ShaderLibrary m_ShaderLibrary;
 	Nebula::Ref<Nebula::Texture2D> m_Texture;
 	Nebula::Ref<Nebula::Texture2D> m_Glass;
+
+	Nebula::Ref<Nebula::Model> m_Backpack;
 
 	Nebula::PerspectiveCameraController m_CameraController;
 };
@@ -313,9 +321,9 @@ public:
 	{
 		PushOverlay(new OpenGLDebugWindow());
 		//PushLayer(new TestCube());
-		//PushLayer(new Cube3D());
-		PushLayer(new Sandbox2D);
-		this->GetWindow().SetVSync(false);
+		PushLayer(new Cube3D());
+		//PushLayer(new Sandbox2D);
+		Nebula::Platform::WindowManager::Get().GetMainWindow()->SetVSync(Nebula::Platform::VSyncMode::On);
 	}
 
 	~TestGame() override

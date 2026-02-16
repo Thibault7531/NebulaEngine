@@ -245,7 +245,7 @@ namespace Nebula
     {
         if (ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID))) == nullptr) return false;
 
-        platform_data.MousePendingLeaveFrame = ImGui::GetFrameCount();
+        if (platform_data.MouseWindowID == event.WindowID) platform_data.MousePendingLeaveFrame = ImGui::GetFrameCount();
 
         return false;
     }
