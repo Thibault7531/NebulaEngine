@@ -2,7 +2,7 @@
 
 #include "Nebula/Renderer/Core/RendererAPI.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Nebula {
 

@@ -10,7 +10,6 @@ set_target_properties(TestGame PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOUR
 
 
 # Compile Options
-set_target_properties(TestGame PROPERTIES COMPILE_OPTIONS "/utf-8")
 add_custom_command(
         TARGET TestGame
         POST_BUILD
@@ -49,6 +48,7 @@ target_include_directories(TestGame PRIVATE
 )
 
 if (nebula_cmake_platform STREQUAL Windows)
+    set_target_properties(TestGame PROPERTIES COMPILE_OPTIONS "/utf-8")
     add_custom_command(
             TARGET TestGame
             POST_BUILD

@@ -1,6 +1,5 @@
 #pragma once
 
-#ifdef NB_PLATFORM_WINDOWS
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 
 extern Nebula::Application* Nebula::CreateApplication();
@@ -23,6 +22,4 @@ int main(int argc, char** argv)
 	delete app;
 	NB_PROFILE_END_SESSION();
 }
-
-#endif // NB_PLATFORM_WINDOWS
 

@@ -4,6 +4,8 @@
 #include <winrt/Microsoft.UI.Windowing.h>
 #include <winrt/Windows.Foundation.Collections.h>
 
+#include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
+
 namespace Nebula::Platform
 {
 
@@ -132,8 +134,9 @@ namespace Nebula::Platform
         return text;
     }
 
-    void* WindowUtils::GetForegroundWindow()
+    Ref<Window> WindowUtils::GetForegroundWindow()
     {
-        return ::GetForegroundWindow();
+        HWND hwnd = ::GetForegroundWindow();
+        return WindowManager::Get().GetWindowFromHandle(hwnd);
     }
 }

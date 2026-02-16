@@ -1,9 +1,10 @@
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Nebula/CoreSystems/Events/Event.h"
 #include "Platform/Nebula/CoreSystems/Events/KeyEvent.h"
+#include "Platform/Nebula/CoreSystems/Events/MouseEvent.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Platform/Nebula/Dialogs/FileDialogs.h"
 

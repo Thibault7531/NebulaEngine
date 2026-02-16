@@ -20,18 +20,16 @@ target_include_directories(PlatformExemple PRIVATE $ENV{GENERATED_DIR})
 
 
 # Compile Options
-set_target_properties(PlatformExemple PROPERTIES COMPILE_OPTIONS "/utf-8")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET PlatformExemple PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
-    target_compile_options(PlatformExemple PRIVATE -0d -Zi)
-    target_link_options(PlatformExemple PRIVATE /DEBUG:FULL)
-    target_compile_definitions(PlatformExemple PRIVATE _DEBUG)
 else ()
     set_property(TARGET PlatformExemple PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif ()
 
 
 if (nebula_cmake_platform STREQUAL Windows)
+    set_target_properties(PlatformExemple PROPERTIES COMPILE_OPTIONS "/utf-8")
+
     add_custom_command(
             TARGET PlatformExemple
             POST_BUILD

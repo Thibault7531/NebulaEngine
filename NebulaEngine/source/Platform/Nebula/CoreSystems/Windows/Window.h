@@ -108,8 +108,8 @@ namespace Nebula::Platform
 
     public:
         virtual void* GetNativeWindow() = 0;
-        virtual void* GetHandle() const = 0;
-        virtual uint32_t GetID() const = 0;
+        [[nodiscard]] virtual void* GetHandle() const = 0;
+        [[nodiscard]] virtual uint32_t GetID() const = 0;
 
     public:
         static Ref<Window> Create(const WindowProperties& props);

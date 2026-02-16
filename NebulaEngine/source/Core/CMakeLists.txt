@@ -14,12 +14,19 @@ file(GLOB_RECURSE NebulaHeaderFiles
 # Windows Source Files
 if (nebula_cmake_platform STREQUAL Windows)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
-         "Platform/Windows/*.cpp"
          "Platform/OpenGL/*.cpp"
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
-         "Platform/Windows/*.hpp"
-         "Platform/Windows/*.h"
+         "Platform/OpenGL/*.hpp"
+         "Platform/OpenGL/*.h"
+    )
+    list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
+    list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
+elseif (nebula_cmake_platform STREQUAL Linux)
+    file(GLOB_RECURSE NebulaPlatformSourceFiles
+         "Platform/OpenGL/*.cpp"
+    )
+    file(GLOB_RECURSE NebulaPlatformHeaderFiles
          "Platform/OpenGL/*.hpp"
          "Platform/OpenGL/*.h"
     )
@@ -38,7 +45,6 @@ set_target_properties(Nebula PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE
 
 
 # Compilation Options
-set_target_properties(Nebula PROPERTIES COMPILE_OPTIONS "/utf-8")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET Nebula PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
 else ()
@@ -87,6 +93,7 @@ target_include_directories(Nebula PRIVATE
 
 # Windows Settings
 if (nebula_cmake_platform STREQUAL Windows)
+    set_target_properties(Nebula PROPERTIES COMPILE_OPTIONS "/utf-8")
     target_compile_definitions(Nebula PUBLIC NB_PLATFORM_WINDOWS)
     set(WIN32 True)
 
