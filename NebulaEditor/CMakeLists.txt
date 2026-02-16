@@ -47,6 +47,8 @@ target_link_libraries(NebulaEditor PUBLIC Nebula)
 target_include_directories(NebulaEditor PRIVATE
         ../NebulaEngine/source
         ../NebulaEngine/source/Core
+        ../NebulaEngine/vendor/Assimp/include
+        ${CMAKE_BINARY_DIR}/NebulaEngine/vendor/Assimp/include
         ../NebulaEngine/vendor/spdlog/include
         ../NebulaEngine/vendor/SDL3/include/SDL3
         ../NebulaEngine/vendor/SDL3/include
