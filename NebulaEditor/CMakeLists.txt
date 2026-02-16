@@ -23,7 +23,6 @@ set_target_properties(NebulaEditor PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_
 
 
 # Compile Options
-set_target_properties(NebulaEditor PROPERTIES COMPILE_OPTIONS "/utf-8")
 add_custom_command(
         TARGET NebulaEditor
         POST_BUILD
@@ -60,6 +59,7 @@ target_include_directories(NebulaEditor PRIVATE
 )
 
 if (nebula_cmake_platform STREQUAL Windows)
+    set_target_properties(NebulaEditor PROPERTIES COMPILE_OPTIONS "/utf-8")
     add_custom_command(
             TARGET NebulaEditor
             POST_BUILD

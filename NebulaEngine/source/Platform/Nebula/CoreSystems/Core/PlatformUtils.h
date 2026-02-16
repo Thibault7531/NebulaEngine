@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
+#include "Platform/Nebula/CoreSystems/Windows/Window.h"
 
 namespace Nebula::Platform
 {
@@ -55,12 +55,6 @@ namespace Nebula::Platform
         void* m_Cursor;
     };
 
-    class Keyboard
-    {
-    public:
-        static int GetScancodeFromKeycode(KeyboardKey keycode);
-    };
-
     class Clipboard
     {
     public:
@@ -71,7 +65,7 @@ namespace Nebula::Platform
     class WindowUtils
     {
     public:
-        static void* GetForegroundWindow();
+        static Ref<Window> GetForegroundWindow();
     };
 
 }

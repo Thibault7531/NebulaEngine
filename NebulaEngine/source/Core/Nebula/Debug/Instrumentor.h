@@ -130,7 +130,11 @@ namespace Nebula
     #define NB_PROFILE_BEGIN_SESSION(name, filepath) ::Nebula::Instrumentor::Get().BeginSession(name, filepath)
     #define NB_PROFILE_END_SESSION() ::Nebula::Instrumentor::Get().EndSession()
     #define NB_PROFILE_SCOPE(name) ::Nebula::InstrumentationTimer timer##__LINE__(name)
-    #define NB_PROFILE_FUNCTION() NB_PROFILE_SCOPE(__FUNCSIG__)
+    #ifdef NB_PLATFORM_WINDOWS
+        #define NB_PROFILE_FUNCTION() NB_PROFILE_SCOPE(__FUNCSIG__)
+    #else
+        #define NB_PROFILE_FUNCTION() NB_PROFILE_SCOPE(__PRETTY_FUNCTION__)
+    #endif
 #else
     #define NB_PROFILE_BEGIN_SESSION(name, filepath)
     #define NB_PROFILE_END_SESSION()

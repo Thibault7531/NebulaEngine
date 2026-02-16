@@ -20,7 +20,7 @@ namespace Nebula
         glGetIntegerv(GL_MAJOR_VERSION, &major);
         glGetIntegerv(GL_MINOR_VERSION, &minor);
         if (major == 0 && minor == 0)
-            sscanf_s(gl_version_str, "%d.%d", &major, &minor);
+            sscanf(gl_version_str, "%d.%d", &major, &minor);
         renderer_data->GlVersion = static_cast<GLuint>(major * 100 + minor * 10);
     #if defined(GL_CONTEXT_PROFILE_MASK)
         if (renderer_data->GlVersion >= 320)
@@ -34,8 +34,8 @@ namespace Nebula
 
         // Store GLSL version string so we can refer to it later in case we recreate shaders.
         // Note: GLSL version is NOT the same as GL version. Leave this to nullptr if unsure.
-        strcpy_s(renderer_data->GlslVersionString, "#version 460");
-        strcat_s(renderer_data->GlslVersionString, "\n");
+        strcpy(renderer_data->GlslVersionString, "#version 460");
+        strcat(renderer_data->GlslVersionString, "\n");
 
         // Make an arbitrary GL call (we don't actually need the result)
         // IF YOU GET A CRASH HERE: it probably means the OpenGL function loader didn't do its job. Let us know!
@@ -106,7 +106,7 @@ namespace Nebula
 
         // Parse GLSL version string
         int glsl_version = 130;
-        sscanf_s(renderer_data->GlslVersionString, "#version %d", &glsl_version);
+        sscanf(renderer_data->GlslVersionString, "#version %d", &glsl_version);
 
         const GLchar* vertex_shader_glsl_410_core =
             "layout (location = 0) in vec2 Position;\n"

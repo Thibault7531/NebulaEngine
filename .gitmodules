@@ -17,6 +17,6 @@
 [submodule "NebulaEngine/vendor/WindowsAppSDK"]
 	path = NebulaEngine/vendor/WindowsAppSDK
 	url = https://github.com/microsoft/WindowsAppSDK.git
-[submodule "NebulaEngine/vendor/Wayland-protocol"]
-	path = NebulaEngine/vendor/Wayland-protocol
-	url = https://gitlab.freedesktop.org/wayland/wayland-protocols.git
+[submodule "NebulaEngine/vendor/SDL"]
+	path = NebulaEngine/vendor/SDL
+	url = https://github.com/libsdl-org/SDL.git

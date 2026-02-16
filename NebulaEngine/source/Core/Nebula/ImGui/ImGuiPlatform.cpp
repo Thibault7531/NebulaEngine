@@ -24,7 +24,11 @@ namespace Nebula
         io.BackendPlatformName = "Nebula::ImGui::Platform";
         io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
         io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+
+        // Viewports not supported on linux because wayland does not allow reading or writing window position
+#ifdef NB_PLATFORM_WINDOWS
         io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
+#endif
 
         // Sets backendio
         platform_io.Platform_SetClipboardTextFn = SetClipboardText;
@@ -266,7 +270,7 @@ namespace Nebula
 
         ImGuiKey key = getImGuiKey(event.GetKeyCode());
         io.AddKeyEvent(key, true);
-        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Platform::Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
+        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Platform::Input::GetNativeKeyCode(event.GetKeyCode()));
 
         return false;
     }
@@ -282,7 +286,7 @@ namespace Nebula
 
         ImGuiKey key = getImGuiKey(event.GetKeyCode());
         io.AddKeyEvent(key, false);
-        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Platform::Keyboard::GetScancodeFromKeycode(event.GetKeyCode()));
+        io.SetKeyEventNativeData(key, static_cast<int>(event.GetKeyCode()), Platform::Input::GetNativeKeyCode(event.GetKeyCode()));
 
         return false;
     }
@@ -374,7 +378,7 @@ namespace Nebula
 
         // We forward mouse input when hovered or captured (via SDL_EVENT_MOUSE_MOTION) or when focused (below)
         // SDL_CaptureMouse() let the OS know e.g. that our imgui drag outside the SDL window boundaries shouldn't e.g. trigger other operations outside
-        Ref<Platform::Window> focused_window = Platform::WindowManager::Get().GetWindowFromHandle((HWND)Platform::WindowUtils::GetForegroundWindow());
+        Ref<Platform::Window> focused_window = Platform::WindowUtils::GetForegroundWindow();
         if (focused_window) focused_window->CaptureMouse(platform_data.MouseButtonsDown != 0);
 
 

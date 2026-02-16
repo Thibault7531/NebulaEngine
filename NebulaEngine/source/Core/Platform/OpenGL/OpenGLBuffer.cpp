@@ -1,6 +1,6 @@
 #include "OpenGLBuffer.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Nebula {
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)

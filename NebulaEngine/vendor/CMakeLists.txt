@@ -57,6 +57,11 @@ else ()
 endif ()
 
 
+# SDL3
+
+add_subdirectory(SDL)
+
+
 # spdlog
 
 add_subdirectory(spdlog)

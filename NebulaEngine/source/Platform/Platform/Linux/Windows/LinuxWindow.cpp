@@ -1,74 +1,66 @@
 #include "LinuxWindow.h"
 
-#include <xdg-shell-client-protocol.h>
-
+#include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Platform/Linux/Rendering/OpenGLContext.h"
 
 namespace Nebula::Platform
 {
-    void handle_global(void* data, wl_registry* registry, uint32_t name, const char* interface, uint32_t version)
-    {
-        if (strcmp(interface, wl_compositor_interface.name) == 0)
-        {
-            auto* compositor = static_cast<wl_compositor*>(wl_registry_bind(registry, name, &wl_compositor_interface, 3));
-            static_cast<LinuxWindow*>(data)->SetWaylandCompositor(compositor);
-        } else if (strcmp(interface, wl_shm_interface.name) == 0)
-        {
-            auto* shm = static_cast<wl_shm*>(wl_registry_bind(registry, name, &wl_shm_interface, 1));
-            static_cast<LinuxWindow*>(data)->SetWaylandShm(shm);
-        } else if (strcmp(interface, xdg_wm_base_interface.name) == 0)
-        {
-            auto* wm_base = static_cast<xdg_wm_base*>(wl_registry_bind(registry, name, &xdg_wm_base_interface, 7));
-            static_cast<LinuxWindow*>(data)->SetWaylandWMBase(wm_base);
-        } else if (strcmp(interface, wl_seat_interface.name) == 0)
-        {
-            auto* seat = static_cast<wl_seat*>(wl_registry_bind(registry, name, &wl_seat_interface, 7));
-            static_cast<LinuxWindow*>(data)->SetWaylandSeat(seat);
-        }
-        NB_PLATFORM_DEBUG("{}", interface);
-    }
-
-    void handle_global_remove(void* data, wl_registry* registry, uint32_t name)
-    {
-    }
 
     LinuxWindow::LinuxWindow(const WindowProperties& props)
     {
-        m_Display = wl_display_connect(nullptr);
+        m_Properties = props;
 
-        m_Registry = wl_display_get_registry(m_Display);
-        wl_registry_add_listener(m_Registry, &RegistryListener, this);
-        wl_display_roundtrip(m_Display);
+        SDL_WindowFlags windowFlags = 0;
+        if (m_Properties.Minimized) windowFlags |= SDL_WINDOW_MINIMIZED;
+        if (m_Properties.Maximized) windowFlags |= SDL_WINDOW_MAXIMIZED;
+        if (m_Properties.AlwaysOnTop) windowFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
+        if (m_Properties.isUtility) windowFlags |= SDL_WINDOW_UTILITY;
 
-        m_Surface = wl_compositor_create_surface(m_Compositor);
-        m_XDGSurface = xdg_wm_base_get_xdg_surface(m_WMBase, m_Surface);
-        m_XDGToplevel = xdg_surface_get_toplevel(m_XDGSurface);
+        if (m_Properties.Style == WindowStyle::ExclusiveFullscreen)
+        {
+            windowFlags |= SDL_WINDOW_FULLSCREEN;
+        } else if (m_Properties.Style == WindowStyle::BorderlessFullscreen)
+        {
+            windowFlags |= SDL_WINDOW_BORDERLESS;
+        } else if (m_Properties.Style == WindowStyle::BorderlessInteractive)
+        {
+            windowFlags |= SDL_WINDOW_BORDERLESS;
+            if (m_Properties.isResizable) windowFlags |= SDL_WINDOW_RESIZABLE;
+        } else if (m_Properties.Style == WindowStyle::Default)
+        {
+            if (m_Properties.isResizable) windowFlags |= SDL_WINDOW_RESIZABLE;
+        }
 
-        xdg_toplevel_set_title(m_XDGToplevel, props.Title.c_str());
-        xdg_toplevel_set_app_id(m_XDGToplevel, props.Title.c_str());
-        if (props.Maximized) xdg_toplevel_set_maximized(m_XDGToplevel);
-        if (props.Minimized) xdg_toplevel_set_minimized(m_XDGToplevel);
+        windowFlags |= SDL_WINDOW_OPENGL;
 
-        wl_pointer* pointer = wl_seat_get_pointer(m_Seat);
-        wl_pointer_add_listener(pointer, &PointerListener, this);
+        m_Window = SDL_CreateWindow(m_Properties.Title.c_str(), m_Properties.Width, m_Properties.Height, windowFlags);
+        SDL_SetWindowPosition(m_Window, m_Properties.x, m_Properties.y);
 
-        wl_surface_commit(m_Surface);
+        SDL_SetEventFilter(EventHandler::OnEvent, nullptr);
+        SDL_SetWindowHitTest(m_Window, EventHandler::OnHitTest, this);
 
         m_Context = CreateRef<OpenGlContext>(this);
+        m_Context->Init();
     }
 
-    LinuxWindow::~LinuxWindow() = default;
+    LinuxWindow::~LinuxWindow()
+    {
+        m_Context.reset();
+        SDL_DestroyWindow(m_Window);
+    }
 
-    void LinuxWindow::SetWindowHitTest(const std::function<HitTest(int32_t, int32_t)>& func) {}
-    void LinuxWindow::RecalculateHitTest() {}
-    const std::function<HitTest(int32_t, int32_t)>& LinuxWindow::GetWindowHitTest() {}
+    void LinuxWindow::SetWindowHitTest(const std::function<HitTest(int32_t, int32_t)>& func)
+    {
+        m_WindowHitTest = func;
+        RecalculateHitTest();
+    }
 
     void LinuxWindow::OnUpdate()
     {
         SwapBuffers();
 
-        wl_display_dispatch(m_Display);
+        CoreUtils::PumpEvents();
     }
 
     void LinuxWindow::SwapBuffers()
@@ -78,33 +70,178 @@ namespace Nebula::Platform
 
     std::pair<uint32_t, uint32_t> LinuxWindow::GetSize() const
     {
-        return {m_Properties.Width, m_Properties.Height};
+        int width, height;
+        SDL_GetWindowSize(m_Window, &width, &height);
+        return {width, height};
     }
 
-    void LinuxWindow::SetSize(uint32_t width, uint32_t height) {}
-    std::pair<uint32_t, uint32_t> LinuxWindow::GetClientSize() const {}
-    void LinuxWindow::SetClientSize(uint32_t width, uint32_t height) {}
-    std::pair<int32_t, int32_t> LinuxWindow::GetPos() const {}
-    void LinuxWindow::SetPos(int32_t x, int32_t y) {}
-    std::pair<int32_t, int32_t> LinuxWindow::GetClientPos() const {}
-    int32_t LinuxWindow::GetTitlebarHeight() const {}
-    void LinuxWindow::SetMousePos(int32_t x, int32_t y) const {}
-    void LinuxWindow::CaptureMouse(bool enabled) {}
-    void LinuxWindow::SetVSync(VSyncMode mode) {}
-    VSyncMode LinuxWindow::IsVSync() const {}
-    void LinuxWindow::SetFullscreen(bool enabled) {}
-    bool LinuxWindow::IsFullscreen() const {}
-    void LinuxWindow::SetMaximized(bool enabled) {}
-    bool LinuxWindow::IsMaximized() const {}
-    void LinuxWindow::Minimize() {}
-    bool LinuxWindow::IsMinimized() const {}
-    bool LinuxWindow::IsFocused() const {}
-    std::string LinuxWindow::GetTitle() const {}
-    void LinuxWindow::SetTitle(const std::string& title) {}
-    void LinuxWindow::Show() const {}
-    void LinuxWindow::Hide() const {}
-    void LinuxWindow::Raise() const {}
-    void LinuxWindow::Flash() const {}
-    Ref<Context> LinuxWindow::GetContext() {}
-    void LinuxWindow::SetCurrentContext() {}
+    void LinuxWindow::SetSize(uint32_t width, uint32_t height)
+    {
+        SDL_SetWindowSize(m_Window, width, height);
+        SDL_SyncWindow(m_Window);
+
+        int newWidth, newWHight;
+        SDL_GetWindowSizeInPixels(m_Window, &newWidth, &newWHight);
+        m_Properties.Width = newWidth;
+        m_Properties.Height = newWHight;
+    }
+
+    std::pair<uint32_t, uint32_t> LinuxWindow::GetClientSize() const
+    {
+        int width, height;
+        SDL_GetWindowSizeInPixels(m_Window, &width, &height);
+        return {width, height};
+    }
+
+    void LinuxWindow::SetClientSize(uint32_t width, uint32_t height)
+    {
+        m_Properties.Width = width;
+        m_Properties.Height = height;
+
+        SDL_SetWindowSize(m_Window, width, height);
+    }
+
+    std::pair<int32_t, int32_t> LinuxWindow::GetPos() const
+    {
+        int x, y;
+        SDL_GetWindowPosition(m_Window, &x, &y);
+        return {x, y};
+    }
+
+    void LinuxWindow::SetPos(int32_t x, int32_t y)
+    {
+        m_Properties.x = x;
+        m_Properties.y = y;
+        SDL_SetWindowPosition(m_Window, x, y);
+    }
+
+    std::pair<int32_t, int32_t> LinuxWindow::GetClientPos() const
+    {
+        int x, y;
+        SDL_GetWindowPosition(m_Window, &x, &y);
+        return {x, y};
+    }
+
+    int32_t LinuxWindow::GetTitlebarHeight() const
+    {
+        return 32;
+    }
+
+    void LinuxWindow::SetMousePos(int32_t x, int32_t y) const
+    {
+        SDL_WarpMouseInWindow(m_Window, x, y);
+    }
+
+    void LinuxWindow::CaptureMouse(bool enabled)
+    {
+        SDL_CaptureMouse(enabled);
+    }
+
+    void LinuxWindow::SetVSync(VSyncMode mode)
+    {
+        m_Context->SetVSync(mode);
+    }
+
+    VSyncMode LinuxWindow::IsVSync() const
+    {
+        return m_Context->IsVsync();
+    }
+
+    void LinuxWindow::SetFullscreen(bool enabled)
+    {
+        if (enabled && m_Properties.Style == WindowStyle::ExclusiveFullscreen) return;
+        if (!enabled && m_Properties.Style != WindowStyle::ExclusiveFullscreen) return;
+
+        if (enabled)
+        {
+            m_LastStyle = m_Properties.Style;
+            m_Properties.Style = WindowStyle::ExclusiveFullscreen;
+        }
+        else
+        {
+            m_Properties.Style = m_LastStyle;
+        }
+        SDL_SetWindowFullscreen(m_Window, enabled);
+    }
+
+    bool LinuxWindow::IsFullscreen() const
+    {
+        return m_Properties.Style == WindowStyle::ExclusiveFullscreen;
+    }
+
+    void LinuxWindow::SetMaximized(bool enabled)
+    {
+        if (m_Properties.Style == WindowStyle::BorderlessFullscreen || m_Properties.Style == WindowStyle::ExclusiveFullscreen) return;
+        m_Properties.Maximized = enabled;
+        if (enabled)
+        {
+            SDL_MaximizeWindow(m_Window);
+        }
+        else
+        {
+            SDL_RestoreWindow(m_Window);
+        }
+    }
+
+    bool LinuxWindow::IsMaximized() const
+    {
+        return m_Properties.Maximized;
+    }
+
+    void LinuxWindow::Minimize()
+    {
+        m_Properties.Minimized = true;
+        SDL_MinimizeWindow(m_Window);
+    }
+
+    bool LinuxWindow::IsMinimized() const
+    {
+        return m_Properties.Minimized;
+    }
+
+    bool LinuxWindow::IsFocused() const
+    {
+        return SDL_GetWindowFlags(m_Window) & SDL_WINDOW_INPUT_FOCUS;
+    }
+
+    std::string LinuxWindow::GetTitle() const
+    {
+        return SDL_GetWindowTitle(m_Window);
+    }
+
+    void LinuxWindow::SetTitle(const std::string& title)
+    {
+        SDL_SetWindowTitle(m_Window, title.c_str());
+    }
+
+    void LinuxWindow::Show() const
+    {
+        SDL_ShowWindow(m_Window);
+    }
+
+    void LinuxWindow::Hide() const
+    {
+        SDL_HideWindow(m_Window);
+    }
+
+    void LinuxWindow::Raise() const
+    {
+        SDL_RaiseWindow(m_Window);
+    }
+
+    void LinuxWindow::Flash() const
+    {
+        SDL_FlashOperation operation = {SDL_FLASH_UNTIL_FOCUSED};
+        SDL_FlashWindow(m_Window, operation);
+    }
+
+    Ref<Context> LinuxWindow::GetContext()
+    {
+        return m_Context;
+    }
+
+    void LinuxWindow::SetCurrentContext()
+    {
+        m_Context->SetCurrent();
+    }
 }

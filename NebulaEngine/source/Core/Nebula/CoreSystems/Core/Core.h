@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <signal.h>
 
 
 // Debug
@@ -9,8 +10,13 @@
 #endif
 
 #ifdef NB_ENABLE_ASSERTS
-	#define NB_ASSERT(x, ...) { if (!(x)) { NB_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-	#define NB_CORE_ASSERT(x, ...) { if (!(x)) { NB_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#ifdef NB_PLATFORM_WINDOWS
+		#define NB_ASSERT(x, ...) { if (!(x)) { NB_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+		#define NB_CORE_ASSERT(x, ...) { if (!(x)) { NB_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+	#else
+		#define NB_ASSERT(x, ...) { if (!(x)) { NB_ERROR("Assertion Failed: {0}", ##__VA_ARGS__); raise(SIGTRAP); } }
+		#define NB_CORE_ASSERT(x, ...) { if (!(x)) { NB_CORE_ERROR("Assertion Failed: {0}", ##__VA_ARGS__); raise(SIGTRAP); } }
+	#endif
 #else
 	#define NB_ASSERT(x, ...)
 	#define NB_CORE_ASSERT(x, ...)

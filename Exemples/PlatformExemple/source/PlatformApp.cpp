@@ -46,27 +46,12 @@ bool OnKeyPressed(Nebula::Platform::KeyPressedEvent& event)
     return true;
 }
 
-bool OnMouseButtonPressed(Nebula::Platform::MouseButtonPressedEvent& event)
-{
-    NB_PLATFORM_INFO(event);
-
-    return true;
-}
-bool OnMouseButtonReleased(Nebula::Platform::MouseButtonReleasedEvent& event)
-{
-    NB_PLATFORM_INFO(event);
-
-    return true;
-}
-
 void Callback(Nebula::Platform::Event& event)
 {
     if (event.GetEventType() == Nebula::Platform::EventType::WindowClosed) s_running = false;
 
     Nebula::Platform::EventDispatcher dispatcher(event);
     dispatcher.Dispatch<Nebula::Platform::KeyPressedEvent>(OnKeyPressed);
-    dispatcher.Dispatch<Nebula::Platform::MouseButtonPressedEvent>(OnMouseButtonPressed);
-    dispatcher.Dispatch<Nebula::Platform::MouseButtonReleasedEvent>(OnMouseButtonReleased);
 }
 
 int main()

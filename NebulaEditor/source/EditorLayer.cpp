@@ -30,7 +30,7 @@ namespace Nebula {
 
         Application::Get().GetImGuiLayer()->BlockEvents(false);
 
-        Platform::WindowManager::Get().GetMainWindow()->SetVSync(Platform::VSyncMode::Off);
+        Platform::WindowManager::Get().GetMainWindow()->SetVSync(Platform::VSyncMode::Adaptive);
         Platform::WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
         {
             ImGuiIO& io = ImGui::GetIO();
@@ -101,6 +101,9 @@ namespace Nebula {
         {
             ImGui::BeginMenu("NebulaEditor", false);
 
+            std::pair<int32_t, int32_t> window_pos = { 0, 0 };
+            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) window_pos = Platform::WindowManager::Get().GetMainWindow()->GetClientPos();
+
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("New Scene", "Ctrl+N")) NewScene();
                 if (ImGui::MenuItem("Open Scene...", "Ctrl+O")) OpenScene();
@@ -112,8 +115,7 @@ namespace Nebula {
 
                 ImGui::EndMenu();
             }
-            auto [window_x, window_y] = Platform::WindowManager::Get().GetMainWindow()->GetClientPos();
-            glm::vec4 rect = {ImGui::GetItemRectMin().x - window_x, ImGui::GetItemRectMin().y - window_y, ImGui::GetItemRectMax().x - window_x, ImGui::GetItemRectMax().y - window_y};
+            glm::vec4 rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
             m_TitleBarButtons.emplace_back(rect);
 
 #ifndef NB_PLATFORM_WINDOWS
@@ -122,15 +124,21 @@ namespace Nebula {
             {
                 Platform::WindowManager::Get().GetMainWindow()->Minimize();
             }
+            rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
+            m_TitleBarButtons.emplace_back(rect);
 
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 42);
             if (ImGui::MenuItem("O")) {
                 if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) Platform::WindowManager::Get().GetMainWindow()->SetMaximized(false);
                 else Platform::WindowManager::Get().GetMainWindow()->SetMaximized(true);
             }
+            rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
+            m_TitleBarButtons.emplace_back(rect);
 
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 16);
             if (ImGui::MenuItem("X")) Application::Get().Shutdown();
+            rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
+            m_TitleBarButtons.emplace_back(rect);
 #endif
         }
         ImGui::EndMainMenuBar();

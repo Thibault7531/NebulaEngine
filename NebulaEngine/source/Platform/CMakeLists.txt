@@ -102,41 +102,15 @@ elseif (nebula_cmake_platform STREQUAL Linux)
     target_compile_definitions(Nebula-Platform PUBLIC NB_PLATFORM_LINUX)
 
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(WAYLAND REQUIRED wayland-client wayland-egl)
-    pkg_check_modules(WAYLAND-PROTOCOLS REQUIRED wayland-protocols)
     pkg_check_modules(EGL REQUIRED egl)
 
-    pkg_get_variable(WAYLAND_PROTOCOLS_DATADIR wayland-protocols pkgdatadir)
-    find_program(WAYLAND_SCANNER wayland-scanner)
-
-    # xdg-shell
-    set(XDG_SHELL_XML ${WAYLAND_PROTOCOLS_DATADIR}/stable/xdg-shell/xdg-shell.xml)
-    set(XDG_SHELL_CODE ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c)
-    set(XDG_SHELL_HEADER ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-client-protocol.h)
-    add_custom_command(
-            OUTPUT ${XDG_SHELL_CODE}
-            COMMAND ${WAYLAND_SCANNER} private-code ${XDG_SHELL_XML} ${XDG_SHELL_CODE}
-            DEPENDS ${XDG_SHELL_XML}
-            VERBATIM
-    )
-    add_custom_command(
-            OUTPUT ${XDG_SHELL_HEADER}
-            COMMAND ${WAYLAND_SCANNER} client-header ${XDG_SHELL_XML} ${XDG_SHELL_HEADER}
-            DEPENDS ${XDG_SHELL_XML}
-            VERBATIM
-    )
-    add_library(XDG_SHELL STATIC ${XDG_SHELL_CODE} ${XDG_SHELL_HEADER})
-    target_include_directories(XDG_SHELL PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-
     target_link_libraries(Nebula-Platform PRIVATE
-                          GLAD_EGL
-                          ${WAYLAND_LIBRARIES}
+                          SDL3::SDL3
                           ${EGL_LIBRARIES}
-                          XDG_SHELL
     )
 
     target_include_directories(Nebula-Platform PUBLIC
-                               ${WAYLAND_INCLUDE_DIRS}
+                               ../../vendor/SDL/include
                                ${EGL_INCLUDE_DIRS}
     )
 endif ()

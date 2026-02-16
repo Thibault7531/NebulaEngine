@@ -2,7 +2,7 @@
 
 #include "Nebula/ImGui/ImGuiRenderer.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace Nebula
 {
