@@ -1,8 +1,8 @@
 #include "OpenGLContext.h"
 
 #include <windows.ui.interop.h>
-#include <glad/glad_wgl.h>
-#include <glad/glad.h>
+#include <glad/wgl.h>
+#include <glad/gl.h>
 
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 
@@ -61,7 +61,7 @@ namespace Nebula::Platform
         if (!s_MainContext) s_MainContext = m_Context;
         wglMakeCurrent(m_DeviceContext, m_Context);
 
-        gladLoadGL();
+        gladLoaderLoadGL();
     }
 
     void OpenGlContext::SetCurrent()
@@ -110,7 +110,7 @@ namespace Nebula::Platform
 
         HGLRC gl_context = wglCreateContext(m_DeviceContext);
         wglMakeCurrent(m_DeviceContext, gl_context);
-        gladLoadWGL(m_DeviceContext);
+        gladLoaderLoadWGL(m_DeviceContext);
         wglMakeCurrent(nullptr, nullptr);
         wglDeleteContext(gl_context);
 

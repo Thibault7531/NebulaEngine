@@ -4,6 +4,7 @@
 #include <winrt/Microsoft.UI.Windowing.h>
 #include <winrt/Windows.Foundation.Collections.h>
 
+#include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula::Platform
@@ -100,11 +101,6 @@ namespace Nebula::Platform
     void Cursor::Show() const
     {
         SetCursor(static_cast<HCURSOR>(m_Cursor));
-    }
-
-    int Keyboard::GetScancodeFromKeycode(KeyboardKey keycode)
-    {
-        return MapVirtualKeyA(static_cast<UINT>(keycode), MAPVK_VK_TO_VSC);
     }
 
     void Clipboard::SetText(const std::string& text)
