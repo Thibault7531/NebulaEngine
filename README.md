@@ -16,7 +16,7 @@ Features include:
 
 Requirements for building on Windows:
 - CMake 4.0
-- Clang-cl
+- Clang
 - Windows 10.0.26000 SDK
 - Windows App SDK 2.0-experimental3
 

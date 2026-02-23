@@ -93,7 +93,6 @@ target_include_directories(Nebula PRIVATE
 
 # Windows Settings
 if (nebula_cmake_platform STREQUAL Windows)
-    set_target_properties(Nebula PROPERTIES COMPILE_OPTIONS "/utf-8")
     target_compile_definitions(Nebula PUBLIC NB_PLATFORM_WINDOWS)
     set(WIN32 True)
 

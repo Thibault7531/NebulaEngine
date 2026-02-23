@@ -28,8 +28,6 @@ endif ()
 
 
 if (nebula_cmake_platform STREQUAL Windows)
-    set_target_properties(PlatformExemple PROPERTIES COMPILE_OPTIONS "/utf-8")
-
     add_custom_command(
             TARGET PlatformExemple
             POST_BUILD

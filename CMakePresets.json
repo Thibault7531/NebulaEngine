@@ -8,10 +8,11 @@
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_SYSTEM_NAME": "Windows",
-        "CMAKE_SYSTEM_VERSION": "10.0.26000"
+        "CMAKE_SYSTEM_VERSION": "10.0.26000",
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
       },
       "hidden": false,
       "architecture": {
@@ -31,10 +32,11 @@
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_SYSTEM_NAME": "Windows",
-        "CMAKE_SYSTEM_VERSION": "10.0.26000"
+        "CMAKE_SYSTEM_VERSION": "10.0.26000",
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
       },
       "hidden": false,
       "architecture": {
@@ -54,10 +56,11 @@
       "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Dist",
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_SYSTEM_NAME": "Windows",
-        "CMAKE_SYSTEM_VERSION": "10.0.26000"
+        "CMAKE_SYSTEM_VERSION": "10.0.26000",
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
       },
       "hidden": false,
       "architecture": {
@@ -79,7 +82,8 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_SYSTEM_NAME": "Linux"
+        "CMAKE_SYSTEM_NAME": "Linux",
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
       },
       "hidden": false,
       "architecture": {
@@ -101,7 +105,8 @@
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_SYSTEM_NAME": "Linux"
+        "CMAKE_SYSTEM_NAME": "Linux",
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
       },
       "hidden": false,
       "architecture": {
@@ -123,7 +128,8 @@
         "CMAKE_BUILD_TYPE": "Dist",
         "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
-        "CMAKE_SYSTEM_NAME": "Linux"
+        "CMAKE_SYSTEM_NAME": "Linux",
+        "CMAKE_SYSTEM_PROCESSOR": "AMD64"
       },
       "hidden": false,
       "architecture": {

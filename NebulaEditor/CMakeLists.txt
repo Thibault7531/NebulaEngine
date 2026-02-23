@@ -61,7 +61,6 @@ target_include_directories(NebulaEditor PRIVATE
 )
 
 if (nebula_cmake_platform STREQUAL Windows)
-    set_target_properties(NebulaEditor PROPERTIES COMPILE_OPTIONS "/utf-8")
     add_custom_command(
             TARGET NebulaEditor
             POST_BUILD

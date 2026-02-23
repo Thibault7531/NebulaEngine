@@ -75,7 +75,6 @@ target_include_directories(Nebula-Platform PRIVATE
 # Windows Settings
 if (nebula_cmake_platform STREQUAL Windows)
     target_compile_definitions(Nebula-Platform PUBLIC NB_PLATFORM_WINDOWS)
-    set_target_properties(Nebula-Platform PROPERTIES COMPILE_OPTIONS "/utf-8")
 
     target_link_libraries(Nebula-Platform PRIVATE
         WindowsApp
@@ -94,7 +93,7 @@ if (nebula_cmake_platform STREQUAL Windows)
 
     # Force WinRT debugging support
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_compile_options(Nebula-Platform PRIVATE /Od)
+        target_compile_options(Nebula-Platform PRIVATE -o0)
         target_compile_definitions(Nebula-Platform PRIVATE _DEBUG WINRT_NO_MAKE_DETECTION)
     endif()
 
