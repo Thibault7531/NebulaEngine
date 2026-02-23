@@ -1,6 +1,6 @@
 # Nebula Engine
 
-nebula Engine is a 2D/3D game engine used as a learning project.
+Nebula Engine is a 2D/3D game engine used as a learning project.
 
 ## Features
 
