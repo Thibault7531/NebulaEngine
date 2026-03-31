@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -66,6 +67,12 @@ namespace Nebula::Platform
     {
     public:
         static Ref<Window> GetForegroundWindow();
+    };
+
+    class Files
+    {
+    public:
+        static std::filesystem::path GetResourcesPath();
     };
 
 }

@@ -135,4 +135,9 @@ namespace Nebula::Platform
         HWND hwnd = ::GetForegroundWindow();
         return WindowManager::Get().GetWindowFromHandle(hwnd);
     }
+
+    std::filesystem::path Files::GetResourcesPath()
+    {
+        return GetModuleFileName(nullptr);
+    }
 }

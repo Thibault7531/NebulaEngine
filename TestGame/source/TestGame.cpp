@@ -296,7 +296,7 @@ public:
 		Nebula::Renderer::EndScene();
 	}
 
-	virtual void OnEvent(Nebula::Platform::Event& event)
+	virtual void OnEvent(Nebula::Platform::Event& event) override
 	{
 		m_CameraController.OnEvent(event);
 	}

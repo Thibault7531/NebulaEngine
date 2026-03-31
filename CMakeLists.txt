@@ -35,21 +35,7 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release Dist)
 
 
 # Compiler arguments
-if (nebula_cmake_platform STREQUAL "Windowsold")
-    set(CMAKE_C_FLAGS "/std:c11")
-    set(CMAKE_C_FLAGS_DEBUG "/EHsc /Od /Zi")
-    set(CMAKE_C_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG")
-    set(CMAKE_C_FLAGS_DIST "/O2 /Ob2 /DNDEBUG")
-
-    set(CMAKE_CXX_FLAGS "")
-    set(CMAKE_CXX_FLAGS_DEBUG "/EHsc /Od /Zi")
-    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /Ob2 /DNDEBUG /EHsc")
-    set(CMAKE_CXX_FLAGS_DIST "/O2 /Ob2 /DNDEBUG /EHsc")
-
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG:FULL")
-    set(CMAKE_EXE_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
-    set(CMAKE_SHARED_LINKER_FLAGS_DIST "/INCREMENTAL:NO")
-else ()
+if (nebula_cmake_platform STREQUAL "Windows")
     set(CMAKE_C_FLAGS "-std=c11")
     set(CMAKE_C_FLAGS_DEBUG "-O0 -g -fms-runtime-lib=static_dbg")
     set(CMAKE_C_FLAGS_RELEASE "-O2 -fms-runtime-lib=static")
@@ -59,6 +45,16 @@ else ()
     set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -fms-runtime-lib=static_dbg")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2 -fms-runtime-lib=static")
     set(CMAKE_CXX_FLAGS_DIST "-O3 -fms-runtime-lib=static")
+else ()
+    set(CMAKE_C_FLAGS "-std=c11")
+    set(CMAKE_C_FLAGS_DEBUG "-O0 -g")
+    set(CMAKE_C_FLAGS_RELEASE "-O2")
+    set(CMAKE_C_FLAGS_DIST "-O3")
+
+    set(CMAKE_CXX_FLAGS "")
+    set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+    set(CMAKE_CXX_FLAGS_DIST "-O3")
 endif ()
 
 

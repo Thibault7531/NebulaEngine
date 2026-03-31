@@ -139,4 +139,9 @@ namespace Nebula::Platform
     {
         return WindowManager::Get().GetWindowFromHandle(SDL_GetKeyboardFocus());
     }
+
+    std::filesystem::path Files::GetResourcesPath()
+    {
+        return std::filesystem::canonical("/proc/self/exe").parent_path();
+    }
 }
