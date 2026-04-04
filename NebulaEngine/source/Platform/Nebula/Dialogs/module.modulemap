@@ -1,0 +1,4 @@
+module NebulaFileDialogs {
+    header "FileDialogs.h"
+    export *
+}

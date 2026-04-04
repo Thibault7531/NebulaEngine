@@ -58,7 +58,7 @@ namespace Nebula::Platform
         if (mode == VSyncMode::On) SDL_GL_SetSwapInterval(1);
     }
 
-    VSyncMode OpenGlContext::IsVsync()
+    VSyncMode OpenGlContext::IsVsync() const
     {
         int mode;
         SDL_GL_GetSwapInterval(&mode);

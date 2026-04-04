@@ -340,7 +340,7 @@ namespace Nebula::Platform
         m_Context->SetCurrent();
     }
 
-    void* WindowsWindow::GetHandle() const
+    void* WindowsWindow::GetHandle()
     {
         return m_Hwnd;
     }

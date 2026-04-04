@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Nebula/CoreSystems/Application/Application.h"
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 
 extern Nebula::Application* Nebula::CreateApplication();
 
 // ReSharper disable once CppNonInlineFunctionDefinitionInHeaderFile
-int main(int argc, char** argv)
+int main()
 {
 	Nebula::Log::Init();
 	Nebula::Platform::Log::Init();
@@ -22,4 +23,5 @@ int main(int argc, char** argv)
 	delete app;
 	NB_PROFILE_END_SESSION();
 }
+
 

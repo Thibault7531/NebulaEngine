@@ -79,7 +79,7 @@ namespace Nebula::Platform
         }
     }
 
-    VSyncMode OpenGlContext::IsVsync()
+    VSyncMode OpenGlContext::IsVsync() const
     {
         int result = wglGetSwapIntervalEXT();
 

@@ -60,7 +60,7 @@ namespace Nebula::Platform
 
     public:
         virtual void* GetNativeWindow() override { return &m_Window; }
-        virtual void* GetHandle() const override;
+        virtual void* GetHandle() override;
         virtual uint32_t GetID() const override;
 
     private:

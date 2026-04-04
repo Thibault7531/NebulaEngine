@@ -10,7 +10,7 @@
 namespace Nebula::Platform
 {
 
-    std::vector<Displays::Display> Displays::GetDisplays()
+    std::vector<Display> Displays::GetDisplays()
     {
         winrt::Windows::Foundation::Collections::IVectorView<winrt::Microsoft::UI::Windowing::DisplayArea> displays = winrt::Microsoft::UI::Windowing::DisplayArea::FindAll();
         std::vector<Display> result;
@@ -138,6 +138,8 @@ namespace Nebula::Platform
 
     std::filesystem::path Files::GetResourcesPath()
     {
-        return GetModuleFileName(nullptr);
+        char buffer[MAX_PATH];
+        GetModuleFileName(nullptr, buffer, MAX_PATH);
+        return std::filesystem::path(buffer).parent_path();
     }
 }

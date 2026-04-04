@@ -14,7 +14,11 @@ file(GLOB_RECURSE EditorHeaderList
 
 
 # Setup Target
-add_executable(NebulaEditor)
+if (nebula_cmake_platform STREQUAL MacOS)
+    add_executable(NebulaEditor MACOSX_BUNDLE)
+else ()
+    add_executable(NebulaEditor)
+endif ()
 target_sources(NebulaEditor PRIVATE ${EditorSourceList} PUBLIC ${EditorHeaderList})
 
 
@@ -66,5 +70,18 @@ if (nebula_cmake_platform STREQUAL Windows)
             POST_BUILD
             COMMAND ${CMAKE_COMMAND}
             ARGS -E copy "${CMAKE_SOURCE_DIR}/NebulaEngine/vendor/winrt/Microsoft.WindowsAppRuntime.Bootstrap.dll" "$<TARGET_FILE_DIR:NebulaEditor>/Microsoft.WindowsAppRuntime.Bootstrap.dll"
+    )
+
+elseif (nebula_cmake_platform STREQUAL MacOS)
+    set_target_properties(NebulaEditor PROPERTIES
+                          MACOSX_BUNDLE TRUE
+                          MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Platform/MacOS/Bundle/MacOSXBundleInfo.plist.in"
+
+                          MACOSX_BUNDLE_BUNDLE_NAME "Nebula Editor"
+                          MACOSX_BUNDLE_GUI_IDENTIFIER "com.nebula.editor"
+                          XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.nebula.editor"
+                          MACOSX_BUNDLE_BUNDLE_VERSION "1"
+                          MACOSX_BUNDLE_SHORT_VERSION_STRING "dev"
+                          MACOSX_BUNDLE_COPYRIGHT "© 2024 - 2026 Infinity"
     )
 endif ()

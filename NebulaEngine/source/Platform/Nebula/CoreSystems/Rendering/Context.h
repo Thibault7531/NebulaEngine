@@ -18,7 +18,7 @@ namespace Nebula::Platform
 
         virtual void SetCurrent() = 0;
         virtual void SetVSync(VSyncMode mode) = 0;
-        virtual VSyncMode IsVsync() = 0;
+        [[nodiscard]] virtual VSyncMode IsVsync() const = 0;
         virtual void SwapBuffers() = 0;
     };
 

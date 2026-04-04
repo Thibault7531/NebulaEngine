@@ -20,7 +20,7 @@ namespace Nebula::Platform
 
         virtual void SetCurrent() override;
         virtual void SetVSync(VSyncMode mode) override;
-        virtual VSyncMode IsVsync() override;
+        virtual VSyncMode IsVsync() const override;
         virtual void SwapBuffers() override;
 
         void InitOpenGL();

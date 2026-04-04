@@ -7,7 +7,7 @@
 namespace Nebula::Platform
 {
 
-    std::vector<Displays::Display> Displays::GetDisplays()
+    std::vector<Display> Displays::GetDisplays()
     {
         int count;
         SDL_DisplayID* displays = SDL_GetDisplays(&count);

@@ -22,6 +22,17 @@ if (nebula_cmake_platform STREQUAL Windows)
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
+
+elseif (nebula_cmake_platform STREQUAL MacOS)
+    file(GLOB_RECURSE NebulaPlatformSourceFiles
+         "Platform/OpenGL/*.cpp"
+    )
+    file(GLOB_RECURSE NebulaPlatformHeaderFiles
+         "Platform/OpenGL/*.hpp"
+         "Platform/OpenGL/*.h"
+    )
+    list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
+    list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
 elseif (nebula_cmake_platform STREQUAL Linux)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
          "Platform/OpenGL/*.cpp"

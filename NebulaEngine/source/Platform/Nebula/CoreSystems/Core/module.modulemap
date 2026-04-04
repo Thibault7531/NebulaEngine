@@ -1,0 +1,4 @@
+module NebulaDisplay {
+    header "Display.h"
+    export *
+}
