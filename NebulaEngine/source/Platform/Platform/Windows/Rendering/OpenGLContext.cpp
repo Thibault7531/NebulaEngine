@@ -34,7 +34,7 @@ namespace Nebula::Platform
 
         int attributes[] = {
             WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 6,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 1,
             WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
             0
         };

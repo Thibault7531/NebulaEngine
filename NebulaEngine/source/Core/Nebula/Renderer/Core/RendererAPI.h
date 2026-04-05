@@ -12,7 +12,7 @@ namespace Nebula {
 	public:
 		enum class API
 		{
-			None = 0, OpenGL = 1
+			None = 0, OpenGL = 1, OpenGL410 = 2
 		};
 
 	public:

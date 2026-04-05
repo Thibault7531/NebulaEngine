@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
+#include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 #include "Shader.h"
 #include "Buffers/VertexArray.h"
 #include "Cameras/Camera.h"
@@ -23,7 +24,7 @@ namespace Nebula
         static constexpr uint32_t MaxQuads = 10000;
         static constexpr uint32_t MaxVertices = MaxQuads * 4;
         static constexpr uint32_t MaxIndices = MaxQuads * 6;
-        static constexpr uint32_t MaxTextureSlots = 32;
+        static constexpr uint32_t MaxTextureSlots = 16;
 
         Ref<VertexArray> QuadVertexArray;
         Ref<VertexBuffer> QuadVertexBuffer;
@@ -83,7 +84,7 @@ namespace Nebula
         for (uint32_t i = 0; i < Nebula::Renderer2DData::MaxTextureSlots; i++)
             samplers[i] = i;
 
-        s_Data.QuadShader = Shader::Create("assets/NebulaEngine/shaders/Renderer2D.glsl");
+        s_Data.QuadShader = Shader::Create(std::format("{}/assets/NebulaEngine/shaders/Renderer2D.glsl", Platform::Files::GetResourcesPath().string()));
 
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetIntArray("u_Textures", samplers, Nebula::Renderer2DData::MaxTextureSlots);

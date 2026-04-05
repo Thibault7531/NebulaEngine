@@ -1,0 +1,32 @@
+#pragma once
+
+#include <cstdint>
+
+#include "Nebula/Renderer/Buffers/VertexArray.h"
+
+namespace Nebula {
+	/**
+	 * OpenGL Vertex array.
+	 */
+	class OpenGL410VertexArray : public VertexArray
+	{
+	public:
+		OpenGL410VertexArray();
+		virtual ~OpenGL410VertexArray() override;
+
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
+
+		virtual void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
+		virtual void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) override;
+
+		virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const override { return m_VertexBuffers; }
+		virtual const Ref<IndexBuffer>& GetIndexBuffer() const override { return m_IndexBuffer;}
+
+	private:
+		uint32_t m_RendererID;
+		std::vector<Ref<VertexBuffer>> m_VertexBuffers;
+		Ref<IndexBuffer> m_IndexBuffer;
+	};
+
+}

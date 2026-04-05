@@ -1,5 +1,7 @@
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 
+#include <mach-o/dyld.h>
+
 #include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
 #include "SwiftPlatformUtils.h"
 #include "WindowManager.h"
@@ -77,5 +79,16 @@ namespace Nebula::Platform
     {
         int32_t id = SwiftPlatformUtils::GetForegroundWindowID();
         return WindowManager::Get().GetWindowFromID(id);
+    }
+
+    std::filesystem::path Files::GetResourcesPath()
+    {
+        uint32_t size = 0;
+        _NSGetExecutablePath(nullptr, &size);
+
+        std::string buffer(size, '\0');
+        _NSGetExecutablePath(buffer.data(), &size);
+
+        return std::filesystem::path(buffer).parent_path().parent_path();
     }
 }

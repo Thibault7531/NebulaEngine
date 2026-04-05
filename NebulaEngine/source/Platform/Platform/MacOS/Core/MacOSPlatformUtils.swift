@@ -5,6 +5,7 @@ import NebulaInput
 import AppKit
 import CoreGraphics
 import CxxStdlib
+import Foundation
 
 public func GetDisplayAmount() -> UInt32 {
     return UInt32(NSScreen.screens.count)

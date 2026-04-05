@@ -42,6 +42,9 @@ public struct OpenGLContext {
         else { return .On }
     }
     public func SwapBuffers() {
+        MainActor.assumeIsolated {
+            m_OGLContext.update()
+        }
         m_OGLContext.flushBuffer()
     }
 }

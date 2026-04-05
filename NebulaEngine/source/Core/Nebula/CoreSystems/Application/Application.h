@@ -16,6 +16,7 @@ namespace Nebula {
 		virtual ~Application();
 
 		void Run();
+		void Render();
 		void Shutdown();
 
 		void OnEvent(Platform::Event& e);

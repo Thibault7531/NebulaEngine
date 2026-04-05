@@ -56,6 +56,9 @@ public struct MacOSWindow {
         if props.Style == .BorderlessInteractive {
             m_Window.titlebarAppearsTransparent = true
             m_Window.titleVisibility = .hidden
+            m_Window.titlebarSeparatorStyle = .none
+            
+            m_Window.contentView!.additionalSafeAreaInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         }
         
         let options: NSTrackingArea.Options = [
@@ -315,8 +318,8 @@ public class MacOSWindowDelegate: NSObject, NSWindowDelegate {
     
     public func windowDidResize(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
-        let width = UInt32(window.frame.width)
-        let height = UInt32(window.frame.height)
+        let width = UInt32(window.contentView!.frame.width)
+        let height = UInt32(window.contentView!.frame.height)
         
         var nebulaEvent = Nebula.Platform.WindowResizedEvent(width, height)
         m_EventHandler.OnWindowResized(&nebulaEvent)

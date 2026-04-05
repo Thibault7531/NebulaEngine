@@ -110,31 +110,36 @@ namespace Nebula
 		while (m_Running) {
 			NB_PROFILE_SCOPE("RunLoop");
 
-			m_MainWindow->SetCurrentContext();
+			Render();
+		}
+	}
 
-			std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
-			const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000.f;
-			m_LastFrameTime = time;
+	void Application::Render()
+	{
+		m_MainWindow->SetCurrentContext();
 
-			if (!m_Minimized)
+		std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
+		const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000.f;
+		m_LastFrameTime = time;
+
+		if (!m_Minimized)
+		{
 			{
-				{
-					NB_PROFILE_SCOPE("LayerStack::OnUpdate");
-					for (Layer* layer : m_LayerStack)
-						layer->OnUpdate(timestep);
-				}
-
-				m_ImGuiLayer->Begin(timestep);
-				{
-					NB_PROFILE_SCOPE("LayerStack::OnImGuiRender");
-					for (Layer* layer : m_LayerStack)
-						layer->OnImGuiRender();
-				}
-				m_ImGuiLayer->End();
+				NB_PROFILE_SCOPE("LayerStack::OnUpdate");
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(timestep);
 			}
 
-			m_MainWindow->OnUpdate();
+			m_ImGuiLayer->Begin(timestep);
+			{
+				NB_PROFILE_SCOPE("LayerStack::OnImGuiRender");
+				for (Layer* layer : m_LayerStack)
+					layer->OnImGuiRender();
+			}
+			m_ImGuiLayer->End();
 		}
+
+		m_MainWindow->OnUpdate();
 	}
 
 	void Application::Shutdown()
@@ -153,6 +158,7 @@ namespace Nebula
 		NB_PROFILE_FUNCTION();
 
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+		Render();
 
 		return false;
 	}

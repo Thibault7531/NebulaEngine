@@ -1,7 +1,13 @@
 #include "Shader.h"
 
 #include "Renderer.h"
+
+#ifdef NB_PLATFORM_MACOS
+#include "Platform/OpenGL410/OpenGL410Shader.h"
+#else
 #include "Platform/OpenGL/OpenGLShader.h"
+#include "Platform/OpenGL410/OpenGL410Shader.h"
+#endif
 
 namespace Nebula {
 
@@ -9,8 +15,15 @@ namespace Nebula {
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-			case RendererAPI::API::OpenGL: return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc, sourceType);
+#ifdef NB_PLATFORM_MACOS
+		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
+		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410Shader>(name, vertexSrc, fragmentSrc, sourceType);
+#else
+		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case RendererAPI::API::OpenGL: return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc, sourceType);
+		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410Shader>(name, vertexSrc, fragmentSrc, sourceType);
+#endif
 		}
 
 		NB_CORE_ASSERT(false, "Unknown RendererAPI");
@@ -21,8 +34,15 @@ namespace Nebula {
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-			case RendererAPI::API::OpenGL: return std::make_shared<OpenGLShader>(filepath);
+#ifdef NB_PLATFORM_MACOS
+		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
+		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410Shader>(filepath);
+#else
+		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case RendererAPI::API::OpenGL: return std::make_shared<OpenGLShader>(filepath);
+		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410Shader>(filepath);
+#endif
 		}
 
 		NB_CORE_ASSERT(false, "Unknown RendererAPI");

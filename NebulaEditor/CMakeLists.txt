@@ -27,18 +27,33 @@ set_target_properties(NebulaEditor PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_
 
 
 # Compile Options
-add_custom_command(
-        TARGET NebulaEditor
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:NebulaEditor>/assets/NebulaEditor"
-)
-add_custom_command(
-        TARGET NebulaEditor
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_FILE_DIR:NebulaEditor>/assets/NebulaEngine"
-)
+if (nebula_cmake_platform STREQUAL MacOS)
+    add_custom_command(
+            TARGET NebulaEditor
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_BUNDLE_CONTENT_DIR:NebulaEditor>/assets/NebulaEditor"
+    )
+    add_custom_command(
+            TARGET NebulaEditor
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_BUNDLE_CONTENT_DIR:NebulaEditor>/assets/NebulaEngine"
+    )
+else ()
+    add_custom_command(
+            TARGET NebulaEditor
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:NebulaEditor>/assets/NebulaEditor"
+    )
+    add_custom_command(
+            TARGET NebulaEditor
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_FILE_DIR:NebulaEditor>/assets/NebulaEngine"
+    )
+endif ()
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET NebulaEditor PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
 else ()
