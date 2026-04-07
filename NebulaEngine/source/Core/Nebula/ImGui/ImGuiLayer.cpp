@@ -1,5 +1,7 @@
 #include "ImGuiLayer.h"
 
+#include <ImGuizmo.h>
+
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
@@ -98,6 +100,7 @@ namespace Nebula
 		m_ImGuiRenderer->NewFrame();
 		m_ImGuiPlatform->NewFrame(ts);
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::End() const

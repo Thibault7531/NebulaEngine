@@ -23,3 +23,6 @@
 [submodule "NebulaEngine/vendor/Assimp"]
 	path = NebulaEngine/vendor/Assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "NebulaEngine/vendor/ImGuizmo"]
+	path = NebulaEngine/vendor/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git

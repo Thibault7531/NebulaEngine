@@ -1,9 +1,10 @@
 #include "EditorLayer.h"
 
-#include <imgui.h>
+#include <imgui_internal.h>
 #include <gtc/type_ptr.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/matrix_decompose.hpp>
 
-#include "imgui_internal.h"
 #include "Nebula.h"
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/Renderer/Buffers/Framebuffer.h"
@@ -27,8 +28,6 @@ namespace Nebula {
         m_Scene = CreateRef<Scene>();
 
         m_SceneHierarchyPanel.SetContext(m_Scene);
-
-        Application::Get().GetImGuiLayer()->BlockEvents(false);
 
         Platform::WindowManager::Get().GetMainWindow()->SetVSync(Platform::VSyncMode::Adaptive);
         Platform::WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
@@ -147,6 +146,9 @@ namespace Nebula {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
         ImGui::Begin("Scene");
         {
+            ImGuizmo::SetDrawlist();
+
+            ImVec2 pos = ImGui::GetCursorScreenPos();
             ImVec2 size = ImGui::GetContentRegionAvail();
             if (m_ViewportSize != *reinterpret_cast<glm::vec2*>(&size)) {
                 m_ViewportSize = { size.x, size.y };
@@ -155,8 +157,53 @@ namespace Nebula {
 
             IsViewportFocused = ImGui::IsWindowFocused();
             IsViewportHovered = ImGui::IsWindowHovered();
+            Application::Get().GetImGuiLayer()->BlockEvents(!IsViewportFocused && !IsViewportHovered);
 
             ImGui::Image(m_Framebuffer->GetColorAttachmentRendererID(), { m_ViewportSize.x, m_ViewportSize.y }, {0, 1}, {1, 0});
+
+            ImGuizmo::Enable(true);
+            ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
+            Entity cameraEntity = m_Scene->GetPrimaryCameraEntity();
+            Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+            if (cameraEntity)
+            {
+                SceneCamera::ProjectionType type = cameraEntity.GetComponent<CameraComponent>().Camera.GetProjectionType();
+                ImGuizmo::SetOrthographic(type == SceneCamera::ProjectionType::Orthographic);
+                TransformComponent& cameraTransform = cameraEntity.GetComponent<TransformComponent>();
+                glm::mat4 view = glm::inverse(cameraTransform.GetTransform());
+
+                if (type == SceneCamera::ProjectionType::Perspective)
+                {
+                    ImGuizmo::ViewManipulate(glm::value_ptr(view), 8.f, ImVec2(pos.x + size.x - 200, pos.y), ImVec2(200, 200), 0x10101000);
+
+                    if (ImGuizmo::IsUsingViewManipulate())
+                    {
+                        glm::quat rotation;
+                        glm::vec3 skew{0.0f};
+                        glm::vec4 perspective{0.0f, 0.0f, 0.0f, 1.0f};
+                        glm::decompose(glm::inverse(view), cameraTransform.Scale, rotation, cameraTransform.Translation, skew, perspective);
+                        cameraTransform.Rotation = glm::eulerAngles(rotation);
+                    }
+                }
+
+                if (selectedEntity && selectedEntity != cameraEntity && m_GizmoOperation != -1)
+                {
+                    glm::mat4 projection = cameraEntity.GetComponent<CameraComponent>().Camera.getProjectionMatrix();
+                    glm::mat4 transform = selectedEntity.GetComponent<TransformComponent>().GetTransform();
+                    ImGuizmo::PushID(0);
+                    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::MODE::WORLD, glm::value_ptr(transform));
+                    ImGuizmo::PopID();
+
+                    if (ImGuizmo::IsUsing())
+                    {
+                        glm::quat rotation;
+                        glm::vec3 skew{0.0f};
+                        glm::vec4 perspective{0.0f, 0.0f, 0.0f, 1.0f};
+                        glm::decompose(transform, selectedEntity.GetComponent<TransformComponent>().Scale, rotation, selectedEntity.GetComponent<TransformComponent>().Translation, skew, perspective);
+                        selectedEntity.GetComponent<TransformComponent>().Rotation = glm::eulerAngles(rotation);
+                    }
+                }
+            }
         }
         ImGui::End();
         ImGui::PopStyleVar();
@@ -225,6 +272,11 @@ namespace Nebula {
         if (event.GetKeyCode() == KeyboardKey::N && control) NewScene();
         if (event.GetKeyCode() == KeyboardKey::O && control) OpenScene();
         if (event.GetKeyCode() == KeyboardKey::S && control && shift) SaveSceneAs();
+
+        if (event.GetKeyCode() == KeyboardKey::Q) m_GizmoOperation = -1;
+        if (event.GetKeyCode() == KeyboardKey::W) m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+        if (event.GetKeyCode() == KeyboardKey::E) m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
+        if (event.GetKeyCode() == KeyboardKey::R) m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
         return false;
     }
 }

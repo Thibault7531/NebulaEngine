@@ -68,6 +68,34 @@ else ()
 endif ()
 
 
+# ImGuizmo
+
+add_library(ImGuizmo STATIC
+            ImGuizmo/GraphEditor.h
+            ImGuizmo/GraphEditor.cpp
+            ImGuizmo/ImCurveEdit.h
+            ImGuizmo/ImCurveEdit.cpp
+            ImGuizmo/ImGradient.h
+            ImGuizmo/ImGradient.cpp
+            ImGuizmo/ImGuizmo.h
+            ImGuizmo/ImGuizmo.cpp
+            ImGuizmo/ImLightRig.h
+            ImGuizmo/ImSequencer.h
+            ImGuizmo/ImSequencer.cpp
+            ImGuizmo/ImZoomSlider.h
+)
+
+target_include_directories(ImGuizmo PRIVATE
+                           imgui
+)
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set_property(TARGET ImGuizmo PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
+else ()
+    set_property(TARGET ImGuizmo PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+endif ()
+
+
 # SDL3
 
 add_subdirectory(SDL)

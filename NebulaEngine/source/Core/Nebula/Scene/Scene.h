@@ -20,6 +20,8 @@ namespace Nebula
         Entity CreateEntity(const std::string& name = "Unnamed Entity");
         void DestroyEntity(Entity entity);
 
+        Entity GetPrimaryCameraEntity();
+
     private:
         template<typename T>
         void OnComponentAdded(Entity entity, T& component);
