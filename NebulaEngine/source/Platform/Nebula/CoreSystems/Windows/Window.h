@@ -100,6 +100,9 @@ namespace Nebula::Platform
         virtual void Raise() const = 0;
         virtual void Flash() const = 0;
 
+        virtual void StartInput() = 0;
+        virtual void StopInput() = 0;
+
         [[nodiscard]] virtual Ref<Context> GetContext() = 0;
         virtual void SetCurrentContext() = 0;
 

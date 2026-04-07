@@ -54,6 +54,9 @@ namespace Nebula::Platform
         virtual void Raise() const override;
         virtual void Flash() const override;
 
+        virtual void StartInput() override {}
+        virtual void StopInput() override {}
+
         [[nodiscard]] virtual Ref<Context> GetContext() override { return m_Context; }
         virtual void SetCurrentContext() override;
 
