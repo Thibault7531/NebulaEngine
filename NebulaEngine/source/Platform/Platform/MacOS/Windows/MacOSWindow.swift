@@ -236,9 +236,9 @@ public struct MacOSWindow {
         return Int32(mainScreen.frame.height - contentRect.origin.y - contentRect.height)
     }
     public func GetTitlebarHeight() -> Int32 {
-        var contentRect: NSRect = m_Window.frame
-        contentRect = NSWindow.contentRect(forFrameRect: contentRect, styleMask: m_WindowStyle)
-        return Int32(contentRect.minX - m_Window.frame.minX)
+        let frame = m_Window.frame
+        let contentLayout = m_Window.contentLayoutRect
+        return Int32(frame.height - contentLayout.height)
     }
     
     public func SetMousePos(x: Int32, y:Int32) {

@@ -7,6 +7,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -16,6 +17,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -25,6 +27,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -34,6 +37,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -43,6 +47,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -52,6 +57,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -61,6 +67,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -70,6 +77,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -79,6 +87,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -88,6 +97,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -97,6 +107,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -106,6 +117,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -115,6 +127,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -124,6 +137,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -133,6 +147,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -142,6 +157,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }
@@ -151,6 +167,7 @@ namespace Nebula::Platform
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {
+            e.WindowID = m_Window->GetID();
             callback(e);
         }
     }

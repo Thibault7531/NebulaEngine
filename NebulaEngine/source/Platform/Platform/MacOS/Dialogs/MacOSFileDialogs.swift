@@ -19,7 +19,7 @@ public func OpenFile(callback: Nebula.Platform.CallbackHandler) {
         OpenPanel.begin { response in
             if response == .OK {
                 if let url = OpenPanel.url {
-                    CallBackWrapper.Callback.OnFileSelected(std.string(url.absoluteString))
+                    CallBackWrapper.Callback.OnFileSelected(std.string(url.relativePath))
                 }
             }
         }

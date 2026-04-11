@@ -122,7 +122,10 @@ namespace Nebula
         strStream << stream.rdbuf();
 
         YAML::Node data = YAML::Load(strStream.str());
-        if (!data["Scene"]) return false;
+        if (!data["Scene"]) {
+            NB_CORE_ERROR("File is not a scene file: {}", filepath);
+            return false;
+        }
 
         std::string sceneName = data["Scene"].as<std::string>();
         NB_CORE_TRACE("Deserializing scene \"{}\"", sceneName.c_str());

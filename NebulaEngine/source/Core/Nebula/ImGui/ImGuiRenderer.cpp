@@ -19,7 +19,7 @@ namespace Nebula
 #ifdef NB_PLATFORM_MACOS
         case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
         case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
-        case RendererAPI::API::OpenGL410: return CreateRef<OpenGL410ImGuiRenderer>();
+        case RendererAPI::API::OpenGL410: return CreateRef<OpenGL410::OpenGL410ImGuiRenderer>();
 #else
         case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
         case RendererAPI::API::OpenGL: return CreateRef<OpenGLImGuiRenderer>();

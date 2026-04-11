@@ -392,7 +392,7 @@ namespace Nebula
             }
 
             // (Optional) Fallback to provide mouse position when focused (SDL_EVENT_MOUSE_MOTION already provides this when hovered or captured)
-            if (platform_data.MouseButtonsDown == 0)
+            if (platform_data.MouseButtonsDown == 0 || true)
             {
                 auto [mouse_x, mouse_y] = Platform::Input::GetMousePosition();
                 auto [window_x, window_y] = focused_window->GetClientPos();
