@@ -12,7 +12,7 @@ namespace Nebula {
 #ifdef NB_PLATFORM_MACOS
 	RendererAPI* RenderCommand::s_RendererAPI = new OpenGL410RendererAPI;
 #else
-	RendererAPI* RenderCommand::s_RendererAPI = new OpenGL410RendererAPI;
+	RendererAPI* RenderCommand::s_RendererAPI = new OpenGLRendererAPI;
 #endif
 
 }

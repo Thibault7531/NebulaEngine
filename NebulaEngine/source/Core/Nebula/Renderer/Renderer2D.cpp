@@ -3,11 +3,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
-#include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 #include "Shader.h"
 #include "Buffers/VertexArray.h"
 #include "Cameras/Camera.h"
 #include "Core/RenderCommand.h"
+#include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 
 namespace Nebula
 {

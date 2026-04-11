@@ -2,6 +2,7 @@
 
 #include "Nebula/CoreSystems/Core/Timestep.h"
 #include "Nebula/Renderer/Renderer.h"
+#include "Nebula/Renderer/Core/RenderCommand.h"
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
@@ -140,6 +141,8 @@ namespace Nebula
 		}
 
 		m_MainWindow->OnUpdate();
+
+		RenderCommand::Log();
 	}
 
 	void Application::Shutdown()

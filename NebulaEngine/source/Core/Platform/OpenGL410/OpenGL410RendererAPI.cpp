@@ -23,6 +23,21 @@ namespace Nebula {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	}
 
+	void OpenGL410RendererAPI::Log()
+	{
+		GLint len;
+		glGetIntegerv(GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH_ARB, &len);
+
+		auto message = static_cast<GLchar*>(malloc(sizeof(GLchar) * len));
+		GLenum source;
+		GLenum type;
+		GLuint id;
+		GLenum severity;
+		GLsizei length;
+		glGetDebugMessageLogARB(1, len, &source, &type, &id, &severity, &length, message);
+		if (type == GL_DEBUG_TYPE_ERROR_ARB) NB_CORE_ERROR("OpenGL Error: {0}", message);
+	}
+
 	void OpenGL410RendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
 		glViewport(x, y, width, height);
