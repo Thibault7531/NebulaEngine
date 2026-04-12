@@ -7,6 +7,11 @@ namespace Nebula::Platform
     {
     }
 
+    MacOSWindow::~MacOSWindow()
+    {
+        m_NativeWindow.Destroy();
+    }
+
     void MacOSWindow::SetEventCallback(const std::function<void(Event&)>& func) { m_EventCallback = func; }
     const std::function<void(Event&)>& MacOSWindow::GetEventCallback() { return m_EventCallback; }
     void MacOSWindow::SetWindowHitTest(const std::function<HitTest(int32_t, int32_t)>& func) { m_WindowHitTest = func; }
@@ -18,7 +23,10 @@ namespace Nebula::Platform
         m_NativeWindow.OnUpdate();
     }
 
-    void MacOSWindow::SwapBuffers() {}
+    void MacOSWindow::SwapBuffers()
+    {
+        m_NativeWindow.SwapBuffers();
+    }
 
     std::pair<uint32_t, uint32_t> MacOSWindow::GetSize() const
     {
@@ -142,7 +150,15 @@ namespace Nebula::Platform
         m_NativeWindow.Flash();
     }
 
-    Ref<Context> MacOSWindow::GetContext() { return nullptr; }
+    Ref<Context> MacOSWindow::GetContext()
+    {
+        if (!m_Context)
+        {
+            OpenGlContext context = m_NativeWindow.GetContext();
+            m_Context = CreateRef<OpenGlContext>(context);
+        }
+        return m_Context;
+    }
 
     void MacOSWindow::SetCurrentContext()
     {

@@ -15,6 +15,9 @@ public struct MacOSWindow {
     var m_WindowTrackingArea: NSTrackingArea
     var m_WindowDelegate: MacOSWindowDelegate
     
+    nonisolated(unsafe) private static var s_EventHandlers: [Int: Nebula.Platform.EventHandler] = [:]
+    nonisolated(unsafe) private static var s_TrackingAreas: [Int: NSTrackingArea] = [:]
+    
     init(props: Nebula.Platform.WindowProperties, eventHandler: Nebula.Platform.EventHandler) {
         m_Properties = props
         m_EventHandler = eventHandler
@@ -79,33 +82,43 @@ public struct MacOSWindow {
         MainActor.assumeIsolated {
             m_Window.contentView!.addTrackingArea(m_WindowTrackingArea)
         }
+        
+        MacOSWindow.s_EventHandlers[m_Window.windowNumber] = m_EventHandler
+        MacOSWindow.s_TrackingAreas[m_Window.windowNumber] = m_WindowTrackingArea
+    }
+    
+    public mutating func Destroy() {
+        m_Window.close()
     }
     
     public mutating func OnUpdate() {
-        SwapBuffers()
-        
         RunLoop.main.run(mode: .default, before: Date())
         var now = Date()
         MainActor.assumeIsolated {
-            var event = NSApp.nextEvent(matching: .any, until: now, inMode: .default, dequeue: true)
+            var event = m_Window.nextEvent(matching: .any, until: now, inMode: .default, dequeue: true)
             while (event != nil) {
-                if (event?.window == m_Window) {
+                NSApp.sendEvent(event!)
+                
+                if let targetWindow = event?.window,
+                   var handler = MacOSWindow.s_EventHandlers[targetWindow.windowNumber],
+                   let trackingArea = MacOSWindow.s_TrackingAreas[targetWindow.windowNumber] {
+                    
                     switch (event!.type) {
                     case .leftMouseDown:
                         var nebulaEvent = Nebula.Platform.MouseButtonPressedEvent(.Left)
-                        m_EventHandler.OnMouseButtonPressed(&nebulaEvent)
+                        handler.OnMouseButtonPressed(&nebulaEvent)
                         
                     case .leftMouseUp:
                         var nebulaEvent = Nebula.Platform.MouseButtonReleasedEvent(.Left)
-                        m_EventHandler.OnMouseButtonReleased(&nebulaEvent)
+                        handler.OnMouseButtonReleased(&nebulaEvent)
                         
                     case .rightMouseDown:
                         var nebulaEvent = Nebula.Platform.MouseButtonPressedEvent(.Right)
-                        m_EventHandler.OnMouseButtonPressed(&nebulaEvent)
+                        handler.OnMouseButtonPressed(&nebulaEvent)
                         
                     case .rightMouseUp:
                         var nebulaEvent = Nebula.Platform.MouseButtonReleasedEvent(.Right)
-                        m_EventHandler.OnMouseButtonReleased(&nebulaEvent)
+                        handler.OnMouseButtonReleased(&nebulaEvent)
                         
                     case .otherMouseDown:
                         let button = event?.buttonNumber
@@ -121,7 +134,7 @@ public struct MacOSWindow {
                             nebulaButton = .Unknown
                         }
                         var nebulaEvent = Nebula.Platform.MouseButtonPressedEvent(nebulaButton)
-                        m_EventHandler.OnMouseButtonPressed(&nebulaEvent)
+                        handler.OnMouseButtonPressed(&nebulaEvent)
                         
                     case .otherMouseUp:
                         let button = event?.buttonNumber
@@ -137,50 +150,48 @@ public struct MacOSWindow {
                             nebulaButton = .Unknown
                         }
                         var nebulaEvent = Nebula.Platform.MouseButtonReleasedEvent(nebulaButton)
-                        m_EventHandler.OnMouseButtonReleased(&nebulaEvent)
+                        handler.OnMouseButtonReleased(&nebulaEvent)
                         
                     case .mouseMoved:
-                        if (event!.window == nil) {break}
-                        let mouseY = Float(m_Window.contentView!.frame.height - event!.window!.mouseLocationOutsideOfEventStream.y)
+                        let mouseY = Float(targetWindow.contentView!.frame.height - event!.window!.mouseLocationOutsideOfEventStream.y)
                         var nebulaEvent = Nebula.Platform.MouseMovedEvent(Float(event!.window!.mouseLocationOutsideOfEventStream.x), mouseY)
-                        m_EventHandler.OnMouseMoved(&nebulaEvent)
+                        handler.OnMouseMoved(&nebulaEvent)
                         
                     case .scrollWheel:
                         var nebulaEvent = Nebula.Platform.MouseScrolledEvent(Float(event!.deltaX), Float(event!.deltaY))
-                        m_EventHandler.OnMouseScrolled(&nebulaEvent)
+                        handler.OnMouseScrolled(&nebulaEvent)
                         
                     case .mouseEntered:
-                        if (event!.trackingArea == m_WindowTrackingArea) {
+                        if (event!.trackingArea == trackingArea) {
                             var nebulaEvent = Nebula.Platform.MouseEnteredEvent()
-                            m_EventHandler.OnMouseEntered(&nebulaEvent)
+                            handler.OnMouseEntered(&nebulaEvent)
                         }
                         
                     case .mouseExited:
-                        if (event!.trackingArea == m_WindowTrackingArea) {
+                        if (event!.trackingArea == trackingArea) {
                             var nebulaEvent = Nebula.Platform.MouseLeftEvent()
-                            m_EventHandler.OnMouseLeft(&nebulaEvent)
+                            handler.OnMouseLeft(&nebulaEvent)
                         }
                         
                     case .keyDown:
                         let key = GetKeyboardKeyFromKeyCode(keycode: event!.keyCode)
                         
                         var nebulaEvent = Nebula.Platform.KeyPressedEvent(key, event!.isARepeat ? 1 : 0)
-                        m_EventHandler.OnKeyPressed(&nebulaEvent)
+                        handler.OnKeyPressed(&nebulaEvent)
                         
                         var nebulaCharEvent = Nebula.Platform.KeyTypedEvent(event!.characters!.cString(using: String.Encoding(rawValue: NSUTF8StringEncoding))![0])
-                        m_EventHandler.OnKeyTyped(&nebulaCharEvent)
+                        handler.OnKeyTyped(&nebulaCharEvent)
                         
                     case .keyUp:
                         let key = GetKeyboardKeyFromKeyCode(keycode: event!.keyCode)
                         
                         var nebulaEvent = Nebula.Platform.KeyReleasedEvent(key)
-                        m_EventHandler.OnKeyReleased(&nebulaEvent)
+                        handler.OnKeyReleased(&nebulaEvent)
                         
                     default:
                         break
                     }
                 }
-                NSApp.sendEvent(event!)
                 event = m_Window.nextEvent(matching: .any, until: now, inMode: .default, dequeue: true)
             }
         }
@@ -221,7 +232,7 @@ public struct MacOSWindow {
         return Int32(mainScreen.frame.height - windowFrame.origin.y - windowFrame.height)
     }
     public func SetPos(x: Int32, y: Int32) {
-        var windowRect: NSRect = NSRect(x: CGFloat(x), y: CGFloat(y), width: m_Window.frame.width, height: m_Window.frame.height)
+        var windowRect: NSRect = NSRect(x: CGFloat(x), y: CGFloat(-y) + CGFloat(NSScreen.main!.frame.height) - m_Window.frame.height, width: m_Window.frame.width, height: m_Window.frame.height)
         m_Window.setFrame(windowRect, display: true)
     }
     public func GetClientX() -> Int32 {
@@ -298,6 +309,10 @@ public struct MacOSWindow {
     }
     public func Flash() {
         NSApplication.shared.requestUserAttention(.informationalRequest)
+    }
+    
+    public func GetContext() -> Nebula.Platform.OpenGlContext {
+        return m_OGLContext
     }
     
     public mutating func SetCurrentContext() {

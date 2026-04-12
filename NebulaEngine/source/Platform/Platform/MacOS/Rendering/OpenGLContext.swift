@@ -5,6 +5,7 @@ import AppKit
 public struct OpenGLContext {
     let m_Window: NSWindow
     let m_OGLContext: NSOpenGLContext
+    nonisolated(unsafe) private static var s_MainOGLContext: NSOpenGLContext? = nil
     
     init(windowID: Int32) {
         m_Window = NSApplication.shared.window(withWindowNumber: Int(windowID))!
@@ -19,9 +20,13 @@ public struct OpenGLContext {
         ]
         
         let pf: NSOpenGLPixelFormat? = NSOpenGLPixelFormat(attributes: attribs)
-        m_OGLContext = NSOpenGLContext(format: pf!, share: nil)!
+        m_OGLContext = NSOpenGLContext(format: pf!, share: OpenGLContext.s_MainOGLContext)!
         m_OGLContext.view = m_Window.contentView
         m_OGLContext.makeCurrentContext()
+        
+        if (OpenGLContext.s_MainOGLContext == nil) {
+            OpenGLContext.s_MainOGLContext = m_OGLContext
+        }
     }
     
     public func SetCurrent() {

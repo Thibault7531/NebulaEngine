@@ -135,8 +135,6 @@ namespace Nebula::Platform
 
     void WindowsWindow::OnUpdate()
     {
-        m_Context->SwapBuffers();
-
         MSG msg;
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) != 0)
         {

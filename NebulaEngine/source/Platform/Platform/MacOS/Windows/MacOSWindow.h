@@ -2,6 +2,7 @@
 
 #include "Platform/Nebula/CoreSystems/Windows/Window.h"
 #include "Platform/Platform/MacOS/Events/EventHandler.h"
+#include "Platform/Platform/MacOS/Rendering/OpenGLContext.h"
 
 #include <SwiftMacOSWindow.h>
 
@@ -12,7 +13,7 @@ namespace Nebula::Platform
     {
     public:
         MacOSWindow(WindowProperties props);
-        virtual ~MacOSWindow() = default;
+        virtual ~MacOSWindow();
 
         virtual void SetEventCallback(const std::function<void(Event&)>& func) override;
         virtual const std::function<void(Event&)>& GetEventCallback() override;
@@ -63,6 +64,7 @@ namespace Nebula::Platform
     private:
         EventHandler m_EventHandler;
         SwiftMacOSWindow::MacOSWindow m_NativeWindow;
+        Ref<Context> m_Context;
 
         std::function<void(Event&)> m_EventCallback;
         std::function<HitTest(int32_t, int32_t)> m_WindowHitTest;

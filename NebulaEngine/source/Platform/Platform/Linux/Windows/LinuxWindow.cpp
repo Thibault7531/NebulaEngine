@@ -58,8 +58,6 @@ namespace Nebula::Platform
 
     void LinuxWindow::OnUpdate()
     {
-        SwapBuffers();
-
         CoreUtils::PumpEvents();
     }
 

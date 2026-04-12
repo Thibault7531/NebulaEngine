@@ -26,7 +26,7 @@ namespace Nebula
         io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
         // Viewports not supported on linux because wayland does not allow reading or writing window position
-#ifdef NB_PLATFORM_WINDOWS
+#if defined(NB_PLATFORM_WINDOWS) || defined(NB_PLATFORM_MACOS)
         io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
 #endif
 
@@ -636,7 +636,7 @@ namespace Nebula
 
         viewport_data->Window->SetPos(viewport->Pos.x, viewport->Pos.y);
         viewport_data->WindowOwned = true;
-        if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
+        if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL || RendererAPI::GetAPI() == RendererAPI::API::OpenGL410)
         {
             viewport_data->GraphicsContext = viewport_data->Window->GetContext();
             viewport_data->Window->SetVSync(viewport_data->ParentWindow->IsVSync());

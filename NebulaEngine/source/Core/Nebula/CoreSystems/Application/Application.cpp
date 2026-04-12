@@ -112,6 +112,7 @@ namespace Nebula
 			NB_PROFILE_SCOPE("RunLoop");
 
 			Render();
+			m_MainWindow->OnUpdate();
 		}
 	}
 
@@ -140,7 +141,7 @@ namespace Nebula
 			m_ImGuiLayer->End();
 		}
 
-		m_MainWindow->OnUpdate();
+		m_MainWindow->SwapBuffers();
 
 		RenderCommand::Log();
 	}

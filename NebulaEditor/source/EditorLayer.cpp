@@ -99,6 +99,8 @@ namespace Nebula {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0, static_cast<float>(height)});
         ImGui::BeginMainMenuBar();
         {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 64);
+
             ImGui::BeginMenu("NebulaEditor", false);
 
             std::pair<int32_t, int32_t> window_pos = { 0, 0 };
@@ -118,7 +120,7 @@ namespace Nebula {
             glm::vec4 rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
             m_TitleBarButtons.emplace_back(rect);
 
-#ifndef NB_PLATFORM_WINDOWS
+#ifdef NB_PLATFORM_LINUX
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 68);
             if (ImGui::MenuItem("_"))
             {

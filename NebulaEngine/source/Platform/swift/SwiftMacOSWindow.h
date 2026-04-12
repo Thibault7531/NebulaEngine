@@ -4177,6 +4177,7 @@ namespace _impl {
 extern "C" {
 #endif
 
+SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V7DestroyyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Destroy()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V8OnUpdateyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // OnUpdate()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V11SwapBuffersyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // SwapBuffers()
 SWIFT_EXTERN uint32_t $s16SwiftMacOSWindow0bC0V14GetWindowWidths6UInt32VyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetWindowWidth()
@@ -4227,6 +4228,7 @@ SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V4ShowyyF(SWIFT_CONTEXT const void * _
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V4HideyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Hide()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V5RaiseyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Raise()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V5FlashyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Flash()
+SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V10GetContextSo6NebulaO8PlatformO06OpenGlE0VyF(SWIFT_INDIRECT_RESULT void * _Nonnull, SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetContext()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V17SetCurrentContextyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // SetCurrentContext()
 SWIFT_EXTERN uint32_t $s16SwiftMacOSWindow0bC0V5GetIDs6UInt32VyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetID()
 struct SwiftMacOSWindow_MacOSWindow {
@@ -4279,6 +4281,35 @@ struct TypeMetadataTrait<std::__1::string> {
 namespace _impl{
 template<>
 inline const constexpr bool isSwiftBridgedCxxRecord<std::__1::string> = true;
+} // namespace
+#pragma clang diagnostic pop
+} // namespace swift
+
+namespace SwiftMacOSWindow SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("SwiftMacOSWindow") {
+namespace _impl {
+
+// Type metadata accessor for OpenGlContext
+SWIFT_EXTERN swift::_impl::MetadataResponseTy $sSo6NebulaO8PlatformO13OpenGlContextVMa(swift::_impl::MetadataRequestTy) SWIFT_NOEXCEPT SWIFT_CALL;
+
+
+} // namespace _impl
+
+} // end namespace 
+
+namespace swift SWIFT_PRIVATE_ATTR {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+template<>
+inline const constexpr bool isUsableInGenericContext<Nebula::Platform::OpenGlContext> = true;
+template<>
+struct TypeMetadataTrait<Nebula::Platform::OpenGlContext> {
+  static SWIFT_INLINE_PRIVATE_HELPER void * _Nonnull getTypeMetadata() {
+    return SwiftMacOSWindow::_impl::$sSo6NebulaO8PlatformO13OpenGlContextVMa(0)._0;
+  }
+};
+namespace _impl{
+template<>
+inline const constexpr bool isSwiftBridgedCxxRecord<Nebula::Platform::OpenGlContext> = true;
 } // namespace
 #pragma clang diagnostic pop
 } // namespace swift
@@ -4345,6 +4376,7 @@ public:
   swift::_impl::_swift_stdlib_reportFatalError("swift", 5, "C++ does not support moving a Swift value yet", 45, 0);
   abort();
   }
+  SWIFT_INLINE_THUNK void Destroy() SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V7DestroyyyF");
   SWIFT_INLINE_THUNK void OnUpdate() SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V8OnUpdateyyF");
   SWIFT_INLINE_THUNK void SwapBuffers() SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V11SwapBuffersyyF");
   SWIFT_INLINE_THUNK uint32_t GetWindowWidth() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V14GetWindowWidths6UInt32VyF");
@@ -4375,6 +4407,7 @@ public:
   SWIFT_INLINE_THUNK void Hide() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V4HideyyF");
   SWIFT_INLINE_THUNK void Raise() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5RaiseyyF");
   SWIFT_INLINE_THUNK void Flash() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5FlashyyF");
+  SWIFT_INLINE_THUNK Nebula::Platform::OpenGlContext GetContext() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V10GetContextSo6NebulaO8PlatformO06OpenGlE0VyF");
   SWIFT_INLINE_THUNK void SetCurrentContext() SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V17SetCurrentContextyyF");
   SWIFT_INLINE_THUNK uint32_t GetID() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5GetIDs6UInt32VyF");
 private:
@@ -4514,6 +4547,9 @@ SwiftMacOSWindow::_impl::swift_interop_returnDirect_SwiftMacOSWindow_uint32_t_0_
 return *storageObjectPtr;
 }
 
+  SWIFT_INLINE_THUNK void MacOSWindow::Destroy() {
+  SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V7DestroyyyF(_getOpaquePointer());
+  }
   SWIFT_INLINE_THUNK void MacOSWindow::OnUpdate() {
   SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V8OnUpdateyyF(_getOpaquePointer());
   }
@@ -4611,6 +4647,14 @@ return result;
   }
   SWIFT_INLINE_THUNK void MacOSWindow::Flash() const {
   SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V5FlashyyF(_getOpaquePointer());
+  }
+  SWIFT_INLINE_THUNK Nebula::Platform::OpenGlContext MacOSWindow::GetContext() const {
+alignas(alignof(Nebula::Platform::OpenGlContext)) char storage[sizeof(Nebula::Platform::OpenGlContext)];
+auto * _Nonnull storageObjectPtr = reinterpret_cast<Nebula::Platform::OpenGlContext *>(storage);
+SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V10GetContextSo6NebulaO8PlatformO06OpenGlE0VyF(storage, _getOpaquePointer());
+Nebula::Platform::OpenGlContext result(static_cast<Nebula::Platform::OpenGlContext &&>(*storageObjectPtr));
+storageObjectPtr->~OpenGlContext();
+return result;
   }
   SWIFT_INLINE_THUNK void MacOSWindow::SetCurrentContext() {
   SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V17SetCurrentContextyyF(_getOpaquePointer());
