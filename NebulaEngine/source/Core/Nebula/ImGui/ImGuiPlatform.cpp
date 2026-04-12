@@ -101,6 +101,15 @@ namespace Nebula
         else
             io.BackendFlags &= ~ImGuiBackendFlags_HasMouseHoveredViewport;
 
+        if (io.WantTextInput)
+        {
+            Platform::WindowManager::Get().GetMainWindow()->StartInput();
+        }
+        else
+        {
+            Platform::WindowManager::Get().GetMainWindow()->StopInput();
+        }
+
         UpdateMouseData();
         UpdateMouseCursor();
     }

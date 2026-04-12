@@ -94,6 +94,22 @@ namespace Nebula
         m_Registry.destroy(entity);
     }
 
+    Entity Scene::GetPrimaryCameraEntity()
+    {
+        Entity result;
+        auto view = m_Registry.view<TransformComponent, CameraComponent>();
+        for (auto entity : view)
+        {
+            auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+
+            if (camera.Primary)
+            {
+                result = Entity{entity, this};
+            }
+        }
+        return result;
+    }
+
     template<typename T>
     void Scene::OnComponentAdded(Entity entity, T& component)
     {

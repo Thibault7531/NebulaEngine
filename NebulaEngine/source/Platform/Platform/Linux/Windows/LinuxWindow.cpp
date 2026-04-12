@@ -233,6 +233,16 @@ namespace Nebula::Platform
         SDL_FlashWindow(m_Window, operation);
     }
 
+    void LinuxWindow::StartInput()
+    {
+        SDL_StartTextInput(m_Window);
+    }
+
+    void LinuxWindow::StopInput()
+    {
+        SDL_StopTextInput(m_Window);
+    }
+
     Ref<Context> LinuxWindow::GetContext()
     {
         return m_Context;

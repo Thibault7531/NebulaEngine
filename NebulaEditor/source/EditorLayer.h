@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm.hpp>
+#include <imgui.h>
+#include <ImGuizmo.h>
 
 #include "Nebula.h"
 #include "Nebula/CoreSystems/Application/Layer.h"
@@ -38,9 +40,7 @@ namespace Nebula {
         Ref<Framebuffer> m_Framebuffer;
 
         Ref<Scene> m_Scene;
-        Entity m_SquareEntity;
-        Entity m_Square2Entity;
-        Entity m_CameraEntity;
+        int m_GizmoOperation = -1;
 
         // Panels
         SceneHierarchyPanel m_SceneHierarchyPanel;

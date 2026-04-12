@@ -89,6 +89,7 @@ target_link_libraries(Nebula PRIVATE
                       EnTT::EnTT
                       GLAD
                       ImGui
+                      ImGuizmo
                       spdlog::spdlog_header_only
                       yaml-cpp::yaml-cpp
 )
@@ -103,6 +104,7 @@ target_include_directories(Nebula PRIVATE
                            ../../vendor/glm
                            ../../vendor/glm/glm
                            ../../vendor/imgui
+                           ../../vendor/ImGuizmo
                            ../../vendor/stb_image
                            ../../vendor/yaml-cpp/include
 )
