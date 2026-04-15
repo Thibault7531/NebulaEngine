@@ -59,6 +59,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 else ()
     set_property(TARGET NebulaEditor PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif ()
+target_compile_definitions(NebulaEditor PUBLIC NB_PLATFORM_APP_NAME="NebulaEditor")
 
 
 # Libraries
@@ -81,6 +82,7 @@ target_include_directories(NebulaEditor PRIVATE
 )
 
 if (nebula_cmake_platform STREQUAL Windows)
+    target_compile_definitions(NebulaEditor PUBLIC NB_PLATFORM_WINDOWS)
     add_custom_command(
             TARGET NebulaEditor
             POST_BUILD
@@ -88,7 +90,11 @@ if (nebula_cmake_platform STREQUAL Windows)
             ARGS -E copy "${CMAKE_SOURCE_DIR}/NebulaEngine/vendor/winrt/Microsoft.WindowsAppRuntime.Bootstrap.dll" "$<TARGET_FILE_DIR:NebulaEditor>/Microsoft.WindowsAppRuntime.Bootstrap.dll"
     )
 
+elseif (nebula_cmake_platform STREQUAL Linux)
+    target_compile_definitions(NebulaEditor PUBLIC NB_PLATFORM_LINUX)
+
 elseif (nebula_cmake_platform STREQUAL MacOS)
+    target_compile_definitions(NebulaEditor PUBLIC NB_PLATFORM_MACOS)
     set_target_properties(NebulaEditor PROPERTIES
                           MACOSX_BUNDLE TRUE
                           MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Platform/MacOS/Bundle/MacOSXBundleInfo.plist.in"

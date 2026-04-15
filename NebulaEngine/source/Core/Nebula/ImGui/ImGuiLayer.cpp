@@ -28,6 +28,12 @@ namespace Nebula
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
+		io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+		char* iniLocation = static_cast<char*>(malloc(strlen(Platform::Files::GetUserDataPath().string().c_str()) + strlen("imgui.ini") + 1));
+		strcpy(iniLocation, (Platform::Files::GetUserDataPath() / "imgui.ini").string().c_str());
+		io.IniFilename = iniLocation;
+
 		ImGui::StyleColorsDark();
 		SetDarkTheme();
 

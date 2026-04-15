@@ -98,6 +98,15 @@ namespace Nebula::Platform
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
+    class WindowRenderEvent : public Event
+    {
+    public:
+        WindowRenderEvent() = default;
+
+        EVENT_CLASS_TYPE(WindowRender)
+        EVENT_CLASS_CATEGORY(EventCategoryApplication)
+    };
+
     class MonitorsChangedEvent : public Event
     {
     public:

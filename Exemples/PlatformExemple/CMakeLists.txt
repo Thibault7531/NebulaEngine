@@ -30,6 +30,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 else ()
     set_property(TARGET PlatformExemple PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif ()
+target_compile_definitions(PlatformExemple PUBLIC NB_PLATFORM_APP_NAME="PlatformExemple")
 
 
 if (nebula_cmake_platform STREQUAL Windows)

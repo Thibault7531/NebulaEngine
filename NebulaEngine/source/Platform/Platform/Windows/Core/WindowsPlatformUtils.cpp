@@ -9,6 +9,7 @@
 
 namespace Nebula::Platform
 {
+    std::string Files::s_AppName = "";
 
     std::vector<Display> Displays::GetDisplays()
     {
@@ -141,5 +142,13 @@ namespace Nebula::Platform
         char buffer[MAX_PATH];
         GetModuleFileName(nullptr, buffer, MAX_PATH);
         return std::filesystem::path(buffer).parent_path();
+    }
+
+    std::filesystem::path Files::GetUserDataPath()
+    {
+        if (s_AppName.empty()) return GetResourcesPath();
+        std::filesystem::path path = std::filesystem::path(getenv("APPDATA")) / s_AppName;
+        std::filesystem::create_directories(path);
+        return path;
     }
 }

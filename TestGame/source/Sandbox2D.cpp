@@ -12,16 +12,16 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
-    m_Dirt = Nebula::Texture2D::Create("assets/TestGame/textures/dirt.png");
-    m_Grass = Nebula::Texture2D::Create("assets/TestGame/textures/grass_block_side.png");
-    m_Stone = Nebula::Texture2D::Create("assets/TestGame/textures/stone.png");
-    m_Craft = Nebula::Texture2D::Create("assets/TestGame/textures/crafting_table_front.png");
-    m_Deepslate = Nebula::Texture2D::Create("assets/TestGame/textures/deepslate.png");
-    m_Bedrock = Nebula::Texture2D::Create("assets/TestGame/textures/bedrock.png");
-    m_Diamond = Nebula::Texture2D::Create("assets/TestGame/textures/diamond_ore.png");
-    m_Iron = Nebula::Texture2D::Create("assets/TestGame/textures/iron_ore.png");
-    m_Coal = Nebula::Texture2D::Create("assets/TestGame/textures/coal_ore.png");
-    m_Rainbow = Nebula::Texture2D::Create("assets/TestGame/textures/furnace_front.png");
+    m_Dirt = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/dirt.png").string());
+    m_Grass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/grass_block_side.png").string());
+    m_Stone = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/stone.png").string());
+    m_Craft = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/crafting_table_front.png").string());
+    m_Deepslate = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/deepslate.png").string());
+    m_Bedrock = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() /"assets/TestGame/textures/bedrock.png").string());
+    m_Diamond = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/diamond_ore.png").string());
+    m_Iron = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/iron_ore.png").string());
+    m_Coal = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/coal_ore.png").string());
+    m_Rainbow = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/furnace_front.png").string());
 
     for (int Y = 0; Y < 32; Y++) {
         for (int X = 0; X < 32; X++) {

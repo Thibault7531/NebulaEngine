@@ -35,6 +35,7 @@ namespace Nebula {
 		bool OnWindowResize(Platform::WindowResizedEvent& e);
 		bool OnWindowMinimize(Platform::WindowMinimizedEvent& e);
 		bool OnWindowRestored(Platform::WindowRestoredEvent& e);
+		bool OnWindowRender(Platform::WindowRenderEvent& e);
 
 	private:
 		Ref<Platform::Window> m_MainWindow;

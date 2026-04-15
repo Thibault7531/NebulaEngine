@@ -95,6 +95,7 @@ namespace Nebula
 		dispatcher.Dispatch<Platform::WindowResizedEvent>(NB_BIND_EVENT_FN(OnWindowResize));
 		dispatcher.Dispatch<Platform::WindowMinimizedEvent>(NB_BIND_EVENT_FN(OnWindowMinimize));
 		dispatcher.Dispatch<Platform::WindowRestoredEvent>(NB_BIND_EVENT_FN(OnWindowRestored));
+		dispatcher.Dispatch<Platform::WindowRenderEvent>(NB_BIND_EVENT_FN(OnWindowRender));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
@@ -162,7 +163,6 @@ namespace Nebula
 		NB_PROFILE_FUNCTION();
 
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
-		Render();
 
 		return false;
 	}
@@ -179,4 +179,9 @@ namespace Nebula
 		return false;
 	}
 
+	bool Application::OnWindowRender(Platform::WindowRenderEvent& e)
+	{
+		Render();
+		return false;
+	}
 }

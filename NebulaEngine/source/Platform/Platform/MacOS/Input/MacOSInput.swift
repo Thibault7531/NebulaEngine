@@ -4,7 +4,14 @@ import Carbon.HIToolbox
 import NebulaInput
 
 public func IsKeyPressed(key: KeyboardKey) -> Bool {
-    return CGEventSource.keyState(.combinedSessionState, key: CGKeyCode(GetNativeKeycode(key: key)))
+    let keycode = GetNativeKeycode(key: key)
+    if (keycode >= 0) {
+        return CGEventSource.keyState(.combinedSessionState, key: CGKeyCode(GetNativeKeycode(key: key)))
+    }
+    else
+    {
+        return false
+    }
 }
 
 public func IsMouseButtonPressed(button: MouseButton) -> Bool {

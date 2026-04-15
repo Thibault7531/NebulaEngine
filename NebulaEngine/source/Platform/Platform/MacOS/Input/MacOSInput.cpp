@@ -1,3 +1,4 @@
+#include "Input.h"
 #include "Platform/Nebula/CoreSystems/Input/Input.h"
 
 #include "SwiftInput.h"
@@ -7,12 +8,12 @@ namespace Nebula::Platform
 
     bool Input::IsKeyPressed(KeyboardKey keycode)
     {
-        SwiftInput::IsKeyPressed(keycode);
+        return SwiftInput::IsKeyPressed(keycode);
     }
 
     bool Input::IsMouseButtonPressed(MouseButton button)
     {
-        SwiftInput::IsMouseButtonPressed(button);
+        return SwiftInput::IsMouseButtonPressed(button);
     }
 
     std::pair<float, float> Input::GetMousePosition()

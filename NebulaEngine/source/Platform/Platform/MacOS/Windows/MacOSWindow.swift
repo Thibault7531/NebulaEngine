@@ -55,8 +55,11 @@ public struct MacOSWindow {
         
         if (props.Maximized) { m_Window.performZoom(nil) }
         if (props.Minimized) { m_Window.miniaturize(nil) }
-        
-        if props.Style == .BorderlessInteractive {
+
+        if props.Style == .BorderlessFullscreen {
+            m_Window.isMovable = false
+            m_Window.isMovableByWindowBackground = false
+        } else if props.Style == .BorderlessInteractive {
             m_Window.titlebarAppearsTransparent = true
             m_Window.titleVisibility = .hidden
             m_Window.titlebarSeparatorStyle = .none
@@ -92,10 +95,10 @@ public struct MacOSWindow {
     }
     
     public mutating func OnUpdate() {
-        RunLoop.main.run(mode: .default, before: Date())
-        var now = Date()
+        let now = Date()
+        //RunLoop.main.run(mode: .default, before: now)
         MainActor.assumeIsolated {
-            var event = m_Window.nextEvent(matching: .any, until: now, inMode: .default, dequeue: true)
+            var event = NSApp.nextEvent(matching: .any, until: now, inMode: .default, dequeue: true)
             while (event != nil) {
                 NSApp.sendEvent(event!)
                 
@@ -108,6 +111,11 @@ public struct MacOSWindow {
                         var nebulaEvent = Nebula.Platform.MouseButtonPressedEvent(.Left)
                         handler.OnMouseButtonPressed(&nebulaEvent)
                         
+                    case .leftMouseDragged:
+                        let mouseY = Float(targetWindow.contentView!.frame.height - event!.window!.mouseLocationOutsideOfEventStream.y)
+                        var nebulaEvent = Nebula.Platform.MouseMovedEvent(Float(event!.window!.mouseLocationOutsideOfEventStream.x), mouseY)
+                        handler.OnMouseMoved(&nebulaEvent)
+                        
                     case .leftMouseUp:
                         var nebulaEvent = Nebula.Platform.MouseButtonReleasedEvent(.Left)
                         handler.OnMouseButtonReleased(&nebulaEvent)
@@ -119,6 +127,11 @@ public struct MacOSWindow {
                     case .rightMouseUp:
                         var nebulaEvent = Nebula.Platform.MouseButtonReleasedEvent(.Right)
                         handler.OnMouseButtonReleased(&nebulaEvent)
+                        
+                    case .rightMouseDragged:
+                        let mouseY = Float(targetWindow.contentView!.frame.height - event!.window!.mouseLocationOutsideOfEventStream.y)
+                        var nebulaEvent = Nebula.Platform.MouseMovedEvent(Float(event!.window!.mouseLocationOutsideOfEventStream.x), mouseY)
+                        handler.OnMouseMoved(&nebulaEvent)
                         
                     case .otherMouseDown:
                         let button = event?.buttonNumber
@@ -135,6 +148,11 @@ public struct MacOSWindow {
                         }
                         var nebulaEvent = Nebula.Platform.MouseButtonPressedEvent(nebulaButton)
                         handler.OnMouseButtonPressed(&nebulaEvent)
+                        
+                    case .otherMouseDragged:
+                        let mouseY = Float(targetWindow.contentView!.frame.height - event!.window!.mouseLocationOutsideOfEventStream.y)
+                        var nebulaEvent = Nebula.Platform.MouseMovedEvent(Float(event!.window!.mouseLocationOutsideOfEventStream.x), mouseY)
+                        handler.OnMouseMoved(&nebulaEvent)
                         
                     case .otherMouseUp:
                         let button = event?.buttonNumber
@@ -192,7 +210,7 @@ public struct MacOSWindow {
                         break
                     }
                 }
-                event = m_Window.nextEvent(matching: .any, until: now, inMode: .default, dequeue: true)
+                event = NSApp.nextEvent(matching: .any, until: now, inMode: .default, dequeue: true)
             }
         }
     }

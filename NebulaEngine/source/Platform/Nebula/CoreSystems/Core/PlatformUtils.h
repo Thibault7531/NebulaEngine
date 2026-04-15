@@ -56,6 +56,12 @@ namespace Nebula::Platform
     {
     public:
         static std::filesystem::path GetResourcesPath();
+        static std::filesystem::path GetUserDataPath();
+
+        static void setAppName(const std::string& appName) { s_AppName = appName; }
+
+    private:
+        static std::string s_AppName;
     };
 
 }

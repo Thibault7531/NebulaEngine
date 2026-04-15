@@ -1,5 +1,7 @@
 #include "EventHandler.h"
 
+#include "Input.h"
+
 namespace Nebula::Platform
 {
     void EventHandler::OnWindowResized(WindowResizedEvent& e)
@@ -9,6 +11,10 @@ namespace Nebula::Platform
         {
             e.WindowID = m_Window->GetID();
             callback(e);
+
+            WindowRenderEvent event{};
+            event.WindowID = m_Window->GetID();
+            m_Window->GetEventCallback()(event);
         }
     }
 
@@ -104,6 +110,8 @@ namespace Nebula::Platform
 
     void EventHandler::OnMouseMoved(MouseMovedEvent& e)
     {
+        if (e.GetX() < 0 || e.GetX() > m_Window->GetSize().first || e.GetY() < 0 || e.GetY() > m_Window->GetSize().second) return;
+
         std::function<void(Event&)> callback = m_Window->GetEventCallback();
         if (callback)
         {

@@ -6,6 +6,7 @@
 
 namespace Nebula::Platform
 {
+    std::string Files::s_AppName = "";
 
     std::vector<Display> Displays::GetDisplays()
     {
@@ -143,5 +144,17 @@ namespace Nebula::Platform
     std::filesystem::path Files::GetResourcesPath()
     {
         return std::filesystem::canonical("/proc/self/exe").parent_path();
+    }
+
+    std::filesystem::path Files::GetUserDataPath()
+    {
+        if (s_AppName.empty()) return GetResourcesPath();
+
+        const char* xdg = getenv("XDG_DATA_HOME");
+        std::filesystem::path path;
+        if (xdg) path = std::filesystem::path(xdg) / s_AppName;
+        else path = std::filesystem::path(getenv("HOME")) / ".local" / "share" / s_AppName;
+        std::filesystem::create_directories(path);
+        return path;
     }
 }

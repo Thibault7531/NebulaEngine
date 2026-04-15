@@ -2,7 +2,11 @@
 
 
 # Setup Target
-add_executable(TestGame source/TestGame.cpp source/Sandbox2D.h source/Sandbox2D.cpp)
+if (nebula_cmake_platform STREQUAL MacOS)
+    add_executable(TestGame MACOSX_BUNDLE source/TestGame.cpp source/Sandbox2D.h source/Sandbox2D.cpp)
+else ()
+    add_executable(TestGame source/TestGame.cpp source/Sandbox2D.h source/Sandbox2D.cpp)
+endif ()
 
 
 # Output Directory
@@ -10,23 +14,39 @@ set_target_properties(TestGame PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOUR
 
 
 # Compile Options
-add_custom_command(
-        TARGET TestGame
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:TestGame>/assets/TestGame"
-)
-add_custom_command(
-        TARGET TestGame
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_FILE_DIR:TestGame>/assets/NebulaEngine"
-)
+if (nebula_cmake_platform STREQUAL MacOS)
+    add_custom_command(
+            TARGET TestGame
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_BUNDLE_CONTENT_DIR:TestGame>/assets/TestGame"
+    )
+    add_custom_command(
+            TARGET TestGame
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_BUNDLE_CONTENT_DIR:TestGame>/assets/NebulaEngine"
+    )
+else ()
+    add_custom_command(
+            TARGET TestGame
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:TestGame>/assets/TestGame"
+    )
+    add_custom_command(
+            TARGET TestGame
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_FILE_DIR:TestGame>/assets/NebulaEngine"
+    )
+endif ()
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set_property(TARGET TestGame PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
 else ()
     set_property(TARGET TestGame PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif ()
+target_compile_definitions(TestGame PUBLIC NB_PLATFORM_APP_NAME="TestGame")
 
 
 # Libraries
@@ -53,5 +73,18 @@ if (nebula_cmake_platform STREQUAL Windows)
             POST_BUILD
             COMMAND ${CMAKE_COMMAND}
             ARGS -E copy "${CMAKE_SOURCE_DIR}/NebulaEngine/vendor/winrt/Microsoft.WindowsAppRuntime.Bootstrap.dll" "$<TARGET_FILE_DIR:TestGame>/Microsoft.WindowsAppRuntime.Bootstrap.dll"
+    )
+
+elseif (nebula_cmake_platform STREQUAL MacOS)
+    set_target_properties(TestGame PROPERTIES
+                          MACOSX_BUNDLE TRUE
+                          MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Platform/MacOS/Bundle/MacOSXBundleInfo.plist.in"
+
+                          MACOSX_BUNDLE_BUNDLE_NAME "Test Game"
+                          MACOSX_BUNDLE_GUI_IDENTIFIER "com.nebula.testgame"
+                          XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.nebula.testgame"
+                          MACOSX_BUNDLE_BUNDLE_VERSION "1"
+                          MACOSX_BUNDLE_SHORT_VERSION_STRING "dev"
+                          MACOSX_BUNDLE_COPYRIGHT "© 2024 - 2026 Infinity"
     )
 endif ()

@@ -2,12 +2,15 @@
 
 #include <mach-o/dyld.h>
 
+#include "Log.h"
 #include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
 #include "SwiftPlatformUtils.h"
 #include "WindowManager.h"
 
 namespace Nebula::Platform
 {
+    std::string Files::s_AppName = "";
+
     struct MacOSCursorWrapper
     {
         SwiftPlatformUtils::MacOSCursor m_Cursor;
@@ -90,5 +93,16 @@ namespace Nebula::Platform
         _NSGetExecutablePath(buffer.data(), &size);
 
         return std::filesystem::path(buffer).parent_path().parent_path();
+    }
+
+    std::filesystem::path Files::GetUserDataPath()
+    {
+        if (s_AppName.empty()) return GetResourcesPath();
+        const char* homedir = getenv("HOME");
+        if (!homedir) NB_PLATFORM_CRITICAL("No home folder found");
+
+        std::filesystem::path path = std::filesystem::path(homedir) / "Library" / "Application Support" / s_AppName;
+        std::filesystem::create_directories(path);
+        return path;
     }
 }
