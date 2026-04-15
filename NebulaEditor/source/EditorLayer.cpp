@@ -98,7 +98,9 @@ namespace Nebula {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0, static_cast<float>(height)});
         ImGui::BeginMainMenuBar();
         {
+#ifdef NB_PLATFORM_MACOS
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 64);
+#endif
 
             ImGui::BeginMenu("NebulaEditor", false);
 

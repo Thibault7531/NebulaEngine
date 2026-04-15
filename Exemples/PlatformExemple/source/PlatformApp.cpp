@@ -108,6 +108,7 @@ int main()
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        window->SwapBuffers();
         window->OnUpdate();
     }
 
