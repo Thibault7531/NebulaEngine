@@ -1,5 +1,7 @@
 #include "OpenGLImGuiRenderer.h"
 
+#include <cstring>
+
 namespace Nebula
 {
 

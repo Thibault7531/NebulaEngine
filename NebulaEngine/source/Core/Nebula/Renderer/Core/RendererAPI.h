@@ -12,13 +12,14 @@ namespace Nebula {
 	public:
 		enum class API
 		{
-			None = 0, OpenGL = 1
+			None = 0, OpenGL = 1, OpenGL410 = 2
 		};
 
 	public:
 		virtual ~RendererAPI() = default;
 
 		virtual void Init() = 0;
+		virtual void Log() = 0;
 
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 

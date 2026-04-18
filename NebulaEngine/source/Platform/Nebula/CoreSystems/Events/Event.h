@@ -12,7 +12,7 @@ namespace Nebula::Platform
     enum class EventType
     {
         None = 0,
-        WindowClosed, WindowResized, WindowMinimized, WindowMaximized, WindowRestored, WindowFocused, WindowLostFocus, WindowMoved, MonitorsChanged,
+        WindowClosed, WindowResized, WindowMinimized, WindowMaximized, WindowRestored, WindowFocused, WindowLostFocus, WindowMoved, WindowRender, MonitorsChanged,
         KeyPressed, KeyReleased, KeyTyped,
         MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled, MouseEntered, MouseLeft
     };

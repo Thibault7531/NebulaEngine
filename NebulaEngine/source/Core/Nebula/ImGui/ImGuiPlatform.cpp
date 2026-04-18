@@ -26,7 +26,7 @@ namespace Nebula
         io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
         // Viewports not supported on linux because wayland does not allow reading or writing window position
-#ifdef NB_PLATFORM_WINDOWS
+#if defined(NB_PLATFORM_WINDOWS) || defined(NB_PLATFORM_MACOS)
         io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
 #endif
 
@@ -38,15 +38,15 @@ namespace Nebula
         UpdateMonitors();
 
         // Load mouse cursors
-        platform_data.MouseCursors[ImGuiMouseCursor_Arrow] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::Arrow);
-        platform_data.MouseCursors[ImGuiMouseCursor_TextInput] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::TextInput);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeAll] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::Move);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNS] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::ResizeNS);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeEW] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::ResizeEW);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNESW] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::ResizeNESW);
-        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNWSE] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::ResizeNWSE);
-        platform_data.MouseCursors[ImGuiMouseCursor_Hand] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::Hand);
-        platform_data.MouseCursors[ImGuiMouseCursor_NotAllowed] = CreateRef<Platform::Cursor>(Platform::Cursor::CursorType::NotAllowed);
+        platform_data.MouseCursors[ImGuiMouseCursor_Arrow] = CreateRef<Platform::Cursor>(Platform::CursorType::Arrow);
+        platform_data.MouseCursors[ImGuiMouseCursor_TextInput] = CreateRef<Platform::Cursor>(Platform::CursorType::TextInput);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeAll] = CreateRef<Platform::Cursor>(Platform::CursorType::Move);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNS] = CreateRef<Platform::Cursor>(Platform::CursorType::ResizeNS);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeEW] = CreateRef<Platform::Cursor>(Platform::CursorType::ResizeEW);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNESW] = CreateRef<Platform::Cursor>(Platform::CursorType::ResizeNESW);
+        platform_data.MouseCursors[ImGuiMouseCursor_ResizeNWSE] = CreateRef<Platform::Cursor>(Platform::CursorType::ResizeNWSE);
+        platform_data.MouseCursors[ImGuiMouseCursor_Hand] = CreateRef<Platform::Cursor>(Platform::CursorType::Hand);
+        platform_data.MouseCursors[ImGuiMouseCursor_NotAllowed] = CreateRef<Platform::Cursor>(Platform::CursorType::NotAllowed);
 
         // SetupPlatformHandles
         ImGuiViewport* mainViewport = ImGui::GetMainViewport();
@@ -364,10 +364,10 @@ namespace Nebula
         platform_io.Monitors.resize(0);
         platform_data.WantUpdateMonitors = false;
 
-        std::vector<Platform::Displays::Display> displays = Platform::Displays::GetDisplays();
+        std::vector<Platform::Display> displays = Platform::Displays::GetDisplays();
         for (int n = 0; n < displays.size(); n++)
         {
-            const Platform::Displays::Display& display = displays[n];
+            const Platform::Display& display = displays[n];
             ImGuiPlatformMonitor monitor;
             monitor.MainPos = ImVec2(display.x, display.y);
             monitor.MainSize = ImVec2(display.width, display.height);
@@ -401,7 +401,7 @@ namespace Nebula
             }
 
             // (Optional) Fallback to provide mouse position when focused (SDL_EVENT_MOUSE_MOTION already provides this when hovered or captured)
-            if (platform_data.MouseButtonsDown == 0)
+            if (platform_data.MouseButtonsDown == 0 || true)
             {
                 auto [mouse_x, mouse_y] = Platform::Input::GetMousePosition();
                 auto [window_x, window_y] = focused_window->GetClientPos();
@@ -645,7 +645,7 @@ namespace Nebula
 
         viewport_data->Window->SetPos(viewport->Pos.x, viewport->Pos.y);
         viewport_data->WindowOwned = true;
-        if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
+        if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL || RendererAPI::GetAPI() == RendererAPI::API::OpenGL410)
         {
             viewport_data->GraphicsContext = viewport_data->Window->GetContext();
             viewport_data->Window->SetVSync(viewport_data->ParentWindow->IsVSync());

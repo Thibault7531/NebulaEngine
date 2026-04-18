@@ -9,8 +9,9 @@
 
 namespace Nebula::Platform
 {
+    std::string Files::s_AppName = "";
 
-    std::vector<Displays::Display> Displays::GetDisplays()
+    std::vector<Display> Displays::GetDisplays()
     {
         winrt::Windows::Foundation::Collections::IVectorView<winrt::Microsoft::UI::Windowing::DisplayArea> displays = winrt::Microsoft::UI::Windowing::DisplayArea::FindAll();
         std::vector<Display> result;
@@ -138,6 +139,16 @@ namespace Nebula::Platform
 
     std::filesystem::path Files::GetResourcesPath()
     {
-        return GetModuleFileName(nullptr);
+        char buffer[MAX_PATH];
+        GetModuleFileName(nullptr, buffer, MAX_PATH);
+        return std::filesystem::path(buffer).parent_path();
+    }
+
+    std::filesystem::path Files::GetUserDataPath()
+    {
+        if (s_AppName.empty()) return GetResourcesPath();
+        std::filesystem::path path = std::filesystem::path(getenv("APPDATA")) / s_AppName;
+        std::filesystem::create_directories(path);
+        return path;
     }
 }

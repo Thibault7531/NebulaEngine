@@ -1,0 +1,9 @@
+module NebulaInput {
+    header "Input.h"
+    export *
+}
+
+module NebulaCursor {
+    header "CursorTypes.h"
+    export *
+}

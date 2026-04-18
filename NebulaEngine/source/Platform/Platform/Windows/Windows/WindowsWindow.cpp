@@ -135,8 +135,6 @@ namespace Nebula::Platform
 
     void WindowsWindow::OnUpdate()
     {
-        m_Context->SwapBuffers();
-
         MSG msg;
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) != 0)
         {
@@ -340,7 +338,7 @@ namespace Nebula::Platform
         m_Context->SetCurrent();
     }
 
-    void* WindowsWindow::GetHandle() const
+    void* WindowsWindow::GetHandle()
     {
         return m_Hwnd;
     }

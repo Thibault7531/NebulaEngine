@@ -5,6 +5,7 @@
 #include "Platform/Nebula/CoreSystems/Events/Event.h"
 #include "Platform/Nebula/CoreSystems/Events/KeyEvent.h"
 #include "Platform/Nebula/CoreSystems/Events/MouseEvent.h"
+#include "Platform/Nebula/CoreSystems/Events/WindowEvents.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Platform/Nebula/Dialogs/FileDialogs.h"
 
@@ -82,7 +83,8 @@ int main()
     glBindVertexArray(vao);
 
     uint32_t vbo;
-    glCreateBuffers(1, &vbo);
+    //glCreateBuffers(1, &vbo);
+    glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -106,6 +108,7 @@ int main()
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        window->SwapBuffers();
         window->OnUpdate();
     }
 

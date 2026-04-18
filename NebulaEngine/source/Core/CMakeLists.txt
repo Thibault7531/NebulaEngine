@@ -15,20 +15,37 @@ file(GLOB_RECURSE NebulaHeaderFiles
 if (nebula_cmake_platform STREQUAL Windows)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
          "Platform/OpenGL/*.cpp"
+         "Platform/OpenGL410/*.cpp"
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
          "Platform/OpenGL/*.hpp"
+         "Platform/OpenGL410/*.hpp"
          "Platform/OpenGL/*.h"
+         "Platform/OpenGL410/*.h"
+    )
+    list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
+    list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
+
+elseif (nebula_cmake_platform STREQUAL MacOS)
+    file(GLOB_RECURSE NebulaPlatformSourceFiles
+         "Platform/OpenGL410/*.cpp"
+    )
+    file(GLOB_RECURSE NebulaPlatformHeaderFiles
+         "Platform/OpenGL410/*.hpp"
+         "Platform/OpenGL410/*.h"
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
 elseif (nebula_cmake_platform STREQUAL Linux)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
          "Platform/OpenGL/*.cpp"
+         "Platform/OpenGL410/*.cpp"
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
          "Platform/OpenGL/*.hpp"
+         "Platform/OpenGL410/*.hpp"
          "Platform/OpenGL/*.h"
+         "Platform/OpenGL410/*.h"
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
@@ -37,7 +54,7 @@ endif ()
 
 # Setup Target
 add_library(Nebula STATIC)
-target_sources(Nebula PRIVATE ${NebulaSourceFiles} PUBLIC ${NebulaHeaderFiles})
+target_sources(Nebula PRIVATE ${NebulaSourceFiles} PUBLIC ${NebulaHeaderFiles} ../../vendor/stb_image/stb_image.h)
 
 
 # Output Directory

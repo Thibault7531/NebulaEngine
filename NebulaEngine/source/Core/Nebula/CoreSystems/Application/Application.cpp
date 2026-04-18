@@ -2,6 +2,7 @@
 
 #include "Nebula/CoreSystems/Core/Timestep.h"
 #include "Nebula/Renderer/Renderer.h"
+#include "Nebula/Renderer/Core/RenderCommand.h"
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
@@ -94,6 +95,7 @@ namespace Nebula
 		dispatcher.Dispatch<Platform::WindowResizedEvent>(NB_BIND_EVENT_FN(OnWindowResize));
 		dispatcher.Dispatch<Platform::WindowMinimizedEvent>(NB_BIND_EVENT_FN(OnWindowMinimize));
 		dispatcher.Dispatch<Platform::WindowRestoredEvent>(NB_BIND_EVENT_FN(OnWindowRestored));
+		dispatcher.Dispatch<Platform::WindowRenderEvent>(NB_BIND_EVENT_FN(OnWindowRender));
 
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
@@ -110,31 +112,39 @@ namespace Nebula
 		while (m_Running) {
 			NB_PROFILE_SCOPE("RunLoop");
 
-			m_MainWindow->SetCurrentContext();
-
-			std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
-			const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000.f;
-			m_LastFrameTime = time;
-
-			if (!m_Minimized)
-			{
-				{
-					NB_PROFILE_SCOPE("LayerStack::OnUpdate");
-					for (Layer* layer : m_LayerStack)
-						layer->OnUpdate(timestep);
-				}
-
-				m_ImGuiLayer->Begin(timestep);
-				{
-					NB_PROFILE_SCOPE("LayerStack::OnImGuiRender");
-					for (Layer* layer : m_LayerStack)
-						layer->OnImGuiRender();
-				}
-				m_ImGuiLayer->End();
-			}
-
+			Render();
 			m_MainWindow->OnUpdate();
 		}
+	}
+
+	void Application::Render()
+	{
+		m_MainWindow->SetCurrentContext();
+
+		std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
+		const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000.f;
+		m_LastFrameTime = time;
+
+		if (!m_Minimized)
+		{
+			{
+				NB_PROFILE_SCOPE("LayerStack::OnUpdate");
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(timestep);
+			}
+
+			m_ImGuiLayer->Begin(timestep);
+			{
+				NB_PROFILE_SCOPE("LayerStack::OnImGuiRender");
+				for (Layer* layer : m_LayerStack)
+					layer->OnImGuiRender();
+			}
+			m_ImGuiLayer->End();
+		}
+
+		m_MainWindow->SwapBuffers();
+
+		RenderCommand::Log();
 	}
 
 	void Application::Shutdown()
@@ -169,4 +179,9 @@ namespace Nebula
 		return false;
 	}
 
+	bool Application::OnWindowRender(Platform::WindowRenderEvent& e)
+	{
+		Render();
+		return false;
+	}
 }

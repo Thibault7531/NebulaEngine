@@ -22,6 +22,23 @@ namespace Nebula::Platform
         std::map<std::string, std::vector<std::string>> fileTypes;
     };
 
+    // Needed for MacOS
+    class CallbackHandler
+    {
+    public:
+        CallbackHandler(std::function<void(std::string)> callback)
+            : m_Callback{callback} {}
+        ~CallbackHandler() = default;
+
+        void OnFileSelected(const std::string& path) const
+        {
+            m_Callback(path);
+        }
+
+    private:
+        std::function<void(std::string)> m_Callback;
+    };
+
     class FileDialogs
     {
     public:

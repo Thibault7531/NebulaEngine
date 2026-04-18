@@ -28,6 +28,12 @@ namespace Nebula
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
+		io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+		char* iniLocation = static_cast<char*>(malloc(strlen(Platform::Files::GetUserDataPath().string().c_str()) + strlen("imgui.ini") + 1));
+		strcpy(iniLocation, (Platform::Files::GetUserDataPath() / "imgui.ini").string().c_str());
+		io.IniFilename = iniLocation;
+
 		ImGui::StyleColorsDark();
 		SetDarkTheme();
 
@@ -54,10 +60,10 @@ namespace Nebula
 		iconConfig.PixelSnapH = true;
 		static const ImWchar iconRanges[] = { 0xf000, 0xf3ff, 0 };
 
-		io.FontDefault = io.Fonts->AddFontFromFileTTF(std::format("{}/assets/NebulaEngine/fonts/Inter_18pt-Regular.ttf", Platform::Files::GetResourcesPath().c_str()).c_str(), baseSize, &config);
-		ImFont* fontBold = io.Fonts->AddFontFromFileTTF(std::format("{}/assets/NebulaEngine/fonts/Inter_18pt-SemiBold.ttf", Platform::Files::GetResourcesPath().c_str()).c_str(), baseSize, &config);
-		ImFont* fontLarge = io.Fonts->AddFontFromFileTTF(std::format("{}/assets/NebulaEngine/fonts/Inter_18pt-Medium.ttf", Platform::Files::GetResourcesPath().c_str()).c_str(), largeSize, &config);
-		ImFont* fontSmall = io.Fonts->AddFontFromFileTTF(std::format("{}/assets/NebulaEngine/fonts/Inter_18pt-Regular.ttf", Platform::Files::GetResourcesPath().c_str()).c_str(), smallSize, &config);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF(std::format("{}/assets/NebulaEngine/fonts/Inter_18pt-Regular.ttf", Platform::Files::GetResourcesPath().string()).c_str(), baseSize, &config);
+		ImFont* fontBold = io.Fonts->AddFontFromFileTTF(std::format("{}/assets/NebulaEngine/fonts/Inter_18pt-SemiBold.ttf", Platform::Files::GetResourcesPath().string()).c_str(), baseSize, &config);
+		ImFont* fontLarge = io.Fonts->AddFontFromFileTTF(std::format("{}/assets/NebulaEngine/fonts/Inter_18pt-Medium.ttf", Platform::Files::GetResourcesPath().string()).c_str(), largeSize, &config);
+		ImFont* fontSmall = io.Fonts->AddFontFromFileTTF(std::format("{}/assets/NebulaEngine/fonts/Inter_18pt-Regular.ttf", Platform::Files::GetResourcesPath().string()).c_str(), smallSize, &config);
 
 		io.Fonts->Build();
 

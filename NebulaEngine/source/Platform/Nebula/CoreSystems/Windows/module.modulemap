@@ -1,0 +1,4 @@
+module NebulaPlatformWindow {
+    header "Window.h"
+    export *
+}

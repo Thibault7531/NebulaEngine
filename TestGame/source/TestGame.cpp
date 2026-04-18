@@ -95,13 +95,13 @@ public:
 
 		m_VAO->SetIndexBuffer(ibo);
 
-		m_Shader = Nebula::Shader::Create("SolidColor", "assets/TestGame/shaders/SolidColorVS.glsl", "assets/TestGame/shaders/SolidColorFS.glsl", Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
+		m_Shader = Nebula::Shader::Create("SolidColor", (Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/shaders/SolidColorVS.glsl").string(), (Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/shaders/SolidColorFS.glsl").string(), Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
 		m_ShaderLibrary.Add("SolidColor", m_Shader);
 
-		m_ShaderLibrary.Load("assets/TestGame/shaders/Texture.glsl");
+		m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/shaders/Texture.glsl").string());
 
-		m_Texture = Nebula::Texture2D::Create("assets/TestGame/textures/crafting_table_front.png");
-		m_Glass = Nebula::Texture2D::Create("assets/TestGame/textures/glass.png");
+		m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/crafting_table_front.png").string());
+		m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/glass.png").string());
 	}
 
 	virtual void OnUpdate(Nebula::Timestep ts) override
@@ -129,7 +129,8 @@ public:
 		const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
 		m_ShaderLibrary.Get("SolidColor")->Bind();
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_Color);
+		m_Shader->SetFloat3("u_Color", m_Color);
+		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_Color);
 		m_ShaderLibrary.Get("SolidColor")->Unbind();
 
 		for (int i = 0; i < 4; i++)
@@ -143,12 +144,16 @@ public:
 		m_Texture->Bind(0);
 		m_Glass->Bind(1);
 
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->Bind();
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->UploadUniformInt("u_Texture", 0);
+		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->Bind();
+		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->UploadUniformInt("u_Texture", 0);
+		m_ShaderLibrary.Get("Texture")->Bind();
+		m_ShaderLibrary.Get("Texture")->SetInt("u_Texture", 0);
 		Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::mat4(1.0f));
 
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->Bind();
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->UploadUniformInt("u_Texture", 1);
+		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->Bind();
+		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->UploadUniformInt("u_Texture", 1);
+		m_ShaderLibrary.Get("Texture")->Bind();
+		m_ShaderLibrary.Get("Texture")->SetInt("u_Texture", 1);
 		Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f)));
 
 		Nebula::Renderer::EndScene();
@@ -259,13 +264,13 @@ public:
 
 		m_VAO->SetIndexBuffer(ibo);
 
-		m_ShaderLibrary.Load("assets/TestGame/shaders/Texture.glsl");
-		m_ShaderLibrary.Load("assets/TestGame/shaders/Model.glsl");
+		m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/shaders/Texture.glsl").string());
+		m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/shaders/Model.glsl").string());
 
-		m_Texture = Nebula::Texture2D::Create("assets/TestGame/textures/crafting_table_front.png");
-		m_Glass = Nebula::Texture2D::Create("assets/TestGame/textures/glass.png");
+		m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/crafting_table_front.png").string());
+		m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/glass.png").string());
 
-		m_Backpack = Nebula::Model::Create("assets/TestGame/models/backpack.fbx");
+		m_Backpack = Nebula::Model::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/models/backpack.fbx").string());
 
 		m_CameraController.GetCamera().setPosition({0.f, 0.f, 3.f});
 	}
@@ -284,11 +289,13 @@ public:
 		Nebula::Ref<Nebula::Shader> textureShader = m_ShaderLibrary.Get("Texture");
 
 		textureShader->Bind();
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		textureShader->SetInt("u_Texture", 0);
 		Nebula::Renderer::Submit(textureShader, m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
 
 		textureShader->Bind();
-		std::dynamic_pointer_cast<Nebula::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 1);
+		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 1);
+		textureShader->SetInt("u_Texture", 1);
 		Nebula::Renderer::Submit(textureShader, m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f)));
 
 		Nebula::Renderer::SubmitModel(m_ShaderLibrary.Get("Model"), m_Backpack, glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f, 0.0f)), glm::vec3(0.01f)));

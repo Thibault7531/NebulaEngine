@@ -30,7 +30,7 @@ in float v_TexIndex;
 in vec2 v_TexCoord;
 
 uniform float u_TilingFactor;
-uniform sampler2D u_Textures[32];
+uniform sampler2D u_Textures[16];
 
 void main()
 {
@@ -52,22 +52,6 @@ void main()
 		case 13: color = texture(u_Textures[13], v_TexCoord); break;
 		case 14: color = texture(u_Textures[14], v_TexCoord); break;
 		case 15: color = texture(u_Textures[15], v_TexCoord); break;
-		case 16: color = texture(u_Textures[16], v_TexCoord); break;
-		case 17: color = texture(u_Textures[17], v_TexCoord); break;
-		case 18: color = texture(u_Textures[18], v_TexCoord); break;
-		case 19: color = texture(u_Textures[19], v_TexCoord); break;
-		case 20: color = texture(u_Textures[20], v_TexCoord); break;
-		case 21: color = texture(u_Textures[21], v_TexCoord); break;
-		case 22: color = texture(u_Textures[22], v_TexCoord); break;
-		case 23: color = texture(u_Textures[23], v_TexCoord); break;
-		case 24: color = texture(u_Textures[24], v_TexCoord); break;
-		case 25: color = texture(u_Textures[25], v_TexCoord); break;
-		case 26: color = texture(u_Textures[26], v_TexCoord); break;
-		case 27: color = texture(u_Textures[27], v_TexCoord); break;
-		case 28: color = texture(u_Textures[28], v_TexCoord); break;
-		case 29: color = texture(u_Textures[29], v_TexCoord); break;
-		case 30: color = texture(u_Textures[30], v_TexCoord); break;
-		case 31: color = texture(u_Textures[31], v_TexCoord); break;
 	}
 
 	color *= v_Color;

@@ -51,7 +51,7 @@
     },
     {
       "name": "Dist-Windows-AMD64",
-      "displayName": "Windows x86 - Dist",
+      "displayName": "Windows x86 - Distribution",
       "description": "Windows Desktop Compiling",
       "generator": "Ninja",
       "cacheVariables": {
@@ -140,6 +140,69 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
+      }
+    },
+    {
+      "name": "Debug-MacOS-AMD64",
+      "displayName": "MacOS x86 - Debug",
+      "description": "MacOS Desktop Compiling",
+      "generator": "Xcode",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      },
+      "hidden": false,
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "Release-MacOS-AMD64",
+      "displayName": "MacOS x86 - Release",
+      "description": "MacOS Desktop Compiling",
+      "generator": "Xcode",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      },
+      "hidden": false,
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "Dist-MacOS-AMD64",
+      "displayName": "MacOS x86 - Distribution",
+      "description": "MacOS Desktop Compiling",
+      "generator": "Xcode",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Dist",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      },
+      "hidden": false,
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
       }
     }
   ]

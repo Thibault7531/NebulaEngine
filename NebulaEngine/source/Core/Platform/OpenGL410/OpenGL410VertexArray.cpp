@@ -1,0 +1,86 @@
+#include "OpenGL410VertexArray.h"
+
+#include <glad/gl.h>
+
+namespace Nebula {
+
+	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
+	{
+		switch (type)
+		{
+			case ShaderDataType::Float: return GL_FLOAT;
+			case ShaderDataType::Float2: return GL_FLOAT;
+			case ShaderDataType::Float3: return GL_FLOAT;
+			case ShaderDataType::Float4: return GL_FLOAT;
+			case ShaderDataType::Mat3: return GL_FLOAT;
+			case ShaderDataType::Mat4: return GL_FLOAT;
+			case ShaderDataType::Int: return GL_INT;
+			case ShaderDataType::Int2: return GL_INT;
+			case ShaderDataType::Int3: return GL_INT;
+			case ShaderDataType::Int4: return GL_INT;
+			case ShaderDataType::Bool: return GL_BOOL;
+			default: break;
+		}
+
+		return GL_INVALID_ENUM;
+	}
+
+	OpenGL410VertexArray::OpenGL410VertexArray()
+	{
+		NB_PROFILE_FUNCTION();
+
+		glGenVertexArrays(1, &m_RendererID);
+	}
+
+	OpenGL410VertexArray::~OpenGL410VertexArray()
+	{
+		NB_PROFILE_FUNCTION();
+
+		glDeleteVertexArrays(1, &m_RendererID);
+	}
+
+	void OpenGL410VertexArray::Bind() const
+	{
+		NB_PROFILE_FUNCTION();
+
+		glBindVertexArray(m_RendererID);
+	}
+
+	void OpenGL410VertexArray::Unbind() const
+	{
+		NB_PROFILE_FUNCTION();
+
+		glBindVertexArray(0);
+	}
+
+	void OpenGL410VertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	{
+		NB_PROFILE_FUNCTION();
+
+		glBindVertexArray(m_RendererID);
+		vertexBuffer->Bind();
+
+		NB_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer Layout is not correct");
+
+		uint32_t index = 0;
+		const auto& layout = vertexBuffer->GetLayout();
+		for (const auto& element : layout)
+		{
+			glEnableVertexAttribArray(index);
+			glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), reinterpret_cast<const void*>(element.Offset));
+			index++;
+		}
+
+		m_VertexBuffers.push_back(vertexBuffer);
+	}
+
+	void OpenGL410VertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	{
+		NB_PROFILE_FUNCTION();
+
+		glBindVertexArray(m_RendererID);
+		indexBuffer->Bind();
+		m_IndexBuffer = indexBuffer;
+	}
+
+}
