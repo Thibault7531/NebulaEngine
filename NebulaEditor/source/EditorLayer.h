@@ -47,6 +47,11 @@ namespace Nebula {
 
         bool IsFirstRender = true;
         std::vector<glm::vec4> m_TitleBarButtons{};
+
+        Ref<Texture2D> m_CloseIcon;
+        Ref<Texture2D> m_MaximizeIcon;
+        Ref<Texture2D> m_RestoreIcon;
+        Ref<Texture2D> m_MinimizeIcon;
     };
 
 }

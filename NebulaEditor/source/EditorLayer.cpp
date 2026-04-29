@@ -4,6 +4,10 @@
 #include <gtc/type_ptr.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
+#define NANOSVG_IMPLEMENTATION
+#include <nanosvg.h>
+#define NANOSVGRAST_IMPLEMENTATION
+#include <nanosvgrast.h>
 
 #include "Nebula.h"
 #include "Nebula/CoreSystems/Application/Application.h"
@@ -45,6 +49,43 @@ namespace Nebula {
 
             return Platform::HitTest::Client;
         });
+
+        uint32_t imageSize = 18;
+        NSVGrasterizer* rast = nsvgCreateRasterizer();
+
+        NSVGimage* closeImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-close-symbolic.svg").string().c_str(), "px", 96);
+        auto* pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
+        nsvgRasterize(rast, closeImage, 0, 0, imageSize/closeImage->width, pixels, imageSize, imageSize, imageSize * 4);
+        m_CloseIcon = Texture2D::Create(imageSize, imageSize);
+        m_CloseIcon->SetData(pixels, imageSize * imageSize * 4);
+        free(pixels);
+        nsvgDelete(closeImage);
+
+        NSVGimage* maximizeImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-maximize-symbolic.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
+        nsvgRasterize(rast, maximizeImage, 0, 0, imageSize/maximizeImage->width, pixels, imageSize, imageSize, imageSize * 4);
+        m_MaximizeIcon = Texture2D::Create(imageSize, imageSize);
+        m_MaximizeIcon->SetData(pixels, imageSize * imageSize * 4);
+        free(pixels);
+        nsvgDelete(maximizeImage);
+
+        NSVGimage* restoreImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-restore-symbolic.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
+        nsvgRasterize(rast, restoreImage, 0, 0, imageSize/restoreImage->width, pixels, imageSize, imageSize, imageSize * 4);
+        m_RestoreIcon = Texture2D::Create(imageSize, imageSize);
+        m_RestoreIcon->SetData(pixels, imageSize * imageSize * 4);
+        free(pixels);
+        nsvgDelete(restoreImage);
+
+        NSVGimage* minimizeImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-minimize-symbolic.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
+        nsvgRasterize(rast, minimizeImage, 0, 0, imageSize/minimizeImage->width, pixels, imageSize, imageSize, imageSize * 4);
+        m_MinimizeIcon = Texture2D::Create(imageSize, imageSize);
+        m_MinimizeIcon->SetData(pixels, imageSize * imageSize * 4);
+        free(pixels);
+        nsvgDelete(minimizeImage);
+
+        nsvgDeleteRasterizer(rast);
 
         NB_INFO("Nebula Editor Loaded");
     }
@@ -96,7 +137,9 @@ namespace Nebula {
         height -= GImGui->FontSize;
         height /= 2;
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0, static_cast<float>(height)});
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
         ImGui::BeginMainMenuBar();
+        ImGui::PopStyleVar();
         {
 #ifdef NB_PLATFORM_MACOS
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 64);
@@ -122,26 +165,61 @@ namespace Nebula {
             m_TitleBarButtons.emplace_back(rect);
 
 #ifdef NB_PLATFORM_LINUX
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 68);
-            if (ImGui::MenuItem("_"))
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {0, 0});
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+
+            float titlabarHeight = Platform::WindowManager::Get().GetMainWindow()->GetTitlebarHeight();
+            ImDrawList* draw_list = ImGui::GetWindowDrawList();
+            uint32_t buttonAlpha = 25;
+            uint32_t buttonSize = 22;
+            uint32_t buttonSpacing = 5;
+            uint32_t textureSize = 18;
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 3*titlabarHeight - 2*buttonSpacing);
+            float buttonPos = ImGui::GetCursorPosX();
+            if (ImGui::InvisibleButton("_", {titlabarHeight, titlabarHeight}, 0))
             {
                 Platform::WindowManager::Get().GetMainWindow()->Minimize();
             }
             rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
             m_TitleBarButtons.emplace_back(rect);
+            if (ImGui::IsItemHovered()) buttonAlpha = 50;
+            else buttonAlpha = 25;
+            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(255, 255, 255, buttonAlpha), 16);
+            ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
+            ImGui::ImageWithBg(m_MinimizeIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(255, 255, 255, 255));
 
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 42);
-            if (ImGui::MenuItem("O")) {
+            buttonPos += titlabarHeight + buttonSpacing;
+            ImGui::SetCursorPosX(buttonPos);
+            if (ImGui::InvisibleButton("O", {titlabarHeight, titlabarHeight}, 0))
+            {
                 if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) Platform::WindowManager::Get().GetMainWindow()->SetMaximized(false);
                 else Platform::WindowManager::Get().GetMainWindow()->SetMaximized(true);
             }
             rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
             m_TitleBarButtons.emplace_back(rect);
+            if (ImGui::IsItemHovered()) buttonAlpha = 50;
+            else buttonAlpha = 25;
+            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(255, 255, 255, buttonAlpha), 16);
+            ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
+            if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) ImGui::ImageWithBg(m_RestoreIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(255, 255, 255, 255));
+            else ImGui::ImageWithBg(m_MaximizeIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(255, 255, 255, 255));
 
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 16);
-            if (ImGui::MenuItem("X")) Application::Get().Shutdown();
+            buttonPos += titlabarHeight + buttonSpacing;
+            ImGui::SetCursorPosX(buttonPos);
+            if (ImGui::InvisibleButton("X", {titlabarHeight, titlabarHeight}, 0))
+            {
+                Application::Get().Shutdown();
+            }
             rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
             m_TitleBarButtons.emplace_back(rect);
+            if (ImGui::IsItemHovered()) buttonAlpha = 50;
+            else buttonAlpha = 25;
+            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(255, 255, 255, buttonAlpha), 16);
+            ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
+            ImGui::ImageWithBg(m_CloseIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(255, 255, 255, 255));
+
+            ImGui::PopStyleVar();
+            ImGui::PopStyleVar();
 #endif
         }
         ImGui::EndMainMenuBar();
