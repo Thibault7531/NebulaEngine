@@ -143,7 +143,7 @@ namespace Nebula
         platform_io.Platform_CreateWindow = CreateImGuiWindow;
         platform_io.Platform_DestroyWindow = DestroyImGuiWindow;
         platform_io.Platform_ShowWindow = ShowWindow;
-        platform_io.Platform_UpdateWindow = UpdateWIndow;
+        platform_io.Platform_UpdateWindow = UpdateWindow;
         platform_io.Platform_SetWindowPos = SetWindowPos;
         platform_io.Platform_GetWindowPos = GetWindowPos;
         platform_io.Platform_SetWindowSize = SetWindowSize;
@@ -648,7 +648,7 @@ namespace Nebula
         if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL || RendererAPI::GetAPI() == RendererAPI::API::OpenGL410)
         {
             viewport_data->GraphicsContext = viewport_data->Window->GetContext();
-            viewport_data->Window->SetVSync(viewport_data->ParentWindow->IsVSync());
+            viewport_data->Window->SetVSync(viewport_data->ParentWindow ? viewport_data->ParentWindow->IsVSync() : Platform::VSyncMode::Adaptive);
             viewport_data->GraphicsContext->SetCurrent();
         }
 
@@ -682,17 +682,20 @@ namespace Nebula
         if (viewport_data->Window) viewport_data->Window->Show();
     }
 
-    void ImGuiPlatform::UpdateWIndow(ImGuiViewport* viewport)
+    void ImGuiPlatform::UpdateWindow(ImGuiViewport* viewport)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
 
         // Update SDL3 parent if it changed _after_ creation.
         // This is for advanced apps that are manipulating ParentViewportID manually.
         ImGuiViewport* parent_viewport = ImGui::FindViewportByID(viewport->ParentViewportId);
-        Ref<Platform::Window> new_parent = Platform::WindowManager::Get().GetWindowFromID(reinterpret_cast<uint64_t>(parent_viewport->PlatformHandle));
-        if (new_parent != viewport_data->ParentWindow)
+        if (parent_viewport)
         {
-            viewport_data->ParentWindow = new_parent;
+            Ref<Platform::Window> new_parent = Platform::WindowManager::Get().GetWindowFromID(reinterpret_cast<uint64_t>(parent_viewport->PlatformHandle));
+            if (new_parent != viewport_data->ParentWindow)
+            {
+                viewport_data->ParentWindow = new_parent;
+            }
         }
     }
 

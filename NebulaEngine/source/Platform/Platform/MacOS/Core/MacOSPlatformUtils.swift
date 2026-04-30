@@ -226,3 +226,15 @@ public func GetForegroundWindowID() -> Int32 {
         return -1
     }
 }
+
+public func IsDarkTheme() -> Bool {
+    if let appearance = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) {
+        if appearance == .darkAqua {
+            return true
+        } else {
+            return false
+        }
+    } else {
+        return false
+    }
+}

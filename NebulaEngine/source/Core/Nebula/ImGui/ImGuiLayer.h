@@ -30,8 +30,8 @@ namespace Nebula
 
 		void BlockEvents(const bool block) { m_BlockEvents = block; }
 
-	private:
 		static void SetDarkTheme();
+		static void SetLightTheme();
 
 	private:
 		bool m_BlockEvents = true;
@@ -41,6 +41,8 @@ namespace Nebula
 
 	public:
 		static ImGuiFonts s_Fonts;
+		static Platform::Theme::ThemeType s_ImGuiTheme;
+		static bool s_AutoTheme;
 	};
 
 }

@@ -64,4 +64,17 @@ namespace Nebula::Platform
         static std::string s_AppName;
     };
 
+    class Theme
+    {
+    public:
+        enum class ThemeType
+        {
+            Light,
+            Dark
+        };
+
+    public:
+        static ThemeType GetTheme();
+    };
+
 }

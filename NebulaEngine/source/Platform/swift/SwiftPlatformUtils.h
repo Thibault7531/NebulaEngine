@@ -4191,6 +4191,7 @@ static SWIFT_C_INLINE_THUNK void swift_interop_returnDirect_SwiftPlatformUtils_u
 
 SWIFT_EXTERN struct swift_interop_returnStub_SwiftPlatformUtils_uint64_t_0_8_void_ptr_8_16 $s18SwiftPlatformUtils7GetTextSSyF(void) SWIFT_NOEXCEPT SWIFT_CALL; // GetText()
 SWIFT_EXTERN void $s18SwiftPlatformUtils10HideCursoryyF(void) SWIFT_NOEXCEPT SWIFT_CALL; // HideCursor()
+SWIFT_EXTERN bool $s18SwiftPlatformUtils11IsDarkThemeSbyF(void) SWIFT_NOEXCEPT SWIFT_CALL; // IsDarkTheme()
 SWIFT_EXTERN void $s18SwiftPlatformUtils17SetMousePosGlobal1x1yys5Int32V_AFtF(int32_t x, int32_t y) SWIFT_NOEXCEPT SWIFT_CALL; // SetMousePosGlobal(x:y:)
 // Stub struct to be used to pass/return values to/from Swift functions.
 struct swift_interop_passStub_SwiftPlatformUtils_uint64_t_0_8_void_ptr_8_16 {
@@ -4352,6 +4353,10 @@ SWIFT_INLINE_THUNK swift::String GetText() noexcept SWIFT_SYMBOL("s:18SwiftPlatf
 
 SWIFT_INLINE_THUNK void HideCursor() noexcept SWIFT_SYMBOL("s:18SwiftPlatformUtils10HideCursoryyF") {
   SwiftPlatformUtils::_impl::$s18SwiftPlatformUtils10HideCursoryyF();
+}
+
+SWIFT_INLINE_THUNK bool IsDarkTheme() noexcept SWIFT_SYMBOL("s:18SwiftPlatformUtils11IsDarkThemeSbyF") SWIFT_WARN_UNUSED_RESULT {
+  return SwiftPlatformUtils::_impl::$s18SwiftPlatformUtils11IsDarkThemeSbyF();
 }
 
 SWIFT_INLINE_THUNK void SetMousePosGlobal(int32_t x, int32_t y) noexcept SWIFT_SYMBOL("s:18SwiftPlatformUtils17SetMousePosGlobal1x1yys5Int32V_AFtF") {

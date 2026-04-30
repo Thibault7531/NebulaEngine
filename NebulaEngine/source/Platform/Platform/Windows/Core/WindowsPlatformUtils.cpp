@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <winrt/Microsoft.UI.Windowing.h>
 #include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.UI.ViewManagement.h>
 
 #include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
@@ -150,5 +151,14 @@ namespace Nebula::Platform
         std::filesystem::path path = std::filesystem::path(getenv("APPDATA")) / s_AppName;
         std::filesystem::create_directories(path);
         return path;
+    }
+
+    Theme::ThemeType Theme::GetTheme()
+    {
+        auto settings = winrt::Windows::UI::ViewManagement::UISettings();
+        auto foreground = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Foreground);
+        bool isDark = (((5 * foreground.G) + (2 * foreground.R) + foreground.B) > (8 * 128));
+
+        return isDark ? ThemeType::Dark : ThemeType::Light;
     }
 }

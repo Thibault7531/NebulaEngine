@@ -90,7 +90,7 @@ namespace Nebula
         static void CreateImGuiWindow(ImGuiViewport* viewport);
         static void DestroyImGuiWindow(ImGuiViewport* viewport);
         static void ShowWindow(ImGuiViewport* viewport);
-        static void UpdateWIndow(ImGuiViewport* viewport);
+        static void UpdateWindow(ImGuiViewport* viewport);
         static ImVec2 GetWindowPos(ImGuiViewport* viewport);
         static void SetWindowPos(ImGuiViewport* viewport, ImVec2 pos);
         static ImVec2 GetWindowSize(ImGuiViewport* viewport);

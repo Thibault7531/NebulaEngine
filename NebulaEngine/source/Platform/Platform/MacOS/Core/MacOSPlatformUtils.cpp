@@ -105,4 +105,10 @@ namespace Nebula::Platform
         std::filesystem::create_directories(path);
         return path;
     }
+
+    Theme::ThemeType Theme::GetTheme()
+    {
+        if (SwiftPlatformUtils::IsDarkTheme()) return ThemeType::Dark;
+        return ThemeType::Light;
+    }
 }

@@ -50,7 +50,7 @@ namespace Nebula {
             return Platform::HitTest::Client;
         });
 
-        uint32_t imageSize = 18;
+        uint32_t imageSize = 16;
         NSVGrasterizer* rast = nsvgCreateRasterizer();
 
         NSVGimage* closeImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-close-symbolic.svg").string().c_str(), "px", 96);
@@ -164,16 +164,38 @@ namespace Nebula {
             glm::vec4 rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
             m_TitleBarButtons.emplace_back(rect);
 
+            if (ImGui::BeginMenu("Theme"))
+            {
+                if (ImGui::MenuItem("Dark", 0, ImGuiLayer::s_ImGuiTheme == Platform::Theme::ThemeType::Dark && !ImGuiLayer::s_AutoTheme))
+                {
+                    ImGuiLayer::SetDarkTheme();
+                    ImGuiLayer::s_AutoTheme = false;
+                }
+                if (ImGui::MenuItem("Light", 0, ImGuiLayer::s_ImGuiTheme == Platform::Theme::ThemeType::Light && !ImGuiLayer::s_AutoTheme))
+                {
+                    ImGuiLayer::SetLightTheme();
+                    ImGuiLayer::s_AutoTheme = false;
+                }
+                if (ImGui::MenuItem("Auto", 0, ImGuiLayer::s_AutoTheme))
+                {
+                    ImGuiLayer::s_AutoTheme = true;
+                }
+                ImGui::EndMenu();
+            }
+            rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
+            m_TitleBarButtons.emplace_back(rect);
+
 #ifdef NB_PLATFORM_LINUX
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {0, 0});
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
 
             float titlabarHeight = Platform::WindowManager::Get().GetMainWindow()->GetTitlebarHeight();
             ImDrawList* draw_list = ImGui::GetWindowDrawList();
-            uint32_t buttonAlpha = 25;
+            int buttonAlpha = 25;
             uint32_t buttonSize = 22;
             uint32_t buttonSpacing = 5;
-            uint32_t textureSize = 18;
+            int buttonColor = ImGuiLayer::s_ImGuiTheme == Platform::Theme::ThemeType::Dark ? 255 : 0;
+            uint32_t textureSize = 16;
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - 3*titlabarHeight - 2*buttonSpacing);
             float buttonPos = ImGui::GetCursorPosX();
             if (ImGui::InvisibleButton("_", {titlabarHeight, titlabarHeight}, 0))
@@ -184,9 +206,9 @@ namespace Nebula {
             m_TitleBarButtons.emplace_back(rect);
             if (ImGui::IsItemHovered()) buttonAlpha = 50;
             else buttonAlpha = 25;
-            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(255, 255, 255, buttonAlpha), 16);
+            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(buttonColor, buttonColor, buttonColor, buttonAlpha), 16);
             ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
-            ImGui::ImageWithBg(m_MinimizeIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(255, 255, 255, 255));
+            ImGui::ImageWithBg(m_MinimizeIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
 
             buttonPos += titlabarHeight + buttonSpacing;
             ImGui::SetCursorPosX(buttonPos);
@@ -199,10 +221,10 @@ namespace Nebula {
             m_TitleBarButtons.emplace_back(rect);
             if (ImGui::IsItemHovered()) buttonAlpha = 50;
             else buttonAlpha = 25;
-            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(255, 255, 255, buttonAlpha), 16);
+            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(buttonColor, buttonColor, buttonColor, buttonAlpha), 16);
             ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
-            if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) ImGui::ImageWithBg(m_RestoreIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(255, 255, 255, 255));
-            else ImGui::ImageWithBg(m_MaximizeIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(255, 255, 255, 255));
+            if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) ImGui::ImageWithBg(m_RestoreIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
+            else ImGui::ImageWithBg(m_MaximizeIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
 
             buttonPos += titlabarHeight + buttonSpacing;
             ImGui::SetCursorPosX(buttonPos);
@@ -214,9 +236,9 @@ namespace Nebula {
             m_TitleBarButtons.emplace_back(rect);
             if (ImGui::IsItemHovered()) buttonAlpha = 50;
             else buttonAlpha = 25;
-            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(255, 255, 255, buttonAlpha), 16);
+            draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(buttonColor, buttonColor, buttonColor, buttonAlpha), 16);
             ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
-            ImGui::ImageWithBg(m_CloseIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(255, 255, 255, 255));
+            ImGui::ImageWithBg(m_CloseIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
 
             ImGui::PopStyleVar();
             ImGui::PopStyleVar();

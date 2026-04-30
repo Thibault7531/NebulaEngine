@@ -7,6 +7,16 @@
 namespace Nebula::Platform
 {
     std::string Files::s_AppName = "";
+    Theme::ThemeType Theme::GetTheme()
+    {
+        SDL_SystemTheme theme = SDL_GetSystemTheme();
+        switch (theme)
+        {
+            case SDL_SYSTEM_THEME_LIGHT: return ThemeType::Light;
+            case SDL_SYSTEM_THEME_DARK:  return ThemeType::Dark;
+            default: return ThemeType::Light;
+        }
+    }
 
     std::vector<Display> Displays::GetDisplays()
     {

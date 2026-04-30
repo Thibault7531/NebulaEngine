@@ -8,6 +8,8 @@
 namespace Nebula
 {
 	ImGuiFonts ImGuiLayer::s_Fonts;
+	Platform::Theme::ThemeType ImGuiLayer::s_ImGuiTheme = Platform::Theme::ThemeType::Dark;
+	bool ImGuiLayer::s_AutoTheme = true;
 
 	ImGuiLayer::ImGuiLayer()
 		: Layer("ImGuiLayer") {}
@@ -35,7 +37,8 @@ namespace Nebula
 		io.IniFilename = iniLocation;
 
 		ImGui::StyleColorsDark();
-		SetDarkTheme();
+		if (Platform::Theme::GetTheme() == Platform::Theme::ThemeType::Dark) SetDarkTheme();
+		else SetLightTheme();
 
 		m_ImGuiPlatform = CreateRef<ImGuiPlatform>();
 		m_ImGuiPlatform->Init(Platform::WindowManager::Get().GetMainWindow());
@@ -103,6 +106,13 @@ namespace Nebula
 	{
 		NB_PROFILE_FUNCTION();
 
+		if (s_AutoTheme)
+		{
+			Platform::Theme::ThemeType theme = Platform::Theme::GetTheme();
+			if (theme != s_ImGuiTheme && theme == Platform::Theme::ThemeType::Dark) SetDarkTheme();
+			else if (theme != s_ImGuiTheme) SetLightTheme();
+		}
+
 		m_ImGuiRenderer->NewFrame();
 		m_ImGuiPlatform->NewFrame(ts);
 		ImGui::NewFrame();
@@ -130,6 +140,7 @@ namespace Nebula
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		auto& colors = style.Colors;
+		s_ImGuiTheme = Platform::Theme::ThemeType::Dark;
 
 		// Style
 		style.WindowPadding = ImVec2(12, 12);
@@ -168,6 +179,9 @@ namespace Nebula
 		colors[ImGuiCol_FrameBg] = ImVec4(0.15f, 0.16f, 0.18f, 1.0f);
 		colors[ImGuiCol_FrameBgHovered] = ImVec4(0.19f, 0.20f, 0.22f, 1.0f);
 		colors[ImGuiCol_FrameBgActive] = ImVec4(0.24f, 0.25f, 0.29f, 1.0f);
+
+		// Menu Bars
+		colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
 
 		// Titles
 		colors[ImGuiCol_TitleBg] = ImVec4(0.09f, 0.09f, 0.09f, 1.00f);
@@ -226,5 +240,113 @@ namespace Nebula
 		colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
 	}
 
+	void ImGuiLayer::SetLightTheme()
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		auto& colors = style.Colors;
+		s_ImGuiTheme = Platform::Theme::ThemeType::Light;
 
+		// Style
+		style.WindowPadding = ImVec2(12, 12);
+		style.FramePadding = ImVec2(6, 6);
+		style.ItemSpacing = ImVec2(8, 6);
+		style.ItemInnerSpacing = ImVec2(6, 6);
+		style.ScrollbarSize = 16.0f;
+		style.GrabMinSize = 8.0f;
+
+		// Rounding
+		style.WindowRounding = 8.0f;
+		style.ChildRounding = 6.0f;
+		style.FrameRounding = 6.0f;
+		style.PopupRounding = 6.0f;
+		style.ScrollbarRounding = 12.0f;
+		style.GrabRounding = 4.0f;
+		style.TabRounding = 6.0f;
+
+		// Alignment
+		style.WindowTitleAlign = ImVec2(0.5f, 0.5f);
+		style.WindowMenuButtonPosition = ImGuiDir_None;
+		style.ColorButtonPosition = ImGuiDir_Right;
+		style.ButtonTextAlign = ImVec2(0.5f, 0.5f);
+		style.SelectableTextAlign = ImVec2(0.0f, 0.5f);
+
+		// Border
+		style.WindowBorderSize = 1.0f;
+		style.ChildBorderSize = 1.0f;
+		style.PopupBorderSize = 1.0f;
+		style.FrameBorderSize = 1.0f;
+		style.TabBorderSize = 1.0f;
+
+		// Main Colors (Light Backgrounds)
+		colors[ImGuiCol_WindowBg]         = ImVec4(0.94f, 0.94f, 0.95f, 1.00f); // Soft light grey
+		colors[ImGuiCol_ChildBg]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_PopupBg]          = ImVec4(1.00f, 1.00f, 1.00f, 0.98f); // Pure white for popups to pop
+		colors[ImGuiCol_Border]           = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+		colors[ImGuiCol_BorderShadow]     = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+		colors[ImGuiCol_FrameBg]          = ImVec4(0.88f, 0.88f, 0.90f, 1.00f);
+		colors[ImGuiCol_FrameBgHovered]   = ImVec4(0.82f, 0.82f, 0.85f, 1.00f);
+		colors[ImGuiCol_FrameBgActive]    = ImVec4(0.75f, 0.75f, 0.80f, 1.00f);
+		colors[ImGuiCol_MenuBarBg]        = ImVec4(0.88f, 0.88f, 0.89f, 1.00f);
+
+		// Menu Bars
+		colors[ImGuiCol_MenuBarBg]        = ImVec4(0.90f, 0.90f, 0.92f, 1.00f);
+
+		// Titles
+		colors[ImGuiCol_TitleBg]          = ImVec4(0.88f, 0.88f, 0.90f, 1.00f); // Inactive: Very subtle grey
+		colors[ImGuiCol_TitleBgActive]    = ImVec4(0.82f, 0.84f, 0.88f, 1.00f); // Active: Soft blue-grey tint
+		colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.88f, 0.88f, 0.90f, 0.75f);
+
+		// Accent colors (Kept consistent with your brand colors but adjusted for light background)
+		ImVec4 accentColor            = ImVec4(0.18f, 0.59f, 0.71f, 1.00f); // The "Nebula Blue"
+		ImVec4 accentColorHovered     = ImVec4(0.22f, 0.65f, 0.77f, 1.00f);
+		ImVec4 accentColorActive      = ImVec4(0.15f, 0.51f, 0.63f, 1.00f);
+		ImVec4 accentColorTransparent = ImVec4(0.18f, 0.59f, 0.71f, 0.15f);
+
+		// Interactive elements
+		colors[ImGuiCol_CheckMark]        = accentColor;
+		colors[ImGuiCol_SliderGrab]       = accentColor;
+		colors[ImGuiCol_SliderGrabActive] = accentColorActive;
+		colors[ImGuiCol_Button]           = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+		colors[ImGuiCol_ButtonHovered]    = accentColor; // Blue hover for modern feel
+		colors[ImGuiCol_ButtonActive]     = accentColorActive;
+
+		// Headers
+		colors[ImGuiCol_Header]           = ImVec4(0.18f, 0.59f, 0.71f, 0.20f);
+		colors[ImGuiCol_HeaderHovered]    = ImVec4(0.18f, 0.59f, 0.71f, 0.35f);
+		colors[ImGuiCol_HeaderActive]     = ImVec4(0.18f, 0.59f, 0.71f, 0.50f);
+
+		// Tabs
+		colors[ImGuiCol_Tab]                = ImVec4(0.80f, 0.80f, 0.82f, 1.00f); // Darker base for inactive tabs
+		colors[ImGuiCol_TabHovered]         = accentColorHovered;                 // Visual feedback on hover
+		colors[ImGuiCol_TabActive]          = ImVec4(0.94f, 0.94f, 0.95f, 1.00f); // Matches WindowBg exactly
+		colors[ImGuiCol_TabSelected]        = accentColor;                        // Brand blue highlight
+		colors[ImGuiCol_TabSelectedOverline] = accentColor;                       // Stronger visual indicator on top
+		colors[ImGuiCol_TabSelectedOverline].w = 0.0f;                            // Make the overline visible
+		colors[ImGuiCol_TabUnfocused]       = ImVec4(0.82f, 0.82f, 0.84f, 1.00f); // Subtle background for the bar
+		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.88f, 0.88f, 0.90f, 1.00f); // Slight lift for active but unfocused
+
+		// Docking and resizing
+		colors[ImGuiCol_DockingPreview]     = ImVec4(0.18f, 0.59f, 0.71f, 0.40f);
+		colors[ImGuiCol_DockingEmptyBg]     = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+		colors[ImGuiCol_ResizeGrip]         = ImVec4(0.32f, 0.48f, 0.55f, 0.10f);
+		colors[ImGuiCol_ResizeGripHovered]  = ImVec4(0.32f, 0.48f, 0.55f, 0.50f);
+		colors[ImGuiCol_ResizeGripActive]   = ImVec4(0.32f, 0.48f, 0.55f, 0.80f);
+
+		// Text and selection (Dark Text)
+		colors[ImGuiCol_Text]               = ImVec4(0.15f, 0.15f, 0.16f, 1.00f); // Deep charcoal, not pure black
+		colors[ImGuiCol_TextDisabled]       = ImVec4(0.50f, 0.50f, 0.55f, 1.00f);
+		colors[ImGuiCol_TextSelectedBg]     = ImVec4(0.18f, 0.59f, 0.71f, 0.30f);
+
+		// Separators
+		colors[ImGuiCol_Separator]          = ImVec4(0.72f, 0.72f, 0.75f, 0.60f);
+		colors[ImGuiCol_SeparatorHovered]   = accentColor;
+		colors[ImGuiCol_SeparatorActive]    = accentColorActive;
+
+		// Scrollbar
+		colors[ImGuiCol_Separator]          = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+		colors[ImGuiCol_ScrollbarBg]        = ImVec4(0.90f, 0.90f, 0.92f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrab]      = ImVec4(0.70f, 0.70f, 0.75f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.65f, 0.65f, 0.68f, 1.00f);
+		colors[ImGuiCol_ScrollbarGrabActive]  = ImVec4(0.55f, 0.55f, 0.58f, 1.00f);
+	}
 }
