@@ -2,7 +2,7 @@
 
 
 # Setup Target
-if (nebula_cmake_platform STREQUAL MacOS)
+if (nebula_cmake_platform STREQUAL MacOS OR nebula_cmake_platform STREQUAL iOS)
     add_executable(PlatformExemple MACOSX_BUNDLE source/PlatformApp.cpp)
 else ()
     add_executable(PlatformExemple source/PlatformApp.cpp)
@@ -45,6 +45,24 @@ elseif (nebula_cmake_platform STREQUAL MacOS)
     set_target_properties(PlatformExemple PROPERTIES
                           MACOSX_BUNDLE TRUE
                           MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Platform/MacOS/Bundle/MacOSXBundleInfo.plist.in"
+
+                          MACOSX_BUNDLE_BUNDLE_NAME "Platform Exemple"
+                          MACOSX_BUNDLE_GUI_IDENTIFIER "com.nebula.platformexemple"
+                          XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.nebula.platformexemple"
+                          MACOSX_BUNDLE_BUNDLE_VERSION "1"
+                          MACOSX_BUNDLE_SHORT_VERSION_STRING "dev"
+                          MACOSX_BUNDLE_COPYRIGHT "© 2024 - 2026 Infinity"
+    )
+
+elseif (nebula_cmake_platform STREQUAL iOS)
+    set_target_properties(PlatformExemple PROPERTIES
+                          XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "iphoneos"
+                          XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "2"
+                          XCODE_ATTRIBUTE_ARCHS "arm64"
+    )
+    set_target_properties(PlatformExemple PROPERTIES
+                          MACOSX_BUNDLE TRUE
+                          MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Platform/iOS/Bundle/iOSBundleInfo.plist.in"
 
                           MACOSX_BUNDLE_BUNDLE_NAME "Platform Exemple"
                           MACOSX_BUNDLE_GUI_IDENTIFIER "com.nebula.platformexemple"

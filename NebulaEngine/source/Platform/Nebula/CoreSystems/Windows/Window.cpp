@@ -1,5 +1,7 @@
 #include "Window.h"
 
+#include "Platform/Platform/iOS/Windows/iOSWindow.h"
+
 #ifdef NB_PLATFORM_WINDOWS
 #include "Platform/Platform/Windows/Windows/WindowsWindow.h"
 #elif NB_PLATFORM_LINUX
@@ -20,6 +22,8 @@ namespace Nebula::Platform
         return CreateRef<LinuxWindow>(props);
 #elif NB_PLATFORM_MACOS
         return CreateRef<MacOSWindow>(props);
+#elif NB_PLATFORM_IOS
+        return CreateRef<iOSWindow>(props);
 #endif
 
     }

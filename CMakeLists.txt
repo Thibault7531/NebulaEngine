@@ -8,13 +8,39 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Scripts/")
 
 # Set Apple OS SDK
 if (APPLE)
-    execute_process(
-            COMMAND xcrun --show-sdk-path
-            OUTPUT_VARIABLE SDK
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 13.3)
-    set(CMAKE_OSX_SYSROOT "${SDK}")
+    if(CMAKE_SYSTEM_NAME MATCHES ".*(Darwin|MacOS).*")
+        execute_process(
+                COMMAND xcrun --show-sdk-path
+                OUTPUT_VARIABLE SDK
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        set(CMAKE_OSX_DEPLOYMENT_TARGET 13.3)
+        set(CMAKE_OSX_SYSROOT "${SDK}")
+        set(CMAKE_Swift_COMPILER_TARGET "x86_64-apple-macosx13.3")
+    elseif (CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        execute_process(
+                COMMAND xcrun --sdk iphoneos --show-sdk-path
+                OUTPUT_VARIABLE SDK
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        set(CMAKE_OSX_DEPLOYMENT_TARGET 16.3)
+        set(CMAKE_OSX_SYSROOT "${SDK}")
+        set(CMAKE_APPLE_SILICON_PROCESSOR "arm64")
+        set(CMAKE_Swift_COMPILER_TARGET "arm64-apple-ios16.3")
+        set(SDKROOT "${SDK}")
+
+        set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "")
+
+        set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "16.3")
+        set(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "iphoneos")
+        set(CMAKE_XCODE_ATTRIBUTE_SDKROOT "iphoneos")
+
+        set(CMAKE_XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "2")
+        set(CMAKE_XCODE_ATTRIBUTE_SUPPORTS_MACCATALYST "NO")
+        set(CMAKE_XCODE_ATTRIBUTE_ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES "YES")
+
+        set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "46SXBN7J7C")
+    endif ()
 endif ()
 
 # Project Specification
@@ -40,6 +66,9 @@ elseif (APPLE)
         set(CMAKE_Swift_LANGUAGE_VERSION 6)
         set(nebula_cmake_platform MacOS)
     elseif(CMAKE_SYSTEM_NAME MATCHES ".*iOS.*")
+        include(InitializeSwift)
+        include(AddSwift)
+        set(CMAKE_Swift_LANGUAGE_VERSION 6)
         set(nebula_cmake_platform iOS)
     else()
         message(WARNING "Unknown Apple platform: \"${CMAKE_SYSTEM_NAME}\"")
@@ -75,7 +104,7 @@ elseif (nebula_cmake_platform STREQUAL Linux)
     set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
     set(CMAKE_CXX_FLAGS_DIST "-O3")
-elseif (nebula_cmake_platform STREQUAL MacOS)
+elseif (nebula_cmake_platform STREQUAL MacOS OR nebula_cmake_platform STREQUAL iOS)
     set(CMAKE_C_FLAGS "-std=c11")
     set(CMAKE_C_FLAGS_DEBUG "-o0 -g")
     set(CMAKE_C_FLAGS_RELEASE "-o2")
