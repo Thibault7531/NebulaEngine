@@ -31,6 +31,8 @@ namespace Nebula {
 
         m_Scene = CreateRef<Scene>();
 
+        m_Camera = EditorCamera(30.f, m_ViewportSize.x / m_ViewportSize.y, 0.1f, 1000.f);
+
         m_SceneHierarchyPanel.SetContext(m_Scene);
 
         Platform::WindowManager::Get().GetMainWindow()->SetVSync(Platform::VSyncMode::Adaptive);
@@ -100,6 +102,7 @@ namespace Nebula {
             m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
 
             m_Scene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+            m_Camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
             DoesViewportFit = true;
         }
@@ -112,13 +115,15 @@ namespace Nebula {
         RenderCommand::SetClearColor({ .3f, .3f, .3f, 1.f });
         RenderCommand::Clear();
 
-        m_Scene->OnUpdate(ts);
+        m_Scene->OnUpdateEditor(ts, m_Camera);
 
         m_Framebuffer->Unbind();
     }
 
     void EditorLayer::OnEvent(Platform::Event &event)
     {
+        m_Camera.OnEvent(event);
+
         Platform::EventDispatcher dispatcher(event);
         dispatcher.Dispatch<Platform::KeyPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnKeyPressedEvent));
     }
@@ -267,45 +272,36 @@ namespace Nebula {
 
             ImGuizmo::Enable(true);
             ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
-            Entity cameraEntity = m_Scene->GetPrimaryCameraEntity();
             Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-            if (cameraEntity)
+            ImGuizmo::SetOrthographic(false);
+            glm::mat4 view = m_Camera.GetViewMatrix();
+
+            ImGuizmo::ViewManipulate(glm::value_ptr(view), m_Camera.GetDistance(), ImVec2(pos.x + size.x - 200, pos.y), ImVec2(200, 200), 0x10101000);
+
+            if (ImGuizmo::IsUsingViewManipulate())
             {
-                SceneCamera::ProjectionType type = cameraEntity.GetComponent<CameraComponent>().Camera.GetProjectionType();
-                ImGuizmo::SetOrthographic(type == SceneCamera::ProjectionType::Orthographic);
-                TransformComponent& cameraTransform = cameraEntity.GetComponent<TransformComponent>();
-                glm::mat4 view = glm::inverse(cameraTransform.GetTransform());
+                float yaw = glm::atan(view[0][2], view[2][2]);
+                float pitch = glm::asin(-view[1][2]);
 
-                if (type == SceneCamera::ProjectionType::Perspective)
+                m_Camera.SetYaw(-yaw);
+                m_Camera.SetPitch(-pitch);
+            }
+
+            if (selectedEntity && m_GizmoOperation != -1)
+            {
+                glm::mat4 projection = m_Camera.GetProjectionMatrix();
+                glm::mat4 transform = selectedEntity.GetComponent<TransformComponent>().GetTransform();
+                ImGuizmo::PushID(0);
+                ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::MODE::WORLD, glm::value_ptr(transform));
+                ImGuizmo::PopID();
+
+                if (ImGuizmo::IsUsing())
                 {
-                    ImGuizmo::ViewManipulate(glm::value_ptr(view), 8.f, ImVec2(pos.x + size.x - 200, pos.y), ImVec2(200, 200), 0x10101000);
-
-                    if (ImGuizmo::IsUsingViewManipulate())
-                    {
-                        glm::quat rotation;
-                        glm::vec3 skew{0.0f};
-                        glm::vec4 perspective{0.0f, 0.0f, 0.0f, 1.0f};
-                        glm::decompose(glm::inverse(view), cameraTransform.Scale, rotation, cameraTransform.Translation, skew, perspective);
-                        cameraTransform.Rotation = glm::eulerAngles(rotation);
-                    }
-                }
-
-                if (selectedEntity && selectedEntity != cameraEntity && m_GizmoOperation != -1)
-                {
-                    glm::mat4 projection = cameraEntity.GetComponent<CameraComponent>().Camera.getProjectionMatrix();
-                    glm::mat4 transform = selectedEntity.GetComponent<TransformComponent>().GetTransform();
-                    ImGuizmo::PushID(0);
-                    ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection), static_cast<ImGuizmo::OPERATION>(m_GizmoOperation), ImGuizmo::MODE::WORLD, glm::value_ptr(transform));
-                    ImGuizmo::PopID();
-
-                    if (ImGuizmo::IsUsing())
-                    {
-                        glm::quat rotation;
-                        glm::vec3 skew{0.0f};
-                        glm::vec4 perspective{0.0f, 0.0f, 0.0f, 1.0f};
-                        glm::decompose(transform, selectedEntity.GetComponent<TransformComponent>().Scale, rotation, selectedEntity.GetComponent<TransformComponent>().Translation, skew, perspective);
-                        selectedEntity.GetComponent<TransformComponent>().Rotation = glm::eulerAngles(rotation);
-                    }
+                    glm::quat rotation;
+                    glm::vec3 skew{0.0f};
+                    glm::vec4 perspective{0.0f, 0.0f, 0.0f, 1.0f};
+                    glm::decompose(transform, selectedEntity.GetComponent<TransformComponent>().Scale, rotation, selectedEntity.GetComponent<TransformComponent>().Translation, skew, perspective);
+                    selectedEntity.GetComponent<TransformComponent>().Rotation = glm::eulerAngles(rotation);
                 }
             }
         }

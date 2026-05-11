@@ -17,7 +17,7 @@ namespace Nebula
         m_Registry.clear();
     }
 
-    void Scene::OnUpdate(Timestep ts)
+    void Scene::OnUpdateRuntime(Timestep ts)
     {
         {
             m_Registry.view<NativeScriptComponent>().each([=, this](auto entity, auto& nsc)
@@ -63,6 +63,20 @@ namespace Nebula
 
             Renderer2D::EndScene();
         }
+    }
+
+    void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
+    {
+        Renderer2D::BeginScene(camera);
+
+        for (const auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>(); const auto entity : view)
+        {
+            auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
+
+            Renderer2D::DrawQuad({.transform = transform.GetTransform(), .color = sprite.Color});
+        }
+
+        Renderer2D::EndScene();
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)

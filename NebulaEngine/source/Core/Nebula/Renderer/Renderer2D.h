@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cameras/Camera.h"
+#include "Cameras/EditorCamera.h"
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Cameras/OrthographicCamera.h"
 #include "Nebula/Renderer/Texture.h"
@@ -34,6 +35,7 @@ namespace Nebula
 
         static void BeginScene(const OrthographicCamera& camera);
         static void BeginScene(const Camera& camera, const glm::mat4& transform);
+        static void BeginScene(const EditorCamera& camera);
         static void EndScene();
         static void NextBash();
         static void Flush();

@@ -7,6 +7,7 @@
 #include "Nebula.h"
 #include "Nebula/CoreSystems/Application/Layer.h"
 #include "Nebula/Renderer/Buffers/Framebuffer.h"
+#include "Nebula/Renderer/Cameras/EditorCamera.h"
 #include "Panels/SceneHierarchyPanel.h"
 
 namespace Nebula {
@@ -38,6 +39,8 @@ namespace Nebula {
         bool DoesViewportFit = false;
         glm::vec2 m_ViewportSize = { 1920.0f, 1080.0f };
         Ref<Framebuffer> m_Framebuffer;
+
+        EditorCamera m_Camera;
 
         Ref<Scene> m_Scene;
         int m_GizmoOperation = -1;

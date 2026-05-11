@@ -3,6 +3,7 @@
 #include <entt/entt.hpp>
 
 #include "Nebula/CoreSystems/Core/Timestep.h"
+#include "Nebula/Renderer/Cameras/EditorCamera.h"
 
 namespace Nebula
 {
@@ -14,7 +15,8 @@ namespace Nebula
         Scene();
         ~Scene();
 
-        void OnUpdate(Timestep ts);
+        void OnUpdateRuntime(Timestep ts);
+        void OnUpdateEditor(Timestep ts, const EditorCamera& camera);
         void OnViewportResize(uint32_t width, uint32_t height);
 
         Entity CreateEntity(const std::string& name = "Unnamed Entity");

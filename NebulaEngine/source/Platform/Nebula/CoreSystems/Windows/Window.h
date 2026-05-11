@@ -1,7 +1,7 @@
 #pragma once
 
+#include <climits>
 #include <string>
-#include <thread>
 #include <Core/Nebula/CoreSystems/Core/Core.h>
 
 #include "Platform/Nebula/CoreSystems/Events/Event.h"
