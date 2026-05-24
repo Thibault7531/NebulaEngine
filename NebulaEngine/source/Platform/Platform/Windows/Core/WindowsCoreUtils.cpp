@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <winrt/base.h>
+#include <WindowsAppSDK-VersionInfo.h>
 
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 
@@ -15,7 +16,7 @@ namespace Nebula::Platform
         LoadLibrary("Microsoft.WindowsAppRuntime.Bootstrap.dll");
         const auto pfn_mdd_bootstrap_initialize = reinterpret_cast<PFN_MddBootstrapInitialize>(GetProcAddress(GetModuleHandle("Microsoft.WindowsAppRuntime.Bootstrap.dll"), "MddBootstrapInitialize"));
 
-        HRESULT hr = pfn_mdd_bootstrap_initialize(0x00020000, L"experimental3", nullptr);
+        HRESULT hr = pfn_mdd_bootstrap_initialize(Microsoft::WindowsAppSDK::Release::MajorMinor, Microsoft::WindowsAppSDK::Release::VersionTag, PCWSTR(Microsoft::WindowsAppSDK::Runtime::Version::UInt64));
         if (FAILED(hr)) NB_PLATFORM_ERROR("Failed loading Windows App SDK with error code {}", hr);
 
         winrt::init_apartment();

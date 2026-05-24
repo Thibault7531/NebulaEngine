@@ -39,34 +39,40 @@ if (nebula_cmake_platform STREQUAL Windows)
         message(WARNING "Could not find Windows SDK")
     endif ()
 
-    add_custom_command(
-            OUTPUT "${CMAKE_BINARY_DIR}/NebulaEngine/vendor/winrt/winmd/Microsoft.UI.winmd"
-            COMMAND powershell -ExecutionPolicy Bypass -File ${CMAKE_SOURCE_DIR}/Scripts/copy-winmd.ps1
-            DEPENDS ${CMAKE_SOURCE_DIR}/Scripts/copy-winmd.ps1
-            COMMENT "Copying Windows App SDK .winmd files"
-            VERBATIM
-            BYPRODUCTS
-    )
 
-    add_custom_target(copy_winmd DEPENDS "${CMAKE_BINARY_DIR}/NebulaEngine/vendor/winrt/winmd/Microsoft.UI.winmd")
-
-    #add_custom_target(copy_winmd
-    #                  COMMAND powershell -ExecutionPolicy Bypass -File ${CMAKE_SOURCE_DIR}/Scripts/copy-winmd.ps1
-    #)
-
-    set(ENV{GENERATED_DIR} "${CMAKE_BINARY_DIR}/cppwinrt")
+    set(ENV{GENERATED_DIR} "${CMAKE_BINARY_DIR}/generated/winrt")
+    set(DEPENDENCIES_DIR "${CMAKE_BINARY_DIR}/generated/deps")
     set(CPPWINRT_EXE "$ENV{WINDOWS_SDK_BIN_DIR}/x64/cppwinrt.exe")
+
+    find_program(NUGET_EXE nuget REQUIRED)
+
+    set(WASDK_VERSION "2.1.3")
+    set(WASDK_DIR "${DEPENDENCIES_DIR}/Microsoft.WindowsAppSDK.${WASDK_VERSION}")
+
+    if(NOT EXISTS "${WASDK_DIR}")
+        message(STATUS "Downloading Windows App SDK via NuGet...")
+        execute_process(
+                COMMAND ${NUGET_EXE} install Microsoft.WindowsAppSDK
+                    -Version ${WASDK_VERSION}
+                    -Source "https://api.nuget.org/v3/index.json"
+                    -OutputDirectory "${DEPENDENCIES_DIR}"
+                RESULT_VARIABLE NUGET_RES
+        )
+        if (NOT NUGET_RES EQUAL 0)
+            message(FATAL_ERROR "Failed to download Windows App SDK via NuGet")
+        endif ()
+    endif ()
 
     add_custom_command(
             OUTPUT $ENV{GENERATED_DIR}/stamp
             COMMAND "${CPPWINRT_EXE}" -verbose
             -input "$ENV{WINDOWS_SDK_METADATA_DIR}/Windows.winmd"
-            -input "${CMAKE_BINARY_DIR}/NebulaEngine/vendor/winrt/winmd/Microsoft.UI.winmd"
-            -input "${CMAKE_BINARY_DIR}/NebulaEngine/vendor/winrt/winmd/Microsoft.Graphics.winmd"
-            -input "${CMAKE_BINARY_DIR}/NebulaEngine/vendor/winrt/winmd/Microsoft.Windows.ApplicationModel.WindowsAppRuntime.winmd"
-            -input "${CMAKE_BINARY_DIR}/NebulaEngine/vendor/winrt/winmd/Microsoft.Windows.ApplicationModel.DynamicDependency.winmd"
-            -input "${CMAKE_BINARY_DIR}/NebulaEngine/vendor/winrt/winmd/Microsoft.Windows.Storage.winmd"
-            -input "${CMAKE_BINARY_DIR}/NebulaEngine/vendor/winrt/winmd/Microsoft.Windows.Storage.Pickers.winmd"
+            -input "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.InteractiveExperiences.2.0.13/metadata/10.0.18362.0/Microsoft.UI.winmd"
+            -input "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.InteractiveExperiences.2.0.13/metadata/10.0.18362.0/Microsoft.Graphics.winmd"
+            -input "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.Foundation.2.0.21/metadata/Microsoft.Windows.ApplicationModel.WindowsAppRuntime.winmd"
+            -input "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.Foundation.2.0.21/metadata/Microsoft.Windows.ApplicationModel.DynamicDependency.winmd"
+            -input "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.Foundation.2.0.21/metadata/Microsoft.Windows.Storage.winmd"
+            -input "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.Foundation.2.0.21/metadata/Microsoft.Windows.Storage.Pickers.winmd"
             -output "$ENV{GENERATED_DIR}"
             COMMAND ${CMAKE_COMMAND} -E touch "$ENV{GENERATED_DIR}/stamp"
             DEPENDS ${WINMD_INPUTS}
@@ -75,6 +81,5 @@ if (nebula_cmake_platform STREQUAL Windows)
     )
 
     add_custom_target(generate_winrt ALL DEPENDS $ENV{GENERATED_DIR}/stamp)
-    add_dependencies(generate_winrt copy_winmd)
 
 endif ()

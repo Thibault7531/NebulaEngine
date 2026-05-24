@@ -5,8 +5,8 @@ Nebula Engine is a 2D/3D game engine used as a learning project.
 ## Features
 
 Features include:
-1. Windows and Linux support. (MacOS is under development using Swift interoperability)
-2. OpenGL graphics API support.
+1. Windows, MacOS and Linux support.
+2. OpenGL 4.6.0 graphics API support. (OpenGL 4.1.0 on MacOS)
 3. 2D and 3D rendering.
 4. Model loading.
 5. ImGui for UI rendering.
@@ -17,8 +17,9 @@ Features include:
 Requirements for building on Windows:
 - CMake 4.0
 - Clang
-- Windows 10.0.26000 SDK
-- Windows App SDK 2.0-experimental3
+- NuGet
+- Windows 10.0.26100.0 SDK
+- Windows App SDK 2.1.3
 
 Requirements for building on Linux:
 - CMake 4.0

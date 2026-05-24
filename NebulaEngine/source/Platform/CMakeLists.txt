@@ -97,6 +97,7 @@ if (nebula_cmake_platform STREQUAL Windows)
 
     target_include_directories(Nebula-Platform PRIVATE
                                $ENV{GENERATED_DIR}
+                               "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.Runtime.2.1.3/include"
                                "${CMAKE_SOURCE_DIR}/NebulaEngine/vendor/WindowsAppSDK/dev/WindowsAppRuntime_BootstrapDLL"
                                "$ENV{WINDOWS_SDK_INCLUDE_DIR}/um"
     )

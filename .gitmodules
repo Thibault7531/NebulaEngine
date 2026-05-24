@@ -14,9 +14,6 @@
 [submodule "NebulaEngine/vendor/yaml-cpp"]
 	path = NebulaEngine/vendor/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
-[submodule "NebulaEngine/vendor/WindowsAppSDK"]
-	path = NebulaEngine/vendor/WindowsAppSDK
-	url = https://github.com/microsoft/WindowsAppSDK.git
 [submodule "NebulaEngine/vendor/SDL"]
 	path = NebulaEngine/vendor/SDL
 	url = https://github.com/libsdl-org/SDL.git
