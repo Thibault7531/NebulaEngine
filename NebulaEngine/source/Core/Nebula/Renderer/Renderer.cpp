@@ -22,6 +22,7 @@ namespace Nebula {
 		NB_PROFILE_FUNCTION();
 
 		NB_CORE_INFO("Shutting down Nebula Renderer");
+		Renderer2D::Shutdown();
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)

@@ -5,6 +5,7 @@
 # IDE Configs
 /.cache
 /.idea
+/.junie
 /.vs
 *.user
 *.sln

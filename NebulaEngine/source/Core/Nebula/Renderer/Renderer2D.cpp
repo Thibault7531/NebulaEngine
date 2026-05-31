@@ -49,7 +49,7 @@ namespace Nebula
 
         s_Data.QuadVertexArray = VertexArray::Create();
 
-        s_Data.QuadVertexBuffer = VertexBuffer::Create(Nebula::Renderer2DData::MaxVertices * sizeof(QuadVertex));
+        s_Data.QuadVertexBuffer = VertexBuffer::Create(Renderer2DData::MaxVertices * sizeof(QuadVertex));
         s_Data.QuadVertexBuffer->SetLayout({
             {ShaderDataType::Float3, "a_Position"},
             {ShaderDataType::Float4, "a_Color"},
@@ -58,12 +58,12 @@ namespace Nebula
         });
         s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
-        s_Data.QuadVertexBufferBase = new QuadVertex[Nebula::Renderer2DData::MaxVertices];
+        s_Data.QuadVertexBufferBase = new QuadVertex[Renderer2DData::MaxVertices];
 
-        auto* quadIndices = new uint32_t[Nebula::Renderer2DData::MaxIndices];
+        auto* quadIndices = new uint32_t[Renderer2DData::MaxIndices];
 
         uint32_t offset = 0;
-        for (uint32_t i = 0; i < Nebula::Renderer2DData::MaxIndices; i += 6)
+        for (uint32_t i = 0; i < Renderer2DData::MaxIndices; i += 6)
         {
             quadIndices[i + 0] = offset + 0;
             quadIndices[i + 1] = offset + 1;
@@ -100,6 +100,16 @@ namespace Nebula
     void Renderer2D::Shutdown()
     {
         NB_PROFILE_FUNCTION();
+
+        s_Data.QuadVertexArray.reset();
+        s_Data.QuadVertexBuffer.reset();
+        s_Data.QuadShader.reset();
+        s_Data.WhiteTexture.reset();
+
+        delete s_Data.QuadVertexBufferBase;
+
+        for (uint32_t i = 0; i < Nebula::Renderer2DData::MaxTextureSlots; i++)
+            s_Data.TextureSlots[i].reset();
     }
 
     void Renderer2D::BeginScene(const OrthographicCamera& camera)
