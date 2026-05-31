@@ -40,6 +40,26 @@ namespace Nebula {
         {
             ImGuiIO& io = ImGui::GetIO();
 
+            auto [WindowWidth, WindowHeight] = Platform::WindowManager::Get().GetMainWindow()->GetSize();
+
+            if (y >= 0 && y <= 5)
+            {
+                if (x >= 0 && x <= 5) return Platform::HitTest::ResizeTopLeft;
+                if (x > 5 && x < WindowWidth - 5) return Platform::HitTest::ResizeTop;
+                if (x >= WindowWidth - 5 && x <= WindowWidth) return Platform::HitTest::ResizeTopRight;
+            }
+            if (y > 5 && y < WindowHeight - 5)
+            {
+                if (x >= 0 && x <= 5) return Platform::HitTest::ResizeLeft;
+                if (x >= WindowWidth - 5 && x <= WindowWidth) return Platform::HitTest::ResizeRight;
+            }
+            if (y >= WindowHeight - 5 && y <= WindowHeight)
+            {
+                if (x >= 0 && x <= 5) return Platform::HitTest::ResizeBottomLeft;
+                if (x > 5 && x < WindowWidth - 5) return Platform::HitTest::ResizeBottom;
+                if (x >= WindowWidth - 5 && x <= WindowWidth) return Platform::HitTest::ResizeBottomRight;
+            }
+
             if (y <= Platform::WindowManager::Get().GetMainWindow()->GetTitlebarHeight())
             {
                 for (auto& button : m_TitleBarButtons)
