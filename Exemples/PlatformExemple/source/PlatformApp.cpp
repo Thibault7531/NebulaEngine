@@ -60,7 +60,7 @@ int main()
     Nebula::Platform::Log::Init();
 
     Nebula::Platform::CoreUtils::InitThread();
-    Nebula::Ref<Nebula::Platform::Window> window = Nebula::Platform::WindowManager::Get().CreateMainWindow({.Style = Nebula::Platform::WindowStyle::BorderlessInteractive});
+    Nebula::Ref<Nebula::Platform::Window> window = Nebula::Platform::WindowManager::Get().CreateMainWindow({.Style = Nebula::Platform::WindowStyle::BorderlessInteractive, .API = Nebula::Platform::GraphicsAPI::OpenGL410});
     window->SetEventCallback(Callback);
 
     const char* vertexCode = vertexShader.c_str();

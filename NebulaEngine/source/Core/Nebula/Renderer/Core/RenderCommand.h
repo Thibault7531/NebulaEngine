@@ -1,14 +1,43 @@
 #pragma once
 
 #include "RendererAPI.h"
+#include "Platform/OpenGL410/OpenGL410RendererAPI.h"
+
+#ifndef NB_PLATFORM_MACOS
+#include "Platform/OpenGL/OpenGLRendererAPI.h"
+#endif
 
 namespace Nebula {
 
 	class RenderCommand
 	{
 	public:
-		inline static void Init()
+		inline static void Init(Platform::GraphicsAPI api)
 		{
+			RendererAPI::s_API = api;
+
+			switch (api)
+			{
+#ifdef NB_PLATFORM_MACOS
+			case Platform::GraphicsAPI::None:
+				{
+					NB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+					return;
+				}
+
+			case Platform::GraphicsAPI::OpenGL410: s_RendererAPI = new OpenGL410RendererAPI(); break;
+			case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return;
+#else
+			case Platform::GraphicsAPI::None:
+				{
+					NB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+					return;
+				}
+
+			case Platform::GraphicsAPI::OpenGL410: s_RendererAPI = new OpenGL410RendererAPI(); break;
+			case Platform::GraphicsAPI::OpenGL460: s_RendererAPI = new OpenGLRendererAPI(); break;
+#endif
+			}
 			s_RendererAPI->Init();
 		}
 
@@ -36,7 +65,7 @@ namespace Nebula {
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
 	private:
-		static RendererAPI* s_RendererAPI;
+		inline static RendererAPI* s_RendererAPI;
 	};
 
 }

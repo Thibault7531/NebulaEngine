@@ -1,4 +1,4 @@
-#include "OpenGLContext.h"
+#include "OpenGL410Context.h"
 
 #include <glad/gl.h>
 #include <KHR/khrplatform.h>
@@ -8,26 +8,26 @@
 
 namespace Nebula::Platform
 {
-    bool OpenGlContext::s_GLInitialized = false;
-    SDL_GLContext OpenGlContext::s_MainContext = nullptr;
+    bool OpenGL410Context::s_GLInitialized = false;
+    SDL_GLContext OpenGL410Context::s_MainContext = nullptr;
 
-    OpenGlContext::OpenGlContext(Window* window)
+    OpenGL410Context::OpenGL410Context(Window* window)
         : m_Window(window)
     {
     }
 
-    OpenGlContext::~OpenGlContext()
+    OpenGL410Context::~OpenGL410Context()
     {
         SDL_GL_DestroyContext(m_Context);
     }
 
-    void OpenGlContext::Init()
+    void OpenGL410Context::Init()
     {
         if (!s_GLInitialized)
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
         }
         else
         {
@@ -46,19 +46,19 @@ namespace Nebula::Platform
         }
     }
 
-    void OpenGlContext::SetCurrent()
+    void OpenGL410Context::SetCurrent()
     {
         SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_Window->GetNativeWindow()), m_Context);
     }
 
-    void OpenGlContext::SetVSync(VSyncMode mode)
+    void OpenGL410Context::SetVSync(VSyncMode mode)
     {
         if (mode == VSyncMode::Off) SDL_GL_SetSwapInterval(0);
         if (mode == VSyncMode::Adaptive) SDL_GL_SetSwapInterval(-1);
         if (mode == VSyncMode::On) SDL_GL_SetSwapInterval(1);
     }
 
-    VSyncMode OpenGlContext::IsVsync() const
+    VSyncMode OpenGL410Context::IsVsync() const
     {
         int mode;
         SDL_GL_GetSwapInterval(&mode);
@@ -68,7 +68,7 @@ namespace Nebula::Platform
         return VSyncMode::Off;
     }
 
-    void OpenGlContext::SwapBuffers()
+    void OpenGL410Context::SwapBuffers()
     {
         SDL_GL_SwapWindow(static_cast<SDL_Window*>(m_Window->GetNativeWindow()));
     }

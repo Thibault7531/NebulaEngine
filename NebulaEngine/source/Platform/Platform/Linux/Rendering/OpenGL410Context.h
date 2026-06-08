@@ -9,11 +9,11 @@
 namespace Nebula::Platform
 {
 
-    class OpenGlContext : public Context
+    class OpenGL410Context : public Context
     {
     public:
-        OpenGlContext(Window* window);
-        virtual ~OpenGlContext();
+        OpenGL410Context(Window* window);
+        virtual ~OpenGL410Context();
 
         virtual void Init() override;
 

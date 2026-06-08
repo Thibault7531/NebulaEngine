@@ -4,17 +4,12 @@
 #include <glm/glm.hpp>
 
 #include "Nebula/Renderer/Buffers/VertexArray.h"
+#include "Platform/Nebula/CoreSystems/Rendering/GraphicsAPI.h"
 
 namespace Nebula {
 
 	class RendererAPI
 	{
-	public:
-		enum class API
-		{
-			None = 0, OpenGL = 1, OpenGL410 = 2
-		};
-
 	public:
 		virtual ~RendererAPI() = default;
 
@@ -28,10 +23,12 @@ namespace Nebula {
 
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 
-		inline static API GetAPI() { return s_API; }
+		inline static Platform::GraphicsAPI GetAPI() { return s_API; }
 
 	private:
-		static API s_API;
+		static Platform::GraphicsAPI s_API;
+
+		friend class RenderCommand;
 	};
 
 }

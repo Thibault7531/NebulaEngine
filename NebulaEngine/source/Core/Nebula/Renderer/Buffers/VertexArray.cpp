@@ -16,13 +16,13 @@ namespace Nebula {
 		switch (Renderer::GetAPI())
 		{
 #ifdef NB_PLATFORM_MACOS
-		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-		case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
-		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410VertexArray>();
+		case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case Platform::GraphicsAPI::OpenGL410: return std::make_shared<OpenGL410VertexArray>();
+		case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
 #else
-		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-		case RendererAPI::API::OpenGL: return std::make_shared<OpenGLVertexArray>();
-		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410VertexArray>();
+		case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case Platform::GraphicsAPI::OpenGL410: return std::make_shared<OpenGL410VertexArray>();
+		case Platform::GraphicsAPI::OpenGL460: return std::make_shared<OpenGLVertexArray>();
 #endif
 		}
 

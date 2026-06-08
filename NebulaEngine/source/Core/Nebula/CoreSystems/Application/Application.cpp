@@ -22,10 +22,16 @@ namespace Nebula
 
 		Platform::CoreUtils::InitThread();
 
+		Platform::GraphicsAPI api = Platform::GraphicsAPI::None;
+		if (Platform::Graphics::isGraphicsAPISupported(Platform::GraphicsAPI::OpenGL460)) api = Platform::GraphicsAPI::OpenGL460;
+		else if (Platform::Graphics::isGraphicsAPISupported(Platform::GraphicsAPI::OpenGL410)) api = Platform::GraphicsAPI::OpenGL410;
+		else NB_CORE_ASSERT(false, "No supported Graphics API found!");
+
+		props.API = api;
 		m_MainWindow = Platform::WindowManager::Get().CreateMainWindow(props);
 		m_MainWindow->SetEventCallback(NB_BIND_EVENT_FN(OnEvent));
 
-		Renderer::Init();
+		Renderer::Init(api);
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);

@@ -1,4 +1,4 @@
-#include "OpenGLContext.h"
+#include "OpenGL460Context.h"
 
 #include <windows.ui.interop.h>
 #include <glad/wgl.h>
@@ -8,10 +8,10 @@
 
 namespace Nebula::Platform
 {
-    bool OpenGlContext::s_GLInitialized = false;
-    HGLRC OpenGlContext::s_MainContext = nullptr;
+    bool OpenGL460Context::s_GLInitialized = false;
+    HGLRC OpenGL460Context::s_MainContext = nullptr;
 
-    OpenGlContext::OpenGlContext(Window* window)
+    OpenGL460Context::OpenGL460Context(Window* window)
         : m_Window(window)
     {
         //winrt::Microsoft::UI::Windowing::AppWindow* nativeWindow = static_cast<winrt::Microsoft::UI::Windowing::AppWindow*>(window->GetNativeWindow());
@@ -21,14 +21,14 @@ namespace Nebula::Platform
         m_DeviceContext = GetDC(m_Handle);
     }
 
-    OpenGlContext::~OpenGlContext()
+    OpenGL460Context::~OpenGL460Context()
     {
         wglMakeCurrent(nullptr, nullptr);
         wglDeleteContext(m_Context);
         ReleaseDC(m_Handle, m_DeviceContext);
     }
 
-    void OpenGlContext::Init()
+    void OpenGL460Context::Init()
     {
         if (!s_GLInitialized) InitOpenGL();
 
@@ -65,12 +65,12 @@ namespace Nebula::Platform
         gladLoaderLoadGL();
     }
 
-    void OpenGlContext::SetCurrent()
+    void OpenGL460Context::SetCurrent()
     {
         wglMakeCurrent(m_DeviceContext, m_Context);
     }
 
-    void OpenGlContext::SetVSync(VSyncMode mode)
+    void OpenGL460Context::SetVSync(VSyncMode mode)
     {
         switch (mode)
         {
@@ -80,7 +80,7 @@ namespace Nebula::Platform
         }
     }
 
-    VSyncMode OpenGlContext::IsVsync() const
+    VSyncMode OpenGL460Context::IsVsync() const
     {
         int result = wglGetSwapIntervalEXT();
 
@@ -88,12 +88,12 @@ namespace Nebula::Platform
         return result ? VSyncMode::On : VSyncMode::Off;
     }
 
-    void OpenGlContext::SwapBuffers()
+    void OpenGL460Context::SwapBuffers()
     {
         ::SwapBuffers(m_DeviceContext);
     }
 
-    void OpenGlContext::InitOpenGL()
+    void OpenGL460Context::InitOpenGL()
     {
         PIXELFORMATDESCRIPTOR pfd = {
             .nSize = sizeof(pfd),

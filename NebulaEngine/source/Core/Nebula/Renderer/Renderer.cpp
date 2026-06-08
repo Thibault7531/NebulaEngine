@@ -7,13 +7,13 @@ namespace Nebula {
 
 	Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData();
 
-	void Renderer::Init()
+	void Renderer::Init(Platform::GraphicsAPI api)
 	{
 		NB_PROFILE_FUNCTION();
 
 		NB_CORE_INFO("Initializing Nebula Renderer");
 
-		RenderCommand::Init();
+		RenderCommand::Init(api);
 		Renderer2D::Init();
 	}
 
