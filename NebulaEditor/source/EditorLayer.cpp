@@ -79,7 +79,7 @@ namespace Nebula {
         auto* pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
         nsvgRasterize(rast, closeImage, 0, 0, imageSize/closeImage->width, pixels, imageSize, imageSize, imageSize * 4);
         m_CloseIcon = Texture2D::Create(imageSize, imageSize);
-        m_CloseIcon->SetData(pixels, imageSize * imageSize * 4);
+        m_CloseIcon->SetData(pixels, imageSize * imageSize * 4, Texture::DataFormat::RGBA);
         free(pixels);
         nsvgDelete(closeImage);
 
@@ -87,7 +87,7 @@ namespace Nebula {
         pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
         nsvgRasterize(rast, maximizeImage, 0, 0, imageSize/maximizeImage->width, pixels, imageSize, imageSize, imageSize * 4);
         m_MaximizeIcon = Texture2D::Create(imageSize, imageSize);
-        m_MaximizeIcon->SetData(pixels, imageSize * imageSize * 4);
+        m_MaximizeIcon->SetData(pixels, imageSize * imageSize * 4, Texture::DataFormat::RGBA);
         free(pixels);
         nsvgDelete(maximizeImage);
 
@@ -95,7 +95,7 @@ namespace Nebula {
         pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
         nsvgRasterize(rast, restoreImage, 0, 0, imageSize/restoreImage->width, pixels, imageSize, imageSize, imageSize * 4);
         m_RestoreIcon = Texture2D::Create(imageSize, imageSize);
-        m_RestoreIcon->SetData(pixels, imageSize * imageSize * 4);
+        m_RestoreIcon->SetData(pixels, imageSize * imageSize * 4, Texture::DataFormat::RGBA);
         free(pixels);
         nsvgDelete(restoreImage);
 
@@ -103,7 +103,7 @@ namespace Nebula {
         pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
         nsvgRasterize(rast, minimizeImage, 0, 0, imageSize/minimizeImage->width, pixels, imageSize, imageSize, imageSize * 4);
         m_MinimizeIcon = Texture2D::Create(imageSize, imageSize);
-        m_MinimizeIcon->SetData(pixels, imageSize * imageSize * 4);
+        m_MinimizeIcon->SetData(pixels, imageSize * imageSize * 4, Texture::DataFormat::RGBA);
         free(pixels);
         nsvgDelete(minimizeImage);
 

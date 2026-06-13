@@ -10,7 +10,7 @@ namespace Nebula
     class OpenGL410Texture2D : public Texture2D
     {
     public:
-        OpenGL410Texture2D(const uint32_t width, const uint32_t height);
+        OpenGL410Texture2D(const uint32_t width, const uint32_t height, InternalFormat internalFormat);
         OpenGL410Texture2D(const std::string& path);
         virtual ~OpenGL410Texture2D();
 
@@ -18,7 +18,7 @@ namespace Nebula
         [[nodiscard]] virtual uint32_t GetHeight() const override { return m_Height; }
         virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
-        virtual void SetData(void* data, uint32_t size) override;
+        virtual void SetData(void* data, uint32_t size, DataFormat format) override;
 
         virtual void Bind(uint32_t slot = 0) const override;
 
@@ -28,9 +28,13 @@ namespace Nebula
         }
 
     private:
+        GLenum GetOpenGL410InternalFormat(InternalFormat format);
+        GLenum GetOpenGL410DataFormat(DataFormat format);
+
+    private:
         std::string m_Path;
         uint32_t m_Width, m_Height;
-        GLenum m_InternalFormat, m_DataFormat;
+        GLenum m_InternalFormat;
         uint32_t m_RendererID;
     };
 
