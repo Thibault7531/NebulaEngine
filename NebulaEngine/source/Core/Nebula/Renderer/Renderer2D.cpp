@@ -39,6 +39,8 @@ namespace Nebula
         uint32_t TextureSlotIndex = 1;
 
         Renderer2D::Statistics Stats;
+
+        bool CullingEnabled = false;
     };
 
     static Renderer2DData s_Data;
@@ -116,6 +118,9 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
+        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
+        RenderCommand::EnableFaceCulling(false);
+
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetMat4("u_ViewProjection", camera.getViewProjectionMatrix());
 
@@ -129,6 +134,9 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
+        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
+        RenderCommand::EnableFaceCulling(false);
+
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetProjectionMatrix() * glm::inverse(transform));
 
@@ -141,6 +149,9 @@ namespace Nebula
     void Renderer2D::BeginScene(const EditorCamera& camera)
     {
         NB_PROFILE_FUNCTION();
+
+        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
+        RenderCommand::EnableFaceCulling(false);
 
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
@@ -159,6 +170,8 @@ namespace Nebula
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
         Flush();
+
+        RenderCommand::EnableFaceCulling(s_Data.CullingEnabled);
     }
 
     void Renderer2D::NextBash()

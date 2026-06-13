@@ -1,21 +1,22 @@
 #pragma once
 
+#include "Nebula/Renderer/Texture.h"
 #include "Nebula/Renderer/Buffers/Framebuffer.h"
 
 namespace Nebula {
 
-    class OpenGLFramebuffer : public Framebuffer
+    class OpenGL460Framebuffer : public Framebuffer
     {
     public:
-        OpenGLFramebuffer(const FramebufferSpecification& spec);
-        virtual ~OpenGLFramebuffer() override;
+        OpenGL460Framebuffer(const FramebufferSpecification& spec);
+        virtual ~OpenGL460Framebuffer() override;
 
         void Invalidate();
 
         virtual void Bind() override;
         virtual void Unbind() override;
 
-        [[nodiscard]] virtual uint32_t GetColorAttachmentRendererID() const override { return m_ColorAttachment; }
+        virtual Ref<Texture2D> GetColorAttachment(uint32_t index) const override { return m_ColorTexture; }
 
         [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 
@@ -23,8 +24,8 @@ namespace Nebula {
 
     private:
         uint32_t m_RendererID = 0;
-        uint32_t m_ColorAttachment = 0;
-        uint32_t m_DepthAttachment = 0;
+        Ref<Texture2D> m_ColorTexture = 0;
+        Ref<Texture2D> m_DepthTexture = 0;
         FramebufferSpecification m_Specification;
 
     };

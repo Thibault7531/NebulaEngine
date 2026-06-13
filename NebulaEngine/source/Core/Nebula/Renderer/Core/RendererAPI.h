@@ -16,6 +16,9 @@ namespace Nebula {
 		virtual void Init() = 0;
 		virtual void Log() = 0;
 
+		virtual bool IsFaceCullingEnabled() const = 0;
+		virtual void EnableFaceCulling(bool enabled) = 0;
+
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 
 		virtual void SetClearColor(const glm::vec4& color) = 0;

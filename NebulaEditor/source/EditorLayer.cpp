@@ -288,7 +288,7 @@ namespace Nebula {
             IsViewportHovered = ImGui::IsWindowHovered();
             Application::Get().GetImGuiLayer()->BlockEvents(!IsViewportFocused && !IsViewportHovered);
 
-            ImGui::Image(m_Framebuffer->GetColorAttachmentRendererID(), { m_ViewportSize.x, m_ViewportSize.y }, {0, 1}, {1, 0});
+            ImGui::Image(m_Framebuffer->GetColorAttachment()->GetRendererID(), { m_ViewportSize.x, m_ViewportSize.y }, {0, 1}, {1, 0});
 
             ImGuizmo::Enable(true);
             ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);

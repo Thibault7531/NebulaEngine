@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Texture.h"
 #include "Nebula/CoreSystems/Core/Core.h"
 
 namespace Nebula {
@@ -20,7 +21,7 @@ namespace Nebula {
         virtual void Bind() = 0;
         virtual void Unbind() = 0;
 
-        [[nodiscard]] virtual uint32_t GetColorAttachmentRendererID() const = 0;
+        virtual Ref<Texture2D> GetColorAttachment(uint32_t index = 0) const = 0;
 
         [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const = 0;
 

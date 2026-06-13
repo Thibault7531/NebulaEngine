@@ -21,6 +21,7 @@ namespace Nebula
         virtual void SetData(void* data, uint32_t size, DataFormat format) override;
 
         virtual void Bind(uint32_t slot = 0) const override;
+        virtual void BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot) const override;
 
         virtual bool operator==(const Texture2D& other) const override
         {

@@ -14,6 +14,8 @@ namespace Nebula {
 		NB_CORE_INFO("Initializing Nebula Renderer");
 
 		RenderCommand::Init(api);
+		RenderCommand::EnableFaceCulling(true);
+
 		Renderer2D::Init();
 	}
 

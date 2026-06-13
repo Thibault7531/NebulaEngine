@@ -11,7 +11,8 @@ namespace Nebula
         enum class InternalFormat
         {
             RGB8,
-            RGBA8
+            RGBA8,
+            Depth24Stencil8
         };
 
         enum class DataFormat
@@ -23,7 +24,16 @@ namespace Nebula
             RGBA,
             BGRA,
             Depth,
-            Stencil
+            Stencil,
+            DepthStencil
+        };
+
+        enum class FramebufferSlotType
+        {
+            Color,
+            Depth,
+            Stencil,
+            DepthStencil
         };
 
     public:
@@ -36,6 +46,7 @@ namespace Nebula
         virtual void SetData(void* data, uint32_t size, DataFormat format) = 0;
 
         virtual void Bind(uint32_t slot = 0) const = 0;
+        virtual void BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot = 0) const = 0;
     };
 
     class Texture2D : public Texture

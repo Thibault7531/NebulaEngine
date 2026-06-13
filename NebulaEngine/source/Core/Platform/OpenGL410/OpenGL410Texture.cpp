@@ -13,7 +13,7 @@ namespace Nebula
         
         glGenTextures(1, &m_RendererID);
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
-        //glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, m_DataFormat, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, GetDataFormatMatchingInternalFormat(), GetDataTypeMatchingInternalFormat(), nullptr);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -81,12 +81,27 @@ namespace Nebula
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
     }
 
-    GLenum OpenGL410Texture2D::GetOpenGL410InternalFormat(InternalFormat format)
+    void OpenGL410Texture2D::BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot) const
+    {
+        GLenum attachment = 0;
+        switch (slotType)
+        {
+        case FramebufferSlotType::Color: attachment = GL_COLOR_ATTACHMENT0 + slot; break;
+        case FramebufferSlotType::Depth: attachment = GL_DEPTH_ATTACHMENT; break;
+        case FramebufferSlotType::Stencil: attachment = GL_STENCIL_ATTACHMENT; break;
+        case FramebufferSlotType::DepthStencil: attachment = GL_DEPTH_STENCIL_ATTACHMENT; break;
+        }
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, m_RendererID, 0);
+    }
+
+    GLint OpenGL410Texture2D::GetOpenGL410InternalFormat(InternalFormat format)
     {
         switch (format)
         {
         case InternalFormat::RGB8: return GL_RGB8;
         case InternalFormat::RGBA8: return GL_RGBA8;
+        case InternalFormat::Depth24Stencil8: return GL_DEPTH24_STENCIL8;
         default:
             {
                 NB_CORE_ASSERT(false, "Unknown InternalFormat!");
@@ -95,7 +110,7 @@ namespace Nebula
         }
     }
 
-    GLenum OpenGL410Texture2D::GetOpenGL410DataFormat(DataFormat format)
+    GLint OpenGL410Texture2D::GetOpenGL410DataFormat(DataFormat format)
     {
         switch (format)
         {
@@ -107,11 +122,31 @@ namespace Nebula
         case DataFormat::BGRA: return GL_BGRA;
         case DataFormat::Depth: return GL_DEPTH_COMPONENT;
         case DataFormat::Stencil: return GL_STENCIL_INDEX;
+        case DataFormat::DepthStencil: return GL_DEPTH_STENCIL;
         default:
             {
                 NB_CORE_ASSERT(false, "Unknown DataFormat!");
                 return 0;
             }
+        }
+    }
+
+    GLint OpenGL410Texture2D::GetDataFormatMatchingInternalFormat()
+    {
+        switch (m_InternalFormat)
+        {
+        case GL_RGB8: return GL_RGB;
+        case GL_RGBA8: return GL_RGBA;
+        case GL_DEPTH24_STENCIL8: return GL_DEPTH_STENCIL;
+        }
+    }
+
+    GLint OpenGL410Texture2D::GetDataTypeMatchingInternalFormat()
+    {
+        switch (m_InternalFormat)
+        {
+        case GL_DEPTH24_STENCIL8: return GL_UNSIGNED_INT_24_8;
+        default: return GL_UNSIGNED_BYTE;
         }
     }
 }

@@ -21,6 +21,7 @@ namespace Nebula
         virtual void SetData(void* data, uint32_t size, DataFormat format) override;
 
         virtual void Bind(uint32_t slot = 0) const override;
+        virtual void BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot) const override;
 
         virtual bool operator==(const Texture2D& other) const override
         {
@@ -28,13 +29,15 @@ namespace Nebula
         }
 
     private:
-        GLenum GetOpenGL410InternalFormat(InternalFormat format);
-        GLenum GetOpenGL410DataFormat(DataFormat format);
+        GLint GetOpenGL410InternalFormat(InternalFormat format);
+        GLint GetOpenGL410DataFormat(DataFormat format);
+        GLint GetDataFormatMatchingInternalFormat();
+        GLint GetDataTypeMatchingInternalFormat();
 
     private:
         std::string m_Path;
         uint32_t m_Width, m_Height;
-        GLenum m_InternalFormat;
+        GLint m_InternalFormat;
         uint32_t m_RendererID;
     };
 

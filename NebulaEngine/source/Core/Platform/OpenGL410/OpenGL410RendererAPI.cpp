@@ -40,6 +40,16 @@ namespace Nebula {
 #endif
 	}
 
+	bool OpenGL410RendererAPI::IsFaceCullingEnabled() const
+	{
+		return glIsEnabled(GL_CULL_FACE);
+	}
+
+	void OpenGL410RendererAPI::EnableFaceCulling(bool enabled)
+	{
+		enabled ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
+	}
+
 	void OpenGL410RendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
 		glViewport(x, y, width, height);

@@ -9,7 +9,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        m_InternalFormat = GL_RGBA8;
+        m_InternalFormat = GetOpenGL460InternalFormat(internalFormat);
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
         glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
@@ -77,12 +77,27 @@ namespace Nebula
         glBindTextureUnit(slot, m_RendererID);
     }
 
+    void OpenGL460Texture2D::BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot) const
+    {
+        GLenum attachment = 0;
+        switch (slotType)
+        {
+        case FramebufferSlotType::Color: attachment = GL_COLOR_ATTACHMENT0 + slot; break;
+        case FramebufferSlotType::Depth: attachment = GL_DEPTH_ATTACHMENT; break;
+        case FramebufferSlotType::Stencil: attachment = GL_STENCIL_ATTACHMENT; break;
+        case FramebufferSlotType::DepthStencil: attachment = GL_DEPTH_STENCIL_ATTACHMENT; break;
+        }
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, m_RendererID, 0);
+    }
+
     GLenum OpenGL460Texture2D::GetOpenGL460InternalFormat(InternalFormat format)
     {
         switch (format)
         {
         case InternalFormat::RGB8: return GL_RGB8;
         case InternalFormat::RGBA8: return GL_RGBA8;
+        case InternalFormat::Depth24Stencil8: return GL_DEPTH24_STENCIL8;
         default:
             {
                 NB_CORE_ASSERT(false, "Unknown InternalFormat!");
@@ -103,6 +118,7 @@ namespace Nebula
         case DataFormat::BGRA: return GL_BGRA;
         case DataFormat::Depth: return GL_DEPTH_COMPONENT;
         case DataFormat::Stencil: return GL_STENCIL_INDEX;
+        case DataFormat::DepthStencil: return GL_DEPTH_STENCIL;
         default:
             {
                 NB_CORE_ASSERT(false, "Unknown DataFormat!");
