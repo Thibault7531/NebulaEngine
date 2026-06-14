@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm.hpp>
+
 #include "Nebula/CoreSystems/Core/Core.h"
 
 namespace Nebula
@@ -44,6 +46,8 @@ namespace Nebula
         virtual uint32_t GetRendererID() const = 0;
 
         virtual void SetData(void* data, uint32_t size, DataFormat format) = 0;
+        virtual std::vector<glm::vec4> GetDataRGBA() = 0;
+        virtual std::vector<uint8_t> GetDataR() = 0;
 
         virtual void Bind(uint32_t slot = 0) const = 0;
         virtual void BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot = 0) const = 0;

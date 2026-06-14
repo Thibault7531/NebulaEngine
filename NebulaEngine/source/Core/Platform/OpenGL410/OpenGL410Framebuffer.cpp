@@ -16,7 +16,7 @@ namespace Nebula {
     OpenGL410Framebuffer::~OpenGL410Framebuffer()
     {
         glDeleteFramebuffers(1, &m_RendererID);
-        m_ColorTexture.reset();
+        for (uint32_t i = 0; i < m_ColorAttachments.size(); i++) m_ColorAttachments[i].reset();
         m_DepthTexture.reset();
     }
 
@@ -24,7 +24,7 @@ namespace Nebula {
     {
         if (m_RendererID != 0) {
             glDeleteFramebuffers(1, &m_RendererID);
-            m_ColorTexture.reset();
+            for (uint32_t i = 0; i < m_ColorAttachments.size(); i++) m_ColorAttachments[i].reset();
             m_DepthTexture.reset();
         }
 
@@ -37,8 +37,12 @@ namespace Nebula {
         glGenFramebuffers(1, &m_RendererID);
         glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 
-        m_ColorTexture = Texture2D::Create(m_Specification.width, m_Specification.height, Texture::InternalFormat::RGBA8);
-        m_ColorTexture->BindToFrameBuffer(Texture::FramebufferSlotType::Color);
+        m_ColorAttachments.resize(m_Specification.colorAttachments.size());
+        for (uint32_t i = 0; i < m_Specification.colorAttachments.size(); i++)
+        {
+            m_ColorAttachments[i] = Texture2D::Create(m_Specification.width, m_Specification.height, m_Specification.colorAttachments[i]);
+            m_ColorAttachments[i]->BindToFrameBuffer(Texture::FramebufferSlotType::Color, i);
+        }
 
         m_DepthTexture = Texture2D::Create(m_Specification.width, m_Specification.height, Texture::InternalFormat::Depth24Stencil8);
         m_DepthTexture->BindToFrameBuffer(Texture::FramebufferSlotType::DepthStencil);

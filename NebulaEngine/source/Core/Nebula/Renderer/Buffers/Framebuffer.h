@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Texture.h"
+#include "Nebula/Renderer/Texture.h"
 #include "Nebula/CoreSystems/Core/Core.h"
 
 namespace Nebula {
@@ -9,6 +9,8 @@ namespace Nebula {
     {
         uint32_t width, height;
         uint32_t samples = 1;
+
+        std::vector<Texture::InternalFormat> colorAttachments = { Texture::InternalFormat::RGBA8 };
 
         bool SwapChainTarget = false;
     };

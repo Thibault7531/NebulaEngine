@@ -73,6 +73,48 @@ namespace Nebula
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, GetOpenGL410DataFormat(format), GL_UNSIGNED_BYTE, data);
     }
 
+    std::vector<glm::vec4> OpenGL410Texture2D::GetDataRGBA()
+    {
+        int bufferSize = 4 * m_Width * m_Height;
+        uint8_t* data = static_cast<uint8_t*>(malloc(bufferSize));
+
+        glBindTexture(GL_TEXTURE_2D, m_RendererID);
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        std::vector<glm::vec4> result(m_Width * m_Height);
+        for (uint32_t y = 0; y < m_Height; y++)
+        {
+            for (uint32_t x = 0; x < m_Width; x++)
+            {
+                result[y*m_Width + x] = glm::vec4(data[((m_Height - y - 1)*m_Width + x)*4], data[((m_Height - y - 1)*m_Width + x)*4+1], data[((m_Height - y - 1)*m_Width + x)*4+2], data[((m_Height - y - 1)*m_Width + x)*4+3]);
+            }
+        }
+        free(data);
+        return result;
+    }
+
+    std::vector<uint8_t> OpenGL410Texture2D::GetDataR()
+    {
+        int bufferSize = m_Width * m_Height;
+        uint8_t* data = static_cast<uint8_t*>(malloc(bufferSize));
+
+        glBindTexture(GL_TEXTURE_2D, m_RendererID);
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        std::vector<uint8_t> result(m_Width * m_Height);
+        for (uint32_t y = 0; y < m_Height; y++)
+        {
+            for (uint32_t x = 0; x < m_Width; x++)
+            {
+                result[y*m_Width + x] = data[((m_Height - y - 1)*m_Width + x)];
+            }
+        }
+        free(data);
+        return result;
+    }
+
     void OpenGL410Texture2D::Bind(uint32_t slot) const
     {
         NB_PROFILE_FUNCTION();

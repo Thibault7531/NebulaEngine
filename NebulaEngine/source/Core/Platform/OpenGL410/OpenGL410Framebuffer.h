@@ -17,7 +17,7 @@ namespace Nebula {
         virtual void Bind() override;
         virtual void Unbind() override;
 
-        virtual Ref<Texture2D> GetColorAttachment(uint32_t index) const override { return m_ColorTexture; }
+        virtual Ref<Texture2D> GetColorAttachment(uint32_t index) const override { return m_ColorAttachments[index]; }
 
         [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 
@@ -25,7 +25,7 @@ namespace Nebula {
 
     private:
         uint32_t m_RendererID = 0;
-        Ref<Texture2D> m_ColorTexture = 0;
+        std::vector<Ref<Texture2D>> m_ColorAttachments{};
         Ref<Texture2D> m_DepthTexture = 0;
         FramebufferSpecification m_Specification;
 
