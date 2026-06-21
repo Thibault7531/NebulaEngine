@@ -21,8 +21,10 @@ namespace Nebula
         virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
         virtual void SetData(void* data, uint32_t size, DataFormat format, DataType dataType) override;
-        virtual std::vector<glm::vec4> GetDataRGBA() override;
-        virtual std::vector<uint8_t> GetDataR() override;
+        virtual std::vector<uint8_t> GetDataR8() override;
+        virtual std::vector<glm::vec4> GetDataRGBA8() override;
+        virtual std::vector<int32_t> GetDataR32I() override;
+        virtual std::vector<uint32_t> GetDataR32UI() override;
 
         virtual void Bind(uint32_t slot = 0) const override;
         virtual void BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot) const override;

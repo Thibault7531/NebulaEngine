@@ -27,7 +27,7 @@ namespace Nebula {
     {
         Application::Get().GetImGuiLayer()->BlockEvents(false);
 
-        m_Framebuffer = Framebuffer::Create({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y)});
+        m_Framebuffer = Framebuffer::Create({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y), .AttachmentSpec = {Texture::InternalFormat::RGBA8, Texture::InternalFormat::R32I, Texture::InternalFormat::Depth24Stencil8}});
 
         m_Scene = CreateRef<Scene>();
 
@@ -335,23 +335,23 @@ namespace Nebula {
         m_SceneHierarchyPanel.OnImGuiRender();
 
         auto [mouse_X, mouse_Y] = Platform::Mouse::GetMousePos();
-        glm::vec4 color = {0, 0, 0, 0};
+        int32_t entity = 0;
         if (IsViewportHovered)
         {
             auto [window_X, window_Y] = Platform::WindowManager::Get().GetMainWindow()->GetClientPos();
             mouse_X -= m_ViewportPos.x + window_X;
             mouse_Y -= m_ViewportPos.y + window_Y;
 
-            Ref<Texture2D> texture = m_Framebuffer->GetColorAttachment();
-            std::vector<glm::vec4> viewport = texture->GetDataRGBA();
-            color = viewport[(uint32_t)mouse_Y * texture->GetWidth() + mouse_X];
+            Ref<Texture2D> texture = m_Framebuffer->GetColorAttachment(1);
+            std::vector<int32_t> viewport = texture->GetDataR32I();
+            entity = viewport[(uint32_t)mouse_Y * texture->GetWidth() + mouse_X];
         }
         ImGui::Begin("Debug Texture Data");
         {
             ImGui::Text("Viewport Position: %f, %f", m_ViewportPos.x, m_ViewportPos.y);
             ImGui::Text("Viewport Size: %f, %f", m_ViewportSize.x, m_ViewportSize.y);
             ImGui::Text("Mouse Position: %f, %f", mouse_X, mouse_Y);
-            ImGui::Text("Color: %f, %f, %f, %f", color.r, color.g, color.b, color.a);
+            ImGui::Text("Entity: %d", entity);
         }
         ImGui::End();
 

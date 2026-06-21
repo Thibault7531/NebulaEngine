@@ -120,7 +120,26 @@ namespace Nebula
         glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, GetOpenGL460DataFormat(format), GetOpenGL460DataType(dataType), data);
     }
 
-    std::vector<glm::vec4> OpenGL460Texture2D::GetDataRGBA()
+    std::vector<uint8_t> OpenGL460Texture2D::GetDataR8()
+    {
+        int bufferSize = m_Width * m_Height;
+        uint8_t* data = static_cast<uint8_t*>(malloc(bufferSize));
+
+        glGetTextureImage(m_RendererID, 0, GL_RED, GL_UNSIGNED_BYTE, bufferSize, data);
+
+        std::vector<uint8_t> result(m_Width * m_Height);
+        for (uint32_t y = 0; y < m_Height; y++)
+        {
+            for (uint32_t x = 0; x < m_Width; x++)
+            {
+                result[y*m_Width + x] = data[((m_Height - y - 1)*m_Width + x)];
+            }
+        }
+        free(data);
+        return result;
+    }
+
+    std::vector<glm::vec4> OpenGL460Texture2D::GetDataRGBA8()
     {
         int bufferSize = 4 * m_Width * m_Height;
         uint8_t* data = static_cast<uint8_t*>(malloc(bufferSize));
@@ -139,14 +158,33 @@ namespace Nebula
         return result;
     }
 
-    std::vector<uint8_t> OpenGL460Texture2D::GetDataR()
+    std::vector<int32_t> OpenGL460Texture2D::GetDataR32I()
     {
-        int bufferSize = m_Width * m_Height;
-        uint8_t* data = static_cast<uint8_t*>(malloc(bufferSize));
+        int bufferSize = 4 * m_Width * m_Height;
+        int32_t* data = static_cast<int32_t*>(malloc(bufferSize));
 
-        glGetTextureImage(m_RendererID, 0, GL_RED, GL_UNSIGNED_BYTE, bufferSize, data);
+        glGetTextureImage(m_RendererID, 0, GL_RED_INTEGER, GL_INT, bufferSize, data);
 
-        std::vector<uint8_t> result(m_Width * m_Height);
+        std::vector<int32_t> result(m_Width * m_Height);
+        for (uint32_t y = 0; y < m_Height; y++)
+        {
+            for (uint32_t x = 0; x < m_Width; x++)
+            {
+                result[y*m_Width + x] = data[((m_Height - y - 1)*m_Width + x)];
+            }
+        }
+        free(data);
+        return result;
+    }
+
+    std::vector<uint32_t> OpenGL460Texture2D::GetDataR32UI()
+    {
+        int bufferSize = 4 * m_Width * m_Height;
+        uint32_t* data = static_cast<uint32_t*>(malloc(bufferSize));
+
+        glGetTextureImage(m_RendererID, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, bufferSize, data);
+
+        std::vector<uint32_t> result(m_Width * m_Height);
         for (uint32_t y = 0; y < m_Height; y++)
         {
             for (uint32_t x = 0; x < m_Width; x++)
@@ -185,6 +223,8 @@ namespace Nebula
         {
         case InternalFormat::RGB8: return GL_RGB8;
         case InternalFormat::RGBA8: return GL_RGBA8;
+        case InternalFormat::R32I: return GL_R32I;
+        case InternalFormat::R32UI: return GL_R32UI;
         case InternalFormat::Depth24Stencil8: return GL_DEPTH24_STENCIL8;
         default:
             {
@@ -220,6 +260,8 @@ namespace Nebula
         switch (dataType)
         {
         case DataType::UnsignedByte: return GL_UNSIGNED_BYTE;
+        case DataType::Int: return GL_INT;
+        case DataType::UnsignedInt: return GL_UNSIGNED_INT;
         case DataType::UnsignedInt24_8: return GL_UNSIGNED_INT_24_8;
         default:
             {

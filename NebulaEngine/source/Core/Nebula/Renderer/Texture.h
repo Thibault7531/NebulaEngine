@@ -15,6 +15,8 @@ namespace Nebula
             None,
             RGB8,
             RGBA8,
+            R32I,
+            R32UI,
             Depth24Stencil8
         };
 
@@ -34,6 +36,8 @@ namespace Nebula
         enum class DataType
         {
             UnsignedByte,
+            Int,
+            UnsignedInt,
             UnsignedInt24_8
         };
 
@@ -69,9 +73,12 @@ namespace Nebula
         [[nodiscard]] virtual uint32_t GetHeight() const = 0;
         virtual uint32_t GetRendererID() const = 0;
 
+        // TODO: Consider using function overloading for GetData
         virtual void SetData(void* data, uint32_t size, DataFormat format, DataType dataType = DataType::UnsignedByte) = 0;
-        virtual std::vector<glm::vec4> GetDataRGBA() = 0;
-        virtual std::vector<uint8_t> GetDataR() = 0;
+        virtual std::vector<uint8_t> GetDataR8() = 0;
+        virtual std::vector<glm::vec4> GetDataRGBA8() = 0;
+        virtual std::vector<int32_t> GetDataR32I() = 0;
+        virtual std::vector<uint32_t> GetDataR32UI() = 0;
 
         virtual void Bind(uint32_t slot = 0) const = 0;
         virtual void BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot = 0) const = 0;

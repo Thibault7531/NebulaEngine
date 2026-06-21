@@ -24,6 +24,7 @@ void main()
 #version 330 core
 
 layout(location = 0) out vec4 color;
+layout(location = 1) out int entity;
 
 in vec4 v_Color;
 in float v_TexIndex;
@@ -55,4 +56,5 @@ void main()
 	}
 
 	color *= v_Color;
+	entity = 50;
 }
