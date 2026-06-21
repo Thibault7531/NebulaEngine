@@ -5,12 +5,23 @@
 
 namespace Nebula {
 
+    struct FramebufferAttachmentSpecification
+    {
+        std::vector<Texture::TextureSpecification> Attachments;
+
+        FramebufferAttachmentSpecification() = default;
+        FramebufferAttachmentSpecification(std::initializer_list<Texture::TextureSpecification> elements)
+            : Attachments(elements) {}
+    };
+
     struct FramebufferSpecification
     {
         uint32_t width, height;
         uint32_t samples = 1;
 
-        std::vector<Texture::InternalFormat> colorAttachments = { Texture::InternalFormat::RGBA8 };
+        FramebufferAttachmentSpecification AttachmentSpec = {
+            Texture::InternalFormat::RGBA8, Texture::InternalFormat::Depth24Stencil8
+        };
 
         bool SwapChainTarget = false;
     };

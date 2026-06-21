@@ -24,11 +24,18 @@ namespace Nebula {
         virtual void Resize(uint32_t width, uint32_t height) override;
 
     private:
-        uint32_t m_RendererID = 0;
-        std::vector<Ref<Texture2D>> m_ColorAttachments{};
-        Ref<Texture2D> m_DepthTexture = 0;
-        FramebufferSpecification m_Specification;
+        static bool IsDepthFormat(Texture::InternalFormat format);
 
+    private:
+        uint32_t m_RendererID = 0;
+
+        std::vector<Texture::TextureSpecification> m_ColorAttachmentFormats;
+        Texture::TextureSpecification m_DepthAttachmentFormat{Texture::InternalFormat::None};
+
+        std::vector<Ref<Texture2D>> m_ColorAttachments{};
+        Ref<Texture2D> m_DepthAttachment;
+
+        FramebufferSpecification m_Specification;
     };
 
 }

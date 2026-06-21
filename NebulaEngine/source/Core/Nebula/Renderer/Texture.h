@@ -12,6 +12,7 @@ namespace Nebula
     public:
         enum class InternalFormat
         {
+            None,
             RGB8,
             RGBA8,
             Depth24Stencil8
@@ -30,12 +31,35 @@ namespace Nebula
             DepthStencil
         };
 
+        enum class DataType
+        {
+            UnsignedByte,
+            UnsignedInt24_8
+        };
+
+        enum class FilterType
+        {
+            Nearest,
+            Linear
+        };
+
         enum class FramebufferSlotType
         {
             Color,
             Depth,
             Stencil,
             DepthStencil
+        };
+
+        struct TextureSpecification
+        {
+            InternalFormat InternalFormat = InternalFormat::RGBA8;
+            FilterType MinFilter = FilterType::Linear;
+            FilterType MagFilter = FilterType::Linear;
+
+            TextureSpecification() = default;
+            TextureSpecification(enum InternalFormat internalFormat)
+                : InternalFormat(internalFormat) {}
         };
 
     public:
@@ -45,7 +69,7 @@ namespace Nebula
         [[nodiscard]] virtual uint32_t GetHeight() const = 0;
         virtual uint32_t GetRendererID() const = 0;
 
-        virtual void SetData(void* data, uint32_t size, DataFormat format) = 0;
+        virtual void SetData(void* data, uint32_t size, DataFormat format, DataType dataType = DataType::UnsignedByte) = 0;
         virtual std::vector<glm::vec4> GetDataRGBA() = 0;
         virtual std::vector<uint8_t> GetDataR() = 0;
 
@@ -56,8 +80,9 @@ namespace Nebula
     class Texture2D : public Texture
     {
     public:
-        static Ref<Texture2D>Create(uint32_t width, uint32_t height, InternalFormat internalFormat = InternalFormat::RGBA8);
-        static Ref<Texture2D>Create(const std::string& path);
+        static Ref<Texture2D>Create(uint32_t width, uint32_t height, const TextureSpecification& spec);
+        static Ref<Texture2D>Create(const std::string& path, const TextureSpecification& spec);
+
 
         virtual bool operator==(const Texture2D& other) const = 0;
     };

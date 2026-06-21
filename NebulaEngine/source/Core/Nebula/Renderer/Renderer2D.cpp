@@ -92,7 +92,7 @@ namespace Nebula
         s_Data.QuadShader->SetIntArray("u_Textures", samplers, Nebula::Renderer2DData::MaxTextureSlots);
         s_Data.QuadShader->Unbind();
 
-        s_Data.WhiteTexture = Texture2D::Create(1, 1);
+        s_Data.WhiteTexture = Texture2D::Create(1, 1, Texture::InternalFormat::RGBA8);
         uint32_t whiteTextureData = 0xffffffff;
         s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t), Texture::DataFormat::RGBA);
 

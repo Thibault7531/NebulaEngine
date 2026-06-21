@@ -10,6 +10,18 @@ namespace Nebula {
     OpenGL410Framebuffer::OpenGL410Framebuffer(const FramebufferSpecification &spec)
         : m_Specification(spec)
     {
+        for (Texture::TextureSpecification format : m_Specification.AttachmentSpec.Attachments)
+        {
+            if (format.InternalFormat == Texture::InternalFormat::Depth24Stencil8)
+            {
+                m_DepthAttachmentFormat = format;
+            }
+            else
+            {
+                m_ColorAttachmentFormats.push_back(format);
+            }
+        }
+
         Invalidate();
     }
 
@@ -17,7 +29,6 @@ namespace Nebula {
     {
         glDeleteFramebuffers(1, &m_RendererID);
         for (uint32_t i = 0; i < m_ColorAttachments.size(); i++) m_ColorAttachments[i].reset();
-        m_DepthTexture.reset();
     }
 
     void OpenGL410Framebuffer::Invalidate()
@@ -25,7 +36,6 @@ namespace Nebula {
         if (m_RendererID != 0) {
             glDeleteFramebuffers(1, &m_RendererID);
             for (uint32_t i = 0; i < m_ColorAttachments.size(); i++) m_ColorAttachments[i].reset();
-            m_DepthTexture.reset();
         }
 
         if (m_Specification.width == 0 || m_Specification.height == 0)
@@ -37,15 +47,32 @@ namespace Nebula {
         glGenFramebuffers(1, &m_RendererID);
         glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 
-        m_ColorAttachments.resize(m_Specification.colorAttachments.size());
-        for (uint32_t i = 0; i < m_Specification.colorAttachments.size(); i++)
+        m_ColorAttachments.resize(m_ColorAttachmentFormats.size());
+        for (uint32_t i = 0; i < m_ColorAttachmentFormats.size(); i++)
         {
-            m_ColorAttachments[i] = Texture2D::Create(m_Specification.width, m_Specification.height, m_Specification.colorAttachments[i]);
+            m_ColorAttachments[i] = Texture2D::Create(m_Specification.width, m_Specification.height, m_ColorAttachmentFormats[i]);
             m_ColorAttachments[i]->BindToFrameBuffer(Texture::FramebufferSlotType::Color, i);
         }
 
-        m_DepthTexture = Texture2D::Create(m_Specification.width, m_Specification.height, Texture::InternalFormat::Depth24Stencil8);
-        m_DepthTexture->BindToFrameBuffer(Texture::FramebufferSlotType::DepthStencil);
+        if (m_DepthAttachmentFormat.InternalFormat != Texture::InternalFormat::None)
+        {
+            m_DepthAttachment = Texture2D::Create(m_Specification.width, m_Specification.height, Texture::InternalFormat::Depth24Stencil8);
+            m_DepthAttachment->BindToFrameBuffer(Texture::FramebufferSlotType::DepthStencil);
+        }
+
+        if (m_ColorAttachments.size() > 0)
+        {
+            std::vector<GLenum> buffers(m_ColorAttachments.size());
+            for (uint32_t i = 0; i < m_ColorAttachments.size(); i++)
+            {
+                buffers.push_back(GL_COLOR_ATTACHMENT0 + i);
+            }
+            glDrawBuffers(buffers.size(), buffers.data());
+        }
+        else
+        {
+            glDrawBuffers(0, nullptr);
+        }
 
         NB_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!")
 
@@ -69,5 +96,14 @@ namespace Nebula {
         m_Specification.height = height;
 
         Invalidate();
+    }
+
+    bool OpenGL410Framebuffer::IsDepthFormat(Texture::InternalFormat format)
+    {
+        switch (format)
+        {
+        case Texture::InternalFormat::Depth24Stencil8: return true;
+        default: return false;
+        }
     }
 }

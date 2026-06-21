@@ -9,14 +9,27 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        m_InternalFormat = GetOpenGL410InternalFormat(internalFormat);
+        m_Specification.InternalFormat = internalFormat;
         
         glGenTextures(1, &m_RendererID);
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
-        glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, GetDataFormatMatchingInternalFormat(), GetDataTypeMatchingInternalFormat(), nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GetOpenGL410InternalFormat(m_Specification.InternalFormat), m_Width, m_Height, 0, GetDataFormatMatchingInternalFormat(), GetDataTypeMatchingInternalFormat(), nullptr);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+
+    OpenGL410Texture2D::OpenGL410Texture2D(uint32_t width, uint32_t height, const TextureSpecification& spec)
+        : m_Width{width}, m_Height{height}, m_Specification{spec}
+    {
+        NB_PROFILE_FUNCTION();
+
+        glGenTextures(1, &m_RendererID);
+        glBindTexture(GL_TEXTURE_2D, m_RendererID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GetOpenGL410InternalFormat(m_Specification.InternalFormat), m_Width, m_Height, 0, GetDataFormatMatchingInternalFormat(), GetDataTypeMatchingInternalFormat(), nullptr);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetOpenGL410FilterType(m_Specification.MinFilter));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetOpenGL410FilterType(m_Specification.MagFilter));
     }
 
     OpenGL410Texture2D::OpenGL410Texture2D(const std::string& path)
@@ -37,21 +50,60 @@ namespace Nebula
 
         GLenum dataFormat = 0;
         if (channels == 4) {
-            m_InternalFormat = GL_RGBA8;
+            m_Specification.InternalFormat = InternalFormat::RGBA8;
             dataFormat = GL_RGBA;
         } else if (channels == 3) {
-            m_InternalFormat = GL_RGB8;
+            m_Specification.InternalFormat = InternalFormat::RGB8;
             dataFormat = GL_RGB;
         }
 
-        NB_CORE_ASSERT(m_InternalFormat & dataFormat, "Format not supported!");
+        NB_CORE_ASSERT(GetOpenGL410InternalFormat(m_Specification.InternalFormat) & dataFormat, "Format not supported!");
 
         glGenTextures(1, &m_RendererID);
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
-        glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Width, m_Height, 0, dataFormat, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GetOpenGL410InternalFormat(m_Specification.InternalFormat), m_Width, m_Height, 0, dataFormat, GL_UNSIGNED_BYTE, nullptr);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
+
+        stbi_image_free(data);
+    }
+
+    OpenGL410Texture2D::OpenGL410Texture2D(const std::string& path, const TextureSpecification& spec)
+        : m_Path{path}, m_Specification{spec}
+    {
+        NB_PROFILE_FUNCTION();
+
+        int width, height, channels;
+        stbi_set_flip_vertically_on_load(1);
+        stbi_uc* data = nullptr;
+        {
+            NB_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
+            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+        }
+        NB_CORE_ASSERT(data, "Failed to load image!");
+        m_Width = width;
+        m_Height = height;
+
+        GLenum dataFormat = 0;
+        if (channels == 4) {
+            m_Specification.InternalFormat = InternalFormat::RGBA8;
+            dataFormat = GL_RGBA;
+        } else if (channels == 3) {
+            m_Specification.InternalFormat = InternalFormat::RGB8;
+            dataFormat = GL_RGB;
+        }
+
+        NB_CORE_ASSERT(GetOpenGL410InternalFormat(m_Specification.InternalFormat) & dataFormat, "Format not supported!");
+
+        glGenTextures(1, &m_RendererID);
+        glBindTexture(GL_TEXTURE_2D, m_RendererID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GetOpenGL410InternalFormat(m_Specification.InternalFormat), m_Width, m_Height, 0, dataFormat, GL_UNSIGNED_BYTE, nullptr);
+
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GetOpenGL410FilterType(m_Specification.MinFilter));
+        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GetOpenGL410FilterType(m_Specification.MagFilter));
 
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 
@@ -65,12 +117,12 @@ namespace Nebula
         glDeleteTextures(1, &m_RendererID);
     }
 
-    void OpenGL410Texture2D::SetData(void *data, uint32_t size, DataFormat format)
+    void OpenGL410Texture2D::SetData(void *data, uint32_t size, DataFormat format, DataType dataType)
     {
         NB_PROFILE_FUNCTION();
 
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, GetOpenGL410DataFormat(format), GL_UNSIGNED_BYTE, data);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, GetOpenGL410DataFormat(format), GetOpenGL410DataType(dataType), data);
     }
 
     std::vector<glm::vec4> OpenGL410Texture2D::GetDataRGBA()
@@ -173,22 +225,50 @@ namespace Nebula
         }
     }
 
+    GLint OpenGL410Texture2D::GetOpenGL410DataType(DataType dataType)
+    {
+        switch (dataType)
+        {
+        case DataType::UnsignedByte: return GL_UNSIGNED_BYTE;
+        case DataType::UnsignedInt24_8: return GL_UNSIGNED_INT_24_8;
+        default:
+            {
+                NB_CORE_ASSERT(false, "Unknown DataType!");
+                return 0;
+            }
+        }
+    }
+
     GLint OpenGL410Texture2D::GetDataFormatMatchingInternalFormat()
     {
-        switch (m_InternalFormat)
+        switch (m_Specification.InternalFormat)
         {
-        case GL_RGB8: return GL_RGB;
-        case GL_RGBA8: return GL_RGBA;
-        case GL_DEPTH24_STENCIL8: return GL_DEPTH_STENCIL;
+        case InternalFormat::RGB8: return GL_RGB;
+        case InternalFormat::RGBA8: return GL_RGBA;
+        case InternalFormat::Depth24Stencil8: return GL_DEPTH_STENCIL;
         }
     }
 
     GLint OpenGL410Texture2D::GetDataTypeMatchingInternalFormat()
     {
-        switch (m_InternalFormat)
+        switch (m_Specification.InternalFormat)
         {
-        case GL_DEPTH24_STENCIL8: return GL_UNSIGNED_INT_24_8;
+        case InternalFormat::Depth24Stencil8: return GL_UNSIGNED_INT_24_8;
         default: return GL_UNSIGNED_BYTE;
+        }
+    }
+
+    GLint OpenGL410Texture2D::GetOpenGL410FilterType(FilterType filterType)
+    {
+        switch (filterType)
+        {
+        case FilterType::Nearest: return GL_NEAREST;
+        case FilterType::Linear: return GL_LINEAR;
+        default:
+            {
+                NB_CORE_ASSERT(false, "Unknown FilterType!");
+                return 0;
+            }
         }
     }
 }
