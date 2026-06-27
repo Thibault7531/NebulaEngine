@@ -28,6 +28,7 @@ namespace Nebula {
         Application::Get().GetImGuiLayer()->BlockEvents(false);
 
         m_Framebuffer = Framebuffer::Create({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y), .AttachmentSpec = {Texture::InternalFormat::RGBA8, Texture::InternalFormat::R32I, Texture::InternalFormat::Depth24Stencil8}});
+        m_Framebuffer->SetClearColors({{.1f, .1f, .1f, 1.f}, glm::vec4{-1.f}});
 
         m_Scene = CreateRef<Scene>();
 
@@ -130,10 +131,8 @@ namespace Nebula {
         RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
         RenderCommand::Clear();
 
+        m_Framebuffer->Clear();
         m_Framebuffer->Bind();
-
-        RenderCommand::SetClearColor({ .3f, .3f, .3f, 1.f });
-        RenderCommand::Clear();
 
         m_Scene->OnUpdateEditor(ts, m_Camera);
 

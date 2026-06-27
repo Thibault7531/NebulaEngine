@@ -9,12 +9,17 @@ namespace Nebula {
     {
     public:
         OpenGL460Framebuffer(const FramebufferSpecification& spec);
-        virtual ~OpenGL460Framebuffer() override;
+        virtual ~OpenGL460Framebuffer();
 
         void Invalidate();
 
         virtual void Bind() override;
         virtual void Unbind() override;
+
+        virtual void SetClearColors(const std::vector<glm::vec4>& colors) override { m_ClearColors = colors; }
+        virtual void SetClearDepth(float depth) override { m_ClearDepth = depth; }
+        virtual void SetClearStencil(int32_t stencil) override { m_ClearStencil = stencil; }
+        virtual void Clear() override;
 
         virtual Ref<Texture2D> GetColorAttachment(uint32_t index) const override { return m_ColorAttachments[index]; }
 
@@ -23,7 +28,7 @@ namespace Nebula {
         virtual void Resize(uint32_t width, uint32_t height) override;
 
     private:
-        static bool IsDepthFormat(Texture::InternalFormat format);
+        static ColorAttachementDataType GetColorAttachmentDataType(Texture::InternalFormat format);
 
     private:
         uint32_t m_RendererID = 0;
@@ -33,6 +38,10 @@ namespace Nebula {
 
         std::vector<Ref<Texture2D>> m_ColorAttachments{};
         Ref<Texture2D> m_DepthAttachment;
+
+        std::vector<glm::vec4> m_ClearColors = { { 0.f, 0.f, 0.f, 1.0f } };
+        float m_ClearDepth = 1.0f;
+        int32_t m_ClearStencil = 1;
 
         FramebufferSpecification m_Specification;
 

@@ -2,6 +2,8 @@
 
 #include <glad/gl.h>
 
+#include "gtc/type_ptr.hpp"
+
 namespace Nebula {
 
     OpenGL460Framebuffer::OpenGL460Framebuffer(const FramebufferSpecification &spec)
@@ -9,9 +11,11 @@ namespace Nebula {
     {
         for (Texture::TextureSpecification format : m_Specification.AttachmentSpec.Attachments)
         {
-            if (IsDepthFormat(format.InternalFormat)) m_DepthAttachmentSpec = format;
+            if (IsDepthFormat(format.InternalFormat) || IsDepthStencilFormat(format.InternalFormat)) m_DepthAttachmentSpec = format;
             else m_ColorAttachmentSpecs.push_back(format);
         }
+
+        m_ClearColors.resize(m_ColorAttachmentSpecs.size());
 
         Invalidate();
     }
@@ -53,10 +57,10 @@ namespace Nebula {
 
         if (m_ColorAttachments.size() > 0)
         {
-            std::vector<GLenum> buffers{};
+            std::vector<GLenum> buffers(m_ColorAttachments.size());
             for (uint32_t i = 0; i < m_ColorAttachments.size(); i++)
             {
-                buffers.push_back(GL_COLOR_ATTACHMENT0 + i);
+                buffers[i] = GL_COLOR_ATTACHMENT0 + i;
             }
             glNamedFramebufferDrawBuffers(m_RendererID, buffers.size(), buffers.data());
         }
@@ -81,6 +85,32 @@ namespace Nebula {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    void OpenGL460Framebuffer::Clear()
+    {
+        for (uint32_t i = 0; i < m_ColorAttachments.size(); i++)
+        {
+            switch (GetColorAttachmentDataType(m_ColorAttachmentSpecs[i].InternalFormat))
+            {
+            case ColorAttachementDataType::None: break;
+            case ColorAttachementDataType::Int:
+                {
+                    auto data = glm::ivec4(m_ClearColors[i]);
+                    glClearNamedFramebufferiv(m_RendererID, GL_COLOR, i, glm::value_ptr(data));
+                    break;
+                }
+            case ColorAttachementDataType::UnsignedInt:
+                {
+                    auto data = glm::uvec4(m_ClearColors[i]);
+                    glClearNamedFramebufferuiv(m_RendererID, GL_COLOR, i, glm::value_ptr(data));
+                    break;
+                }
+            case ColorAttachementDataType::Float: glClearNamedFramebufferfv(m_RendererID, GL_COLOR, i, glm::value_ptr(m_ClearColors[i])); break;
+            }
+        }
+        if (m_DepthAttachment) glClearNamedFramebufferfv(m_RendererID, GL_DEPTH, 0, &m_ClearDepth);
+        if (m_DepthAttachment) glClearNamedFramebufferiv(m_RendererID, GL_STENCIL, 0, &m_ClearStencil);
+    }
+
     void OpenGL460Framebuffer::Resize(uint32_t width, uint32_t height)
     {
         m_Specification.width = width;
@@ -89,12 +119,16 @@ namespace Nebula {
         Invalidate();
     }
 
-    bool OpenGL460Framebuffer::IsDepthFormat(Texture::InternalFormat format)
+    ColorAttachementDataType OpenGL460Framebuffer::GetColorAttachmentDataType(Texture::InternalFormat format)
     {
         switch (format)
         {
-        case Texture::InternalFormat::Depth24Stencil8: return true;
-        default: return false;
+        case Texture::InternalFormat::None: return ColorAttachementDataType::None;
+        case Texture::InternalFormat::RGB8: return ColorAttachementDataType::Float;
+        case Texture::InternalFormat::RGBA8: return ColorAttachementDataType::Float;
+        case Texture::InternalFormat::R32I: return ColorAttachementDataType::Int;
+        case Texture::InternalFormat::R32UI: return ColorAttachementDataType::UnsignedInt;
+        default: return ColorAttachementDataType::None;
         }
     }
 }
