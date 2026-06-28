@@ -30,6 +30,7 @@ namespace Nebula {
 
     private:
         bool OnKeyPressedEvent(const Platform::KeyPressedEvent& event);
+        bool OnMouseButtonPressedEvent(const Platform::MouseButtonPressedEvent& event);
 
     private:
         bool m_MouseCursorChanged = false;

@@ -25,14 +25,14 @@ namespace Nebula {
     OpenGL410Framebuffer::~OpenGL410Framebuffer()
     {
         glDeleteFramebuffers(1, &m_RendererID);
-        for (uint32_t i = 0; i < m_ColorAttachments.size(); i++) m_ColorAttachments[i].reset();
+        for (auto& m_ColorAttachment : m_ColorAttachments) m_ColorAttachment.reset();
     }
 
     void OpenGL410Framebuffer::Invalidate()
     {
         if (m_RendererID != 0) {
             glDeleteFramebuffers(1, &m_RendererID);
-            for (uint32_t i = 0; i < m_ColorAttachments.size(); i++) m_ColorAttachments[i].reset();
+            for (auto& m_ColorAttachment : m_ColorAttachments) m_ColorAttachment.reset();
         }
 
         if (m_Specification.width == 0 || m_Specification.height == 0)
@@ -57,7 +57,7 @@ namespace Nebula {
             m_DepthAttachment->BindToFrameBuffer(Texture::FramebufferSlotType::DepthStencil);
         }
 
-        if (m_ColorAttachments.size() > 0)
+        if (!m_ColorAttachments.empty())
         {
             std::vector<GLenum> buffers(m_ColorAttachments.size());
             for (uint32_t i = 0; i < m_ColorAttachments.size(); i++)

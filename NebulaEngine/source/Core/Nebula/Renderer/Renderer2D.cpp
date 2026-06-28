@@ -17,6 +17,7 @@ namespace Nebula
         glm::vec4 Color;
         float TexIndex;
         glm::vec2 TexCoord;
+        int32_t entityID;
     };
 
     struct Renderer2DData
@@ -56,7 +57,8 @@ namespace Nebula
             {ShaderDataType::Float3, "a_Position"},
             {ShaderDataType::Float4, "a_Color"},
             {ShaderDataType::Float, "a_TexIndex"},
-            {ShaderDataType::Float2, "a_TexCoord"}
+            {ShaderDataType::Float2, "a_TexCoord"},
+            {ShaderDataType::Int, "a_EntityID"}
         });
         s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -376,24 +378,28 @@ namespace Nebula
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4( 0.5f, 0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4( -0.5f, 0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;
@@ -426,24 +432,28 @@ namespace Nebula
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( 0.5f, 0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( -0.5f, 0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;

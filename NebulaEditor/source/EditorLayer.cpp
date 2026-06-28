@@ -145,6 +145,7 @@ namespace Nebula {
 
         Platform::EventDispatcher dispatcher(event);
         dispatcher.Dispatch<Platform::KeyPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnKeyPressedEvent));
+        dispatcher.Dispatch<Platform::MouseButtonPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressedEvent));
     }
 
     void EditorLayer::OnImGuiRender()
@@ -333,27 +334,6 @@ namespace Nebula {
 
         m_SceneHierarchyPanel.OnImGuiRender();
 
-        auto [mouse_X, mouse_Y] = Platform::Mouse::GetMousePos();
-        int32_t entity = 0;
-        if (IsViewportHovered)
-        {
-            auto [window_X, window_Y] = Platform::WindowManager::Get().GetMainWindow()->GetClientPos();
-            mouse_X -= m_ViewportPos.x + window_X;
-            mouse_Y -= m_ViewportPos.y + window_Y;
-
-            Ref<Texture2D> texture = m_Framebuffer->GetColorAttachment(1);
-            std::vector<int32_t> viewport = texture->GetDataR32I();
-            entity = viewport[(uint32_t)mouse_Y * texture->GetWidth() + mouse_X];
-        }
-        ImGui::Begin("Debug Texture Data");
-        {
-            ImGui::Text("Viewport Position: %f, %f", m_ViewportPos.x, m_ViewportPos.y);
-            ImGui::Text("Viewport Size: %f, %f", m_ViewportSize.x, m_ViewportSize.y);
-            ImGui::Text("Mouse Position: %f, %f", mouse_X, mouse_Y);
-            ImGui::Text("Entity: %d", entity);
-        }
-        ImGui::End();
-
         if (IsFirstRender)
         {
             Platform::WindowManager::Get().GetMainWindow()->RecalculateHitTest();
@@ -372,15 +352,6 @@ namespace Nebula {
 
     void EditorLayer::OpenScene()
     {
-        /*
-        std::string path = Platform::FileDialogs::OpenFile({ Platform::FileType::NebulaScene });
-        if (!path.empty()) {
-            NewScene();
-
-            SceneSerializer serializer(m_Scene);
-            serializer.Deserialize(path);
-        }
-        */
         Platform::FileDialogs::OpenFile(Platform::FileType::NebulaScene, [&](std::string path)
         {
             NewScene();
@@ -392,13 +363,6 @@ namespace Nebula {
 
     void EditorLayer::SaveSceneAs()
     {
-        /*
-        std::string path = Platform::FileDialogs::SaveFile("Nebula Scene (*.nbscene)\0*.nbscene\0");
-        if (!path.empty()) {
-            SceneSerializer serializer(m_Scene);
-            serializer.Serialize(path);
-        }
-        */
         Platform::FileDialogs::SaveFile(Platform::FileType::NebulaScene, [&](std::string path)
         {
             SceneSerializer serializer(m_Scene);
@@ -421,6 +385,23 @@ namespace Nebula {
         if (event.GetKeyCode() == KeyboardKey::W) m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
         if (event.GetKeyCode() == KeyboardKey::E) m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
         if (event.GetKeyCode() == KeyboardKey::R) m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
+        return false;
+    }
+
+    bool EditorLayer::OnMouseButtonPressedEvent(const Platform::MouseButtonPressedEvent& event)
+    {
+        if (event.GetMouseButton() == MouseButton::Left && IsViewportHovered)
+        {
+            auto [window_X, window_Y] = Platform::WindowManager::Get().GetMainWindow()->GetClientPos();
+            auto [mouse_X, mouse_Y] = Platform::Mouse::GetMousePos();
+            mouse_X -= m_ViewportPos.x + window_X;
+            mouse_Y -= m_ViewportPos.y + window_Y;
+
+            Ref<Texture2D> texture = m_Framebuffer->GetColorAttachment(1);
+            std::vector<int32_t> viewport = texture->GetDataR32I();
+            uint32_t entity = viewport[(uint32_t)mouse_Y * texture->GetWidth() + mouse_X];
+            m_SceneHierarchyPanel.SetSelectedEntity(Entity(static_cast<entt::entity>(entity), m_Scene.get()));
+        }
         return false;
     }
 }
