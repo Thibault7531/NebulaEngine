@@ -33,6 +33,8 @@ namespace Nebula
 
 		Renderer::Init(api);
 
+		m_MainFramebuffer = Framebuffer::Create({m_MainWindow->GetSize().first, m_MainWindow->GetSize().second});
+
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 
@@ -126,6 +128,7 @@ namespace Nebula
 	void Application::Render()
 	{
 		m_MainWindow->SetCurrentContext();
+		m_MainFramebuffer->Bind();
 
 		std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
 		const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000.f;
@@ -148,7 +151,7 @@ namespace Nebula
 			m_ImGuiLayer->End();
 		}
 
-		m_MainWindow->SwapBuffers();
+		m_MainWindow->Present(m_MainFramebuffer->GetRendererID());
 
 		RenderCommand::Log();
 	}
@@ -169,6 +172,7 @@ namespace Nebula
 		NB_PROFILE_FUNCTION();
 
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+		m_MainFramebuffer->Resize(e.GetWidth(), e.GetHeight());
 
 		return false;
 	}

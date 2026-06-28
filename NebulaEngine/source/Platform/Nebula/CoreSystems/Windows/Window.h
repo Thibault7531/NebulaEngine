@@ -73,6 +73,7 @@ namespace Nebula::Platform
 
         virtual void OnUpdate() = 0;
         virtual void SwapBuffers() = 0;
+        virtual void Present(uint32_t framebuffer) = 0;
 
         [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetSize() const = 0;
         virtual void SetSize(uint32_t width, uint32_t height) = 0;

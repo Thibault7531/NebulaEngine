@@ -72,4 +72,10 @@ namespace Nebula::Platform
     {
         SDL_GL_SwapWindow(static_cast<SDL_Window*>(m_Window->GetNativeWindow()));
     }
+
+    void OpenGL460Context::Present(uint32_t framebuffer)
+    {
+        glBlitNamedFramebuffer(framebuffer, 0, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        SwapBuffers();
+    }
 }

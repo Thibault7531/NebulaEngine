@@ -160,6 +160,11 @@ namespace Nebula::Platform
         m_Context->SwapBuffers();
     }
 
+    void WindowsWindow::Present(uint32_t framebuffer)
+    {
+        m_Context->Present(framebuffer);
+    }
+
     std::pair<unsigned int, unsigned int> WindowsWindow::GetSize() const
     {
         auto size = m_Window.Size();

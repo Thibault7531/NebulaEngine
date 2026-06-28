@@ -137,6 +137,7 @@ namespace Nebula {
         m_Scene->OnUpdateEditor(ts, m_Camera);
 
         m_Framebuffer->Unbind();
+        Application::Get().GetMainFramebuffer()->Bind();
     }
 
     void EditorLayer::OnEvent(Platform::Event &event)
@@ -300,6 +301,8 @@ namespace Nebula {
             ImGuizmo::SetOrthographic(false);
             glm::mat4 view = m_Camera.GetViewMatrix();
 
+            // TODO: Reactivate when ImGuizmo fixes righthandedness
+            /*
             ImGuizmo::ViewManipulate(glm::value_ptr(view), m_Camera.GetDistance(), ImVec2(pos.x + size.x - 200, pos.y), ImVec2(200, 200), 0x10101000);
 
             if (ImGuizmo::IsUsingViewManipulate())
@@ -310,6 +313,7 @@ namespace Nebula {
                 m_Camera.SetYaw(-yaw);
                 m_Camera.SetPitch(-pitch);
             }
+            */
 
             if (selectedEntity && m_GizmoOperation != -1)
             {
@@ -392,15 +396,14 @@ namespace Nebula {
     {
         if (event.GetMouseButton() == MouseButton::Left && IsViewportHovered && !ImGuizmo::IsOver())
         {
-            auto [window_X, window_Y] = Platform::WindowManager::Get().GetMainWindow()->GetClientPos();
-            auto [mouse_X, mouse_Y] = Platform::Mouse::GetMousePos();
-            mouse_X -= m_ViewportPos.x + window_X;
-            mouse_Y -= m_ViewportPos.y + window_Y;
+            ImVec2 mousePos = ImGui::GetMousePos();
+            uint32_t mouse_X = mousePos.x - m_ViewportPos.x;
+            uint32_t mouse_Y = mousePos.y - m_ViewportPos.y;
 
             Ref<Texture2D> texture = m_Framebuffer->GetColorAttachment(1);
             std::vector<int32_t> viewport = texture->GetDataR32I();
-            uint32_t entity = viewport[(uint32_t)mouse_Y * texture->GetWidth() + mouse_X];
-            m_SceneHierarchyPanel.SetSelectedEntity(Entity(static_cast<entt::entity>(entity), m_Scene.get()));
+            uint32_t entity = viewport[mouse_Y * texture->GetWidth() + mouse_X];
+            m_SceneHierarchyPanel.SetSelectedEntity(entity == -1 ? Entity() : Entity(static_cast<entt::entity>(entity), m_Scene.get()));
         }
         return false;
     }

@@ -639,6 +639,7 @@ namespace Nebula
         props.AlwaysOnTop = (viewport->Flags & ImGuiViewportFlags_TopMost);
         props.isUtility = (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon);
         props.Style = (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? Platform::WindowStyle::BorderlessFullscreen : Platform::WindowStyle::Default;
+        props.API = Platform::WindowManager::Get().GetMainWindow()->GetProperties().API;
         const Ref<Platform::Window> window = Platform::WindowManager::Get().CreateWindow(props);
         window->SetEventCallback(s_EventCallback);
         viewport_data->Window = window;

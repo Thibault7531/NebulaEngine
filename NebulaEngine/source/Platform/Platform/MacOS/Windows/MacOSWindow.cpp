@@ -28,6 +28,11 @@ namespace Nebula::Platform
         m_NativeWindow.SwapBuffers();
     }
 
+    void MacOSWindow::Present(uint32_t framebuffer)
+    {
+        m_NativeWindow.Present(framebuffer);
+    }
+
     std::pair<uint32_t, uint32_t> MacOSWindow::GetSize() const
     {
         return {m_NativeWindow.GetWindowWidth(), m_NativeWindow.GetWindowHeight()};

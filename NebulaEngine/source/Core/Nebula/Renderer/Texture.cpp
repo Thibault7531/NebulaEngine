@@ -20,7 +20,7 @@ namespace Nebula {
         {
 #ifdef NB_PLATFORM_MACOS
         case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Texture2D>(width, height, internalFormat);
+        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Texture2D>(width, height, spec);
         case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
 #else
         case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
@@ -39,7 +39,7 @@ namespace Nebula {
         {
 #ifdef NB_PLATFORM_MACOS
         case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Texture2D>(path);
+        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Texture2D>(path, spec);
         case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
 #else
         case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;

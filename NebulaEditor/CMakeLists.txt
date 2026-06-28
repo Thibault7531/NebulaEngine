@@ -29,11 +29,11 @@ set_target_properties(NebulaEditor PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_
 # Compile Options
 if (nebula_cmake_platform STREQUAL MacOS)
     add_custom_target(NebulaEditorCopyNebulaEditorAssets
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:NebulaEditor>/assets/NebulaEditor"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_BUNDLE_CONTENT_DIR:NebulaEditor>/assets/NebulaEditor"
             COMMENT "Copying NebulaEditor assets to build directory..."
     )
     add_custom_target(NebulaEditorCopyNebulaEngineAssets
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_FILE_DIR:NebulaEditor>/assets/NebulaEngine"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/NebulaEngine/assets/" "$<TARGET_BUNDLE_CONTENT_DIR:NebulaEditor>/assets/NebulaEngine"
             COMMENT "Copying NebulaEngine assets to build directory..."
     )
 else ()

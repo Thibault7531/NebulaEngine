@@ -77,6 +77,11 @@ namespace Nebula::Platform
         m_Context->SwapBuffers();
     }
 
+    void LinuxWindow::Present(uint32_t framebuffer)
+    {
+        m_Context->Present(framebuffer);
+    }
+
     std::pair<uint32_t, uint32_t> LinuxWindow::GetSize() const
     {
         int width, height;

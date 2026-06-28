@@ -24,6 +24,7 @@ namespace Nebula {
         virtual Ref<Texture2D> GetColorAttachment(uint32_t index) const override { return m_ColorAttachments[index]; }
 
         [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
+        virtual uint32_t GetRendererID() const override { return m_RendererID; }
 
         virtual void Resize(uint32_t width, uint32_t height) override;
 

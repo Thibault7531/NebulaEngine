@@ -93,6 +93,16 @@ namespace Nebula::Platform
         ::SwapBuffers(m_DeviceContext);
     }
 
+    void OpenGL410Context::Present(uint32_t framebuffer)
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBlitFramebuffer(0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindRenderbuffer(GL_DRAW_FRAMEBUFFER, 0);
+        SwapBuffers();
+    }
+
     void OpenGL410Context::InitOpenGL()
     {
         PIXELFORMATDESCRIPTOR pfd = {
