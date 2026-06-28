@@ -66,7 +66,7 @@ target_include_directories(NebulaEditor PRIVATE
         ../NebulaEngine/vendor/SDL3/include/SDL3
         ../NebulaEngine/vendor/SDL3/include
         ../NebulaEngine/vendor/imgui
-        ../NebulaEngine/vendor/ImGuizmo
+        ../NebulaEngine/vendor/ImGuizmo/src
         ../NebulaEngine/vendor/nanosvg
         ../NebulaEngine/vendor/entt/single_include
         ../NebulaEngine/vendor/Glad/include
