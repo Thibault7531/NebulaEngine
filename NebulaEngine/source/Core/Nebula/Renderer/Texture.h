@@ -64,6 +64,8 @@ namespace Nebula
             TextureSpecification() = default;
             TextureSpecification(enum InternalFormat internalFormat)
                 : InternalFormat(internalFormat) {}
+            TextureSpecification(enum InternalFormat internalFormat, FilterType filter)
+                : InternalFormat(internalFormat), MinFilter(filter), MagFilter(filter) {}
         };
 
     public:

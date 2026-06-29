@@ -100,8 +100,8 @@ public:
 
 		m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/shaders/Texture.glsl").string());
 
-		m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/crafting_table_front.png").string());
-		m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/glass.png").string());
+		m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/crafting_table_front.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
+		m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/glass.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
 	}
 
 	virtual void OnUpdate(Nebula::Timestep ts) override
@@ -267,8 +267,8 @@ public:
 		m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/shaders/Texture.glsl").string());
 		m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/shaders/Model.glsl").string());
 
-		m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/crafting_table_front.png").string());
-		m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/glass.png").string());
+		m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/crafting_table_front.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
+		m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/textures/glass.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
 
 		m_Backpack = Nebula::Model::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/TestGame/models/backpack.fbx").string());
 
