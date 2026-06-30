@@ -394,7 +394,7 @@ namespace Nebula {
 
     bool EditorLayer::OnMouseButtonPressedEvent(const Platform::MouseButtonPressedEvent& event)
     {
-        if (event.GetMouseButton() == MouseButton::Left && IsViewportHovered && !ImGuizmo::IsOver())
+        if (event.GetMouseButton() == MouseButton::Left && IsViewportHovered && !ImGuizmo::IsOver() && !Platform::Input::IsKeyPressed(KeyboardKey::LeftAlt))
         {
             ImVec2 mousePos = ImGui::GetMousePos();
             uint32_t mouse_X = mousePos.x - m_ViewportPos.x;

@@ -130,7 +130,6 @@ public:
 
 		m_ShaderLibrary.Get("SolidColor")->Bind();
 		m_Shader->SetFloat3("u_Color", m_Color);
-		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_Color);
 		m_ShaderLibrary.Get("SolidColor")->Unbind();
 
 		for (int i = 0; i < 4; i++)
@@ -144,14 +143,10 @@ public:
 		m_Texture->Bind(0);
 		m_Glass->Bind(1);
 
-		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->Bind();
-		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->UploadUniformInt("u_Texture", 0);
 		m_ShaderLibrary.Get("Texture")->Bind();
 		m_ShaderLibrary.Get("Texture")->SetInt("u_Texture", 0);
 		Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::mat4(1.0f));
 
-		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->Bind();
-		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(m_ShaderLibrary.Get("Texture"))->UploadUniformInt("u_Texture", 1);
 		m_ShaderLibrary.Get("Texture")->Bind();
 		m_ShaderLibrary.Get("Texture")->SetInt("u_Texture", 1);
 		Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f)));
@@ -289,12 +284,10 @@ public:
 		Nebula::Ref<Nebula::Shader> textureShader = m_ShaderLibrary.Get("Texture");
 
 		textureShader->Bind();
-		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 		textureShader->SetInt("u_Texture", 0);
 		Nebula::Renderer::Submit(textureShader, m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
 
 		textureShader->Bind();
-		//std::dynamic_pointer_cast<Nebula::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 1);
 		textureShader->SetInt("u_Texture", 1);
 		Nebula::Renderer::Submit(textureShader, m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f)));
 
