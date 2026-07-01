@@ -17,6 +17,7 @@ namespace Nebula
         glm::vec4 Color;
         float TexIndex;
         glm::vec2 TexCoord;
+        int32_t entityID;
     };
 
     struct Renderer2DData
@@ -39,6 +40,8 @@ namespace Nebula
         uint32_t TextureSlotIndex = 1;
 
         Renderer2D::Statistics Stats;
+
+        bool CullingEnabled = false;
     };
 
     static Renderer2DData s_Data;
@@ -54,7 +57,8 @@ namespace Nebula
             {ShaderDataType::Float3, "a_Position"},
             {ShaderDataType::Float4, "a_Color"},
             {ShaderDataType::Float, "a_TexIndex"},
-            {ShaderDataType::Float2, "a_TexCoord"}
+            {ShaderDataType::Float2, "a_TexCoord"},
+            {ShaderDataType::Int, "a_EntityID"}
         });
         s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -90,9 +94,9 @@ namespace Nebula
         s_Data.QuadShader->SetIntArray("u_Textures", samplers, Nebula::Renderer2DData::MaxTextureSlots);
         s_Data.QuadShader->Unbind();
 
-        s_Data.WhiteTexture = Texture2D::Create(1, 1);
+        s_Data.WhiteTexture = Texture2D::Create(1, 1, Texture::InternalFormat::RGBA8);
         uint32_t whiteTextureData = 0xffffffff;
-        s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+        s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t), Texture::DataFormat::RGBA);
 
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
     }
@@ -116,6 +120,9 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
+        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
+        RenderCommand::EnableFaceCulling(false);
+
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetMat4("u_ViewProjection", camera.getViewProjectionMatrix());
 
@@ -129,6 +136,9 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
+        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
+        RenderCommand::EnableFaceCulling(false);
+
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetProjectionMatrix() * glm::inverse(transform));
 
@@ -141,6 +151,9 @@ namespace Nebula
     void Renderer2D::BeginScene(const EditorCamera& camera)
     {
         NB_PROFILE_FUNCTION();
+
+        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
+        RenderCommand::EnableFaceCulling(false);
 
         s_Data.QuadShader->Bind();
         s_Data.QuadShader->SetMat4("u_ViewProjection", camera.GetViewProjectionMatrix());
@@ -159,6 +172,8 @@ namespace Nebula
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
         Flush();
+
+        RenderCommand::EnableFaceCulling(s_Data.CullingEnabled);
     }
 
     void Renderer2D::NextBash()
@@ -363,24 +378,28 @@ namespace Nebula
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4( 0.5f, 0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = transform * glm::vec4( -0.5f, 0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;
@@ -413,24 +432,28 @@ namespace Nebula
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( 0.5f, -0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 0.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( 0.5f, 0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 1.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadVertexBufferPtr->Position = properties.transform * glm::vec4( -0.5f, 0.5f, 0.0f, 1.0f );
         s_Data.QuadVertexBufferPtr->Color = properties.color;
         s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
         s_Data.QuadVertexBufferPtr->TexCoord = glm::vec2( 0.0f, 1.0f );
+        s_Data.QuadVertexBufferPtr->entityID = properties.entityID;
         s_Data.QuadVertexBufferPtr++;
 
         s_Data.QuadIndexCount += 6;

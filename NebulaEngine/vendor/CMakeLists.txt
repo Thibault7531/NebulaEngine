@@ -72,18 +72,18 @@ endif ()
 # ImGuizmo
 
 add_library(ImGuizmo STATIC
-            ImGuizmo/GraphEditor.h
-            ImGuizmo/GraphEditor.cpp
-            ImGuizmo/ImCurveEdit.h
-            ImGuizmo/ImCurveEdit.cpp
-            ImGuizmo/ImGradient.h
-            ImGuizmo/ImGradient.cpp
-            ImGuizmo/ImGuizmo.h
-            ImGuizmo/ImGuizmo.cpp
-            ImGuizmo/ImLightRig.h
-            ImGuizmo/ImSequencer.h
-            ImGuizmo/ImSequencer.cpp
-            ImGuizmo/ImZoomSlider.h
+            ImGuizmo/src/GraphEditor.h
+            ImGuizmo/src/GraphEditor.cpp
+            ImGuizmo/src/ImCurveEdit.h
+            ImGuizmo/src/ImCurveEdit.cpp
+            ImGuizmo/src/ImGradient.h
+            ImGuizmo/src/ImGradient.cpp
+            ImGuizmo/src/ImGuizmo.h
+            ImGuizmo/src/ImGuizmo.cpp
+            ImGuizmo/src/ImLightRig.h
+            ImGuizmo/src/ImSequencer.h
+            ImGuizmo/src/ImSequencer.cpp
+            ImGuizmo/src/ImZoomSlider.h
 )
 
 target_include_directories(ImGuizmo PRIVATE

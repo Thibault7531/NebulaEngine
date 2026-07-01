@@ -6,7 +6,9 @@
 #include <winrt/Microsoft.UI.Dispatching.h>
 #include <winrt/Windows.Foundation.Collections.h>
 
-#include "Platform/Platform/Windows/Rendering/OpenGLContext.h"
+#include "Platform/Nebula/CoreSystems/Core/Log.h"
+#include "Platform/Platform/Windows/Rendering/OpenGL410Context.h"
+#include "Platform/Platform/Windows/Rendering/OpenGL460Context.h"
 
 namespace Nebula::Platform
 {
@@ -95,7 +97,17 @@ namespace Nebula::Platform
 
         m_Window.Show(true);
 
-        m_Context = CreateRef<OpenGlContext>(this);
+        switch (m_Properties.API)
+        {
+        case GraphicsAPI::None:
+            {
+                NB_PLATFORM_CRITICAL("Window created without graphics API!");
+                break;
+            }
+
+        case GraphicsAPI::OpenGL410: m_Context = CreateRef<OpenGL410Context>(this); break;
+        case GraphicsAPI::OpenGL460: m_Context = CreateRef<OpenGL460Context>(this); break;
+        }
         m_Context->Init();
     }
 
@@ -146,6 +158,11 @@ namespace Nebula::Platform
     void WindowsWindow::SwapBuffers()
     {
         m_Context->SwapBuffers();
+    }
+
+    void WindowsWindow::Present(uint32_t framebuffer)
+    {
+        m_Context->Present(framebuffer);
     }
 
     std::pair<unsigned int, unsigned int> WindowsWindow::GetSize() const

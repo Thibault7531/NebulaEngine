@@ -2,7 +2,8 @@
 
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
-#include "Platform/Platform/Linux/Rendering/OpenGLContext.h"
+#include "Platform/Platform/Linux/Rendering/OpenGL410Context.h"
+#include "Platform/Platform/Linux/Rendering/OpenGL460Context.h"
 
 namespace Nebula::Platform
 {
@@ -40,7 +41,17 @@ namespace Nebula::Platform
         SDL_SetEventFilter(EventHandler::OnEvent, nullptr);
         SDL_SetWindowHitTest(m_Window, EventHandler::OnHitTest, this);
 
-        m_Context = CreateRef<OpenGlContext>(this);
+        switch (m_Properties.API)
+        {
+        case GraphicsAPI::None:
+            {
+                NB_PLATFORM_CRITICAL("Window created without graphics API!");
+                break;
+            }
+
+        case GraphicsAPI::OpenGL410: m_Context = CreateRef<OpenGL410Context>(this); break;
+        case GraphicsAPI::OpenGL460: m_Context = CreateRef<OpenGL460Context>(this); break;
+        }
         m_Context->Init();
     }
 
@@ -64,6 +75,11 @@ namespace Nebula::Platform
     void LinuxWindow::SwapBuffers()
     {
         m_Context->SwapBuffers();
+    }
+
+    void LinuxWindow::Present(uint32_t framebuffer)
+    {
+        m_Context->Present(framebuffer);
     }
 
     std::pair<uint32_t, uint32_t> LinuxWindow::GetSize() const

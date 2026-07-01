@@ -624,7 +624,7 @@ namespace Nebula
         ImGuiViewport* main_viewport = ImGui::GetMainViewport();
         auto* main_viewport_data = static_cast<ViewportData*>(main_viewport->PlatformUserData);
 
-        if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
+        if (RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460)
         {
             main_viewport_data->GraphicsContext->SetCurrent();
         }
@@ -639,13 +639,14 @@ namespace Nebula
         props.AlwaysOnTop = (viewport->Flags & ImGuiViewportFlags_TopMost);
         props.isUtility = (viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon);
         props.Style = (viewport->Flags & ImGuiViewportFlags_NoDecoration) ? Platform::WindowStyle::BorderlessFullscreen : Platform::WindowStyle::Default;
+        props.API = Platform::WindowManager::Get().GetMainWindow()->GetProperties().API;
         const Ref<Platform::Window> window = Platform::WindowManager::Get().CreateWindow(props);
         window->SetEventCallback(s_EventCallback);
         viewport_data->Window = window;
 
         viewport_data->Window->SetPos(viewport->Pos.x, viewport->Pos.y);
         viewport_data->WindowOwned = true;
-        if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL || RendererAPI::GetAPI() == RendererAPI::API::OpenGL410)
+        if (RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460 || RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL410)
         {
             viewport_data->GraphicsContext = viewport_data->Window->GetContext();
             viewport_data->Window->SetVSync(viewport_data->ParentWindow ? viewport_data->ParentWindow->IsVSync() : Platform::VSyncMode::Adaptive);

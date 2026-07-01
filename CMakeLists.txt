@@ -55,7 +55,7 @@ endif ()
 
 
 # Compiler arguments
-if (nebula_cmake_platform STREQUAL "Windows")
+if (nebula_cmake_platform STREQUAL Windows)
     set(CMAKE_C_FLAGS "-std=c11")
     set(CMAKE_C_FLAGS_DEBUG "-O0 -g -fms-runtime-lib=static_dbg")
     set(CMAKE_C_FLAGS_RELEASE "-O2 -fms-runtime-lib=static")

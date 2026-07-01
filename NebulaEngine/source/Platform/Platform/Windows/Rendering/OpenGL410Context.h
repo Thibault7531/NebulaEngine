@@ -1,19 +1,20 @@
 #pragma once
 
-#include <EGL/egl.h>
-#include <SDL3/SDL.h>
+#include <Windows.h>
+#include <winrt/Microsoft.UI.Windowing.h>
 
+#include "Core/Nebula/CoreSystems/Core/Core.h"
 #include "Platform/Nebula/CoreSystems/Rendering/Context.h"
 #include "Platform/Nebula/CoreSystems/Windows/Window.h"
 
 namespace Nebula::Platform
 {
 
-    class OpenGlContext : public Context
+    class OpenGL410Context : public Context
     {
     public:
-        OpenGlContext(Window* window);
-        virtual ~OpenGlContext();
+        OpenGL410Context(Window* window);
+        virtual ~OpenGL410Context();
 
         virtual void Init() override;
 
@@ -21,14 +22,20 @@ namespace Nebula::Platform
         virtual void SetVSync(VSyncMode mode) override;
         virtual VSyncMode IsVsync() const override;
         virtual void SwapBuffers() override;
+        virtual void Present(uint32_t framebuffer) override;
+
+        void InitOpenGL();
 
     private:
         Window* m_Window;
-        SDL_GLContext m_Context = nullptr;
+        HWND m_Handle;
+        HDC m_DeviceContext;
+
+        HGLRC m_Context = nullptr;
 
     private:
         static bool s_GLInitialized;
-        static SDL_GLContext s_MainContext;
+        static HGLRC s_MainContext;
     };
 
 }

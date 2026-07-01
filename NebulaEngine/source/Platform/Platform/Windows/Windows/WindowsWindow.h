@@ -24,6 +24,7 @@ namespace Nebula::Platform
 
         virtual void OnUpdate() override;
         virtual void SwapBuffers() override;
+        virtual void Present(uint32_t framebuffer) override;
 
         [[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetSize() const override;
         virtual void SetSize(uint32_t width, uint32_t height) override;

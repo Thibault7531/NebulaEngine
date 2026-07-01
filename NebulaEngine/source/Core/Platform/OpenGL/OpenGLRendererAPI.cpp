@@ -17,11 +17,19 @@ namespace Nebula {
 
 		glEnable(GL_DEPTH_TEST);
 
-		glEnable(GL_CULL_FACE);
-
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback(MessageCallback, nullptr);
+	}
+
+	bool OpenGLRendererAPI::IsFaceCullingEnabled() const
+	{
+		return glIsEnabled(GL_CULL_FACE);
+	}
+
+	void OpenGLRendererAPI::EnableFaceCulling(bool enabled)
+	{
+		enabled ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 	}
 
 	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)

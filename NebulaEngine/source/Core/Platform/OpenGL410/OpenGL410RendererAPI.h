@@ -12,6 +12,9 @@ namespace Nebula {
 		virtual void Init() override;
 		virtual void Log() override;
 
+		virtual bool IsFaceCullingEnabled() const override;
+		virtual void EnableFaceCulling(bool enabled) override;
+
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
 
 		virtual void SetClearColor(const glm::vec4& color) override;

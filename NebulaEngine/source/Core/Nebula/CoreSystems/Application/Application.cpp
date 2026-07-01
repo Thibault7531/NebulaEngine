@@ -22,10 +22,18 @@ namespace Nebula
 
 		Platform::CoreUtils::InitThread();
 
+		Platform::GraphicsAPI api = Platform::GraphicsAPI::None;
+		if (Platform::Graphics::isGraphicsAPISupported(Platform::GraphicsAPI::OpenGL460)) api = Platform::GraphicsAPI::OpenGL460;
+		else if (Platform::Graphics::isGraphicsAPISupported(Platform::GraphicsAPI::OpenGL410)) api = Platform::GraphicsAPI::OpenGL410;
+		else NB_CORE_ASSERT(false, "No supported Graphics API found!");
+
+		props.API = api;
 		m_MainWindow = Platform::WindowManager::Get().CreateMainWindow(props);
 		m_MainWindow->SetEventCallback(NB_BIND_EVENT_FN(OnEvent));
 
-		Renderer::Init();
+		Renderer::Init(api);
+
+		m_MainFramebuffer = Framebuffer::Create({m_MainWindow->GetSize().first, m_MainWindow->GetSize().second});
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -120,6 +128,7 @@ namespace Nebula
 	void Application::Render()
 	{
 		m_MainWindow->SetCurrentContext();
+		m_MainFramebuffer->Bind();
 
 		std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
 		const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000.f;
@@ -142,7 +151,7 @@ namespace Nebula
 			m_ImGuiLayer->End();
 		}
 
-		m_MainWindow->SwapBuffers();
+		m_MainWindow->Present(m_MainFramebuffer->GetRendererID());
 
 		RenderCommand::Log();
 	}
@@ -163,6 +172,7 @@ namespace Nebula
 		NB_PROFILE_FUNCTION();
 
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+		m_MainFramebuffer->Resize(e.GetWidth(), e.GetHeight());
 
 		return false;
 	}

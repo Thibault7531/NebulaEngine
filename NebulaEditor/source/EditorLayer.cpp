@@ -27,7 +27,8 @@ namespace Nebula {
     {
         Application::Get().GetImGuiLayer()->BlockEvents(false);
 
-        m_Framebuffer = Framebuffer::Create({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y)});
+        m_Framebuffer = Framebuffer::Create({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y), .AttachmentSpec = {Texture::InternalFormat::RGBA8, Texture::InternalFormat::R32I, Texture::InternalFormat::Depth24Stencil8}});
+        m_Framebuffer->SetClearColors({{.1f, .1f, .1f, 1.f}, glm::vec4{-1.f}});
 
         m_Scene = CreateRef<Scene>();
 
@@ -78,32 +79,32 @@ namespace Nebula {
         NSVGimage* closeImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-close-symbolic.svg").string().c_str(), "px", 96);
         auto* pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
         nsvgRasterize(rast, closeImage, 0, 0, imageSize/closeImage->width, pixels, imageSize, imageSize, imageSize * 4);
-        m_CloseIcon = Texture2D::Create(imageSize, imageSize);
-        m_CloseIcon->SetData(pixels, imageSize * imageSize * 4);
+        m_CloseIcon = Texture2D::Create(imageSize, imageSize, Texture::InternalFormat::RGBA8);
+        m_CloseIcon->SetData(pixels, imageSize * imageSize * 4, Texture::DataFormat::RGBA);
         free(pixels);
         nsvgDelete(closeImage);
 
         NSVGimage* maximizeImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-maximize-symbolic.svg").string().c_str(), "px", 96);
         pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
         nsvgRasterize(rast, maximizeImage, 0, 0, imageSize/maximizeImage->width, pixels, imageSize, imageSize, imageSize * 4);
-        m_MaximizeIcon = Texture2D::Create(imageSize, imageSize);
-        m_MaximizeIcon->SetData(pixels, imageSize * imageSize * 4);
+        m_MaximizeIcon = Texture2D::Create(imageSize, imageSize, Texture::InternalFormat::RGBA8);
+        m_MaximizeIcon->SetData(pixels, imageSize * imageSize * 4, Texture::DataFormat::RGBA);
         free(pixels);
         nsvgDelete(maximizeImage);
 
         NSVGimage* restoreImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-restore-symbolic.svg").string().c_str(), "px", 96);
         pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
         nsvgRasterize(rast, restoreImage, 0, 0, imageSize/restoreImage->width, pixels, imageSize, imageSize, imageSize * 4);
-        m_RestoreIcon = Texture2D::Create(imageSize, imageSize);
-        m_RestoreIcon->SetData(pixels, imageSize * imageSize * 4);
+        m_RestoreIcon = Texture2D::Create(imageSize, imageSize, Texture::InternalFormat::RGBA8);
+        m_RestoreIcon->SetData(pixels, imageSize * imageSize * 4, Texture::DataFormat::RGBA);
         free(pixels);
         nsvgDelete(restoreImage);
 
         NSVGimage* minimizeImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "window-minimize-symbolic.svg").string().c_str(), "px", 96);
         pixels = static_cast<unsigned char*>(malloc(imageSize * imageSize * 4));
         nsvgRasterize(rast, minimizeImage, 0, 0, imageSize/minimizeImage->width, pixels, imageSize, imageSize, imageSize * 4);
-        m_MinimizeIcon = Texture2D::Create(imageSize, imageSize);
-        m_MinimizeIcon->SetData(pixels, imageSize * imageSize * 4);
+        m_MinimizeIcon = Texture2D::Create(imageSize, imageSize, Texture::InternalFormat::RGBA8);
+        m_MinimizeIcon->SetData(pixels, imageSize * imageSize * 4, Texture::DataFormat::RGBA);
         free(pixels);
         nsvgDelete(minimizeImage);
 
@@ -130,14 +131,13 @@ namespace Nebula {
         RenderCommand::SetClearColor({ 0.f, 0.f, 0.f, 1.f });
         RenderCommand::Clear();
 
+        m_Framebuffer->Clear();
         m_Framebuffer->Bind();
-
-        RenderCommand::SetClearColor({ .3f, .3f, .3f, 1.f });
-        RenderCommand::Clear();
 
         m_Scene->OnUpdateEditor(ts, m_Camera);
 
         m_Framebuffer->Unbind();
+        Application::Get().GetMainFramebuffer()->Bind();
     }
 
     void EditorLayer::OnEvent(Platform::Event &event)
@@ -146,6 +146,7 @@ namespace Nebula {
 
         Platform::EventDispatcher dispatcher(event);
         dispatcher.Dispatch<Platform::KeyPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnKeyPressedEvent));
+        dispatcher.Dispatch<Platform::MouseButtonPressedEvent>(NB_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressedEvent));
     }
 
     void EditorLayer::OnImGuiRender()
@@ -283,12 +284,16 @@ namespace Nebula {
                 m_ViewportSize = { size.x, size.y };
                 DoesViewportFit = false;
             }
+            if (m_ViewportPos != *reinterpret_cast<glm::vec2*>(&pos))
+            {
+                m_ViewportPos = { pos.x, pos.y };
+            }
 
             IsViewportFocused = ImGui::IsWindowFocused();
             IsViewportHovered = ImGui::IsWindowHovered();
             Application::Get().GetImGuiLayer()->BlockEvents(!IsViewportFocused && !IsViewportHovered);
 
-            ImGui::Image(m_Framebuffer->GetColorAttachmentRendererID(), { m_ViewportSize.x, m_ViewportSize.y }, {0, 1}, {1, 0});
+            ImGui::Image(m_Framebuffer->GetColorAttachment()->GetRendererID(), { m_ViewportSize.x, m_ViewportSize.y }, {0, 1}, {1, 0});
 
             ImGuizmo::Enable(true);
             ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
@@ -296,6 +301,8 @@ namespace Nebula {
             ImGuizmo::SetOrthographic(false);
             glm::mat4 view = m_Camera.GetViewMatrix();
 
+            // TODO: Reactivate when ImGuizmo fixes righthandedness
+            /*
             ImGuizmo::ViewManipulate(glm::value_ptr(view), m_Camera.GetDistance(), ImVec2(pos.x + size.x - 200, pos.y), ImVec2(200, 200), 0x10101000);
 
             if (ImGuizmo::IsUsingViewManipulate())
@@ -306,6 +313,7 @@ namespace Nebula {
                 m_Camera.SetYaw(-yaw);
                 m_Camera.SetPitch(-pitch);
             }
+            */
 
             if (selectedEntity && m_GizmoOperation != -1)
             {
@@ -348,15 +356,6 @@ namespace Nebula {
 
     void EditorLayer::OpenScene()
     {
-        /*
-        std::string path = Platform::FileDialogs::OpenFile({ Platform::FileType::NebulaScene });
-        if (!path.empty()) {
-            NewScene();
-
-            SceneSerializer serializer(m_Scene);
-            serializer.Deserialize(path);
-        }
-        */
         Platform::FileDialogs::OpenFile(Platform::FileType::NebulaScene, [&](std::string path)
         {
             NewScene();
@@ -368,13 +367,6 @@ namespace Nebula {
 
     void EditorLayer::SaveSceneAs()
     {
-        /*
-        std::string path = Platform::FileDialogs::SaveFile("Nebula Scene (*.nbscene)\0*.nbscene\0");
-        if (!path.empty()) {
-            SceneSerializer serializer(m_Scene);
-            serializer.Serialize(path);
-        }
-        */
         Platform::FileDialogs::SaveFile(Platform::FileType::NebulaScene, [&](std::string path)
         {
             SceneSerializer serializer(m_Scene);
@@ -397,6 +389,22 @@ namespace Nebula {
         if (event.GetKeyCode() == KeyboardKey::W) m_GizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
         if (event.GetKeyCode() == KeyboardKey::E) m_GizmoOperation = ImGuizmo::OPERATION::ROTATE;
         if (event.GetKeyCode() == KeyboardKey::R) m_GizmoOperation = ImGuizmo::OPERATION::SCALE;
+        return false;
+    }
+
+    bool EditorLayer::OnMouseButtonPressedEvent(const Platform::MouseButtonPressedEvent& event)
+    {
+        if (event.GetMouseButton() == MouseButton::Left && IsViewportHovered && !ImGuizmo::IsOver() && !Platform::Input::IsKeyPressed(KeyboardKey::LeftAlt))
+        {
+            ImVec2 mousePos = ImGui::GetMousePos();
+            uint32_t mouse_X = mousePos.x - m_ViewportPos.x;
+            uint32_t mouse_Y = mousePos.y - m_ViewportPos.y;
+
+            Ref<Texture2D> texture = m_Framebuffer->GetColorAttachment(1);
+            std::vector<int32_t> viewport = texture->GetDataR32I();
+            uint32_t entity = viewport[mouse_Y * texture->GetWidth() + mouse_X];
+            m_SceneHierarchyPanel.SetSelectedEntity(entity == -1 ? Entity() : Entity(static_cast<entt::entity>(entity), m_Scene.get()));
+        }
         return false;
     }
 }

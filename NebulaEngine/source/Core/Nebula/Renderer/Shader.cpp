@@ -16,13 +16,13 @@ namespace Nebula {
 		switch (Renderer::GetAPI())
 		{
 #ifdef NB_PLATFORM_MACOS
-		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-		case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
-		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410Shader>(name, vertexSrc, fragmentSrc, sourceType);
+		case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case Platform::GraphicsAPI::OpenGL410: return std::make_shared<OpenGL410Shader>(name, vertexSrc, fragmentSrc, sourceType);
+		case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
 #else
-		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-		case RendererAPI::API::OpenGL: return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc, sourceType);
-		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410Shader>(name, vertexSrc, fragmentSrc, sourceType);
+		case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case Platform::GraphicsAPI::OpenGL410: return std::make_shared<OpenGL410Shader>(name, vertexSrc, fragmentSrc, sourceType);
+		case Platform::GraphicsAPI::OpenGL460: return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc, sourceType);
 #endif
 		}
 
@@ -35,13 +35,13 @@ namespace Nebula {
 		switch (Renderer::GetAPI())
 		{
 #ifdef NB_PLATFORM_MACOS
-		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-		case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
-		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410Shader>(filepath);
+		case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case Platform::GraphicsAPI::OpenGL410: return std::make_shared<OpenGL410Shader>(filepath);
+		case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
 #else
-		case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-		case RendererAPI::API::OpenGL: return std::make_shared<OpenGLShader>(filepath);
-		case RendererAPI::API::OpenGL410: return std::make_shared<OpenGL410Shader>(filepath);
+		case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case Platform::GraphicsAPI::OpenGL410: return std::make_shared<OpenGL410Shader>(filepath);
+		case Platform::GraphicsAPI::OpenGL460: return std::make_shared<OpenGLShader>(filepath);
 #endif
 		}
 

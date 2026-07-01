@@ -77,4 +77,10 @@ namespace Nebula::Platform
         static ThemeType GetTheme();
     };
 
+    class Graphics
+    {
+    public:
+        static bool isGraphicsAPISupported(GraphicsAPI api);
+    };
+
 }

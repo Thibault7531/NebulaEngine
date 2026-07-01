@@ -20,6 +20,7 @@ namespace Nebula
             Ref<Texture2D> texture = nullptr;
             glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
             float tilingFactor = 1.0f;
+            int32_t entityID = -1;
         };
         struct QuadPropertiesAdvanced
         {
@@ -27,6 +28,7 @@ namespace Nebula
             Ref<Texture2D> texture = nullptr;
             glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
             float tilingFactor = 1.0f;
+            int32_t entityID = -1;
         };
 
     public:

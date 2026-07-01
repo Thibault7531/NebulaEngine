@@ -8,24 +8,24 @@
 #ifdef NB_PLATFORM_MACOS
 #include "Platform/OpenGL410/OpenGL410Texture.h"
 #else
-#include "Platform/OpenGL/OpenGLTexture.h"
+#include "Platform/OpenGL/OpenGL460Texture.h"
 #include "Platform/OpenGL410/OpenGL410Texture.h"
 #endif
 
 namespace Nebula {
 
-    Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
+    Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height, const TextureSpecification& spec)
     {
         switch (Renderer::GetAPI())
         {
 #ifdef NB_PLATFORM_MACOS
-        case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-        case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
-        case RendererAPI::API::OpenGL410: return CreateRef<OpenGL410Texture2D>(width, height);
+        case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Texture2D>(width, height, spec);
+        case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
 #else
-        case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-        case RendererAPI::API::OpenGL: return CreateRef<OpenGLTexture2D>(width, height);
-        case RendererAPI::API::OpenGL410: return CreateRef<OpenGL410Texture2D>(width, height);
+        case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Texture2D>(width, height, spec);
+        case Platform::GraphicsAPI::OpenGL460: return CreateRef<OpenGL460Texture2D>(width, height, spec);
 #endif
         }
 
@@ -33,18 +33,18 @@ namespace Nebula {
         return nullptr;
     }
 
-    Ref<Texture2D> Texture2D::Create(const std::string& path)
+    Ref<Texture2D> Texture2D::Create(const std::string& path, const TextureSpecification& spec)
     {
         switch (Renderer::GetAPI())
         {
 #ifdef NB_PLATFORM_MACOS
-        case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-        case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
-        case RendererAPI::API::OpenGL410: return CreateRef<OpenGL410Texture2D>(path);
+        case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Texture2D>(path, spec);
+        case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
 #else
-        case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-        case RendererAPI::API::OpenGL: return CreateRef<OpenGLTexture2D>(path);
-        case RendererAPI::API::OpenGL410: return CreateRef<OpenGL410Texture2D>(path);
+        case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Texture2D>(path, spec);
+        case Platform::GraphicsAPI::OpenGL460: return CreateRef<OpenGL460Texture2D>(path, spec);
 #endif
         }
 

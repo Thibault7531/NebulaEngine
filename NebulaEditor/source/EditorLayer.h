@@ -30,6 +30,7 @@ namespace Nebula {
 
     private:
         bool OnKeyPressedEvent(const Platform::KeyPressedEvent& event);
+        bool OnMouseButtonPressedEvent(const Platform::MouseButtonPressedEvent& event);
 
     private:
         bool m_MouseCursorChanged = false;
@@ -37,6 +38,7 @@ namespace Nebula {
         bool IsViewportFocused = false;
         bool IsViewportHovered = false;
         bool DoesViewportFit = false;
+        glm::vec2 m_ViewportPos = { 0.0f, 0.0f };
         glm::vec2 m_ViewportSize = { 1920.0f, 1080.0f };
         Ref<Framebuffer> m_Framebuffer;
 

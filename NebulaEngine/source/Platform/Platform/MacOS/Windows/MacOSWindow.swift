@@ -217,6 +217,9 @@ public struct MacOSWindow {
     public mutating func SwapBuffers() {
         m_OGLContext.SwapBuffers()
     }
+    public mutating func Present(framebuffer: UInt32) {
+        m_OGLContext.Present(framebuffer)
+    }
     
     public func GetWindowWidth() -> UInt32 {
         return UInt32(m_Window.frame.width)

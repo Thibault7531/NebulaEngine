@@ -6,6 +6,7 @@
 
 #include "Platform/Nebula/CoreSystems/Events/Event.h"
 #include "Platform/Nebula/CoreSystems/Rendering/Context.h"
+#include "Platform/Nebula/CoreSystems/Rendering/GraphicsAPI.h"
 
 namespace Nebula::Platform
 {
@@ -55,6 +56,8 @@ namespace Nebula::Platform
         // Don't change
         bool isMouseHovering = false;
         bool isCursorChanged = false;
+
+        mutable GraphicsAPI API = GraphicsAPI::None;
     };
 
     class Window
@@ -70,6 +73,7 @@ namespace Nebula::Platform
 
         virtual void OnUpdate() = 0;
         virtual void SwapBuffers() = 0;
+        virtual void Present(uint32_t framebuffer) = 0;
 
         [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetSize() const = 0;
         virtual void SetSize(uint32_t width, uint32_t height) = 0;

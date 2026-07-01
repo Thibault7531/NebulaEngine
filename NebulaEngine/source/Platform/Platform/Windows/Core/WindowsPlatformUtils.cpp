@@ -161,4 +161,14 @@ namespace Nebula::Platform
 
         return isDark ? ThemeType::Dark : ThemeType::Light;
     }
+
+    bool Graphics::isGraphicsAPISupported(GraphicsAPI api)
+    {
+        switch (api)
+        {
+        case GraphicsAPI::OpenGL410: return true;
+        case GraphicsAPI::OpenGL460: return true;
+        default: return false;
+        }
+    }
 }

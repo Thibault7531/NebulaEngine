@@ -104,7 +104,7 @@ target_include_directories(Nebula PRIVATE
                            ../../vendor/glm
                            ../../vendor/glm/glm
                            ../../vendor/imgui
-                           ../../vendor/ImGuizmo
+                           ../../vendor/ImGuizmo/src
                            ../../vendor/stb_image
                            ../../vendor/yaml-cpp/include
 )

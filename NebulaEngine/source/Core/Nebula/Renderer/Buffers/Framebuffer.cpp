@@ -5,24 +5,48 @@
 #ifdef NB_PLATFORM_MACOS
 #include "Platform/OpenGL410/OpenGL410Framebuffer.h"
 #else
-#include "Platform/OpenGL/OpenGLFramebuffer.h"
+#include "Platform/OpenGL/OpenGL460Framebuffer.h"
 #include "Platform/OpenGL410/OpenGL410Framebuffer.h"
 #endif
 
 namespace Nebula {
+    bool Framebuffer::IsDepthFormat(Texture::InternalFormat format)
+    {
+        switch (format)
+        {
+        default: return false;
+        }
+    }
+
+    bool Framebuffer::IsStencilFormat(Texture::InternalFormat format)
+    {
+        switch (format)
+        {
+        default: return false;
+        }
+    }
+
+    bool Framebuffer::IsDepthStencilFormat(Texture::InternalFormat format)
+    {
+        switch (format)
+        {
+        case Texture::InternalFormat::Depth24Stencil8: return true;
+        default: return false;
+        }
+    }
 
     Ref<Framebuffer> Framebuffer::Create(const FramebufferSpecification &spec)
     {
         switch (Renderer::GetAPI())
         {
 #ifdef NB_PLATFORM_MACOS
-        case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-        case RendererAPI::API::OpenGL: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
-        case RendererAPI::API::OpenGL410: return CreateRef<OpenGL410Framebuffer>(spec);
+        case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Framebuffer>(spec);
+        case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
 #else
-        case RendererAPI::API::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
-        case RendererAPI::API::OpenGL: return CreateRef<OpenGLFramebuffer>(spec);
-        case RendererAPI::API::OpenGL410: return CreateRef<OpenGL410Framebuffer>(spec);
+        case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+        case Platform::GraphicsAPI::OpenGL410: return CreateRef<OpenGL410Framebuffer>(spec);
+        case Platform::GraphicsAPI::OpenGL460: return CreateRef<OpenGL460Framebuffer>(spec);
 #endif
         }
 
