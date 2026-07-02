@@ -10,9 +10,7 @@ namespace Nebula
     class OpenGL460Texture2D : public Texture2D
     {
     public:
-        [[deprecated]] OpenGL460Texture2D(const uint32_t width, const uint32_t height, InternalFormat internalFormat);
         OpenGL460Texture2D(uint32_t width, uint32_t height, const TextureSpecification& spec);
-        [[deprecated]] OpenGL460Texture2D(const std::string& path);
         OpenGL460Texture2D(const std::string& path, const TextureSpecification& spec);
         virtual ~OpenGL460Texture2D();
 

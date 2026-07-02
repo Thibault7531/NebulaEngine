@@ -101,8 +101,7 @@ endif ()
 # Targets
 add_subdirectory(NebulaEngine)
 add_subdirectory(NebulaEditor)
-add_subdirectory(TestGame)
-add_subdirectory(Exemples/PlatformExemple)
+add_subdirectory(Exemples)
 
 
 # Visual Studio Properties
