@@ -48,6 +48,25 @@ namespace Nebula {
 		return nullptr;
 	}
 
+	Ref<IndexBuffer> IndexBuffer::Create()
+	{
+		switch (Renderer::GetAPI())
+		{
+#ifdef NB_PLATFORM_MACOS
+		case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case Platform::GraphicsAPI::OpenGL410: return std::make_shared<OpenGL410IndexBuffer>();
+		case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return nullptr;
+#else
+		case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return nullptr;
+		case Platform::GraphicsAPI::OpenGL410: return std::make_shared<OpenGL410IndexBuffer>();
+		case Platform::GraphicsAPI::OpenGL460: return std::make_shared<OpenGLIndexBuffer>();
+#endif
+		}
+
+		NB_CORE_ASSERT(false, "Unknown RendererAPI");
+		return nullptr;
+	}
+
 	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
 	{
 		switch (Renderer::GetAPI())

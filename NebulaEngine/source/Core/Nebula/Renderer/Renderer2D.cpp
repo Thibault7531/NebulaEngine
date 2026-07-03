@@ -50,6 +50,17 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
+        RendererAPI::BlendState state;
+        state.enabled = true;
+        state.srcColorFactor = RendererAPI::BlendFactor::SourceAlpha;
+        state.dstColorFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
+        state.srcAlphaFactor = RendererAPI::BlendFactor::SourceAlpha;
+        state.dstAlphaFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
+        RenderCommand::SetBlendingState(state);
+        RenderCommand::EnableFaceCulling(true);
+        RenderCommand::EnableDepthTest(true);
+        RenderCommand::EnableScissorTest(false);
+
         s_Data.QuadVertexArray = VertexArray::Create();
 
         s_Data.QuadVertexBuffer = VertexBuffer::Create(Renderer2DData::MaxVertices * sizeof(QuadVertex));
@@ -198,7 +209,9 @@ namespace Nebula
         s_Data.QuadShader->Bind();
         for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++) s_Data.TextureSlots[i]->Bind(i);
 
+        s_Data.QuadVertexArray->Bind();
         RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+        s_Data.QuadVertexArray->Unbind();
         s_Data.QuadShader->Unbind();
 
         s_Data.Stats.DrawCalls++;

@@ -86,6 +86,8 @@ namespace Nebula
 
         virtual void Bind(uint32_t slot = 0) const = 0;
         virtual void BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot = 0) const = 0;
+
+        static void BindWithID(uint32_t id, uint32_t slot = 0);
     };
 
     class Texture2D : public Texture

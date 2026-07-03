@@ -6,25 +6,33 @@ namespace Nebula {
 
 	enum class ShaderDataType
 	{
-		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool
+		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Byte, Byte2, Byte3, Byte4, UByte, UByte2, UByte3, UByte4, Int, Int2, Int3, Int4, Bool
 	};
 
 	static uint32_t ShaderDataTypeSize(ShaderDataType type)
 	{
 		switch (type)
 		{
-			case ShaderDataType::Float: return 4;
-			case ShaderDataType::Float2: return 4 * 2;
-			case ShaderDataType::Float3: return 4 * 3;
-			case ShaderDataType::Float4: return 4 * 4;
-			case ShaderDataType::Mat3: return 4 * 3 * 3;
-			case ShaderDataType::Mat4: return 4 * 4 * 4;
-			case ShaderDataType::Int: return 4;
-			case ShaderDataType::Int2: return 4 * 2;
-			case ShaderDataType::Int3: return 4 * 3;
-			case ShaderDataType::Int4: return 4 * 4;
-			case ShaderDataType::Bool: return 1;
-			default: break;
+		case ShaderDataType::Float: return 4;
+		case ShaderDataType::Float2: return 4 * 2;
+		case ShaderDataType::Float3: return 4 * 3;
+		case ShaderDataType::Float4: return 4 * 4;
+		case ShaderDataType::Mat3: return 4 * 3 * 3;
+		case ShaderDataType::Mat4: return 4 * 4 * 4;
+		case ShaderDataType::Byte: return 1;
+		case ShaderDataType::Byte2: return 2;
+		case ShaderDataType::Byte3: return 3;
+		case ShaderDataType::Byte4: return 4;
+		case ShaderDataType::UByte: return 1;
+		case ShaderDataType::UByte2: return 2;
+		case ShaderDataType::UByte3: return 3;
+		case ShaderDataType::UByte4: return 4;
+		case ShaderDataType::Int: return 4;
+		case ShaderDataType::Int2: return 4 * 2;
+		case ShaderDataType::Int3: return 4 * 3;
+		case ShaderDataType::Int4: return 4 * 4;
+		case ShaderDataType::Bool: return 1;
+		default: break;
 		}
 
 		NB_CORE_ASSERT(false, "Unknown ShaderDataType!");
@@ -50,18 +58,26 @@ namespace Nebula {
 		{
 			switch (Type)
 			{
-				case ShaderDataType::Float: return 1;
-				case ShaderDataType::Float2: return 2;
-				case ShaderDataType::Float3: return 3;
-				case ShaderDataType::Float4: return 4;
-				case ShaderDataType::Mat3: return 3 * 3;
-				case ShaderDataType::Mat4: return 4 * 4;
-				case ShaderDataType::Int: return 1;
-				case ShaderDataType::Int2: return 2;
-				case ShaderDataType::Int3: return 3;
-				case ShaderDataType::Int4: return 4;
-				case ShaderDataType::Bool: return 1;
-				default: break;
+			case ShaderDataType::Float: return 1;
+			case ShaderDataType::Float2: return 2;
+			case ShaderDataType::Float3: return 3;
+			case ShaderDataType::Float4: return 4;
+			case ShaderDataType::Mat3: return 3 * 3;
+			case ShaderDataType::Mat4: return 4 * 4;
+			case ShaderDataType::Byte: return 1;
+			case ShaderDataType::Byte2: return 2;
+			case ShaderDataType::Byte3: return 3;
+			case ShaderDataType::Byte4: return 4;
+			case ShaderDataType::UByte: return 1;
+			case ShaderDataType::UByte2: return 2;
+			case ShaderDataType::UByte3: return 3;
+			case ShaderDataType::UByte4: return 4;
+			case ShaderDataType::Int: return 1;
+			case ShaderDataType::Int2: return 2;
+			case ShaderDataType::Int3: return 3;
+			case ShaderDataType::Int4: return 4;
+			case ShaderDataType::Bool: return 1;
+			default: break;
 			}
 
 			NB_CORE_ASSERT(false, "Unknown ShaderDataType!");
@@ -131,8 +147,12 @@ namespace Nebula {
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		virtual void SetData(uint16_t* indices, uint32_t count) = 0;
+		virtual void SetData(uint32_t* indices, uint32_t count) = 0;
+
 		[[nodiscard]] virtual uint32_t GetCount() const = 0;
 
+		static Ref<IndexBuffer> Create();
 		static Ref<IndexBuffer> Create(uint32_t* Indices, uint32_t count);
 	};
 

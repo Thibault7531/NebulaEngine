@@ -2,6 +2,7 @@
 
 #include <ImGuizmo.h>
 
+#include "ImGuiRenderer.h"
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
@@ -43,8 +44,7 @@ namespace Nebula
 		m_ImGuiPlatform = CreateRef<ImGuiPlatform>();
 		m_ImGuiPlatform->Init(Platform::WindowManager::Get().GetMainWindow());
 
-		m_ImGuiRenderer = ImGuiRenderer::Create();
-		m_ImGuiRenderer->Init();
+		ImGuiRenderer::Init();
 
 		// Font configuration
 		ImFontConfig config;
@@ -93,7 +93,7 @@ namespace Nebula
 
 		NB_CORE_INFO("Shutting down ImGui");
 
-		m_ImGuiRenderer->Shutdown();
+		ImGuiRenderer::Shutdown();
 		m_ImGuiPlatform->Shutdown();
 		ImGui::DestroyContext();
 	}
@@ -113,7 +113,7 @@ namespace Nebula
 			else if (theme != s_ImGuiTheme) SetLightTheme();
 		}
 
-		m_ImGuiRenderer->NewFrame();
+		ImGuiRenderer::BeginFrame();
 		m_ImGuiPlatform->NewFrame(ts);
 		ImGui::NewFrame();
 		ImGuizmo::BeginFrame();
@@ -126,7 +126,7 @@ namespace Nebula
 		ImGuiIO& io = ImGui::GetIO();
 
 		ImGui::Render();
-		m_ImGuiRenderer->Render(ImGui::GetDrawData());
+		ImGuiRenderer::RenderDrawData(ImGui::GetDrawData());
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{

@@ -166,6 +166,11 @@ namespace Nebula
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, m_RendererID, 0);
     }
 
+    void OpenGL460Texture2D::BindWithID(uint32_t id, uint32_t slot)
+    {
+        glBindTextureUnit(slot, id);
+    }
+
     GLenum OpenGL460Texture2D::GetOpenGL460InternalFormat(InternalFormat format)
     {
         switch (format)

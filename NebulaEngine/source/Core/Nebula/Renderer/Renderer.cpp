@@ -1,7 +1,7 @@
 #include "Renderer.h"
 
-#include "Core/RenderCommand.h"
 #include "Renderer2D.h"
+#include "Core/RenderCommand.h"
 
 namespace Nebula {
 
@@ -14,7 +14,17 @@ namespace Nebula {
 		NB_CORE_INFO("Initializing Nebula Renderer");
 
 		RenderCommand::Init(api);
+
+		RendererAPI::BlendState state;
+		state.enabled = true;
+		state.srcColorFactor = RendererAPI::BlendFactor::SourceAlpha;
+		state.dstColorFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
+		state.srcAlphaFactor = RendererAPI::BlendFactor::SourceAlpha;
+		state.dstAlphaFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
+		RenderCommand::SetBlendingState(state);
 		RenderCommand::EnableFaceCulling(true);
+		RenderCommand::EnableDepthTest(true);
+		RenderCommand::EnableScissorTest(false);
 
 		Renderer2D::Init();
 	}
@@ -39,6 +49,11 @@ namespace Nebula {
 
 	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
+		RenderCommand::SetBlendingState({.enabled = true});
+		RenderCommand::EnableFaceCulling(true);
+		RenderCommand::EnableDepthTest(true);
+		RenderCommand::EnableScissorTest(false);
+
 		m_SceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
 	}
 

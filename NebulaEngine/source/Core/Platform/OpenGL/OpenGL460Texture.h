@@ -32,6 +32,9 @@ namespace Nebula
             return m_RendererID == dynamic_cast<const OpenGL460Texture2D&>(other).m_RendererID;
         }
 
+    public:
+        static void BindWithID(uint32_t id, uint32_t slot = 0);
+
     private:
         GLenum GetOpenGL460InternalFormat(InternalFormat format);
         GLenum GetOpenGL460DataFormat(DataFormat format);

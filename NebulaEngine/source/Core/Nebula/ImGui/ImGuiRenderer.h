@@ -3,24 +3,54 @@
 #include <imgui.h>
 
 #include "Nebula/CoreSystems/Core/Core.h"
+#include "Nebula/Renderer/Shader.h"
+#include "Nebula/Renderer/Texture.h"
+#include "Nebula/Renderer/Buffers/VertexArray.h"
+#include "Nebula/Renderer/Core/RendererAPI.h"
 
 namespace Nebula
 {
+    struct RendererData
+    {
+        bool HasPolygonMode = false;
+        bool HasClipOrigin = false;
 
-    // TODO: Make this class platform-agnostic
+        Ref<Shader> shader;
+        Ref<VertexBuffer> vertexBuffer;
+        Ref<IndexBuffer> indexBuffer;
+
+        std::vector<Ref<Texture>> textures;
+
+        // Last states
+        RendererAPI::BlendState BlendState;
+        bool isEnabledFaceCulling;
+        bool isEnabledDepthTest;
+        bool isEnabledStencilTest;
+        bool isEnabledScissorTest;
+        bool isEnabledPrimitiveRestart;
+        RendererAPI::PolygonMode PolygonMode;
+    };
+
     class ImGuiRenderer
     {
     public:
-        virtual ~ImGuiRenderer() {}
+        static void Init();
+        static void Shutdown();
 
-        virtual void Init() = 0;
-        virtual void Shutdown() = 0;
+        static void BeginFrame();
 
-        virtual void NewFrame() = 0;
+        static void SetupRenderState(ImDrawData& drawData, uint32_t width, uint32_t height, Ref<VertexArray> vertexArray);
+        static void RenderDrawData(ImDrawData* drawData);
+        static void UndoRenderState();
 
-        virtual void Render(ImDrawData* draw_data) = 0;
+        static void CreateTexture(ImTextureData& textureData);
+        static void DestroyTexture(ImTextureData& textureData);
+        static void UpdateTexture(ImTextureData& textureData);
 
-        static Ref<ImGuiRenderer> Create();
+        static void CreateDeviceObjects();
+        static void DestroyDeviceObjects();
+
+        static void RenderWindow(ImGuiViewport* viewport, void*);
     };
 
 }

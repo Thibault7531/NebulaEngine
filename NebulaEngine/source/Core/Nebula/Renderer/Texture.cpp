@@ -14,6 +14,22 @@
 
 namespace Nebula {
 
+    void Texture::BindWithID(uint32_t id, uint32_t slot)
+    {
+        switch (Renderer::GetAPI())
+        {
+#ifdef NB_PLATFORM_MACOS
+        case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return;
+        case Platform::GraphicsAPI::OpenGL410: return OpenGL410Texture2D::BindWithID(id, slot);
+        case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return;
+#else
+        case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is not supported"); return;
+        case Platform::GraphicsAPI::OpenGL410: return OpenGL410Texture2D::BindWithID(id, slot);
+        case Platform::GraphicsAPI::OpenGL460: return OpenGL460Texture2D::BindWithID(id, slot);
+#endif
+        }
+    }
+
     Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height, const TextureSpecification& spec)
     {
         switch (Renderer::GetAPI())

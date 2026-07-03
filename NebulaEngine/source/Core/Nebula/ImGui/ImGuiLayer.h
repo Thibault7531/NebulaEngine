@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ImGuiPlatform.h"
-#include "ImGuiRenderer.h"
 #include "Nebula/CoreSystems/Application/Layer.h"
 
 namespace Nebula
@@ -37,7 +36,6 @@ namespace Nebula
 		bool m_BlockEvents = true;
 
 		Ref<ImGuiPlatform> m_ImGuiPlatform;
-		Ref<ImGuiRenderer> m_ImGuiRenderer;
 
 	public:
 		static ImGuiFonts s_Fonts;

@@ -8,18 +8,26 @@ namespace Nebula {
 	{
 		switch (type)
 		{
-			case ShaderDataType::Float: return GL_FLOAT;
-			case ShaderDataType::Float2: return GL_FLOAT;
-			case ShaderDataType::Float3: return GL_FLOAT;
-			case ShaderDataType::Float4: return GL_FLOAT;
-			case ShaderDataType::Mat3: return GL_FLOAT;
-			case ShaderDataType::Mat4: return GL_FLOAT;
-			case ShaderDataType::Int: return GL_INT;
-			case ShaderDataType::Int2: return GL_INT;
-			case ShaderDataType::Int3: return GL_INT;
-			case ShaderDataType::Int4: return GL_INT;
-			case ShaderDataType::Bool: return GL_BOOL;
-			default: break;
+		case ShaderDataType::Float: return GL_FLOAT;
+		case ShaderDataType::Float2: return GL_FLOAT;
+		case ShaderDataType::Float3: return GL_FLOAT;
+		case ShaderDataType::Float4: return GL_FLOAT;
+		case ShaderDataType::Mat3: return GL_FLOAT;
+		case ShaderDataType::Mat4: return GL_FLOAT;
+		case ShaderDataType::Byte: return GL_BYTE;
+		case ShaderDataType::Byte2: return GL_BYTE;
+		case ShaderDataType::Byte3: return GL_BYTE;
+		case ShaderDataType::Byte4: return GL_BYTE;
+		case ShaderDataType::UByte: return GL_UNSIGNED_BYTE;
+		case ShaderDataType::UByte2: return GL_UNSIGNED_BYTE;
+		case ShaderDataType::UByte3: return GL_UNSIGNED_BYTE;
+		case ShaderDataType::UByte4: return GL_UNSIGNED_BYTE;
+		case ShaderDataType::Int: return GL_INT;
+		case ShaderDataType::Int2: return GL_INT;
+		case ShaderDataType::Int3: return GL_INT;
+		case ShaderDataType::Int4: return GL_INT;
+		case ShaderDataType::Bool: return GL_BOOL;
+		default: break;
 		}
 
 		return GL_INVALID_ENUM;
@@ -92,6 +100,21 @@ namespace Nebula {
 						glVertexAttribDivisor(index, 1);
 						index++;
 					}
+					break;
+				}
+
+			case ShaderDataType::Byte:
+			case ShaderDataType::Byte2:
+			case ShaderDataType::Byte3:
+			case ShaderDataType::Byte4:
+			case ShaderDataType::UByte:
+			case ShaderDataType::UByte2:
+			case ShaderDataType::UByte3:
+			case ShaderDataType::UByte4:
+				{
+					glEnableVertexAttribArray(index);
+					glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), reinterpret_cast<const void*>(element.Offset));
+					index++;
 					break;
 				}
 

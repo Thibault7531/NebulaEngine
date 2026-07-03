@@ -231,6 +231,12 @@ namespace Nebula
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, m_RendererID, 0);
     }
 
+    void OpenGL410Texture2D::BindWithID(uint32_t id, uint32_t slot)
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, id);
+    }
+
     GLint OpenGL410Texture2D::GetOpenGL410InternalFormat(InternalFormat format)
     {
         switch (format)
