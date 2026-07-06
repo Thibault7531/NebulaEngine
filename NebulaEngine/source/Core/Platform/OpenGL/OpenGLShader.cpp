@@ -13,43 +13,34 @@ namespace Nebula {
 		return 0;
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, const SOURCE_TYPE sourceType)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 		: m_Name(name)
 	{
-		NB_PROFILE_FUNCTION();
-
-		std::string VertexSource;
-		std::string FragmentSource;
-		if (sourceType == SOURCE_TYPE::NB_SHADER_FILE)
-		{
-			VertexSource = ReadFile(vertexSrc);
-			FragmentSource = ReadFile(fragmentSrc);
-		}
-		else
-		{
-			VertexSource = vertexSrc;
-			FragmentSource = fragmentSrc;
-		}
-
 		std::unordered_map<GLenum, std::string> shaderSources;
-		shaderSources[GL_VERTEX_SHADER] = VertexSource;
-		shaderSources[GL_FRAGMENT_SHADER] = FragmentSource;
+		shaderSources[GL_VERTEX_SHADER] = vertexSrc;
+		shaderSources[GL_FRAGMENT_SHADER] = fragmentSrc;
 		Compile(shaderSources);
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& filepath)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::filesystem::path& vertexPath,
+		const std::filesystem::path& fragmentPath)
+			:m_Name(name)
+	{
+		std::unordered_map<GLenum, std::string> shaderSources;
+		shaderSources[GL_VERTEX_SHADER] = ReadFile(vertexPath.string());
+		shaderSources[GL_FRAGMENT_SHADER] = ReadFile(fragmentPath.string());
+		Compile(shaderSources);
+	}
+
+	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
 	{
 		NB_PROFILE_FUNCTION();
 
-		std::string shaderSource = ReadFile(filepath);
+		std::string shaderSource = ReadFile(filepath.string());
         auto shaderSources = PreProcess(shaderSource);
 		Compile(shaderSources);
 
-		auto lastSlash = filepath.find_last_of("\\/");
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-		auto lastDot = filepath.rfind('.');
-		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-		m_Name = filepath.substr(lastSlash, count);
+		m_Name = filepath.stem().string();
 	}
 
 	OpenGLShader::~OpenGLShader()

@@ -10,8 +10,9 @@ namespace Nebula {
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, SOURCE_TYPE sourceType);
-		OpenGLShader(const std::string& filepath);
+		OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		OpenGLShader(const std::string& name, const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath);
+		OpenGLShader(const std::filesystem::path& filepath);
 		virtual ~OpenGLShader();
 
 		virtual void Bind() const override;

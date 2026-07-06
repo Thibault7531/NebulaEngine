@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <glm/glm.hpp>
 
@@ -9,8 +10,6 @@ namespace Nebula {
 
 	class Shader
 	{
-	public:
-		enum class SOURCE_TYPE { NB_SHADER_STRING, NB_SHADER_FILE };
 	public:
 		virtual ~Shader() = default;
 
@@ -27,8 +26,9 @@ namespace Nebula {
 
 		[[nodiscard]] virtual const std::string& GetName() const = 0;
 
-		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc, SOURCE_TYPE sourceType);
-		static Ref<Shader> Create(const std::string& filepath);
+		static Ref<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+		static Ref<Shader> Create(const std::string& name, const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath);
+		static Ref<Shader> Create(const std::filesystem::path& filepath);
 
 	};
 
@@ -37,9 +37,9 @@ namespace Nebula {
 	public:
 		void Add(const std::string& name, const Ref<Shader>& shader);
 		void Add(const Ref<Shader>& shader);
-		Ref<Shader> Load(const std::string& filepath);
-		Ref<Shader> Load(const std::string& name, const std::string& filepath);
-		Ref<Shader> Load(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
+		Ref<Shader> Load(const std::filesystem::path& filepath);
+		Ref<Shader> Load(const std::string& name, const std::filesystem::path& filepath);
+		Ref<Shader> Load(const std::string& name, const std::filesystem::path& vertexPath, const std::filesystem::path& fragmentPath);
 
 		Ref<Shader> Get(const std::string& name);
 

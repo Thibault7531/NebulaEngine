@@ -278,7 +278,7 @@ namespace Nebula
         ImGuiIO& io = ImGui::GetIO();
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
 
-        renderer_data.shader = Shader::Create("ImGui", (Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/ImGui.vsh").string(), (Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/ImGui.fsh").string(), Shader::SOURCE_TYPE::NB_SHADER_FILE);
+        renderer_data.shader = Shader::Create("ImGui", Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/ImGui.vsh", Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/ImGui.fsh");
         renderer_data.vertexBuffer = VertexBuffer::Create(IMGUI_MAX_VTX_BUFFER_SIZE);
         renderer_data.vertexBuffer->SetLayout({
             { ShaderDataType::Float2, "a_Position" },

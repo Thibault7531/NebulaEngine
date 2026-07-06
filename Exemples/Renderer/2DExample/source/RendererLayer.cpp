@@ -38,7 +38,7 @@ void RendererLayer::OnAttach()
 
     m_VAO->SetIndexBuffer(ibo);
 
-    m_Shader = Nebula::Shader::Create("SolidColor", (Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColorVS.glsl").string(), (Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColorFS.glsl").string(), Nebula::Shader::SOURCE_TYPE::NB_SHADER_FILE);
+    m_Shader = Nebula::Shader::Create("SolidColor", Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColorVS.glsl", Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColorFS.glsl");
     m_ShaderLibrary.Add("SolidColor", m_Shader);
 
     m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/Texture.glsl").string());
