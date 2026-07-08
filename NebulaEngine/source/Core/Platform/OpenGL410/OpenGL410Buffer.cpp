@@ -107,4 +107,49 @@ namespace Nebula {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
+	OpenGL410UniformBuffer::OpenGL410UniformBuffer(const BufferLayout& layout)
+		: m_Layout{layout}
+	{
+		glGenBuffers(1, &m_RendererID);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+		glBufferData(GL_UNIFORM_BUFFER, layout.GetStride(), nullptr, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	OpenGL410UniformBuffer::~OpenGL410UniformBuffer()
+	{
+		glDeleteBuffers(1, &m_RendererID);
+	}
+
+	void OpenGL410UniformBuffer::Bind() const
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+	}
+
+	void OpenGL410UniformBuffer::Unbind() const
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	void OpenGL410UniformBuffer::BindToSlot(uint32_t slot) const
+	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, slot, m_RendererID);
+	}
+
+	void OpenGL410UniformBuffer::SetData(uint32_t index, const void* data)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+		glBufferSubData(GL_UNIFORM_BUFFER, m_Layout.GetElements()[index].Offset, m_Layout.GetElements()[index].Size, data);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
+	void OpenGL410UniformBuffer::SetLayout(const BufferLayout& layout)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+		glBufferData(GL_UNIFORM_BUFFER, layout.GetStride(), nullptr, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		m_Layout = layout;
+	}
+
 }

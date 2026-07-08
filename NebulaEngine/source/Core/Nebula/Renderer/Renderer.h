@@ -26,9 +26,14 @@ namespace Nebula {
 		inline static Platform::GraphicsAPI GetAPI() { return RendererAPI::GetAPI(); }
 
 	private:
+		static void SetRenderState();
+
+	private:
 		struct SceneData
 		{
 			glm::mat4 viewProjectionMatrix;
+
+			Ref<UniformBuffer> m_UBO;
 		};
 
 		static SceneData* m_SceneData;

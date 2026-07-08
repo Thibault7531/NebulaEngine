@@ -4,6 +4,7 @@
 #include <string>
 #include <glm/glm.hpp>
 
+#include "Buffers/Buffer.h"
 #include "Nebula/CoreSystems/Core/Core.h"
 
 namespace Nebula {
@@ -23,6 +24,7 @@ namespace Nebula {
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
 		virtual void SetMat4(const std::string& name, const glm::mat4& value) = 0;
 
+		virtual void SetUniformBlock(const std::string& name, Ref<UniformBuffer> ubo) = 0;
 
 		[[nodiscard]] virtual const std::string& GetName() const = 0;
 

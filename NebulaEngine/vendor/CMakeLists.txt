@@ -102,6 +102,11 @@ endif ()
 add_subdirectory(SDL)
 
 
+# Slang
+
+add_subdirectory(slang)
+
+
 # spdlog
 
 add_subdirectory(spdlog)

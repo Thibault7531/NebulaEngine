@@ -19,7 +19,7 @@ private:
     Nebula::ShaderLibrary m_ShaderLibrary;
 
     Nebula::Ref<Nebula::VertexArray> m_VAO;
-    Nebula::Ref<Nebula::Shader> m_Shader, m_TextureShader;
+    Nebula::Ref<Nebula::UniformBuffer> m_ColorUBO;
 
     Nebula::Ref<Nebula::Texture2D> m_Texture, m_Glass;
 

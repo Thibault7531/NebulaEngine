@@ -90,6 +90,7 @@ target_link_libraries(Nebula PRIVATE
                       GLAD
                       ImGui
                       ImGuizmo
+                      slang::slang
                       spdlog::spdlog_header_only
                       yaml-cpp::yaml-cpp
 )

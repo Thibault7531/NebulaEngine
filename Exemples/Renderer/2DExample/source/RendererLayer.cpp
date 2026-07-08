@@ -10,6 +10,9 @@ RendererLayer::RendererLayer()
 void RendererLayer::OnAttach()
 {
     m_VAO = Nebula::VertexArray::Create();
+    m_ColorUBO = Nebula::UniformBuffer::Create({
+        {Nebula::ShaderDataType::Float3, "u_Color"}
+    });
 
     float vertices[5 * 4] = {
         -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -38,10 +41,8 @@ void RendererLayer::OnAttach()
 
     m_VAO->SetIndexBuffer(ibo);
 
-    m_Shader = Nebula::Shader::Create("SolidColor", Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColorVS.glsl", Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColorFS.glsl");
-    m_ShaderLibrary.Add("SolidColor", m_Shader);
-
-    m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/Texture.glsl").string());
+    m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColor.slang");
+    m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/Texture.slang");
 
     m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/crafting_table_front.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
     m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/glass.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
@@ -75,16 +76,18 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 
     const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-    m_ShaderLibrary.Get("SolidColor")->Bind();
-    m_Shader->SetFloat3("u_Color", m_Color);
-    m_ShaderLibrary.Get("SolidColor")->Unbind();
+    Nebula::Ref<Nebula::Shader> solidColorShader = m_ShaderLibrary.Get("SolidColor");
+    solidColorShader->Bind();
+    m_ColorUBO->SetData(0, glm::value_ptr(m_Color));
+    solidColorShader->SetUniformBlock("ColorUBO", m_ColorUBO);
+    solidColorShader->Unbind();
 
     for (int i = 0; i < 4; i++)
     {
         glm::vec3 position = m_Position + glm::vec3(0.11f, 0.0f, 0.0f) * static_cast<float>(i);
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
 
-        Nebula::Renderer::Submit(m_ShaderLibrary.Get("SolidColor"), m_VAO, transform);
+        Nebula::Renderer::Submit(solidColorShader, m_VAO, transform);
     }
 
     m_Texture->Bind(0);

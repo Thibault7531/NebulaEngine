@@ -102,8 +102,8 @@ namespace Nebula
         glBindTexture(GL_TEXTURE_2D, m_RendererID);
         glTexImage2D(GL_TEXTURE_2D, 0, GetOpenGL410InternalFormat(m_Specification.InternalFormat), m_Width, m_Height, 0, dataFormat, GL_UNSIGNED_BYTE, nullptr);
 
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GetOpenGL410FilterType(m_Specification.MinFilter));
-        glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GetOpenGL410FilterType(m_Specification.MagFilter));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetOpenGL410FilterType(m_Specification.MinFilter));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetOpenGL410FilterType(m_Specification.MagFilter));
 
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 

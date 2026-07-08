@@ -16,6 +16,7 @@ namespace Nebula
         bool HasClipOrigin = false;
 
         Ref<Shader> shader;
+        Ref<UniformBuffer> uniformBuffer;
         Ref<VertexBuffer> vertexBuffer;
         Ref<IndexBuffer> indexBuffer;
 

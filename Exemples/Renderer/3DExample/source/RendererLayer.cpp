@@ -76,8 +76,8 @@ void RendererLayer::OnAttach()
 
 	m_VAO->SetIndexBuffer(ibo);
 
-	m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/3DRendererExample/shaders/Texture.glsl").string());
-	m_ShaderLibrary.Load((Nebula::Platform::Files::GetResourcesPath() / "assets/3DRendererExample/shaders/Model.glsl").string());
+	m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/3DRendererExample/shaders/Texture.slang");
+	m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/3DRendererExample/shaders/Model.slang");
 
 	m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/3DRendererExample/textures/crafting_table_front.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
 	m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/3DRendererExample/textures/glass.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});

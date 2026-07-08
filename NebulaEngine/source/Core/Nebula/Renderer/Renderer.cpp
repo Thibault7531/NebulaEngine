@@ -2,6 +2,7 @@
 
 #include "Renderer2D.h"
 #include "Core/RenderCommand.h"
+#include "gtc/type_ptr.hpp"
 
 namespace Nebula {
 
@@ -15,16 +16,10 @@ namespace Nebula {
 
 		RenderCommand::Init(api);
 
-		RendererAPI::BlendState state;
-		state.enabled = true;
-		state.srcColorFactor = RendererAPI::BlendFactor::SourceAlpha;
-		state.dstColorFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
-		state.srcAlphaFactor = RendererAPI::BlendFactor::SourceAlpha;
-		state.dstAlphaFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
-		RenderCommand::SetBlendingState(state);
-		RenderCommand::EnableFaceCulling(true);
-		RenderCommand::EnableDepthTest(true);
-		RenderCommand::EnableScissorTest(false);
+		m_SceneData->m_UBO = UniformBuffer::Create({
+			{ShaderDataType::Mat4, "u_ViewProjection"},
+			{ShaderDataType::Mat4, "u_Transform"}
+		});
 
 		Renderer2D::Init();
 	}
@@ -35,6 +30,8 @@ namespace Nebula {
 
 		NB_CORE_INFO("Shutting down Nebula Renderer");
 		Renderer2D::Shutdown();
+
+		m_SceneData->m_UBO.reset();
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
@@ -44,17 +41,16 @@ namespace Nebula {
 
 	void Renderer::BeginScene(const PerspectiveCamera& camera)
 	{
+		SetRenderState();
 		m_SceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
+		m_SceneData->m_UBO->SetData(0, glm::value_ptr(m_SceneData->viewProjectionMatrix));
 	}
 
 	void Renderer::BeginScene(const OrthographicCamera& camera)
 	{
-		RenderCommand::SetBlendingState({.enabled = true});
-		RenderCommand::EnableFaceCulling(true);
-		RenderCommand::EnableDepthTest(true);
-		RenderCommand::EnableScissorTest(false);
-
+		SetRenderState();
 		m_SceneData->viewProjectionMatrix = camera.getViewProjectionMatrix();
+		m_SceneData->m_UBO->SetData(0, glm::value_ptr(m_SceneData->viewProjectionMatrix));
 	}
 
 	void Renderer::EndScene()
@@ -64,8 +60,8 @@ namespace Nebula {
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
 	{
 		shader->Bind();
-		shader->SetMat4("u_ViewProjection", m_SceneData->viewProjectionMatrix);
-		shader->SetMat4("u_Transform", transform);
+		m_SceneData->m_UBO->SetData(1, glm::value_ptr(transform));
+		shader->SetUniformBlock("RendererUBO", m_SceneData->m_UBO);
 
 		vertexArray->Bind();
 
@@ -78,11 +74,25 @@ namespace Nebula {
 	void Renderer::SubmitModel(const Ref<Shader>& shader, const Ref<Model>& model, const glm::mat4& transform)
 	{
 		shader->Bind();
-		shader->SetMat4("u_ViewProjection", m_SceneData->viewProjectionMatrix);
-		shader->SetMat4("u_Transform", transform);
+		m_SceneData->m_UBO->SetData(1, glm::value_ptr(transform));
+		shader->SetUniformBlock("RendererUBO", m_SceneData->m_UBO);
 
 		model->Draw();
 
 		shader->Unbind();
+	}
+
+	void Renderer::SetRenderState()
+	{
+		RendererAPI::BlendState state;
+		state.enabled = true;
+		state.srcColorFactor = RendererAPI::BlendFactor::SourceAlpha;
+		state.dstColorFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
+		state.srcAlphaFactor = RendererAPI::BlendFactor::SourceAlpha;
+		state.dstAlphaFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
+		RenderCommand::SetBlendingState(state);
+		RenderCommand::EnableFaceCulling(true);
+		RenderCommand::EnableDepthTest(true);
+		RenderCommand::EnableScissorTest(false);
 	}
 }

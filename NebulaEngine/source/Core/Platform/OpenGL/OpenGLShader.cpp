@@ -1,8 +1,12 @@
 #include "OpenGLShader.h"
 
+#include <regex>
+#include <slang.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Nebula {
+	bool OpenGLShader::s_IsSlangGlobalSessionCreated = false;
+	Slang::ComPtr<slang::IGlobalSession> OpenGLShader::s_GlobalSession;
 
 	static GLenum ShaderTypeFromString(const std::string& type)
 	{
@@ -19,7 +23,7 @@ namespace Nebula {
 		std::unordered_map<GLenum, std::string> shaderSources;
 		shaderSources[GL_VERTEX_SHADER] = vertexSrc;
 		shaderSources[GL_FRAGMENT_SHADER] = fragmentSrc;
-		Compile(shaderSources);
+		CompileGLSL(shaderSources);
 	}
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::filesystem::path& vertexPath,
@@ -29,18 +33,22 @@ namespace Nebula {
 		std::unordered_map<GLenum, std::string> shaderSources;
 		shaderSources[GL_VERTEX_SHADER] = ReadFile(vertexPath.string());
 		shaderSources[GL_FRAGMENT_SHADER] = ReadFile(fragmentPath.string());
-		Compile(shaderSources);
+		CompileGLSL(shaderSources);
 	}
 
 	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
 	{
 		NB_PROFILE_FUNCTION();
 
-		std::string shaderSource = ReadFile(filepath.string());
-        auto shaderSources = PreProcess(shaderSource);
-		Compile(shaderSources);
-
 		m_Name = filepath.stem().string();
+		std::string shaderSource = ReadFile(filepath.string());
+
+		if (filepath.extension() == ".slang") CompileSlang(shaderSource);
+		else
+		{
+			auto shaderSources = PreProcess(shaderSource);
+			CompileGLSL(shaderSources);
+		}
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -106,51 +114,75 @@ namespace Nebula {
 		UploadUniformMat4(name, value);
 	}
 
+	void OpenGLShader::SetUniformBlock(const std::string& name, Ref<UniformBuffer> ubo)
+	{
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformBlockIndex(m_RendererID, name.c_str());
+		ubo->BindToSlot(location);
+	}
+
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value) const
 	{
-		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);
 	}
 
 	void OpenGLShader::UploadUniformIntArray(const std::string &name, const int *value, const uint32_t count) const
 	{
-		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1iv(location, count, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value) const
 	{
-		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1f(location, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& vector) const
 	{
-		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform2fv(location, 1, glm::value_ptr(vector));
 	}
 
 	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& vector) const
 	{
-		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform3fv(location, 1, glm::value_ptr(vector));
 	}
 
 	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& vector) const
 	{
-		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform4fv(location, 1, glm::value_ptr(vector));
 	}
 
 	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const
 	{
-		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const
 	{
-		const GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		GLint location = 0;
+		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
+		else location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
@@ -201,7 +233,7 @@ namespace Nebula {
 		return result;
 	}
 
-	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
+	void OpenGLShader::CompileGLSL(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
 		NB_PROFILE_FUNCTION();
 
@@ -272,5 +304,119 @@ namespace Nebula {
 		}
 
 		m_RendererID = program;
+	}
+
+	void OpenGLShader::CompileSlang(const std::string& shader)
+	{
+		if (!s_IsSlangGlobalSessionCreated)
+		{
+			slang::createGlobalSession(s_GlobalSession.writeRef());
+
+			s_IsSlangGlobalSessionCreated = true;
+		}
+
+		std::unordered_map<GLenum, std::string> shaderSources;
+
+		slang::SessionDesc sessionDesc = {};
+		slang::TargetDesc targetDesc = {};
+		targetDesc.format = SLANG_GLSL;
+		targetDesc.profile = s_GlobalSession->findProfile("glsl_460");
+
+		sessionDesc.targets = &targetDesc;
+		sessionDesc.targetCount = 1;
+
+		Slang::ComPtr<slang::ISession> session;
+		s_GlobalSession->createSession(sessionDesc, session.writeRef());
+
+		session->createCompileRequest(m_CompileRequest.writeRef());
+
+		int translationUnitIdx = m_CompileRequest->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, m_Name.c_str());
+		m_CompileRequest->addTranslationUnitSourceString(translationUnitIdx, m_Name.c_str(), shader.c_str());
+
+		int vertexEntryPointIdx = m_CompileRequest->addEntryPoint(translationUnitIdx, "vertexMain", SLANG_STAGE_VERTEX);
+		int fragmentEntryPointIdx = m_CompileRequest->addEntryPoint(translationUnitIdx, "fragmentMain", SLANG_STAGE_FRAGMENT);
+
+		const SlangResult vertexCompileResult = m_CompileRequest->compile();
+		NB_CORE_ASSERT(SLANG_SUCCEEDED(vertexCompileResult), "Slang compilation failed !");
+
+		m_CompileRequest->getProgramWithEntryPoints(m_ProgramReflection.writeRef());
+
+		std::regex setFirstPattern(R"(\bset\s*=\s*\d+\s*,\s*)");
+		std::regex setLastPattern(R"(,\s*\bset\s*=\s*\d+)");
+		size_t outputSize = 0;
+
+		std::string vertexSource = static_cast<const char*>(m_CompileRequest->getEntryPointCode(vertexEntryPointIdx, &outputSize));
+		std::string cleanedVertexSource = std::regex_replace(vertexSource, setFirstPattern, "");
+		cleanedVertexSource = std::regex_replace(cleanedVertexSource, setLastPattern, "");
+
+		std::string fragmentSource = static_cast<const char*>(m_CompileRequest->getEntryPointCode(fragmentEntryPointIdx, &outputSize));
+		std::string cleanedFragmentSource = std::regex_replace(fragmentSource, setFirstPattern, "");
+		cleanedFragmentSource = std::regex_replace(cleanedFragmentSource, setLastPattern, "");
+
+		shaderSources[GL_VERTEX_SHADER] = cleanedVertexSource;
+		shaderSources[GL_FRAGMENT_SHADER] = cleanedFragmentSource;
+
+		CompileGLSL(shaderSources);
+
+		m_IsSlangShader = true;
+	}
+
+	uint32_t OpenGLShader::GetSlangUniformLocation(const std::string& name) const
+	{
+		slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout(0);
+		uint32_t paramCount = programLayout->getParameterCount();
+
+		uint32_t paramIndex = 0;
+		slang::VariableLayoutReflection* uniformLayout = nullptr;
+		while (paramIndex < paramCount && !uniformLayout)
+		{
+			slang::VariableLayoutReflection* paramLayout = programLayout->getParameterByIndex(paramIndex);
+			if (strcmp(paramLayout->getVariable()->getName(), name.c_str()) == 0) uniformLayout = paramLayout;
+			paramIndex++;
+		}
+
+		if (uniformLayout)
+		{
+			slang::TypeReflection* type = uniformLayout->getTypeLayout()->getType();
+			switch (type->getKind())
+			{
+			case slang::TypeReflection::Kind::Resource:
+				{
+					SlangResourceShape shape = type->getResourceShape();
+					uint32_t baseShape = shape & SLANG_RESOURCE_BASE_SHAPE_MASK;
+
+					if (baseShape == SLANG_TEXTURE_2D)
+					{
+						return uniformLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+					}
+					return 0;
+				}
+
+			case slang::TypeReflection::Kind::ConstantBuffer:
+			case slang::TypeReflection::Kind::ParameterBlock:
+			case slang::TypeReflection::Kind::Struct:
+				{
+					return uniformLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+				}
+
+			case slang::TypeReflection::Kind::Scalar:
+			case slang::TypeReflection::Kind::Vector:
+			case slang::TypeReflection::Kind::Matrix:
+				{
+					uint32_t categoryCount = uniformLayout->getCategoryCount();
+					for (uint32_t i = 0; i < categoryCount; i++)
+					{
+						slang::ParameterCategory category = uniformLayout->getCategoryByIndex(i);
+						if (category == slang::ParameterCategory::Uniform) return uniformLayout->getOffset(category);
+					}
+				}
+
+			default:
+				{
+					return 0;
+				}
+			}
+		}
+		return 0;
 	}
 }

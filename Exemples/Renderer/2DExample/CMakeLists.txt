@@ -74,6 +74,18 @@ if (nebula_cmake_platform STREQUAL Windows)
             COMMAND ${CMAKE_COMMAND}
             ARGS -E copy "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.Foundation.2.0.21/runtimes/win-x64/native/Microsoft.WindowsAppRuntime.Bootstrap.dll" "$<TARGET_FILE_DIR:Renderer2DExample>/Microsoft.WindowsAppRuntime.Bootstrap.dll"
     )
+    add_custom_command(
+            TARGET Renderer2DExample
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy "${CMAKE_BINARY_DIR}/_deps/slang_prebuilt-src/bin/slang.dll" "$<TARGET_FILE_DIR:Renderer2DExample>/slang.dll"
+    )
+    add_custom_command(
+            TARGET Renderer2DExample
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy "${CMAKE_BINARY_DIR}/_deps/slang_prebuilt-src/bin/slang-compiler.dll" "$<TARGET_FILE_DIR:Renderer2DExample>/slang-compiler.dll"
+    )
 
 elseif (nebula_cmake_platform STREQUAL MacOS)
     set_target_properties(Renderer2DExample PROPERTIES

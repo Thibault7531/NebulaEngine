@@ -83,6 +83,19 @@ if (nebula_cmake_platform STREQUAL Windows)
             COMMAND ${CMAKE_COMMAND}
             ARGS -E copy "${CMAKE_BINARY_DIR}/generated/deps/Microsoft.WindowsAppSDK.Foundation.2.0.21/runtimes/win-x64/native/Microsoft.WindowsAppRuntime.Bootstrap.dll" "$<TARGET_FILE_DIR:NebulaEditor>/Microsoft.WindowsAppRuntime.Bootstrap.dll"
     )
+    add_custom_command(
+            TARGET NebulaEditor
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy "${CMAKE_BINARY_DIR}/_deps/slang_prebuilt-src/bin/slang.dll" "$<TARGET_FILE_DIR:NebulaEditor>/slang.dll"
+    )
+    add_custom_command(
+            TARGET NebulaEditor
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy "${CMAKE_BINARY_DIR}/_deps/slang_prebuilt-src/bin/slang-compiler.dll" "$<TARGET_FILE_DIR:NebulaEditor>/slang-compiler.dll"
+    )
+
 
 elseif (nebula_cmake_platform STREQUAL Linux)
     target_compile_definitions(NebulaEditor PUBLIC NB_PLATFORM_LINUX)

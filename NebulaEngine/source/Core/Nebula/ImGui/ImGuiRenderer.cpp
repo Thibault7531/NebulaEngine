@@ -122,8 +122,9 @@ namespace Nebula
         };
 
         renderer_data.shader->Bind();
-        renderer_data.shader->SetMat4("ProjMtx", ortho_projection);
-        renderer_data.shader->SetInt("Texture", 0);
+        renderer_data.uniformBuffer->SetData(0, &ortho_projection);
+        renderer_data.shader->SetUniformBlock("ImGuiUBO", renderer_data.uniformBuffer);
+        renderer_data.shader->SetInt("u_Texture", 0);
         renderer_data.shader->Unbind();
 
         vertexArray->Bind();
@@ -278,7 +279,10 @@ namespace Nebula
         ImGuiIO& io = ImGui::GetIO();
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
 
-        renderer_data.shader = Shader::Create("ImGui", Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/ImGui.vsh", Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/ImGui.fsh");
+        renderer_data.shader = Shader::Create(Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/ImGui.slang");
+        renderer_data.uniformBuffer = UniformBuffer::Create({
+            {ShaderDataType::Mat4, "u_ProjectionMatrix"}
+        });
         renderer_data.vertexBuffer = VertexBuffer::Create(IMGUI_MAX_VTX_BUFFER_SIZE);
         renderer_data.vertexBuffer->SetLayout({
             { ShaderDataType::Float2, "a_Position" },
@@ -294,6 +298,7 @@ namespace Nebula
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
 
         renderer_data.shader.reset();
+        renderer_data.uniformBuffer.reset();
         renderer_data.vertexBuffer.reset();
         renderer_data.indexBuffer.reset();
     }

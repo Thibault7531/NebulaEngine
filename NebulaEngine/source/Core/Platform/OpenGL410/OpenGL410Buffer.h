@@ -46,4 +46,25 @@ namespace Nebula {
 		uint32_t m_Count;
 	};
 
+	class OpenGL410UniformBuffer : public UniformBuffer
+	{
+	public:
+		OpenGL410UniformBuffer(const BufferLayout& layout);
+		virtual ~OpenGL410UniformBuffer() override;
+
+		virtual void Bind() const override;
+		virtual void Unbind() const override;
+
+		virtual void BindToSlot(uint32_t slot) const override;
+
+		virtual void SetData(uint32_t index, const void* data) override;
+
+		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
+		virtual void SetLayout(const BufferLayout& layout) override;
+
+	private:
+		uint32_t m_RendererID;
+		BufferLayout m_Layout;
+	};
+
 }

@@ -156,4 +156,23 @@ namespace Nebula {
 		static Ref<IndexBuffer> Create(uint32_t* Indices, uint32_t count);
 	};
 
+	class UniformBuffer
+	{
+	public:
+		virtual ~UniformBuffer() = default;
+
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
+
+		virtual void BindToSlot(uint32_t slot = 0) const = 0;
+
+		virtual void SetData(uint32_t index, const void* data) = 0;
+
+		virtual const BufferLayout& GetLayout() const = 0;
+		virtual void SetLayout(const BufferLayout& layout) = 0;
+
+	public:
+		static Ref<UniformBuffer> Create(const BufferLayout& layout);
+	};
+
 }

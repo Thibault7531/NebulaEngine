@@ -42,16 +42,6 @@ namespace Nebula
         static void NextBash();
         static void Flush();
 
-        [[deprecated]] static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
-        [[deprecated]] static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
-        [[deprecated]] static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float tilingFactor = 1.0f);
-        [[deprecated]] static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float tilingFactor = 1.0f);
-
-        [[deprecated]] static void DrawRotatedQuad(const glm::vec2& position, const float& rotation, const glm::vec2& size, const glm::vec4& color);
-        [[deprecated]] static void DrawRotatedQuad(const glm::vec3& position, const float& rotation, const glm::vec2& size, const glm::vec4& color);
-        [[deprecated]] static void DrawRotatedQuad(const glm::vec2& position, const float& rotation, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float tilingFactor = 1.0f);
-        [[deprecated]] static void DrawRotatedQuad(const glm::vec3& position, const float& rotation, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec4& color = {1.0f, 1.0f, 1.0f, 1.0f}, float tilingFactor = 1.0f);
-
         static void DrawQuad(const QuadProperties& properties);
         static void DrawQuad(const QuadPropertiesAdvanced& properties);
 
@@ -65,6 +55,9 @@ namespace Nebula
         };
         static Statistics GetStatistics();
         static void ResetStats();
+
+    private:
+        static void SetupRenderState();
 
     };
 
