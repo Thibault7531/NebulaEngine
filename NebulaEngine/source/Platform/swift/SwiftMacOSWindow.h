@@ -4180,11 +4180,12 @@ SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V4ShowyyF(SWIFT_CONTEXT const void * _
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V4HideyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Hide()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V5RaiseyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Raise()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V5FlashyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Flash()
-SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V10GetContextSo6NebulaO8PlatformO06OpenGlE0VyF(SWIFT_INDIRECT_RESULT void * _Nonnull, SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetContext()
+SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V16GetOpenGLContextSo6NebulaO8PlatformO0E9GlContextVSgyF(SWIFT_INDIRECT_RESULT void * _Nonnull, SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetOpenGLContext()
+SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V16GetMetal3ContextSo6NebulaO8PlatformO0eF0VSgyF(SWIFT_INDIRECT_RESULT void * _Nonnull, SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetMetal3Context()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V17SetCurrentContextyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // SetCurrentContext()
 SWIFT_EXTERN uint32_t $s16SwiftMacOSWindow0bC0V5GetIDs6UInt32VyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetID()
 struct SwiftMacOSWindow_MacOSWindow {
-  _Alignas(8) char _storage[128];
+  _Alignas(8) char _storage[192];
 };
 
 // Stub struct to be used to pass/return values to/from Swift functions.
@@ -4262,6 +4263,35 @@ struct TypeMetadataTrait<Nebula::Platform::OpenGlContext> {
 namespace _impl{
 template<>
 inline const constexpr bool isSwiftBridgedCxxRecord<Nebula::Platform::OpenGlContext> = true;
+} // namespace
+#pragma clang diagnostic pop
+} // namespace swift
+
+namespace SwiftMacOSWindow SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("SwiftMacOSWindow") {
+namespace _impl {
+
+// Type metadata accessor for Metal3Context
+SWIFT_EXTERN swift::_impl::MetadataResponseTy $sSo6NebulaO8PlatformO13Metal3ContextVMa(swift::_impl::MetadataRequestTy) SWIFT_NOEXCEPT SWIFT_CALL;
+
+
+} // namespace _impl
+
+} // end namespace 
+
+namespace swift SWIFT_PRIVATE_ATTR {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+template<>
+inline const constexpr bool isUsableInGenericContext<Nebula::Platform::Metal3Context> = true;
+template<>
+struct TypeMetadataTrait<Nebula::Platform::Metal3Context> {
+  static SWIFT_INLINE_PRIVATE_HELPER void * _Nonnull getTypeMetadata() {
+    return SwiftMacOSWindow::_impl::$sSo6NebulaO8PlatformO13Metal3ContextVMa(0)._0;
+  }
+};
+namespace _impl{
+template<>
+inline const constexpr bool isSwiftBridgedCxxRecord<Nebula::Platform::Metal3Context> = true;
 } // namespace
 #pragma clang diagnostic pop
 } // namespace swift
@@ -4354,7 +4384,8 @@ public:
   SWIFT_INLINE_THUNK void Hide() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V4HideyyF");
   SWIFT_INLINE_THUNK void Raise() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5RaiseyyF");
   SWIFT_INLINE_THUNK void Flash() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5FlashyyF");
-  SWIFT_INLINE_THUNK Nebula::Platform::OpenGlContext GetContext() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V10GetContextSo6NebulaO8PlatformO06OpenGlE0VyF");
+  SWIFT_INLINE_THUNK swift::Optional<Nebula::Platform::OpenGlContext> GetOpenGLContext() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V16GetOpenGLContextSo6NebulaO8PlatformO0E9GlContextVSgyF");
+  SWIFT_INLINE_THUNK swift::Optional<Nebula::Platform::Metal3Context> GetMetal3Context() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V16GetMetal3ContextSo6NebulaO8PlatformO0eF0VSgyF");
   SWIFT_INLINE_THUNK void SetCurrentContext() SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V17SetCurrentContextyyF");
   SWIFT_INLINE_THUNK uint32_t GetID() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5GetIDs6UInt32VyF");
 private:
@@ -4363,7 +4394,7 @@ private:
   SWIFT_INLINE_THUNK const char * _Nonnull _getOpaquePointer() const noexcept { return _storage; }
   SWIFT_INLINE_THUNK char * _Nonnull _getOpaquePointer() noexcept { return _storage; }
 
-  alignas(8) char _storage[128];
+  alignas(8) char _storage[192];
   friend class _impl::_impl_MacOSWindow;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc++17-extensions"
@@ -4598,13 +4629,15 @@ return result;
   SWIFT_INLINE_THUNK void MacOSWindow::Flash() const {
   SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V5FlashyyF(_getOpaquePointer());
   }
-  SWIFT_INLINE_THUNK Nebula::Platform::OpenGlContext MacOSWindow::GetContext() const {
-alignas(alignof(Nebula::Platform::OpenGlContext)) char storage[sizeof(Nebula::Platform::OpenGlContext)];
-auto * _Nonnull storageObjectPtr = reinterpret_cast<Nebula::Platform::OpenGlContext *>(storage);
-SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V10GetContextSo6NebulaO8PlatformO06OpenGlE0VyF(storage, _getOpaquePointer());
-Nebula::Platform::OpenGlContext result(static_cast<Nebula::Platform::OpenGlContext &&>(*storageObjectPtr));
-storageObjectPtr->~OpenGlContext();
-return result;
+  SWIFT_INLINE_THUNK swift::Optional<Nebula::Platform::OpenGlContext> MacOSWindow::GetOpenGLContext() const {
+  return swift::_impl::_impl_Optional<Nebula::Platform::OpenGlContext>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
+    SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V16GetOpenGLContextSo6NebulaO8PlatformO0E9GlContextVSgyF(result, _getOpaquePointer());
+  });
+  }
+  SWIFT_INLINE_THUNK swift::Optional<Nebula::Platform::Metal3Context> MacOSWindow::GetMetal3Context() const {
+  return swift::_impl::_impl_Optional<Nebula::Platform::Metal3Context>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
+    SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V16GetMetal3ContextSo6NebulaO8PlatformO0eF0VSgyF(result, _getOpaquePointer());
+  });
   }
   SWIFT_INLINE_THUNK void MacOSWindow::SetCurrentContext() {
   SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V17SetCurrentContextyyF(_getOpaquePointer());

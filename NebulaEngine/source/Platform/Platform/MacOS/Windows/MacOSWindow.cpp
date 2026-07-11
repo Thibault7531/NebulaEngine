@@ -159,8 +159,11 @@ namespace Nebula::Platform
     {
         if (!m_Context)
         {
-            OpenGlContext context = m_NativeWindow.GetContext();
-            m_Context = CreateRef<OpenGlContext>(context);
+            swift::Optional<Metal3Context> mtlContext = m_NativeWindow.GetMetal3Context();
+            if (!mtlContext.isNone()) m_Context = CreateRef<Metal3Context>(mtlContext.get());
+
+            swift::Optional<OpenGlContext> oglContext = m_NativeWindow.GetOpenGLContext();
+            if (!oglContext.isNone()) m_Context = CreateRef<OpenGlContext>(oglContext.get());
         }
         return m_Context;
     }

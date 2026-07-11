@@ -23,3 +23,6 @@
 [submodule "NebulaEngine/vendor/ImGuizmo"]
 	path = NebulaEngine/vendor/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
+[submodule "NebulaEngine/vendor/metal-cpp"]
+	path = NebulaEngine/vendor/metal-cpp
+	url = https://github.com/apple/metal-cpp.git

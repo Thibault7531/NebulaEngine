@@ -1,4 +1,5 @@
 # Platform Examples
+add_subdirectory(Platform/Metal3Example)
 add_subdirectory(Platform/OpenGLExample)
 
 # Renderer Examples

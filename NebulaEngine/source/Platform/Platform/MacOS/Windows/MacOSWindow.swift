@@ -1,4 +1,5 @@
 import NebulaPlatformWindow
+import NebulaMetalContext
 import NebulaOpenGLContext
 import NebulaEventHandler
 
@@ -10,7 +11,8 @@ public struct MacOSWindow {
     let m_Properties: Nebula.Platform.WindowProperties
     let m_Window: NSWindow
     var m_WindowStyle: NSWindow.StyleMask
-    var m_OGLContext: Nebula.Platform.OpenGlContext
+    var m_MTL3Context: Nebula.Platform.Metal3Context?
+    var m_OGLContext: Nebula.Platform.OpenGlContext?
     var m_EventHandler: Nebula.Platform.EventHandler
     var m_WindowTrackingArea: NSTrackingArea
     var m_WindowDelegate: MacOSWindowDelegate
@@ -79,7 +81,11 @@ public struct MacOSWindow {
         m_Window.makeKeyAndOrderFront(nil)
         m_Window.setIsVisible(true)
         
-        m_OGLContext = Nebula.Platform.OpenGlContext(Int32(m_Window.windowNumber))
+        if (m_Properties.API == .OpenGL410) { m_OGLContext = Nebula.Platform.OpenGlContext(Int32(m_Window.windowNumber)) }
+        if (m_Properties.API == .Metal3) {
+            let ptr = Unmanaged.passUnretained(m_Window).toOpaque()
+            m_MTL3Context = Nebula.Platform.Metal3Context(ptr)
+        }
         
         m_WindowTrackingArea = NSTrackingArea(rect: .zero, options: options, owner: nil, userInfo: nil)
         MainActor.assumeIsolated {
@@ -215,10 +221,10 @@ public struct MacOSWindow {
         }
     }
     public mutating func SwapBuffers() {
-        m_OGLContext.SwapBuffers()
+        m_OGLContext?.SwapBuffers()
     }
     public mutating func Present(framebuffer: UInt32) {
-        m_OGLContext.Present(framebuffer)
+        m_OGLContext?.Present(framebuffer)
     }
     
     public func GetWindowWidth() -> UInt32 {
@@ -283,10 +289,12 @@ public struct MacOSWindow {
     }
     
     public mutating func SetVSync(mode: Nebula.Platform.VSyncMode) {
-        m_OGLContext.SetVSync(mode)
+        m_OGLContext?.SetVSync(mode)
     }
     public func IsVSync() -> Nebula.Platform.VSyncMode {
-        return m_OGLContext.IsVsync()
+        var mode: Nebula.Platform.VSyncMode = .Off
+        if (m_OGLContext != nil) {mode = m_OGLContext!.IsVsync()}
+        return mode
     }
     public func SetFullscreen(enabled: Bool) {
         if (m_Window.contentView!.isInFullScreenMode == enabled) { return }
@@ -332,12 +340,16 @@ public struct MacOSWindow {
         NSApplication.shared.requestUserAttention(.informationalRequest)
     }
     
-    public func GetContext() -> Nebula.Platform.OpenGlContext {
+    public func GetOpenGLContext() -> Nebula.Platform.OpenGlContext? {
         return m_OGLContext
     }
     
+    public func GetMetal3Context() -> Nebula.Platform.Metal3Context? {
+        return m_MTL3Context
+    }
+    
     public mutating func SetCurrentContext() {
-        m_OGLContext.SetCurrent()
+        m_OGLContext?.SetCurrent()
     }
     
     public func GetID() -> UInt32 {

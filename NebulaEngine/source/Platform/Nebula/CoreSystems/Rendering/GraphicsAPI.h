@@ -5,6 +5,7 @@ namespace Nebula::Platform
     enum class GraphicsAPI
     {
         None,
+        Metal3,
         OpenGL410,
         OpenGL460
     };
