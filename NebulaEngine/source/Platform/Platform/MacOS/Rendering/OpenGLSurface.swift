@@ -2,7 +2,7 @@ import NebulaPlatformWindow
 
 import AppKit
 
-public struct OpenGLContext {
+public struct OpenGLSurface {
     let m_Window: NSWindow
     let m_OGLContext: NSOpenGLContext
     nonisolated(unsafe) private static var s_MainOGLContext: NSOpenGLContext? = nil
@@ -20,24 +20,25 @@ public struct OpenGLContext {
         ]
         
         let pf: NSOpenGLPixelFormat? = NSOpenGLPixelFormat(attributes: attribs)
-        m_OGLContext = NSOpenGLContext(format: pf!, share: OpenGLContext.s_MainOGLContext)!
+        m_OGLContext = NSOpenGLContext(format: pf!, share: OpenGLSurface.s_MainOGLContext)!
         m_OGLContext.view = m_Window.contentView
         m_OGLContext.makeCurrentContext()
         
-        if (OpenGLContext.s_MainOGLContext == nil) {
-            OpenGLContext.s_MainOGLContext = m_OGLContext
+        if (OpenGLSurface.s_MainOGLContext == nil) {
+            OpenGLSurface.s_MainOGLContext = m_OGLContext
         }
     }
     
-    public func SetCurrent() {
+    public func NewFrame() {
         m_OGLContext.makeCurrentContext()
     }
-    public func SetVSync(mode: NebulaPlatformWindow.Nebula.Platform.VSyncMode) {
+    
+    public func SetVSync(mode: NebulaPlatformWindow.Nebula.Graphics.VSyncMode) {
         var newMode: [GLint] = [1]
         if (mode == .Off) { newMode[0] = 0 }
         m_OGLContext.setValues(newMode, for: .swapInterval)
     }
-    public func IsVSync() -> NebulaPlatformWindow.Nebula.Platform.VSyncMode {
+    public func IsVSync() -> NebulaPlatformWindow.Nebula.Graphics.VSyncMode {
         var mode: [GLint] = [0]
         let p_mode: UnsafeMutablePointer = UnsafeMutablePointer<GLint>.allocate(capacity: 1)
         p_mode.initialize(from: &mode, count: 1)
@@ -46,6 +47,7 @@ public struct OpenGLContext {
         if (mode[0] == 0) { return .Off }
         else { return .On }
     }
+    
     public func SwapBuffers() {
         MainActor.assumeIsolated {
             m_OGLContext.update()
@@ -54,6 +56,6 @@ public struct OpenGLContext {
     }
 }
 
-public func CreateOpenGLContext(windowID: Int32) -> OpenGLContext {
-    return OpenGLContext(windowID: windowID)
+public func CreateOpenGLSurface(windowID: Int32) -> OpenGLSurface {
+    return OpenGLSurface(windowID: windowID)
 }

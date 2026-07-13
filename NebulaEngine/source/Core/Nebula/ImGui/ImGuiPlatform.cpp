@@ -163,7 +163,7 @@ namespace Nebula
         auto* viewport_data = new ViewportData;
         viewport_data->Window = platform_data.Window;
         viewport_data->WindowOwned = false;
-        viewport_data->GraphicsContext = platform_data.Window->GetContext();
+        viewport_data->GraphicsContext = platform_data.Window->GetSurface();
         main_viewport->PlatformUserData = viewport_data;
         main_viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(platform_data.Window->GetID()));
     }
@@ -648,7 +648,7 @@ namespace Nebula
         viewport_data->WindowOwned = true;
         if (RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460 || RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL410)
         {
-            viewport_data->GraphicsContext = viewport_data->Window->GetContext();
+            viewport_data->GraphicsContext = viewport_data->Window->GetSurface();
             viewport_data->Window->SetVSync(viewport_data->ParentWindow ? viewport_data->ParentWindow->IsVSync() : Platform::VSyncMode::Adaptive);
             viewport_data->GraphicsContext->SetCurrent();
         }

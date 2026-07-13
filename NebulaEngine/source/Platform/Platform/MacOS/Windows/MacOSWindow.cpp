@@ -5,6 +5,17 @@ namespace Nebula::Platform
     MacOSWindow::MacOSWindow(WindowProperties props)
         : m_EventHandler{this}, m_NativeWindow{SwiftMacOSWindow::CreateMacOSWindow(props, m_EventHandler)}
     {
+        m_Properties = props;
+        if (m_Properties.API == GraphicsAPI::Metal3)
+        {
+            auto* mtlContext = static_cast<Graphics::Surface*>(m_NativeWindow.GetMetal3Context());
+            m_GrahicsSurface = std::shared_ptr<Graphics::Surface>(mtlContext);
+        }
+        if (m_Properties.API == GraphicsAPI::OpenGL410)
+        {
+            auto* glContext = static_cast<Graphics::Surface*>(m_NativeWindow.GetOpenGLContext());
+            m_GrahicsSurface = std::shared_ptr<Graphics::Surface>(glContext);
+        }
     }
 
     MacOSWindow::~MacOSWindow()
@@ -23,12 +34,7 @@ namespace Nebula::Platform
         m_NativeWindow.OnUpdate();
     }
 
-    void MacOSWindow::SwapBuffers()
-    {
-        m_NativeWindow.SwapBuffers();
-    }
-
-    void MacOSWindow::Present(uint32_t framebuffer)
+    void MacOSWindow::Present(void* framebuffer)
     {
         m_NativeWindow.Present(framebuffer);
     }
@@ -80,12 +86,12 @@ namespace Nebula::Platform
 
     void MacOSWindow::CaptureMouse(bool enabled) {}
 
-    void MacOSWindow::SetVSync(VSyncMode mode)
+    void MacOSWindow::SetVSync(Graphics::VSyncMode mode)
     {
         m_NativeWindow.SetVSync(mode);
     }
 
-    VSyncMode MacOSWindow::IsVSync() const
+    Graphics::VSyncMode MacOSWindow::IsVSync() const
     {
         return m_NativeWindow.IsVSync();
     }
@@ -155,22 +161,9 @@ namespace Nebula::Platform
         m_NativeWindow.Flash();
     }
 
-    Ref<Context> MacOSWindow::GetContext()
+    Ref<Graphics::Surface> MacOSWindow::GetSurface()
     {
-        if (!m_Context)
-        {
-            swift::Optional<Metal3Context> mtlContext = m_NativeWindow.GetMetal3Context();
-            if (!mtlContext.isNone()) m_Context = CreateRef<Metal3Context>(mtlContext.get());
-
-            swift::Optional<OpenGlContext> oglContext = m_NativeWindow.GetOpenGLContext();
-            if (!oglContext.isNone()) m_Context = CreateRef<OpenGlContext>(oglContext.get());
-        }
-        return m_Context;
-    }
-
-    void MacOSWindow::SetCurrentContext()
-    {
-        m_NativeWindow.SetCurrentContext();
+        return m_GrahicsSurface;
     }
 
     void* MacOSWindow::GetNativeWindow()
