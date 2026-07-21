@@ -12,7 +12,7 @@
 #include "Nebula.h"
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/Renderer/Buffers/Framebuffer.h"
-#include "Nebula/Renderer/Core/RenderCommand.h"
+#include "../../NebulaEngine/source/Core/Nebula/Graphics/Core/RenderCommand.h"
 #include "Nebula/Scene/SceneSerializer.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Platform/Nebula/Dialogs/FileDialogs.h"

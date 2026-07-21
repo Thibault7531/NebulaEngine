@@ -27,6 +27,12 @@ namespace Nebula::Graphics
         return m_NativeSurface.IsVSync();
     }
 
+    void OpenGlSurface::Resize(uint32_t width, uint32_t height)
+    {
+        NewFrame();
+        glViewport(0, 0, width, height);
+    }
+
     void OpenGlSurface::NewFrame()
     {
         m_NativeSurface.NewFrame();

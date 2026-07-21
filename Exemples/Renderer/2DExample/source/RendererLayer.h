@@ -16,15 +16,15 @@ public:
     virtual void OnEvent(Nebula::Platform::Event& event) override;
 
 private:
-    Nebula::ShaderLibrary m_ShaderLibrary;
+    Nebula::Graphics::ShaderLibrary m_ShaderLibrary;
 
-    Nebula::Ref<Nebula::VertexArray> m_VAO;
-    Nebula::Ref<Nebula::UniformBuffer> m_ColorUBO;
+    Nebula::Ref<Nebula::Graphics::VertexArray> m_VAO;
+    Nebula::Ref<Nebula::Graphics::UniformBuffer> m_ColorUBO;
 
-    Nebula::Ref<Nebula::Texture2D> m_Texture, m_Glass;
+    Nebula::Ref<Nebula::Graphics::Texture2D> m_Texture, m_Glass;
 
     Nebula::OrthographicCameraController m_CameraController;
 
     glm::vec3 m_Position;
-    glm::vec3 m_Color;
+    glm::vec3 m_Color {0.f, 0.f, 0.f};
 };

@@ -51,6 +51,11 @@ namespace Nebula::Graphics
         return VSyncMode::Off;
     }
 
+    void Metal3Surface::Resize(uint32_t width, uint32_t height)
+    {
+        static_cast<CA::MetalLayer*>(m_MetalLayer)->setDrawableSize(CGSize(width, height));
+    }
+
     void Metal3Surface::NewFrame()
     {
         m_MetalDrawable = static_cast<CA::MetalLayer*>(m_MetalLayer)->nextDrawable();

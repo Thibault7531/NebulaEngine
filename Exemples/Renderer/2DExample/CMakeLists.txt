@@ -29,11 +29,13 @@ target_include_directories(Renderer2DExample PRIVATE
         ../../../NebulaEngine/vendor/spdlog/include
         ../../../NebulaEngine/vendor/SDL3/include/SDL3
         ../../../NebulaEngine/vendor/SDL3/include
+        ../../../NebulaEngine/vendor/stb_image
         ../../../NebulaEngine/vendor/imgui
         ../../../NebulaEngine/vendor/entt/single_include
         ../../../NebulaEngine/vendor/Glad/include
         ../../../NebulaEngine/vendor/glm
         ../../../NebulaEngine/vendor/glm/glm
+        ../../../NebulaEngine/vendor/metal-cpp
 )
 
 

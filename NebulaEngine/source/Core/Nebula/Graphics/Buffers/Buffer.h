@@ -1,43 +1,13 @@
 #pragma once
+#include <cstdint>
+#include <vector>
 
-#include "Nebula/CoreSystems/Core/Core.h"
+#include "Core/Nebula/CoreSystems/Core/Core.h"
+#include "Core/Nebula/CoreSystems/Core/Log.h"
+#include "Nebula/Graphics/ShaderPipeline.h"
 
-namespace Nebula {
-
-	enum class ShaderDataType
-	{
-		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Byte, Byte2, Byte3, Byte4, UByte, UByte2, UByte3, UByte4, Int, Int2, Int3, Int4, Bool
-	};
-
-	static uint32_t ShaderDataTypeSize(ShaderDataType type)
-	{
-		switch (type)
-		{
-		case ShaderDataType::Float: return 4;
-		case ShaderDataType::Float2: return 4 * 2;
-		case ShaderDataType::Float3: return 4 * 3;
-		case ShaderDataType::Float4: return 4 * 4;
-		case ShaderDataType::Mat3: return 4 * 3 * 3;
-		case ShaderDataType::Mat4: return 4 * 4 * 4;
-		case ShaderDataType::Byte: return 1;
-		case ShaderDataType::Byte2: return 2;
-		case ShaderDataType::Byte3: return 3;
-		case ShaderDataType::Byte4: return 4;
-		case ShaderDataType::UByte: return 1;
-		case ShaderDataType::UByte2: return 2;
-		case ShaderDataType::UByte3: return 3;
-		case ShaderDataType::UByte4: return 4;
-		case ShaderDataType::Int: return 4;
-		case ShaderDataType::Int2: return 4 * 2;
-		case ShaderDataType::Int3: return 4 * 3;
-		case ShaderDataType::Int4: return 4 * 4;
-		case ShaderDataType::Bool: return 1;
-		default: break;
-		}
-
-		NB_CORE_ASSERT(false, "Unknown ShaderDataType!");
-		return 0;
-	}
+namespace Nebula::Graphics
+{
 
 	struct BufferElement
 	{
@@ -62,8 +32,8 @@ namespace Nebula {
 			case ShaderDataType::Float2: return 2;
 			case ShaderDataType::Float3: return 3;
 			case ShaderDataType::Float4: return 4;
-			case ShaderDataType::Mat3: return 3 * 3;
-			case ShaderDataType::Mat4: return 4 * 4;
+			case ShaderDataType::Matrix3: return 3 * 3;
+			case ShaderDataType::Matrix4: return 4 * 4;
 			case ShaderDataType::Byte: return 1;
 			case ShaderDataType::Byte2: return 2;
 			case ShaderDataType::Byte3: return 3;
@@ -122,21 +92,24 @@ namespace Nebula {
 		uint32_t m_Stride;
 	};
 
+	enum class BufferDataType
+	{
+		UInt16,
+		UInt32
+	};
+
 	class VertexBuffer
 	{
 	public:
 		virtual ~VertexBuffer() = default;
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
-		virtual void SetData(const void* data, uint32_t size) = 0;
+		virtual void SetData(const void* data, uint32_t size, uint32_t offset = 0) = 0;
 
 		[[nodiscard]] virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
-		static Ref<VertexBuffer> Create(uint32_t size);
-		static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
+		//static Ref<VertexBuffer> Create(uint32_t size);
+		//static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
 	};
 
 	class IndexBuffer
@@ -144,27 +117,20 @@ namespace Nebula {
 	public:
 		virtual ~IndexBuffer() = default;
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
-		virtual void SetData(uint16_t* indices, uint32_t count) = 0;
-		virtual void SetData(uint32_t* indices, uint32_t count) = 0;
+		virtual void SetData(uint16_t* indices, uint32_t count, uint32_t offset = 0) = 0;
+		virtual void SetData(uint32_t* indices, uint32_t count, uint32_t offset = 0) = 0;
 
 		[[nodiscard]] virtual uint32_t GetCount() const = 0;
+		virtual BufferDataType GetDataType() const = 0;
 
-		static Ref<IndexBuffer> Create();
-		static Ref<IndexBuffer> Create(uint32_t* Indices, uint32_t count);
+		//static Ref<IndexBuffer> Create();
+		//static Ref<IndexBuffer> Create(uint32_t* Indices, uint32_t count);
 	};
 
 	class UniformBuffer
 	{
 	public:
 		virtual ~UniformBuffer() = default;
-
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-
-		virtual void BindToSlot(uint32_t slot = 0) const = 0;
 
 		virtual void SetData(uint32_t index, const void* data) = 0;
 
@@ -174,5 +140,6 @@ namespace Nebula {
 	public:
 		static Ref<UniformBuffer> Create(const BufferLayout& layout);
 	};
+
 
 }

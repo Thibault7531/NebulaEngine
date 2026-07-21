@@ -37,6 +37,7 @@ namespace Nebula
 
     Ref<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     {
+        /*
         std::vector<float> vertices;
         std::vector<uint32_t> indices;
 
@@ -63,11 +64,11 @@ namespace Nebula
             for (int32_t j = 0; j < face.mNumIndices; j++) indices.push_back(face.mIndices[j]);
         }
 
-        Ref<VertexArray> vertexArray = VertexArray::Create();
-        Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices.size() * sizeof(float));
+        Ref<Graphics::VertexArray> vertexArray = VertexArray::Create();
+        Ref<Graphics::VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices.size() * sizeof(float));
         vertexBuffer->SetData(vertices.data(), vertices.size() * sizeof(float));
         vertexBuffer->SetLayout({
-            { ShaderDataType::Float3, "a_Position" },
+            {Graphics::ShaderDataType::Float3, "a_Position" },
             { ShaderDataType::Float3, "a_Normal" }
         });
         vertexArray->AddVertexBuffer(vertexBuffer);
@@ -75,6 +76,7 @@ namespace Nebula
         vertexArray->SetIndexBuffer(indexBuffer);
 
         return CreateRef<Mesh>(vertexArray);
+        */
     }
 
     Ref<Model> Model::Create(const std::string& path)

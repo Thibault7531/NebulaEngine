@@ -9,6 +9,7 @@ RendererLayer::RendererLayer()
 
 void RendererLayer::OnAttach()
 {
+    /*
     m_VAO = Nebula::VertexArray::Create();
     m_ColorUBO = Nebula::UniformBuffer::Create({
         {Nebula::ShaderDataType::Float3, "u_Color"}
@@ -46,6 +47,7 @@ void RendererLayer::OnAttach()
 
     m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/crafting_table_front.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
     m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/glass.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
+    */
 }
 
 void RendererLayer::OnDetach()
@@ -69,6 +71,15 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
         m_Position -= glm::vec3(1.0f, 0.0f, 0.0f) * static_cast<float>(ts);
     }
 
+    Nebula::Ref<Nebula::Graphics::Device> device = Nebula::Application::Get().GetDevice();
+    Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = device->CreateCommandBuffer();
+
+    Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
+    renderPass->EndRenderPass();
+
+    commandBuffer->Commit();
+
+    /*
     Nebula::RenderCommand::SetClearColor({0.18f, 0.49f, 0.6f, 1.0f});
     Nebula::RenderCommand::Clear();
 
@@ -102,6 +113,7 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
     Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f)));
 
     Nebula::Renderer::EndScene();
+    */
 }
 
 void RendererLayer::OnImGuiRender()

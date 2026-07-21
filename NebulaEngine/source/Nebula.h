@@ -27,14 +27,13 @@
 // Renderer
 #include "Core/Nebula/Renderer/Renderer.h"
 #include "Core/Nebula/Renderer/Renderer2D.h"
-#include "Core/Nebula/Renderer/Shader.h"
-#include "Core/Nebula/Renderer/Texture.h"
-#include "Core/Nebula/Renderer/Buffers/Framebuffer.h"
-#include "Core/Nebula/Renderer/Buffers/VertexArray.h"
+#include "Core/Nebula/Graphics/Shader.h"
+#include "Core/Nebula/Graphics/Texture.h"
+#include "Core/Nebula/Graphics/Buffers/Framebuffer.h"
+#include "Core/Nebula/Graphics/Buffers/VertexArray.h"
 #include "Core/Nebula/Renderer/Cameras/Camera.h"
 #include "Core/Nebula/Renderer/Cameras/OrthographicCamera.h"
 #include "Core/Nebula/Renderer/Cameras/PerspectiveCamera.h"
-#include "Core/Nebula/Renderer/Core/RenderCommand.h"
 
 // Scene
 #include "Core/Nebula/Scene/Components.h"

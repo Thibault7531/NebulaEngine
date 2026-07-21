@@ -4,6 +4,7 @@
 
 #include "Platform/Nebula/CoreSystems/Graphics/Surface.h"
 #include "SwiftMetal3Surface.h"
+#include "Core/Nebula/CoreSystems/Core/Core.h"
 
 namespace Nebula::Graphics
 {
@@ -18,6 +19,7 @@ namespace Nebula::Graphics
 
         virtual void SetVSync(VSyncMode mode) override;
         virtual VSyncMode IsVsync() const override;
+        virtual void Resize(uint32_t width, uint32_t height) override;
 
         virtual void NewFrame() override;
         virtual void Present(void* framebuffer) override;
@@ -32,6 +34,27 @@ namespace Nebula::Graphics
         void* m_MetalCommandQueue = nullptr;
 
         void* m_MetalDrawable = nullptr;
+    };
+
+    class Metal3SurfacePointer
+    {
+    public:
+        Metal3SurfacePointer(void* window) { m_Pointer = CreateRef<Metal3Surface>(window); }
+        ~Metal3SurfacePointer() = default;
+
+        Ref<Metal3Surface> GetSharedPointer() { return m_Pointer; }
+        void* GetPointer() { return m_Pointer.get(); }
+
+        virtual void SetDevice(void* device, void* commandQueue) { m_Pointer->SetDevice(device, commandQueue); }
+
+        virtual void SetVSync(VSyncMode mode) { m_Pointer->SetVSync(mode); }
+        virtual VSyncMode IsVsync() const { return m_Pointer->IsVsync(); }
+
+        virtual void NewFrame() { m_Pointer->NewFrame(); }
+        virtual void Present(void* framebuffer) { m_Pointer->Present(framebuffer); }
+
+    private:
+        Ref<Metal3Surface> m_Pointer;
     };
 
 }

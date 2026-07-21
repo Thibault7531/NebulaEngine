@@ -3,10 +3,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
-#include "Shader.h"
-#include "Buffers/VertexArray.h"
+#include "Nebula/Graphics/Shader.h"
+#include "Nebula/Graphics/Buffers/VertexArray.h"
 #include "Cameras/Camera.h"
-#include "Core/RenderCommand.h"
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 
 namespace Nebula
@@ -28,17 +27,17 @@ namespace Nebula
         static constexpr uint32_t MaxIndices = MaxQuads * 6;
         static constexpr uint32_t MaxTextureSlots = 16;
 
-        Ref<VertexArray> QuadVertexArray;
-        Ref<VertexBuffer> QuadVertexBuffer;
-        Ref<Shader> QuadShader;
-        Ref<UniformBuffer> QuadUniformBuffer;
-        Ref<Texture2D> WhiteTexture;
+        Ref<Graphics::VertexArray> QuadVertexArray;
+        Ref<Graphics::VertexBuffer> QuadVertexBuffer;
+        Ref<Graphics::Shader> QuadShader;
+        Ref<Graphics::UniformBuffer> QuadUniformBuffer;
+        Ref<Graphics::Texture2D> WhiteTexture;
 
         uint32_t QuadIndexCount = 0;
         QuadVertex* QuadVertexBufferBase = nullptr;
         QuadVertex* QuadVertexBufferPtr = nullptr;
 
-        std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
+        std::array<Ref<Graphics::Texture2D>, MaxTextureSlots> TextureSlots;
         uint32_t TextureSlotIndex = 1;
 
         Renderer2D::Statistics Stats;
@@ -52,6 +51,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         s_Data.QuadVertexArray = VertexArray::Create();
 
         s_Data.QuadVertexBuffer = VertexBuffer::Create(Renderer2DData::MaxVertices * sizeof(QuadVertex));
@@ -107,6 +107,7 @@ namespace Nebula
         s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t), Texture::DataFormat::RGBA);
 
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
+        */
     }
 
     void Renderer2D::Shutdown()
@@ -129,6 +130,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         SetupRenderState();
 
         s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
@@ -142,12 +144,14 @@ namespace Nebula
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
+        */
     }
 
     void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         SetupRenderState();
 
         s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
@@ -162,12 +166,14 @@ namespace Nebula
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
+        */
     }
 
     void Renderer2D::BeginScene(const EditorCamera& camera)
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         SetupRenderState();
 
         s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
@@ -181,24 +187,28 @@ namespace Nebula
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
+        */
     }
 
     void Renderer2D::EndScene()
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         auto dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferBase));
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
         Flush();
 
         RenderCommand::EnableFaceCulling(s_Data.CullingEnabled);
+        */
     }
 
     void Renderer2D::NextBash()
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         auto dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferBase));
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
@@ -208,12 +218,14 @@ namespace Nebula
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
+        */
     }
 
     void Renderer2D::Flush()
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         s_Data.QuadShader->Bind();
         for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++) s_Data.TextureSlots[i]->Bind(i);
 
@@ -223,12 +235,14 @@ namespace Nebula
         s_Data.QuadShader->Unbind();
 
         s_Data.Stats.DrawCalls++;
+        */
     }
 
     void Renderer2D::DrawQuad(const QuadProperties& properties)
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         if (s_Data.QuadIndexCount == Renderer2DData::MaxIndices || s_Data.TextureSlotIndex == Renderer2DData::MaxTextureSlots) NextBash();
 
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), properties.position);
@@ -285,12 +299,14 @@ namespace Nebula
         s_Data.QuadIndexCount += 6;
 
         s_Data.Stats.QuadCount++;
+        */
     }
 
     void Renderer2D::DrawQuad(const QuadPropertiesAdvanced& properties)
     {
         NB_PROFILE_FUNCTION();
 
+        /*
         if (s_Data.QuadIndexCount == Renderer2DData::MaxIndices || s_Data.TextureSlotIndex == Renderer2DData::MaxTextureSlots) NextBash();
 
         float textureIndex = 0.0f;
@@ -343,6 +359,7 @@ namespace Nebula
         s_Data.QuadIndexCount += 6;
 
         s_Data.Stats.QuadCount++;
+        */
     }
 
     Renderer2D::Statistics Renderer2D::GetStatistics()
@@ -357,6 +374,7 @@ namespace Nebula
 
     void Renderer2D::SetupRenderState()
     {
+        /*
         RendererAPI::BlendState state;
         state.enabled = true;
         state.srcColorFactor = RendererAPI::BlendFactor::SourceAlpha;
@@ -367,5 +385,6 @@ namespace Nebula
         RenderCommand::EnableFaceCulling(false);
         RenderCommand::EnableDepthTest(true);
         RenderCommand::EnableScissorTest(false);
+        */
     }
 }

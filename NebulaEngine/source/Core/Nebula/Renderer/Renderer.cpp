@@ -1,19 +1,18 @@
 #include "Renderer.h"
 
 #include "Renderer2D.h"
-#include "Core/RenderCommand.h"
 #include "gtc/type_ptr.hpp"
 
 namespace Nebula {
 
 	Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData();
 
-	void Renderer::Init(Platform::GraphicsAPI api)
+	void Renderer::Init()
 	{
 		NB_PROFILE_FUNCTION();
 
 		NB_CORE_INFO("Initializing Nebula Renderer");
-
+		/*
 		RenderCommand::Init(api);
 
 		m_SceneData->m_UBO = UniformBuffer::Create({
@@ -22,6 +21,7 @@ namespace Nebula {
 		});
 
 		Renderer2D::Init();
+		*/
 	}
 
 	void Renderer::Shutdown()
@@ -36,7 +36,7 @@ namespace Nebula {
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
 	{
-		RenderCommand::SetViewport(0, 0, width, height);
+		//RenderCommand::SetViewport(0, 0, width, height);
 	}
 
 	void Renderer::BeginScene(const PerspectiveCamera& camera)
@@ -57,8 +57,9 @@ namespace Nebula {
 	{
 	}
 
-	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
+	void Renderer::Submit(const Ref<Graphics::Shader>& shader, const Ref<Graphics::VertexArray>& vertexArray, const glm::mat4& transform)
 	{
+		/*
 		shader->Bind();
 		m_SceneData->m_UBO->SetData(1, glm::value_ptr(transform));
 		shader->SetUniformBlock("RendererUBO", m_SceneData->m_UBO);
@@ -69,10 +70,12 @@ namespace Nebula {
 
 		vertexArray->Unbind();
 		shader->Unbind();
+		*/
 	}
 
-	void Renderer::SubmitModel(const Ref<Shader>& shader, const Ref<Model>& model, const glm::mat4& transform)
+	void Renderer::SubmitModel(const Ref<Graphics::Shader>& shader, const Ref<Model>& model, const glm::mat4& transform)
 	{
+		/*
 		shader->Bind();
 		m_SceneData->m_UBO->SetData(1, glm::value_ptr(transform));
 		shader->SetUniformBlock("RendererUBO", m_SceneData->m_UBO);
@@ -80,10 +83,12 @@ namespace Nebula {
 		model->Draw();
 
 		shader->Unbind();
+		*/
 	}
 
 	void Renderer::SetRenderState()
 	{
+		/*
 		RendererAPI::BlendState state;
 		state.enabled = true;
 		state.srcColorFactor = RendererAPI::BlendFactor::SourceAlpha;
@@ -94,5 +99,6 @@ namespace Nebula {
 		RenderCommand::EnableFaceCulling(true);
 		RenderCommand::EnableDepthTest(true);
 		RenderCommand::EnableScissorTest(false);
+		*/
 	}
 }

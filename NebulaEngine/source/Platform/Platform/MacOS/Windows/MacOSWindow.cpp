@@ -8,8 +8,7 @@ namespace Nebula::Platform
         m_Properties = props;
         if (m_Properties.API == GraphicsAPI::Metal3)
         {
-            auto* mtlContext = static_cast<Graphics::Surface*>(m_NativeWindow.GetMetal3Context());
-            m_GrahicsSurface = std::shared_ptr<Graphics::Surface>(mtlContext);
+            m_GrahicsSurface = m_NativeWindow.GetMetal3Context().GetSharedPointer();
         }
         if (m_Properties.API == GraphicsAPI::OpenGL410)
         {

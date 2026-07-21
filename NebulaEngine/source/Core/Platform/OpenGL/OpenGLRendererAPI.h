@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Nebula/Renderer/Core/RendererAPI.h"
+#include "../../Nebula/Graphics/Core/RendererAPI.h"
 
 #include <glad/gl.h>
 

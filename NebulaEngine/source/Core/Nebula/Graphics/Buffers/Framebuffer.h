@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Nebula/CoreSystems/Core/Core.h"
-#include "Nebula/Renderer/Texture.h"
+#include "Nebula/Graphics/Texture.h"
 
-namespace Nebula {
-
+namespace Nebula::Graphics
+{
     struct FramebufferAttachmentSpecification
     {
         std::vector<Texture::TextureSpecification> Attachments;
@@ -24,6 +23,17 @@ namespace Nebula {
         };
 
         bool SwapChainTarget = false;
+
+        uint64_t hash() const
+        {
+            uint64_t hash = 0xcbf29ce484222325ULL;
+            for (auto attachment : AttachmentSpec.Attachments)
+            {
+                hash ^= static_cast<uint32_t>(attachment.InternalFormat);
+                hash *= 0x100000001b3ULL;
+            }
+            return hash;
+        }
     };
 
     enum class ColorAttachementDataType
@@ -39,18 +49,19 @@ namespace Nebula {
     public:
         virtual ~Framebuffer() = default;
 
-        virtual void Bind() = 0;
-        virtual void Unbind() = 0;
-
         virtual void SetClearColors(const std::vector<glm::vec4>& colors) = 0;
         virtual void SetClearDepth(float depth) = 0;
         virtual void SetClearStencil(int32_t stencil) = 0;
-        virtual void Clear() = 0;
 
         virtual Ref<Texture2D> GetColorAttachment(uint32_t index = 0) const = 0;
+        virtual const std::vector<Texture::TextureSpecification>& GetColorAttachmentSpecs() const = 0;
+        virtual const std::vector<glm::vec4>& GetClearColors() const = 0;
+        virtual Ref<Texture2D> GetDepthAttachment() const = 0;
+        virtual const Texture::TextureSpecification& GetDepthAttachmentSpec() const = 0;
+        virtual float GetClearDepth() const = 0;
 
         [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const = 0;
-        virtual uint32_t GetRendererID() const = 0;
+        virtual void* GetNativeFramebuffer() = 0;
 
         virtual void Resize(uint32_t width, uint32_t height) = 0;
 
@@ -59,9 +70,5 @@ namespace Nebula {
         static bool IsStencilFormat(Texture::InternalFormat format);
         static bool IsDepthStencilFormat(Texture::InternalFormat format);
 
-    public:
-        static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
-
     };
-
 }

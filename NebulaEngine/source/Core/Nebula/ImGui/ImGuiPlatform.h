@@ -4,6 +4,7 @@
 
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Nebula/CoreSystems/Core/Timestep.h"
+#include "Nebula/Graphics/Buffers/Framebuffer.h"
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 #include "Platform/Nebula/CoreSystems/Events/KeyEvent.h"
 #include "Platform/Nebula/CoreSystems/Events/MouseEvent.h"
@@ -35,7 +36,8 @@ namespace Nebula
         Ref<Platform::Window> Window;
         Ref<Platform::Window> ParentWindow;
         bool WindowOwned;
-        Ref<Platform::Context> GraphicsContext;
+        Ref<Graphics::Surface> GraphicsSurface;
+        Ref<Graphics::Framebuffer> Framebuffer;
 
         ViewportData() { memset((void*)this, 0, sizeof(*this)); }
     };

@@ -4,7 +4,7 @@
 #include "Cameras/EditorCamera.h"
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Cameras/OrthographicCamera.h"
-#include "Nebula/Renderer/Texture.h"
+#include "Nebula/Graphics/Texture.h"
 
 namespace Nebula
 {
@@ -17,7 +17,7 @@ namespace Nebula
             glm::vec3 position = glm::vec3(0.0f);
             float rotation = 0.0f;
             glm::vec2 size = { 1.0f, 1.0f };
-            Ref<Texture2D> texture = nullptr;
+            Ref<Graphics::Texture2D> texture = nullptr;
             glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
             float tilingFactor = 1.0f;
             int32_t entityID = -1;
@@ -25,7 +25,7 @@ namespace Nebula
         struct QuadPropertiesAdvanced
         {
             glm::mat4 transform = glm::mat4(1.0f);
-            Ref<Texture2D> texture = nullptr;
+            Ref<Graphics::Texture2D> texture = nullptr;
             glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
             float tilingFactor = 1.0f;
             int32_t entityID = -1;

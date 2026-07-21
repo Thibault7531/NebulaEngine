@@ -132,7 +132,6 @@ namespace Nebula
 		{
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			Platform::WindowManager::Get().GetMainWindow()->SetCurrentContext();
 		}
 	}
 

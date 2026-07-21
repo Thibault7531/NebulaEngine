@@ -1,6 +1,7 @@
 #include "ImGuiPlatform.h"
 
-#include "Nebula/Renderer/Core/RendererAPI.h"
+#include "../Graphics/Core/RendererAPI.h"
+#include "Nebula/CoreSystems/Application/Application.h"
 #include "Platform/Nebula/CoreSystems/Input/Input.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
@@ -163,7 +164,8 @@ namespace Nebula
         auto* viewport_data = new ViewportData;
         viewport_data->Window = platform_data.Window;
         viewport_data->WindowOwned = false;
-        viewport_data->GraphicsContext = platform_data.Window->GetSurface();
+        viewport_data->GraphicsSurface = platform_data.Window->GetSurface();
+        viewport_data->Framebuffer = Application::Get().GetMainFramebuffer();
         main_viewport->PlatformUserData = viewport_data;
         main_viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(platform_data.Window->GetID()));
     }
@@ -349,10 +351,13 @@ namespace Nebula
     bool ImGuiPlatform::OnWindowResizedEvent(const Platform::WindowResizedEvent& event) const
     {
         ImGuiViewport* viewport = ImGui::FindViewportByPlatformHandle(reinterpret_cast<void*>(static_cast<intptr_t>(event.WindowID)));
+        auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
         if (viewport == nullptr)
             return false;
 
         viewport->PlatformRequestResize = true;
+        viewport_data->GraphicsSurface->Resize(event.GetWidth(), event.GetHeight());
+        viewport_data->Framebuffer->Resize(event.GetWidth(), event.GetHeight());
 
         return true;
     }
@@ -624,11 +629,6 @@ namespace Nebula
         ImGuiViewport* main_viewport = ImGui::GetMainViewport();
         auto* main_viewport_data = static_cast<ViewportData*>(main_viewport->PlatformUserData);
 
-        if (RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460)
-        {
-            main_viewport_data->GraphicsContext->SetCurrent();
-        }
-
         Platform::WindowProperties props = Platform::WindowProperties();
         props.Title = "No Title Yet";
         props.Width = viewport->Size.x;
@@ -646,11 +646,16 @@ namespace Nebula
 
         viewport_data->Window->SetPos(viewport->Pos.x, viewport->Pos.y);
         viewport_data->WindowOwned = true;
-        if (RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460 || RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL410)
+        if (Graphics::RendererAPI::GetAPI() != Platform::GraphicsAPI::None)
         {
-            viewport_data->GraphicsContext = viewport_data->Window->GetSurface();
-            viewport_data->Window->SetVSync(viewport_data->ParentWindow ? viewport_data->ParentWindow->IsVSync() : Platform::VSyncMode::Adaptive);
-            viewport_data->GraphicsContext->SetCurrent();
+            viewport_data->GraphicsSurface = viewport_data->Window->GetSurface();
+            Application::Get().GetDevice()->SetSurfaceDevice(viewport_data->GraphicsSurface);
+            viewport_data->Window->SetVSync(viewport_data->ParentWindow ? viewport_data->ParentWindow->IsVSync() : Graphics::VSyncMode::Adaptive);
+            Graphics::FramebufferSpecification spec = {
+                props.Width,
+                props.Height
+            };
+            viewport_data->Framebuffer = Application::Get().GetDevice()->CreateFramebuffer(spec);
         }
 
         viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(viewport_data->Window->GetID()));
@@ -670,7 +675,7 @@ namespace Nebula
             {
                 Platform::WindowManager::Get().DestroyWindow(viewport_data->Window);
             }
-            viewport_data->GraphicsContext = nullptr;
+            viewport_data->GraphicsSurface = nullptr;
             viewport_data->Window = nullptr;
             delete viewport_data;
         }
@@ -753,17 +758,16 @@ namespace Nebula
     void ImGuiPlatform::RenderWindow(ImGuiViewport* viewport, void*)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        if (viewport_data->GraphicsContext)
-            viewport_data->GraphicsContext->SetCurrent();
+        if (viewport_data->GraphicsSurface)
+            viewport_data->GraphicsSurface->NewFrame();
     }
 
     void ImGuiPlatform::SwapBuffers(ImGuiViewport* viewport, void*)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        if (viewport_data->GraphicsContext)
+        if (viewport_data->GraphicsSurface)
         {
-            viewport_data->GraphicsContext->SetCurrent();
-            viewport_data->GraphicsContext->SwapBuffers();
+            viewport_data->GraphicsSurface->Present(viewport_data->Framebuffer->GetNativeFramebuffer());
         }
     }
 

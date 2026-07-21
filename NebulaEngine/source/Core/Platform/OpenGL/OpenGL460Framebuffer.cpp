@@ -24,6 +24,7 @@ namespace Nebula {
     {
         glDeleteFramebuffers(1, &m_RendererID);
         for (uint32_t i = 0; i < m_ColorAttachments.size(); i++) m_ColorAttachments[i].reset();
+        m_DepthAttachment.reset();
     }
 
     void OpenGL460Framebuffer::Invalidate()
@@ -31,6 +32,7 @@ namespace Nebula {
         if (m_RendererID != 0) {
             glDeleteFramebuffers(1, &m_RendererID);
             for (uint32_t i = 0; i < m_ColorAttachments.size(); i++) m_ColorAttachments[i].reset();
+            m_DepthAttachment.reset();
         }
 
         if (m_Specification.width == 0 || m_Specification.height == 0)

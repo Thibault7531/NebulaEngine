@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Nebula/Renderer/Core/RendererAPI.h"
+#include "../../Nebula/Graphics/Core/RendererAPI.h"
 
 #include <glad/gl.h>
 
-namespace Nebula {
+namespace Nebula::Graphics {
 
 	class OpenGL410RendererAPI : public RendererAPI
 	{
