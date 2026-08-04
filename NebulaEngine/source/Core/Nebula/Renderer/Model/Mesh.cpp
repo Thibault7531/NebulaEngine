@@ -6,13 +6,4 @@ namespace Nebula
         : m_VertexArray(vertexArray)
     {
     }
-
-    void Mesh::Draw()
-    {
-        /*
-        m_VertexArray->Bind();
-        RenderCommand::DrawIndexed(m_VertexArray);
-        m_VertexArray->Unbind();
-        */
-    }
 }

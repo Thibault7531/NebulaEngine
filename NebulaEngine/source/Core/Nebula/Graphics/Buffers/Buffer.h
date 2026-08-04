@@ -133,6 +133,7 @@ namespace Nebula::Graphics
 		virtual ~UniformBuffer() = default;
 
 		virtual void SetData(uint32_t index, const void* data) = 0;
+		virtual void SetData(const std::string& paramater, const void* data) = 0;
 
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;

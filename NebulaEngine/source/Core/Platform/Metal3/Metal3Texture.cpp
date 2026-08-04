@@ -38,13 +38,16 @@ namespace Nebula::Graphics
 
     Metal3Texture2D::Metal3Texture2D(MTL::Device* device, const std::filesystem::path& path,
         const TextureSpecification& spec)
+            : m_spec{spec}
     {
-        int width, height, channels;
+        int width, height, channels, components;
         stbi_set_flip_vertically_on_load(1);
         stbi_uc* data = nullptr;
         {
             NB_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+            stbi_info(path.c_str(), &width, &height, &components);
+            data = stbi_load(path.c_str(), &width, &height, &channels, components == 3 ? 4 : 0);
+            if (components == 3) channels = 4;
         }
         NB_CORE_ASSERT(data, "Failed to load image!");
 

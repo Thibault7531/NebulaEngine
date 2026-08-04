@@ -17,11 +17,6 @@ namespace Nebula
         ProcessNode(scene->mRootNode, scene);
     }
 
-    void Model::Draw()
-    {
-        for (int32_t i = 0; i < m_Meshes.size(); i++) m_Meshes[i]->Draw();
-    }
-
     void Model::ProcessNode(aiNode* node, const aiScene* scene)
     {
         for (int32_t i = 0; i < node->mNumMeshes; i++)

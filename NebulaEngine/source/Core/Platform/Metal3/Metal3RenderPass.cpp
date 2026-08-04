@@ -101,10 +101,23 @@ namespace Nebula::Graphics
         m_RenderCommandEncoder->setVertexBuffer(metalBuffer->GetBuffer(), 0, m_CurrentlyBoundShaderPipeline->GetVertexInputLocation("input"));
     }
 
+    void Metal3RenderPass::DrawIndexed(Ref<IndexBuffer> indexBuffer, uint32_t elementCount)
+    {
+        Ref<Metal3IndexBuffer> metalIndexBuffer = std::dynamic_pointer_cast<Metal3IndexBuffer>(indexBuffer);
+        if (elementCount == 0) elementCount = metalIndexBuffer->GetCount();
+        if (elementCount) m_RenderCommandEncoder->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle, elementCount, Metal3IndexBuffer::GetIndexType(metalIndexBuffer->GetDataType()), metalIndexBuffer->GetBuffer(), 0, 1, 0, 0);
+    }
+
     void Metal3RenderPass::DrawIndexedOffset(Ref<IndexBuffer> indexBuffer, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset)
     {
         Ref<Metal3IndexBuffer> metalIndexBuffer = std::dynamic_pointer_cast<Metal3IndexBuffer>(indexBuffer);
-        if (metalIndexBuffer->GetCount()) m_RenderCommandEncoder->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle, elementCount, Metal3IndexBuffer::GetIndexType(metalIndexBuffer->GetDataType()), metalIndexBuffer->GetBuffer(), indexOffset, 1, vertexOffset, 0);
+        if (elementCount) m_RenderCommandEncoder->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle, elementCount, Metal3IndexBuffer::GetIndexType(metalIndexBuffer->GetDataType()), metalIndexBuffer->GetBuffer(), indexOffset, 1, vertexOffset, 0);
+    }
+
+    void Metal3RenderPass::DrawArrayIndexed(Ref<VertexArray> vertexArray, uint32_t elementCount)
+    {
+        BindVertexBuffer(vertexArray->GetVertexBuffers()[0]);
+        DrawIndexed(vertexArray->GetIndexBuffer(), elementCount);
     }
 
     void Metal3RenderPass::DrawArrayIndexedOffset(Ref<VertexArray> vertexArray, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset)

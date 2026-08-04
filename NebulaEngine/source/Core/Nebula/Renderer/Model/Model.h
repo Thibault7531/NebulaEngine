@@ -14,7 +14,7 @@ namespace Nebula
         Model(const std::string& path);
         ~Model() = default;
 
-        void Draw();
+        std::vector<Ref<Mesh>>& GetMeshes() { return m_Meshes; }
 
     private:
         void ProcessNode(aiNode* node, const aiScene* scene);

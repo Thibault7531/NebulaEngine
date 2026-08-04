@@ -126,10 +126,10 @@ namespace Nebula
 		NB_PROFILE_FUNCTION();
 
 		while (m_Running) {
+			NB_PROFILE_SCOPE("RunLoop");
 #ifdef NB_PLATFORM_MACOS
 			NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
 #endif
-			NB_PROFILE_SCOPE("RunLoop");
 
 			Render();
 #ifdef NB_PLATFORM_MACOS

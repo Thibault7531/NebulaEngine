@@ -12,7 +12,7 @@ namespace Nebula
         Mesh(const Ref<Graphics::VertexArray>& vertexArray);
         ~Mesh() = default;
 
-        void Draw();
+        Ref<Graphics::VertexArray> GetVertexArray() const { return m_VertexArray; }
 
     private:
         Ref<Graphics::VertexArray> m_VertexArray;

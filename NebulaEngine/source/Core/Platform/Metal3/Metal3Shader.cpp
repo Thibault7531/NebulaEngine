@@ -102,7 +102,7 @@ namespace Nebula::Graphics
 
 	uint32_t Metal3Shader::GetUniformBlockLocation(const std::string& uniformBlockName)
 	{
-    	slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout(0);
+    	slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout();
     	uint32_t paramCount = programLayout->getParameterCount();
 
     	uint32_t paramIndex = 0;

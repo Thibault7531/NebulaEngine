@@ -48,8 +48,10 @@ namespace Nebula::Graphics
 
         virtual void BindVertexBuffer(Ref<VertexBuffer> vertexBuffer) = 0;
 
+        virtual void DrawIndexed(Ref<IndexBuffer> indexBuffer, uint32_t elementCount = 0) = 0;
         virtual void DrawIndexedOffset(Ref<IndexBuffer> indexBuffer, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset) = 0;
 
+        virtual void DrawArrayIndexed(Ref<VertexArray> vertexArray, uint32_t elementCount = 0) = 0;
         virtual void DrawArrayIndexedOffset(Ref<VertexArray> vertexArray, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset) = 0;
 ;
         virtual void EndRenderPass() = 0;

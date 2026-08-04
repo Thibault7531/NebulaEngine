@@ -83,4 +83,16 @@ namespace Nebula::Graphics
     {
         memcpy(static_cast<uint8_t*>(m_Buffer->contents()) + m_Layout.GetElements()[index].Offset, data, m_Layout.GetElements()[index].Size);
     }
+
+    void Metal3UniformBuffer::SetData(const std::string& paramater, const void* data)
+    {
+        for (const auto& bufferParam : m_Layout.GetElements())
+        {
+            if (bufferParam.Name == paramater)
+            {
+                memcpy(static_cast<uint8_t*>(m_Buffer->contents()) + bufferParam.Offset, data, bufferParam.Size);
+                return;
+            }
+        }
+    }
 }

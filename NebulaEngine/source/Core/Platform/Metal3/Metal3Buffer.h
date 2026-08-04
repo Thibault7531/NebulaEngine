@@ -60,6 +60,7 @@ namespace Nebula::Graphics
         ~Metal3UniformBuffer() override;
 
         virtual void SetData(uint32_t index, const void* data) override;
+        virtual void SetData(const std::string& paramater, const void* data) override;
 
         virtual const BufferLayout& GetLayout() const override { return m_Layout; }
         virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
