@@ -16,11 +16,16 @@ public:
     virtual void OnEvent(Nebula::Platform::Event& event) override;
 
 private:
-    Nebula::Ref<Nebula::VertexArray> m_VAO;
+    Nebula::Ref<Nebula::Graphics::Device> m_Device;
 
-    Nebula::ShaderLibrary m_ShaderLibrary;
-    Nebula::Ref<Nebula::Texture2D> m_Texture;
-    Nebula::Ref<Nebula::Texture2D> m_Glass;
+    Nebula::Ref<Nebula::Graphics::VertexArray> m_VAO;
+    Nebula::Ref<Nebula::Graphics::UniformBuffer> m_RendererUBO;
+
+    Nebula::Graphics::ShaderLibrary m_ShaderLibrary;
+    Nebula::Ref<Nebula::Graphics::ShaderPipeline> m_TextureShader;
+    Nebula::Ref<Nebula::Graphics::ShaderPipeline> m_ModelShader;
+    Nebula::Ref<Nebula::Graphics::Texture2D> m_Texture;
+    Nebula::Ref<Nebula::Graphics::Texture2D> m_Glass;
 
     Nebula::Ref<Nebula::Model> m_Backpack;
 
