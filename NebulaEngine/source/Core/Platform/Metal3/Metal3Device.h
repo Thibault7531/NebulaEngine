@@ -22,7 +22,7 @@ namespace Nebula::Graphics
         virtual Ref<IndexBuffer> CreateIndexBuffer(uint16_t* data, uint32_t count) override;
         virtual Ref<IndexBuffer> CreateIndexBuffer(uint32_t* data, uint32_t count) override;
 
-        virtual Ref<UniformBuffer> CreateUniformBuffer(const BufferLayout& layout) override;
+        virtual Ref<UniformBuffer> CreateUniformBuffer(const BufferLayout& layout, uint32_t instances) override;
 
         virtual Ref<Texture2D> CreateTexture2D(uint32_t width, uint32_t height, const Texture::TextureSpecification& spec) override;
         virtual Ref<Texture2D> CreateTexture2D(std::filesystem::path path, const Texture::TextureSpecification& spec) override;

@@ -56,9 +56,6 @@ namespace Nebula
         static Statistics GetStatistics();
         static void ResetStats();
 
-    private:
-        static void SetupRenderState();
-
     };
 
 }

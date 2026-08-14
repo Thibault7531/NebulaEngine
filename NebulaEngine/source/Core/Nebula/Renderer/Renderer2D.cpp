@@ -6,6 +6,8 @@
 #include "Nebula/Graphics/Shader.h"
 #include "Nebula/Graphics/Buffers/VertexArray.h"
 #include "Cameras/Camera.h"
+#include "Nebula/CoreSystems/Application/Application.h"
+#include "Nebula/Graphics/Device.h"
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 
 namespace Nebula
@@ -25,13 +27,18 @@ namespace Nebula
         static constexpr uint32_t MaxQuads = 10000;
         static constexpr uint32_t MaxVertices = MaxQuads * 4;
         static constexpr uint32_t MaxIndices = MaxQuads * 6;
-        static constexpr uint32_t MaxTextureSlots = 16;
+        static constexpr uint32_t MaxTextureSlots = 15;
 
+        Ref<Graphics::Device> Device;
+        Graphics::ShaderLibrary ShaderLibrary;
         Ref<Graphics::VertexArray> QuadVertexArray;
         Ref<Graphics::VertexBuffer> QuadVertexBuffer;
-        Ref<Graphics::Shader> QuadShader;
+        Ref<Graphics::ShaderPipeline> QuadShader;
         Ref<Graphics::UniformBuffer> QuadUniformBuffer;
         Ref<Graphics::Texture2D> WhiteTexture;
+
+        Ref<Graphics::CommandBuffer> CommandBuffer;
+        Ref<Graphics::RenderPass> RenderPass;
 
         uint32_t QuadIndexCount = 0;
         QuadVertex* QuadVertexBufferBase = nullptr;
@@ -51,17 +58,18 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        /*
-        s_Data.QuadVertexArray = VertexArray::Create();
+        s_Data.Device = Application::Get().GetDevice();
 
-        s_Data.QuadVertexBuffer = VertexBuffer::Create(Renderer2DData::MaxVertices * sizeof(QuadVertex));
+        s_Data.QuadVertexArray = Graphics::VertexArray::Create();
+
+        s_Data.QuadVertexBuffer = s_Data.Device->CreateVertexBuffer(Renderer2DData::MaxVertices * sizeof(QuadVertex));
         s_Data.QuadVertexBuffer->SetLayout({
-            {ShaderDataType::Float3, "a_Position"},
-            {ShaderDataType::Float4, "a_Color"},
-            {ShaderDataType::Float, "a_TexIndex"},
-            {ShaderDataType::Float2, "a_TexCoord"},
-            {ShaderDataType::Float, "a_TilingFactor"},
-            {ShaderDataType::Int, "a_EntityID"}
+            { Graphics::ShaderDataType::Float3, "a_Position"},
+            { Graphics::ShaderDataType::Float4, "a_Color"},
+            { Graphics::ShaderDataType::Float, "a_TexIndex"},
+            { Graphics::ShaderDataType::Float2, "a_TexCoord"},
+            { Graphics::ShaderDataType::Float, "a_TilingFactor"},
+            { Graphics::ShaderDataType::Int, "a_EntityID"}
         });
         s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
 
@@ -83,31 +91,40 @@ namespace Nebula
             offset += 4;
         }
 
-        Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(quadIndices, Nebula::Renderer2DData::MaxIndices);
+        Ref<Graphics::IndexBuffer> indexBuffer = s_Data.Device->CreateIndexBuffer(quadIndices, Renderer2DData::MaxIndices);
         s_Data.QuadVertexArray->SetIndexBuffer(indexBuffer);
         delete[] quadIndices;
 
-        int32_t samplers[Renderer2DData::MaxTextureSlots];
-        for (uint32_t i = 0; i < Renderer2DData::MaxTextureSlots; i++)
-            samplers[i] = i;
+        s_Data.ShaderLibrary.Load(Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/Renderer2D.slang");
+        Graphics::VertexLayout layout = {
+            { Graphics::ShaderDataType::Float3, "a_Position" },
+            { Graphics::ShaderDataType::Float4, "a_Color" },
+            { Graphics::ShaderDataType::Float, "a_TexIndex" },
+            { Graphics::ShaderDataType::Float2, "a_TexCoord" },
+            { Graphics::ShaderDataType::Float, "a_TilingFactor" },
+            { Graphics::ShaderDataType::Int, "a_EntityID" }
+        };
+        Graphics::BlendState blendState;
+        blendState.enabled = true;
+        blendState.srcColorFactor = Graphics::BlendFactor::SourceAlpha;
+        blendState.dstColorFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
+        blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
+        blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
+        Graphics::PipelineSpecification spec;
+        spec.framebufferSpec = Application::Get().GetMainFramebuffer()->GetSpecification();
+        spec.blendState = blendState;
+        s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
 
-        s_Data.QuadShader = Shader::Create(Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/Renderer2D.slang");
-
-        s_Data.QuadShader->Bind();
-        s_Data.QuadShader->SetIntArray("u_Textures", samplers, Renderer2DData::MaxTextureSlots);
-        s_Data.QuadShader->Unbind();
-
-        s_Data.QuadUniformBuffer = UniformBuffer::Create({
-            {ShaderDataType::Mat4, "u_ViewProjection"},
-            {ShaderDataType::Float, "u_TilingFactor"}
+        s_Data.QuadUniformBuffer = s_Data.Device->CreateUniformBuffer({
+            { Graphics::ShaderDataType::Matrix4, "u_ViewProjection" },
+            { Graphics::ShaderDataType::Float, "u_TilingFactor" }
         });
 
-        s_Data.WhiteTexture = Texture2D::Create(1, 1, Texture::InternalFormat::RGBA8);
+        s_Data.WhiteTexture = s_Data.Device->CreateTexture2D(1, 1, Graphics::Texture::InternalFormat::RGBA8);
         uint32_t whiteTextureData = 0xffffffff;
-        s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t), Texture::DataFormat::RGBA);
+        s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t), Graphics::Texture::DataFormat::RGBA);
 
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
-        */
     }
 
     void Renderer2D::Shutdown()
@@ -130,119 +147,101 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        /*
-        SetupRenderState();
+        s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
+        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
 
-        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
-        RenderCommand::EnableFaceCulling(false);
-
-        s_Data.QuadShader->Bind();
+        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
+        s_Data.RenderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.getViewProjectionMatrix()));
-        s_Data.QuadShader->SetUniformBlock("Renderer2DUBO", s_Data.QuadUniformBuffer);
 
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
-        */
     }
 
     void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
     {
         NB_PROFILE_FUNCTION();
 
-        /*
-        SetupRenderState();
+        s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
+        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
 
-        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
-        RenderCommand::EnableFaceCulling(false);
-
-        s_Data.QuadShader->Bind();
+        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
         glm::mat4 viewProjection = camera.GetProjectionMatrix() * glm::inverse(transform);
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(viewProjection));
-        s_Data.QuadShader->SetUniformBlock("Renderer2DUBO", s_Data.QuadUniformBuffer);
 
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
-        */
     }
 
     void Renderer2D::BeginScene(const EditorCamera& camera)
     {
         NB_PROFILE_FUNCTION();
 
-        /*
-        SetupRenderState();
+        s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
+        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
 
-        s_Data.CullingEnabled = RenderCommand::IsFaceCullingEnabled();
-        RenderCommand::EnableFaceCulling(false);
-
-        s_Data.QuadShader->Bind();
+        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.GetViewProjectionMatrix()));
-        s_Data.QuadShader->SetUniformBlock("Renderer2DUBO", s_Data.QuadUniformBuffer);
 
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
-        */
     }
 
     void Renderer2D::EndScene()
     {
         NB_PROFILE_FUNCTION();
 
-        /*
         auto dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferBase));
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
         Flush();
-
-        RenderCommand::EnableFaceCulling(s_Data.CullingEnabled);
-        */
     }
 
     void Renderer2D::NextBash()
     {
         NB_PROFILE_FUNCTION();
 
-        /*
         auto dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferBase));
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
         Flush();
 
+        s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
+        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
+
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
 
         s_Data.TextureSlotIndex = 1;
-        */
     }
 
     void Renderer2D::Flush()
     {
         NB_PROFILE_FUNCTION();
 
-        /*
-        s_Data.QuadShader->Bind();
-        for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++) s_Data.TextureSlots[i]->Bind(i);
+        s_Data.RenderPass->SetShaderPipeline(s_Data.QuadShader);
+        s_Data.RenderPass->SetUniformBlock("Renderer2DUBO", s_Data.QuadUniformBuffer);
+        for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++) s_Data.RenderPass->BindTextureToSlot(s_Data.TextureSlots[i], i);
+        for (uint32_t i = s_Data.TextureSlotIndex; i < s_Data.MaxTextureSlots; i++) s_Data.RenderPass->BindTextureToSlot(s_Data.WhiteTexture, i);
 
-        s_Data.QuadVertexArray->Bind();
-        RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
-        s_Data.QuadVertexArray->Unbind();
-        s_Data.QuadShader->Unbind();
+        s_Data.RenderPass->DrawArrayIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+
+        s_Data.RenderPass->EndRenderPass();
+        s_Data.CommandBuffer->Commit();
 
         s_Data.Stats.DrawCalls++;
-        */
     }
 
     void Renderer2D::DrawQuad(const QuadProperties& properties)
     {
         NB_PROFILE_FUNCTION();
 
-        /*
         if (s_Data.QuadIndexCount == Renderer2DData::MaxIndices || s_Data.TextureSlotIndex == Renderer2DData::MaxTextureSlots) NextBash();
 
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), properties.position);
@@ -299,14 +298,12 @@ namespace Nebula
         s_Data.QuadIndexCount += 6;
 
         s_Data.Stats.QuadCount++;
-        */
     }
 
     void Renderer2D::DrawQuad(const QuadPropertiesAdvanced& properties)
     {
         NB_PROFILE_FUNCTION();
 
-        /*
         if (s_Data.QuadIndexCount == Renderer2DData::MaxIndices || s_Data.TextureSlotIndex == Renderer2DData::MaxTextureSlots) NextBash();
 
         float textureIndex = 0.0f;
@@ -359,7 +356,6 @@ namespace Nebula
         s_Data.QuadIndexCount += 6;
 
         s_Data.Stats.QuadCount++;
-        */
     }
 
     Renderer2D::Statistics Renderer2D::GetStatistics()
@@ -370,21 +366,5 @@ namespace Nebula
     void Renderer2D::ResetStats()
     {
         memset(&s_Data.Stats, 0, sizeof(Statistics));
-    }
-
-    void Renderer2D::SetupRenderState()
-    {
-        /*
-        RendererAPI::BlendState state;
-        state.enabled = true;
-        state.srcColorFactor = RendererAPI::BlendFactor::SourceAlpha;
-        state.dstColorFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
-        state.srcAlphaFactor = RendererAPI::BlendFactor::SourceAlpha;
-        state.dstAlphaFactor = RendererAPI::BlendFactor::OneMinusSourceAlpha;
-        RenderCommand::SetBlendingState(state);
-        RenderCommand::EnableFaceCulling(false);
-        RenderCommand::EnableDepthTest(true);
-        RenderCommand::EnableScissorTest(false);
-        */
     }
 }

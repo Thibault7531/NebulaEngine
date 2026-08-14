@@ -16,7 +16,7 @@ void RendererLayer::OnAttach()
     m_RendererUBO = m_Device->CreateUniformBuffer({
         { Nebula::Graphics::ShaderDataType::Matrix4, "u_ViewProjection" },
         { Nebula::Graphics::ShaderDataType::Matrix4, "u_Transform" }
-    });
+    }, 6);
 
     float vertices[5 * 4] = {
         -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -88,59 +88,43 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
         m_Position -= glm::vec3(1.0f, 0.0f, 0.0f) * static_cast<float>(ts);
     }
 
-    m_RendererUBO->SetData("u_ViewProjection", glm::value_ptr(m_CameraController.GetCamera().getViewProjectionMatrix()));
+    for (uint32_t instance = 0; instance < m_RendererUBO->GetInstanceCount(); instance++) m_RendererUBO->SetData(instance, "u_ViewProjection", glm::value_ptr(m_CameraController.GetCamera().getViewProjectionMatrix()));
 
     const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-    m_ColorUBO->SetData("u_Color", glm::value_ptr(m_Color));
+    m_ColorUBO->SetData(0, "u_Color", glm::value_ptr(m_Color));
 
-    Nebula::Ref<Nebula::Graphics::CommandBuffer> clearCommandBuffer = m_Device->CreateCommandBuffer();
-    Nebula::Ref<Nebula::Graphics::RenderPass> clearRenderPass = clearCommandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
-    clearRenderPass->EndRenderPass();
-    clearCommandBuffer->Commit();
+    Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
+    Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
+    renderPass->SetShaderPipeline(m_SolidColorShader);
 
     for (int i = 0; i < 4; i++)
     {
         glm::vec3 position = m_Position + glm::vec3(0.11f, 0.0f, 0.0f) * static_cast<float>(i);
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
 
-        m_RendererUBO->SetData("u_Transform", glm::value_ptr(transform));
+        m_RendererUBO->SetData(i, "u_Transform", glm::value_ptr(transform));
 
-        Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
-        Nebula::Ref<Nebula::Graphics::RenderPass> coloredSquareRenderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), false);
-        coloredSquareRenderPass->SetShaderPipeline(m_SolidColorShader);
-        coloredSquareRenderPass->SetUniformBlock("ColorUBO", m_ColorUBO);
-        coloredSquareRenderPass->SetUniformBlock("RendererUBO", m_RendererUBO);
-        coloredSquareRenderPass->DrawArrayIndexed(m_VAO);
-        coloredSquareRenderPass->EndRenderPass();
-
-        commandBuffer->Commit();
+        renderPass->SetUniformBlock("ColorUBO", m_ColorUBO, 0);
+        renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, i);
+        renderPass->DrawArrayIndexed(m_VAO);
     }
 
-    m_RendererUBO->SetData("u_Transform", glm::value_ptr(glm::mat4(1.0f)));
-
-    Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
-    Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), false);
+    m_RendererUBO->SetData(4, "u_Transform", glm::value_ptr(glm::mat4(1.0f)));
 
     renderPass->SetShaderPipeline(m_TextureShader);
-    renderPass->SetUniformBlock("RendererUBO", m_RendererUBO);
+    renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 4);
     renderPass->BindTextureToSlot(m_Texture);
     renderPass->DrawArrayIndexed(m_VAO);
-    renderPass->EndRenderPass();
 
-    commandBuffer->Commit();
-
-    m_RendererUBO->SetData("u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f))));
-
-    commandBuffer = m_Device->CreateCommandBuffer();
-    renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), false);
+    m_RendererUBO->SetData(5, "u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f))));
 
     renderPass->SetShaderPipeline(m_TextureShader);
-    renderPass->SetUniformBlock("RendererUBO", m_RendererUBO);
+    renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 5);
     renderPass->BindTextureToSlot(m_Glass);
     renderPass->DrawArrayIndexed(m_VAO);
-    renderPass->EndRenderPass();
 
+    renderPass->EndRenderPass();
     commandBuffer->Commit();
 }
 

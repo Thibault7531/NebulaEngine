@@ -2,6 +2,7 @@
 
 #include "Nebula/CoreSystems/Core/Timestep.h"
 #include "Nebula/Renderer/Renderer.h"
+#include "Nebula/Renderer/Renderer2D.h"
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 #ifdef NB_PLATFORM_MACOS
@@ -39,9 +40,10 @@ namespace Nebula
 		m_Device = Graphics::Device::CreateDefaultDevice();
 		m_Device->SetSurfaceDevice(m_MainWindow->GetSurface());
 
-		Renderer::Init();
-
 		m_MainFramebuffer = m_Device->CreateFramebuffer({m_MainWindow->GetClientSize().first, m_MainWindow->GetClientSize().second});
+
+		Renderer::Init();
+		Renderer2D::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -55,8 +57,10 @@ namespace Nebula
 
 		NB_CORE_INFO("Engine shutting down");
 
-		Renderer::Shutdown();
 		PopOverlay(m_ImGuiLayer);
+		delete m_ImGuiLayer;
+		Renderer2D::Shutdown();
+		Renderer::Shutdown();
 
 		Platform::WindowManager::Get().DestroyMainWindow();
 		m_MainWindow.reset();

@@ -53,9 +53,9 @@ namespace Nebula::Graphics
         return CreateRef<Metal3IndexBuffer>(m_Device, data, count);
     }
 
-    Ref<UniformBuffer> Metal3Device::CreateUniformBuffer(const BufferLayout& layout)
+    Ref<UniformBuffer> Metal3Device::CreateUniformBuffer(const BufferLayout& layout, uint32_t instances)
     {
-        return CreateRef<Metal3UniformBuffer>(m_Device, layout);
+        return CreateRef<Metal3UniformBuffer>(m_Device, layout, instances);
     }
 
     Ref<Texture2D> Metal3Device::CreateTexture2D(uint32_t width, uint32_t height,

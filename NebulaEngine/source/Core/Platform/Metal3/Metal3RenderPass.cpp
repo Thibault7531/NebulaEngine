@@ -74,11 +74,13 @@ namespace Nebula::Graphics
         m_RenderCommandEncoder->setRenderPipelineState(nativePipeline);
     }
 
-    void Metal3RenderPass::SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer)
+    void Metal3RenderPass::SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer,
+        uint32_t instanceIndex)
     {
         uint32_t location = m_CurrentlyBoundShaderPipeline->GetUniformBlockLocation(blockName);
-        m_RenderCommandEncoder->setVertexBuffer(std::dynamic_pointer_cast<Metal3UniformBuffer>(buffer)->GetBuffer(), 0, location);
-        m_RenderCommandEncoder->setFragmentBuffer(std::dynamic_pointer_cast<Metal3UniformBuffer>(buffer)->GetBuffer(), 0, location);
+        Ref<Metal3UniformBuffer> uniformBuffer = std::dynamic_pointer_cast<Metal3UniformBuffer>(buffer);
+        m_RenderCommandEncoder->setVertexBuffer(uniformBuffer->GetBuffer(), uniformBuffer->GetLayout().GetStride() * instanceIndex, location);
+        m_RenderCommandEncoder->setFragmentBuffer(uniformBuffer->GetBuffer(), uniformBuffer->GetLayout().GetStride() * instanceIndex, location);
     }
 
     void Metal3RenderPass::BindTextureToSlot(Ref<Texture2D> texture, uint32_t slot)

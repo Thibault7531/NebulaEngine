@@ -4,6 +4,11 @@
 
 namespace Nebula::Graphics
 {
+    ShaderLibrary::~ShaderLibrary()
+    {
+        m_Shaders.clear();
+    }
+
     void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
     {
         m_Shaders[name] = shader;

@@ -68,10 +68,10 @@ namespace Nebula::Graphics
         }
     }
 
-    Metal3UniformBuffer::Metal3UniformBuffer(MTL::Device* device, const BufferLayout& layout)
-        : m_Layout{layout}
+    Metal3UniformBuffer::Metal3UniformBuffer(MTL::Device* device, const BufferLayout& layout, uint32_t instances)
+        : m_InstanceCount{instances}, m_Layout{layout}
     {
-        m_Buffer = device->newBuffer(layout.GetStride(), MTL::ResourceStorageModeShared);
+        m_Buffer = device->newBuffer(layout.GetStride() * instances, MTL::ResourceStorageModeShared);
     }
 
     Metal3UniformBuffer::~Metal3UniformBuffer()
@@ -84,13 +84,13 @@ namespace Nebula::Graphics
         memcpy(static_cast<uint8_t*>(m_Buffer->contents()) + m_Layout.GetElements()[index].Offset, data, m_Layout.GetElements()[index].Size);
     }
 
-    void Metal3UniformBuffer::SetData(const std::string& paramater, const void* data)
+    void Metal3UniformBuffer::SetData(uint32_t instanceIndex, const std::string& paramater, const void* data)
     {
         for (const auto& bufferParam : m_Layout.GetElements())
         {
             if (bufferParam.Name == paramater)
             {
-                memcpy(static_cast<uint8_t*>(m_Buffer->contents()) + bufferParam.Offset, data, bufferParam.Size);
+                memcpy(static_cast<uint8_t*>(m_Buffer->contents()) + instanceIndex * m_Layout.GetStride() + bufferParam.Offset, data, bufferParam.Size);
                 return;
             }
         }

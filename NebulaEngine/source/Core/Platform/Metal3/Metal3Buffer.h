@@ -56,11 +56,13 @@ namespace Nebula::Graphics
     class Metal3UniformBuffer : public UniformBuffer
     {
     public:
-        Metal3UniformBuffer(MTL::Device* device, const BufferLayout& layout);
+        Metal3UniformBuffer(MTL::Device* device, const BufferLayout& layout, uint32_t instances = 1);
         ~Metal3UniformBuffer() override;
 
         virtual void SetData(uint32_t index, const void* data) override;
-        virtual void SetData(const std::string& paramater, const void* data) override;
+        virtual void SetData(uint32_t instanceIndex, const std::string& paramater, const void* data) override;
+
+        virtual uint32_t GetInstanceCount() const override { return m_InstanceCount; }
 
         virtual const BufferLayout& GetLayout() const override { return m_Layout; }
         virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
@@ -69,6 +71,7 @@ namespace Nebula::Graphics
         MTL::Buffer* GetBuffer() { return m_Buffer; }
 
     private:
+        uint32_t m_InstanceCount = 1;
         BufferLayout m_Layout;
 
         MTL::Buffer* m_Buffer;

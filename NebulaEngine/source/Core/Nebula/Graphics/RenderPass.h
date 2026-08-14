@@ -42,7 +42,7 @@ namespace Nebula::Graphics
         virtual void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 
         virtual void SetShaderPipeline(Ref<ShaderPipeline> pipeline) = 0;
-        virtual void SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer) = 0;
+        virtual void SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer, uint32_t instanceIndex = 0) = 0;
         virtual void BindTextureToSlot(Ref<Texture2D> texture, uint32_t slot = 0) = 0;
         virtual void BindTextureToSlot(Texture2D* texture, uint32_t slot = 0) = 0;
 

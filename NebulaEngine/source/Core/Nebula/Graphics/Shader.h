@@ -19,6 +19,7 @@ namespace Nebula::Graphics
     {
     public:
         ShaderLibrary() = default;
+        ~ShaderLibrary();
 
         void Add(const std::string& name, const Ref<Shader>& shader);
         void Add(const Ref<Shader>& shader);

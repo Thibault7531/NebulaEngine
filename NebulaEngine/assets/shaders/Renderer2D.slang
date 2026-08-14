@@ -3,8 +3,8 @@ struct Renderer2DUniforms
     float4x4 u_ViewProjection;
 }
 
-Sampler2D u_Textures[16];
-ParameterBlock<Renderer2DUniforms> Renderer2DUBO;
+Sampler2D u_Textures[15];
+ParameterBlock<Renderer2DUniforms> Renderer2DUBO : register(b1);
 
 struct VSInput
 {
@@ -37,8 +37,8 @@ struct FSInput
 
 struct FSOutput
 {
-    float4 Color;
-    int EntityID;
+    float4 Color : SV_Target0;
+    int EntityID : SV_Target1;
 }
 
 [shader("vertex")]
@@ -78,7 +78,6 @@ FSOutput fragmentMain(FSInput input)
     case 12: output.Color = u_Textures[12].Sample(input.v_TexCoord * input.v_TilingFactor); break;
     case 13: output.Color = u_Textures[13].Sample(input.v_TexCoord * input.v_TilingFactor); break;
     case 14: output.Color = u_Textures[14].Sample(input.v_TexCoord * input.v_TilingFactor); break;
-    case 15: output.Color = u_Textures[15].Sample(input.v_TexCoord * input.v_TilingFactor); break;
     }
 
     output.Color *= input.v_Color;

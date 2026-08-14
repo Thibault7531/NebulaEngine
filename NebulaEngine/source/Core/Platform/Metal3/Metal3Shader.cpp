@@ -49,11 +49,11 @@ namespace Nebula::Graphics
     	NS::Error* error;
 
     	m_VertexLibrary = device->newLibrary(NS::String::string(vertexSource.c_str(), NS::ASCIIStringEncoding), compileOptions, &error);
-    	NB_CORE_ASSERT(m_VertexLibrary, "Could not compile Metal vertex shader {}: {}", m_Name, error->localizedDescription()->utf8String());
+    	NB_CORE_ASSERT(m_VertexLibrary, std::format("Could not compile Metal vertex shader {}: {}", m_Name, error->localizedDescription()->utf8String()))
     	m_VertexFunction = m_VertexLibrary->newFunction(NS::String::string("vertexMain", NS::ASCIIStringEncoding));
 
     	m_FragmentLibrary = device->newLibrary(NS::String::string(fragmentSource.c_str(), NS::ASCIIStringEncoding), compileOptions, &error);
-    	NB_CORE_ASSERT(m_FragmentLibrary, "Could not compile Metal fragment shader {}: {}", m_Name, error->localizedDescription()->utf8String());
+    	NB_CORE_ASSERT(m_FragmentLibrary, std::format("Could not compile Metal fragment shader {}: {}", m_Name, error->localizedDescription()->utf8String()))
     	m_FragmentFunction = m_FragmentLibrary->newFunction(NS::String::string("fragmentMain", NS::ASCIIStringEncoding));
 
     	compileOptions->release();

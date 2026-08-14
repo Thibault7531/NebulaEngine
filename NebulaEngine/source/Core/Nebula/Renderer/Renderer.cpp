@@ -24,8 +24,6 @@ namespace Nebula {
 			{ Graphics::ShaderDataType::Matrix4, "u_ViewProjection" },
 			{ Graphics::ShaderDataType::Matrix4, "u_Transform" }
 		});
-
-		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()
@@ -33,7 +31,6 @@ namespace Nebula {
 		NB_PROFILE_FUNCTION();
 
 		NB_CORE_INFO("Shutting down Nebula Renderer");
-		Renderer2D::Shutdown();
 
 		m_SceneData->m_UBO.reset();
 	}
