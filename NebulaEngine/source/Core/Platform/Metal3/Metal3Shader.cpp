@@ -20,6 +20,9 @@ namespace Nebula::Graphics
     	m_VertexLibrary->release();
     	m_FragmentFunction->release();
     	m_FragmentLibrary->release();
+
+    	m_ProgramReflection = nullptr;
+    	m_CompileRequest = nullptr;
     }
 
     std::string Metal3Shader::ReadFile(const std::filesystem::path& path)

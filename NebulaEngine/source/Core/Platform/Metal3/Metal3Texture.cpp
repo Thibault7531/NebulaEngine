@@ -8,7 +8,7 @@ namespace Nebula::Graphics
 {
     Metal3Texture2D::Metal3Texture2D(MTL::Device* device, uint32_t width, uint32_t height,
         const TextureSpecification& spec)
-            : m_spec{spec}
+            : m_spec{spec}, m_Device{device}
     {
         MTL::TextureDescriptor* textureDescriptor = MTL::TextureDescriptor::alloc()->init();
         textureDescriptor->setTextureType(MTL::TextureType2D);
@@ -38,7 +38,7 @@ namespace Nebula::Graphics
 
     Metal3Texture2D::Metal3Texture2D(MTL::Device* device, const std::filesystem::path& path,
         const TextureSpecification& spec)
-            : m_spec{spec}
+            : m_spec{spec}, m_Device{device}
     {
         int width, height, channels, components;
         stbi_set_flip_vertically_on_load(1);
@@ -88,6 +88,15 @@ namespace Nebula::Graphics
 
     std::vector<uint8_t> Metal3Texture2D::GetDataR8()
     {
+        MTL::CommandQueue* commandQueue = m_Device->newCommandQueue();
+        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
+        MTL::BlitCommandEncoder* blitEncoder = commandBuffer->blitCommandEncoder();
+        blitEncoder->synchronizeTexture(m_Texture, 0, 0);
+        blitEncoder->endEncoding();
+        commandBuffer->commit();
+        commandBuffer->waitUntilCompleted();
+        commandQueue->release();
+
         std::vector<uint8_t> result(m_Texture->width() * m_Texture->height());
         m_Texture->getBytes(result.data(), m_Texture->width() * sizeof(uint8_t), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
         return result;
@@ -95,6 +104,15 @@ namespace Nebula::Graphics
 
     std::vector<int32_t> Metal3Texture2D::GetDataR32I()
     {
+        MTL::CommandQueue* commandQueue = m_Device->newCommandQueue();
+        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
+        MTL::BlitCommandEncoder* blitEncoder = commandBuffer->blitCommandEncoder();
+        blitEncoder->synchronizeTexture(m_Texture, 0, 0);
+        blitEncoder->endEncoding();
+        commandBuffer->commit();
+        commandBuffer->waitUntilCompleted();
+        commandQueue->release();
+
         std::vector<int32_t> result(m_Texture->width() * m_Texture->height());
         m_Texture->getBytes(result.data(), m_Texture->width() * sizeof(int32_t), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
         return result;
@@ -102,6 +120,15 @@ namespace Nebula::Graphics
 
     std::vector<uint32_t> Metal3Texture2D::GetDataR32UI()
     {
+        MTL::CommandQueue* commandQueue = m_Device->newCommandQueue();
+        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
+        MTL::BlitCommandEncoder* blitEncoder = commandBuffer->blitCommandEncoder();
+        blitEncoder->synchronizeTexture(m_Texture, 0, 0);
+        blitEncoder->endEncoding();
+        commandBuffer->commit();
+        commandBuffer->waitUntilCompleted();
+        commandQueue->release();
+
         std::vector<uint32_t> result(m_Texture->width() * m_Texture->height());
         m_Texture->getBytes(result.data(), m_Texture->width() * sizeof(uint32_t), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
         return result;
@@ -109,6 +136,15 @@ namespace Nebula::Graphics
 
     std::vector<glm::vec4> Metal3Texture2D::GetDataRGBA8()
     {
+        MTL::CommandQueue* commandQueue = m_Device->newCommandQueue();
+        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
+        MTL::BlitCommandEncoder* blitEncoder = commandBuffer->blitCommandEncoder();
+        blitEncoder->synchronizeTexture(m_Texture, 0, 0);
+        blitEncoder->endEncoding();
+        commandBuffer->commit();
+        commandBuffer->waitUntilCompleted();
+        commandQueue->release();
+
         std::vector<glm::vec4> result(m_Texture->width() * m_Texture->height());
         m_Texture->getBytes(result.data(), m_Texture->width() * sizeof(glm::vec4), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
         return result;

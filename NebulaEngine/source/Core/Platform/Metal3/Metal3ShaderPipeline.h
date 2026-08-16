@@ -20,6 +20,7 @@ namespace Nebula::Graphics
         static MTL::VertexFormat GetMetal3VertexFormat(ShaderDataType type);
         static MTL::BlendOperation GetMetal3BlendOperation(BlendOperation operation);
         static MTL::BlendFactor GetMetal3BlendFactor(BlendFactor factor);
+        static bool IsColorFormatBlendable(Texture::InternalFormat format);
 
     public:
         MTL::RenderPipelineState* GetRenderPipelineState() { return m_RenderPipelineState; }

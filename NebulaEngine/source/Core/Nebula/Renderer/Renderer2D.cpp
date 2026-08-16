@@ -96,24 +96,6 @@ namespace Nebula
         delete[] quadIndices;
 
         s_Data.ShaderLibrary.Load(Platform::Files::GetResourcesPath() / "assets/NebulaEngine/shaders/Renderer2D.slang");
-        Graphics::VertexLayout layout = {
-            { Graphics::ShaderDataType::Float3, "a_Position" },
-            { Graphics::ShaderDataType::Float4, "a_Color" },
-            { Graphics::ShaderDataType::Float, "a_TexIndex" },
-            { Graphics::ShaderDataType::Float2, "a_TexCoord" },
-            { Graphics::ShaderDataType::Float, "a_TilingFactor" },
-            { Graphics::ShaderDataType::Int, "a_EntityID" }
-        };
-        Graphics::BlendState blendState;
-        blendState.enabled = true;
-        blendState.srcColorFactor = Graphics::BlendFactor::SourceAlpha;
-        blendState.dstColorFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
-        blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
-        blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
-        Graphics::PipelineSpecification spec;
-        spec.framebufferSpec = Application::Get().GetMainFramebuffer()->GetSpecification();
-        spec.blendState = blendState;
-        s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
 
         s_Data.QuadUniformBuffer = s_Data.Device->CreateUniformBuffer({
             { Graphics::ShaderDataType::Matrix4, "u_ViewProjection" },
@@ -150,6 +132,25 @@ namespace Nebula
         s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
         s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
 
+        Graphics::VertexLayout layout = {
+            { Graphics::ShaderDataType::Float3, "a_Position" },
+            { Graphics::ShaderDataType::Float4, "a_Color" },
+            { Graphics::ShaderDataType::Float, "a_TexIndex" },
+            { Graphics::ShaderDataType::Float2, "a_TexCoord" },
+            { Graphics::ShaderDataType::Float, "a_TilingFactor" },
+            { Graphics::ShaderDataType::Int, "a_EntityID" }
+        };
+        Graphics::BlendState blendState;
+        blendState.enabled = true;
+        blendState.srcColorFactor = Graphics::BlendFactor::SourceAlpha;
+        blendState.dstColorFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
+        blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
+        blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
+        Graphics::PipelineSpecification spec;
+        spec.framebufferSpec = Application::Get().GetMainFramebuffer()->GetSpecification();
+        spec.blendState = blendState;
+        s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
+
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
         s_Data.RenderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.getViewProjectionMatrix()));
@@ -162,12 +163,38 @@ namespace Nebula
 
     void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
     {
+        BeginScene(camera, transform, Application::Get().GetMainFramebuffer(), false);
+    }
+
+    void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform,
+        Ref<Graphics::Framebuffer> framebuffer, bool clear)
+    {
         NB_PROFILE_FUNCTION();
 
         s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
-        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
+        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, clear);
+
+        Graphics::VertexLayout layout = {
+            { Graphics::ShaderDataType::Float3, "a_Position" },
+            { Graphics::ShaderDataType::Float4, "a_Color" },
+            { Graphics::ShaderDataType::Float, "a_TexIndex" },
+            { Graphics::ShaderDataType::Float2, "a_TexCoord" },
+            { Graphics::ShaderDataType::Float, "a_TilingFactor" },
+            { Graphics::ShaderDataType::Int, "a_EntityID" }
+        };
+        Graphics::BlendState blendState;
+        blendState.enabled = true;
+        blendState.srcColorFactor = Graphics::BlendFactor::SourceAlpha;
+        blendState.dstColorFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
+        blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
+        blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
+        Graphics::PipelineSpecification spec;
+        spec.framebufferSpec = framebuffer->GetSpecification();
+        spec.blendState = blendState;
+        s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
+        s_Data.RenderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
         glm::mat4 viewProjection = camera.GetProjectionMatrix() * glm::inverse(transform);
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(viewProjection));
 
@@ -179,12 +206,37 @@ namespace Nebula
 
     void Renderer2D::BeginScene(const EditorCamera& camera)
     {
+        BeginScene(camera, Application::Get().GetMainFramebuffer(), false);
+    }
+
+    void Renderer2D::BeginScene(const EditorCamera& camera, Ref<Graphics::Framebuffer> framebuffer, bool clear)
+    {
         NB_PROFILE_FUNCTION();
 
         s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
-        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
+        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, clear);
+
+        Graphics::VertexLayout layout = {
+            { Graphics::ShaderDataType::Float3, "a_Position" },
+            { Graphics::ShaderDataType::Float4, "a_Color" },
+            { Graphics::ShaderDataType::Float, "a_TexIndex" },
+            { Graphics::ShaderDataType::Float2, "a_TexCoord" },
+            { Graphics::ShaderDataType::Float, "a_TilingFactor" },
+            { Graphics::ShaderDataType::Int, "a_EntityID" }
+        };
+        Graphics::BlendState blendState;
+        blendState.enabled = true;
+        blendState.srcColorFactor = Graphics::BlendFactor::SourceAlpha;
+        blendState.dstColorFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
+        blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
+        blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
+        Graphics::PipelineSpecification spec;
+        spec.framebufferSpec = framebuffer->GetSpecification();
+        spec.blendState = blendState;
+        s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
+        s_Data.RenderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.GetViewProjectionMatrix()));
 
         s_Data.QuadIndexCount = 0;
@@ -210,10 +262,12 @@ namespace Nebula
         auto dataSize = static_cast<uint32_t>(reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferPtr) - reinterpret_cast<uint8_t*>(s_Data.QuadVertexBufferBase));
         s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 
+        Ref<Graphics::Framebuffer> framebuffer = s_Data.RenderPass->GetFramebuffer();
+
         Flush();
 
         s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
-        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
+        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, false);
 
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;

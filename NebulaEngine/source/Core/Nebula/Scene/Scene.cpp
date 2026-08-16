@@ -32,51 +32,6 @@ namespace Nebula
                 nsc.Instance->OnUpdate(ts);
             });
         }
-
-        Camera* primaryCamera = nullptr;
-        glm::mat4 cameraTransform;
-        {
-            auto view = m_Registry.view<TransformComponent, CameraComponent>();
-            for (auto entity : view)
-            {
-                auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
-
-                if (camera.Primary)
-                {
-                    primaryCamera = &camera.Camera;
-                    cameraTransform = transform.GetTransform();
-                    break;
-                }
-            }
-        }
-
-        if (primaryCamera)
-        {
-            Renderer2D::BeginScene(*primaryCamera, cameraTransform);
-
-            for (const auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>(); const auto entity : view)
-            {
-                auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
-
-                Renderer2D::DrawQuad({.transform = transform.GetTransform(), .color = sprite.Color});
-            }
-
-            Renderer2D::EndScene();
-        }
-    }
-
-    void Scene::OnUpdateEditor(Timestep ts, const EditorCamera& camera)
-    {
-        Renderer2D::BeginScene(camera);
-
-        for (const auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>(); const auto entity : view)
-        {
-            auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
-
-            Renderer2D::DrawQuad({.transform = transform.GetTransform(), .color = sprite.Color, .entityID = static_cast<int32_t>(entity)});
-        }
-
-        Renderer2D::EndScene();
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height)

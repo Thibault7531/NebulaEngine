@@ -6,7 +6,7 @@
 
 #include "Nebula.h"
 #include "Nebula/CoreSystems/Application/Layer.h"
-#include "Nebula/Renderer/Buffers/Framebuffer.h"
+#include "Nebula/Graphics/Buffers/Framebuffer.h"
 #include "Nebula/Renderer/Cameras/EditorCamera.h"
 #include "Panels/SceneHierarchyPanel.h"
 
@@ -40,7 +40,8 @@ namespace Nebula {
         bool DoesViewportFit = false;
         glm::vec2 m_ViewportPos = { 0.0f, 0.0f };
         glm::vec2 m_ViewportSize = { 1920.0f, 1080.0f };
-        Ref<Framebuffer> m_Framebuffer;
+        Ref<Graphics::Device> m_Device;
+        Ref<Graphics::Framebuffer> m_Framebuffer;
 
         EditorCamera m_Camera;
 
@@ -53,10 +54,10 @@ namespace Nebula {
         bool IsFirstRender = true;
         std::vector<glm::vec4> m_TitleBarButtons{};
 
-        Ref<Texture2D> m_CloseIcon;
-        Ref<Texture2D> m_MaximizeIcon;
-        Ref<Texture2D> m_RestoreIcon;
-        Ref<Texture2D> m_MinimizeIcon;
+        Ref<Graphics::Texture2D> m_CloseIcon;
+        Ref<Graphics::Texture2D> m_MaximizeIcon;
+        Ref<Graphics::Texture2D> m_RestoreIcon;
+        Ref<Graphics::Texture2D> m_MinimizeIcon;
     };
 
 }

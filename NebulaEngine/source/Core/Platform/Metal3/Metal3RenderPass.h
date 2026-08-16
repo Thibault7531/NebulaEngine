@@ -14,6 +14,8 @@ namespace Nebula::Graphics
         Metal3RenderPass(MTL::Device* device, MTL::CommandBuffer* commandBuffer, Ref<Metal3Framebuffer> framebuffer, bool clear);
         ~Metal3RenderPass() override;
 
+        virtual Ref<Framebuffer> GetFramebuffer() const override { return m_Framebuffer; }
+
         virtual void SetCullMode(CullMode mode) override;
         virtual void SetDepthStencilState(DepthStencilState state) override;
 

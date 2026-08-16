@@ -35,6 +35,8 @@ namespace Nebula::Graphics
     public:
         virtual ~RenderPass() = default;
 
+        virtual Ref<Framebuffer> GetFramebuffer() const = 0;
+
         virtual void SetCullMode(CullMode mode) = 0;
         virtual void SetDepthStencilState(DepthStencilState state) = 0;
 

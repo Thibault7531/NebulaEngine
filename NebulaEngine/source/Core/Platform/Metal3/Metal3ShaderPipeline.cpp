@@ -46,7 +46,7 @@ namespace Nebula::Graphics
             {
                 MTL::RenderPipelineColorAttachmentDescriptor* colorAttachmentDescriptor = renderPipelineDescriptor->colorAttachments()->object(colorAttachmentIndex);
                 colorAttachmentDescriptor->setPixelFormat(Metal3Texture2D::GetMetal3PixelFormat(attachmentSpec.InternalFormat));
-                colorAttachmentDescriptor->setBlendingEnabled(spec.blendState.enabled);
+                colorAttachmentDescriptor->setBlendingEnabled(IsColorFormatBlendable(attachmentSpec.InternalFormat) && spec.blendState.enabled);
                 colorAttachmentDescriptor->setAlphaBlendOperation(GetMetal3BlendOperation(spec.blendState.alphaOperation));
                 colorAttachmentDescriptor->setRgbBlendOperation(GetMetal3BlendOperation(spec.blendState.colorOperation));
                 colorAttachmentDescriptor->setDestinationAlphaBlendFactor(GetMetal3BlendFactor(spec.blendState.dstAlphaFactor));
@@ -117,6 +117,19 @@ namespace Nebula::Graphics
         case BlendFactor::OneMinusSourceAlpha: return MTL::BlendFactorOneMinusSourceAlpha;
         case BlendFactor::DestinationAlpha: return MTL::BlendFactorDestinationAlpha;
         case BlendFactor::OneMinusDestinationAlpha: return MTL::BlendFactorOneMinusDestinationAlpha;
+        }
+    }
+
+    bool Metal3ShaderPipeline::IsColorFormatBlendable(Texture::InternalFormat format)
+    {
+        switch (format)
+        {
+        case Texture::InternalFormat::None: return false;
+        case Texture::InternalFormat::RGB8: return true;
+        case Texture::InternalFormat::RGBA8: return true;
+        case Texture::InternalFormat::R32I: return false;
+        case Texture::InternalFormat::R32UI: return false;
+        case Texture::InternalFormat::Depth24Stencil8: return false;
         }
     }
 }

@@ -38,6 +38,7 @@ namespace Nebula::Graphics
     private:
         TextureSpecification m_spec;
 
+        MTL::Device* m_Device;
         MTL::Texture* m_Texture;
         MTL::SamplerState* m_Sampler;
     };

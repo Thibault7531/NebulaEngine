@@ -1,7 +1,8 @@
 #include "Application.h"
 
 #include "Nebula/CoreSystems/Core/Timestep.h"
-#include "Nebula/Renderer/Renderer.h"
+#include "Nebula/Graphics/Core/RendererAPI.h"
+#include "Nebula/Renderer/SceneRenderer.h"
 #include "Nebula/Renderer/Renderer2D.h"
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
@@ -42,7 +43,7 @@ namespace Nebula
 
 		m_MainFramebuffer = m_Device->CreateFramebuffer({m_MainWindow->GetClientSize().first, m_MainWindow->GetClientSize().second});
 
-		Renderer::Init();
+		SceneRenderer::Init();
 		Renderer2D::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
@@ -60,7 +61,7 @@ namespace Nebula
 		PopOverlay(m_ImGuiLayer);
 		delete m_ImGuiLayer;
 		Renderer2D::Shutdown();
-		Renderer::Shutdown();
+		SceneRenderer::Shutdown();
 
 		Platform::WindowManager::Get().DestroyMainWindow();
 		m_MainWindow.reset();
@@ -187,7 +188,7 @@ namespace Nebula
 	{
 		NB_PROFILE_FUNCTION();
 
-		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+		SceneRenderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 		m_MainWindow->GetSurface()->Resize(e.GetWidth(), e.GetHeight());
 		m_MainFramebuffer->Resize(e.GetWidth(), e.GetHeight());
 

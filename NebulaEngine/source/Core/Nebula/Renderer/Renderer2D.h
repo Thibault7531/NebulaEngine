@@ -5,6 +5,7 @@
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Cameras/OrthographicCamera.h"
 #include "Nebula/Graphics/Texture.h"
+#include "Nebula/Graphics/Buffers/Framebuffer.h"
 
 namespace Nebula
 {
@@ -37,7 +38,9 @@ namespace Nebula
 
         static void BeginScene(const OrthographicCamera& camera);
         static void BeginScene(const Camera& camera, const glm::mat4& transform);
+        static void BeginScene(const Camera& camera, const glm::mat4& transform, Ref<Graphics::Framebuffer> framebuffer, bool clear = true);
         static void BeginScene(const EditorCamera& camera);
+        static void BeginScene(const EditorCamera& camera, Ref<Graphics::Framebuffer> framebuffer, bool clear = true);
         static void EndScene();
         static void NextBash();
         static void Flush();
