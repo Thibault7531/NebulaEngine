@@ -1,6 +1,5 @@
 import NebulaPlatformWindow
 import NebulaMetalSurface
-import NebulaOpenGLSurface
 import NebulaEventHandler
 
 import AppKit
@@ -12,7 +11,6 @@ public struct MacOSWindow {
     let m_Window: NSWindow
     var m_WindowStyle: NSWindow.StyleMask
     var m_MTL3Surface: Nebula.Graphics.Metal3SurfacePointer?
-    var m_OGLSurface: Nebula.Graphics.OpenGlSurface?
     var m_EventHandler: Nebula.Platform.EventHandler
     var m_WindowTrackingArea: NSTrackingArea
     var m_WindowDelegate: MacOSWindowDelegate
@@ -81,7 +79,6 @@ public struct MacOSWindow {
         m_Window.makeKeyAndOrderFront(nil)
         m_Window.setIsVisible(true)
         
-        if (m_Properties.API == .OpenGL410) { m_OGLSurface = Nebula.Graphics.OpenGlSurface(Int32(m_Window.windowNumber)) }
         if (m_Properties.API == .Metal3) {
             let ptr = Unmanaged.passUnretained(m_Window).toOpaque()
             m_MTL3Surface = Nebula.Graphics.Metal3SurfacePointer(ptr)
@@ -225,7 +222,6 @@ public struct MacOSWindow {
     }
     public mutating func Present(framebuffer: UnsafeMutableRawPointer) {
         m_MTL3Surface?.Present(framebuffer)
-        m_OGLSurface?.Present(framebuffer)
     }
     
     public func GetWindowWidth() -> UInt32 {
@@ -290,11 +286,11 @@ public struct MacOSWindow {
     }
     
     public mutating func SetVSync(mode: Nebula.Graphics.VSyncMode) {
-        m_OGLSurface?.SetVSync(mode)
+        m_MTL3Surface?.SetVSync(mode)
     }
     public func IsVSync() -> Nebula.Graphics.VSyncMode {
         var mode: Nebula.Graphics.VSyncMode = .Off
-        if (m_OGLSurface != nil) {mode = m_OGLSurface!.IsVsync()}
+        if (m_MTL3Surface != nil) {mode = m_MTL3Surface!.IsVsync()}
         return mode
     }
     public func SetFullscreen(enabled: Bool) {
@@ -339,10 +335,6 @@ public struct MacOSWindow {
     }
     public func Flash() {
         NSApplication.shared.requestUserAttention(.informationalRequest)
-    }
-    
-    public mutating func GetOpenGLContext() -> UnsafeMutableRawPointer {
-        return UnsafeMutableRawPointer(UnsafeMutablePointer(&m_OGLSurface!))
     }
     
     public mutating func GetMetal3Context() -> Nebula.Graphics.Metal3SurfacePointer {

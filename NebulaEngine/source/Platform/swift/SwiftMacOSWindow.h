@@ -4179,11 +4179,10 @@ SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V4ShowyyF(SWIFT_CONTEXT const void * _
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V4HideyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Hide()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V5RaiseyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Raise()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V5FlashyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // Flash()
-SWIFT_EXTERN void * _Nonnull $s16SwiftMacOSWindow0bC0V16GetOpenGLContextSvyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetOpenGLContext()
 SWIFT_EXTERN void $s16SwiftMacOSWindow0bC0V16GetMetal3ContextSo6NebulaO8GraphicsO0E14SurfacePointerVyF(SWIFT_INDIRECT_RESULT void * _Nonnull, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetMetal3Context()
 SWIFT_EXTERN uint32_t $s16SwiftMacOSWindow0bC0V5GetIDs6UInt32VyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // GetID()
 struct SwiftMacOSWindow_MacOSWindow {
-  _Alignas(8) char _storage[168];
+  _Alignas(8) char _storage[128];
 };
 
 // Stub struct to be used to pass/return values to/from Swift functions.
@@ -4352,7 +4351,6 @@ public:
   SWIFT_INLINE_THUNK void Hide() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V4HideyyF");
   SWIFT_INLINE_THUNK void Raise() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5RaiseyyF");
   SWIFT_INLINE_THUNK void Flash() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5FlashyyF");
-  SWIFT_INLINE_THUNK void * _Nonnull GetOpenGLContext() SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V16GetOpenGLContextSvyF");
   SWIFT_INLINE_THUNK Nebula::Graphics::Metal3SurfacePointer GetMetal3Context() SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V16GetMetal3ContextSo6NebulaO8GraphicsO0E14SurfacePointerVyF");
   SWIFT_INLINE_THUNK uint32_t GetID() const SWIFT_SYMBOL("s:16SwiftMacOSWindow0bC0V5GetIDs6UInt32VyF");
 private:
@@ -4361,7 +4359,7 @@ private:
   SWIFT_INLINE_THUNK const char * _Nonnull _getOpaquePointer() const noexcept { return _storage; }
   SWIFT_INLINE_THUNK char * _Nonnull _getOpaquePointer() noexcept { return _storage; }
 
-  alignas(8) char _storage[168];
+  alignas(8) char _storage[128];
   friend class _impl::_impl_MacOSWindow;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc++17-extensions"
@@ -4592,9 +4590,6 @@ return result;
   }
   SWIFT_INLINE_THUNK void MacOSWindow::Flash() const {
   SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V5FlashyyF(_getOpaquePointer());
-  }
-  SWIFT_INLINE_THUNK void * _Nonnull MacOSWindow::GetOpenGLContext() {
-  return SwiftMacOSWindow::_impl::$s16SwiftMacOSWindow0bC0V16GetOpenGLContextSvyF(_getOpaquePointer());
   }
   SWIFT_INLINE_THUNK Nebula::Graphics::Metal3SurfacePointer MacOSWindow::GetMetal3Context() {
 alignas(alignof(Nebula::Graphics::Metal3SurfacePointer)) char storage[sizeof(Nebula::Graphics::Metal3SurfacePointer)];

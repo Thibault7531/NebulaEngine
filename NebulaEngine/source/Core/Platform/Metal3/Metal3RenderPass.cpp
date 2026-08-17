@@ -131,6 +131,7 @@ namespace Nebula::Graphics
     void Metal3RenderPass::EndRenderPass()
     {
         m_RenderCommandEncoder->endEncoding();
+        m_CurrentlyBoundShaderPipeline.reset();
     }
 
     MTL::CullMode Metal3RenderPass::GetMetal3CullMode(CullMode mode)

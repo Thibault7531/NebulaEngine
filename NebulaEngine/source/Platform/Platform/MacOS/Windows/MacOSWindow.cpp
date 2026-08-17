@@ -10,11 +10,6 @@ namespace Nebula::Platform
         {
             m_GrahicsSurface = m_NativeWindow.GetMetal3Context().GetSharedPointer();
         }
-        if (m_Properties.API == GraphicsAPI::OpenGL410)
-        {
-            auto* glContext = static_cast<Graphics::Surface*>(m_NativeWindow.GetOpenGLContext());
-            m_GrahicsSurface = std::shared_ptr<Graphics::Surface>(glContext);
-        }
     }
 
     MacOSWindow::~MacOSWindow()

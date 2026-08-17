@@ -6,7 +6,6 @@ namespace Nebula::Platform
     {
         None,
         Metal3,
-        OpenGL410,
         OpenGL460
     };
 }

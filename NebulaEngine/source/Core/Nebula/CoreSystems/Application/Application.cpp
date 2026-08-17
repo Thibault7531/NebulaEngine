@@ -29,7 +29,6 @@ namespace Nebula
 		Platform::GraphicsAPI api = Platform::GraphicsAPI::None;
 		if (Platform::Graphics::isGraphicsAPISupported(Platform::GraphicsAPI::Metal3)) api = Platform::GraphicsAPI::Metal3;
 		else if (Platform::Graphics::isGraphicsAPISupported(Platform::GraphicsAPI::OpenGL460)) api = Platform::GraphicsAPI::OpenGL460;
-		else if (Platform::Graphics::isGraphicsAPISupported(Platform::GraphicsAPI::OpenGL410)) api = Platform::GraphicsAPI::OpenGL410;
 		else NB_CORE_ASSERT(false, "No supported Graphics API found!");
 
 		props.API = api;

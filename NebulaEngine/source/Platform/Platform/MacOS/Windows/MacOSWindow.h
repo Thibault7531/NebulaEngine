@@ -2,7 +2,6 @@
 
 #include "Platform/Nebula/CoreSystems/Windows/Window.h"
 #include "Platform/Platform/MacOS/Events/EventHandler.h"
-#include "Platform/Platform/MacOS/Rendering/OpenGLSurface.h"
 #include "Platform/Platform/MacOS/Rendering/Metal3Surface.h"
 
 #include <SwiftMacOSWindow.h>
