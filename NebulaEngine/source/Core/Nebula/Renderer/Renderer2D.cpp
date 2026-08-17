@@ -118,6 +118,7 @@ namespace Nebula
         s_Data.QuadUniformBuffer.reset();
         s_Data.QuadShader.reset();
         s_Data.WhiteTexture.reset();
+        s_Data.ShaderLibrary.Clear();
 
         delete s_Data.QuadVertexBufferBase;
 

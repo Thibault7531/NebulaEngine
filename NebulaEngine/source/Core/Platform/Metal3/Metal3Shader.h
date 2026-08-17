@@ -44,7 +44,8 @@ namespace Nebula::Graphics
         MTL::Library* m_FragmentLibrary;
         MTL::Function* m_FragmentFunction;
 
-        Slang::ComPtr<slang::ICompileRequest> m_CompileRequest;
+        // TODO: Implement shader layout caching
+        Slang::ComPtr<slang::ISession> m_Session;
         Slang::ComPtr<slang::IComponentType> m_ProgramReflection;
 
     private:

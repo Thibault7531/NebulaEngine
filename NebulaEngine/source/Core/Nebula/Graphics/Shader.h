@@ -25,6 +25,7 @@ namespace Nebula::Graphics
         void Add(const Ref<Shader>& shader);
         Ref<Shader> Load(const std::filesystem::path& filepath);
         Ref<Shader> Load(const std::string& name, const std::filesystem::path& filepath);
+        void Clear();
 
         Ref<Shader> Get(const std::string& name);
 

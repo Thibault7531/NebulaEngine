@@ -22,7 +22,7 @@ namespace Nebula::Graphics
     	m_FragmentLibrary->release();
 
     	m_ProgramReflection = nullptr;
-    	m_CompileRequest = nullptr;
+    	m_Session = nullptr;
     }
 
     std::string Metal3Shader::ReadFile(const std::filesystem::path& path)
@@ -79,26 +79,26 @@ namespace Nebula::Graphics
     	sessionDesc.targets = &targetDesc;
     	sessionDesc.targetCount = 1;
 
-    	Slang::ComPtr<slang::ISession> session;
-    	s_GlobalSession->createSession(sessionDesc, session.writeRef());
+    	s_GlobalSession->createSession(sessionDesc, m_Session.writeRef());
 
-    	session->createCompileRequest(m_CompileRequest.writeRef());
+    	Slang::ComPtr<slang::ICompileRequest> compileRequest;
+    	m_Session->createCompileRequest(compileRequest.writeRef());
 
-    	int translationUnitIdx = m_CompileRequest->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, m_Name.c_str());
-    	m_CompileRequest->addTranslationUnitSourceString(translationUnitIdx, m_Name.c_str(), source.c_str());
+    	int translationUnitIdx = compileRequest->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, m_Name.c_str());
+    	compileRequest->addTranslationUnitSourceString(translationUnitIdx, m_Name.c_str(), source.c_str());
 
-    	int vertexEntryPointIdx = m_CompileRequest->addEntryPoint(translationUnitIdx, "vertexMain", SLANG_STAGE_VERTEX);
-    	int fragmentEntryPointIdx = m_CompileRequest->addEntryPoint(translationUnitIdx, "fragmentMain", SLANG_STAGE_FRAGMENT);
+    	int vertexEntryPointIdx = compileRequest->addEntryPoint(translationUnitIdx, "vertexMain", SLANG_STAGE_VERTEX);
+    	int fragmentEntryPointIdx = compileRequest->addEntryPoint(translationUnitIdx, "fragmentMain", SLANG_STAGE_FRAGMENT);
 
-    	const SlangResult vertexCompileResult = m_CompileRequest->compile();
+    	const SlangResult vertexCompileResult = compileRequest->compile();
     	NB_CORE_ASSERT(SLANG_SUCCEEDED(vertexCompileResult), "Slang compilation failed !");
 
-    	m_CompileRequest->getProgramWithEntryPoints(m_ProgramReflection.writeRef());
+    	compileRequest->getProgramWithEntryPoints(m_ProgramReflection.writeRef());
 
     	size_t outputSize = 0;
 
-    	std::string vertexSource = static_cast<const char*>(m_CompileRequest->getEntryPointCode(vertexEntryPointIdx, &outputSize));
-    	std::string fragmentSource = static_cast<const char*>(m_CompileRequest->getEntryPointCode(fragmentEntryPointIdx, &outputSize));
+    	std::string vertexSource = static_cast<const char*>(compileRequest->getEntryPointCode(vertexEntryPointIdx, &outputSize));
+    	std::string fragmentSource = static_cast<const char*>(compileRequest->getEntryPointCode(fragmentEntryPointIdx, &outputSize));
 
     	CompileMSL(device, vertexSource, fragmentSource);
     }

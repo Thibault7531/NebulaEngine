@@ -33,6 +33,11 @@ namespace Nebula::Graphics
         return shader;
     }
 
+    void ShaderLibrary::Clear()
+    {
+        m_Shaders.clear();
+    }
+
     Ref<Shader> ShaderLibrary::Get(const std::string& name)
     {
         return m_Shaders[name];
