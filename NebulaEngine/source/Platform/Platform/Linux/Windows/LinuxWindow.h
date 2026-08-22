@@ -21,8 +21,7 @@ namespace Nebula::Platform
         virtual const std::function<HitTest(int32_t, int32_t)>& GetWindowHitTest() override { return m_WindowHitTest; }
 
         virtual void OnUpdate() override;
-        virtual void SwapBuffers() override;
-        virtual void Present(uint32_t framebuffer) override;
+        virtual void Present(void* framebuffer) override;
 
         [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetSize() const override;
         virtual void SetSize(uint32_t width, uint32_t height) override;
@@ -36,8 +35,8 @@ namespace Nebula::Platform
         virtual void SetMousePos(int32_t x, int32_t y) const override;
         virtual void CaptureMouse(bool enabled) override;
 
-        virtual void SetVSync(VSyncMode mode) override;
-        [[nodiscard]] virtual VSyncMode IsVSync() const override;
+        virtual void SetVSync(Graphics::VSyncMode mode) override;
+        [[nodiscard]] virtual Graphics::VSyncMode IsVSync() const override;
         virtual void SetFullscreen(bool enabled) override;
         [[nodiscard]] virtual bool IsFullscreen() const override;
         virtual void SetMaximized(bool enabled) override;
@@ -56,8 +55,7 @@ namespace Nebula::Platform
         virtual void StartInput() override;
         virtual void StopInput() override;
 
-        virtual Ref<Context> GetContext() override;
-        virtual void SetCurrentContext() override;
+        virtual Ref<Graphics::Surface> GetSurface() override;
 
     public:
         virtual void* GetNativeWindow() override { return m_Window; }
@@ -67,7 +65,7 @@ namespace Nebula::Platform
     private:
         SDL_Window* m_Window;
 
-        Ref<Context> m_Context;
+        Ref<Graphics::Surface> m_Surface;
 
         std::function<void(Event&)> m_EventCallback;
         std::function<HitTest(int32_t, int32_t)> m_WindowHitTest;

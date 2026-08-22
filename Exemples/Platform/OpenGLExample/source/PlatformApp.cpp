@@ -60,7 +60,7 @@ int main()
     Nebula::Platform::Log::Init();
 
     Nebula::Platform::CoreUtils::InitThread();
-    Nebula::Ref<Nebula::Platform::Window> window = Nebula::Platform::WindowManager::Get().CreateMainWindow({.Style = Nebula::Platform::WindowStyle::Default, .API = Nebula::Platform::GraphicsAPI::OpenGL410});
+    Nebula::Ref<Nebula::Platform::Window> window = Nebula::Platform::WindowManager::Get().CreateMainWindow({.Style = Nebula::Platform::WindowStyle::Default, .API = Nebula::Platform::GraphicsAPI::OpenGL460});
     window->SetEventCallback(Callback);
 
     const char* vertexCode = vertexShader.c_str();
@@ -83,8 +83,7 @@ int main()
     glBindVertexArray(vao);
 
     uint32_t vbo;
-    //glCreateBuffers(1, &vbo);
-    glGenBuffers(1, &vbo);
+    glCreateBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,

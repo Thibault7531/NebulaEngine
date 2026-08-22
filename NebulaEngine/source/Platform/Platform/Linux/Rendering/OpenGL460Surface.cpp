@@ -1,4 +1,4 @@
-#include "OpenGL410Context.h"
+#include "OpenGL460Surface.h"
 
 #include <glad/gl.h>
 #include <KHR/khrplatform.h>
@@ -6,28 +6,19 @@
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Platform/Linux/Windows/LinuxWindow.h"
 
-namespace Nebula::Platform
+namespace Nebula::Graphics
 {
-    bool OpenGL410Context::s_GLInitialized = false;
-    SDL_GLContext OpenGL410Context::s_MainContext = nullptr;
+    bool OpenGL460Surface::s_GLInitialized = false;
+    SDL_GLContext OpenGL460Surface::s_MainContext = nullptr;
 
-    OpenGL410Context::OpenGL410Context(Window* window)
+    OpenGL460Surface::OpenGL460Surface(Platform::Window* window)
         : m_Window(window)
-    {
-    }
-
-    OpenGL410Context::~OpenGL410Context()
-    {
-        SDL_GL_DestroyContext(m_Context);
-    }
-
-    void OpenGL410Context::Init()
     {
         if (!s_GLInitialized)
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
         }
         else
         {
@@ -36,7 +27,7 @@ namespace Nebula::Platform
         }
 
         m_Context = SDL_GL_CreateContext(static_cast<SDL_Window*>(m_Window->GetNativeWindow()));
-        SetCurrent();
+        OpenGL460Surface::NewFrame();
 
         if (!s_GLInitialized)
         {
@@ -46,19 +37,19 @@ namespace Nebula::Platform
         }
     }
 
-    void OpenGL410Context::SetCurrent()
+    OpenGL460Surface::~OpenGL460Surface()
     {
-        SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_Window->GetNativeWindow()), m_Context);
+        SDL_GL_DestroyContext(m_Context);
     }
 
-    void OpenGL410Context::SetVSync(VSyncMode mode)
+    void OpenGL460Surface::SetVSync(VSyncMode mode)
     {
         if (mode == VSyncMode::Off) SDL_GL_SetSwapInterval(0);
         if (mode == VSyncMode::Adaptive) SDL_GL_SetSwapInterval(-1);
         if (mode == VSyncMode::On) SDL_GL_SetSwapInterval(1);
     }
 
-    VSyncMode OpenGL410Context::IsVsync() const
+    VSyncMode OpenGL460Surface::IsVsync() const
     {
         int mode;
         SDL_GL_GetSwapInterval(&mode);
@@ -68,18 +59,15 @@ namespace Nebula::Platform
         return VSyncMode::Off;
     }
 
-    void OpenGL410Context::SwapBuffers()
+    void OpenGL460Surface::NewFrame()
     {
-        SDL_GL_SwapWindow(static_cast<SDL_Window*>(m_Window->GetNativeWindow()));
+        SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_Window->GetNativeWindow()), m_Context);
     }
 
-    void OpenGL410Context::Present(uint32_t framebuffer)
+    void OpenGL460Surface::Present(void* texture)
     {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glBlitFramebuffer(0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-        SwapBuffers();
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-        glBindRenderbuffer(GL_DRAW_FRAMEBUFFER, 0);
+        GLuint fbID = static_cast<GLuint>(reinterpret_cast<intptr_t>(texture));
+        if (fbID != 0) glBlitNamedFramebuffer(fbID, 0, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        SDL_GL_SwapWindow(static_cast<SDL_Window*>(m_Window->GetNativeWindow()));
     }
 }
