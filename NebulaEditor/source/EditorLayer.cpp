@@ -231,7 +231,7 @@ namespace Nebula {
             else buttonAlpha = 25;
             draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(buttonColor, buttonColor, buttonColor, buttonAlpha), 16);
             ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
-            ImGui::ImageWithBg(m_MinimizeIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
+            ImGui::ImageWithBg(m_MinimizeIcon.get(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
 
             buttonPos += titlabarHeight + buttonSpacing;
             ImGui::SetCursorPosX(buttonPos);
@@ -246,8 +246,8 @@ namespace Nebula {
             else buttonAlpha = 25;
             draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(buttonColor, buttonColor, buttonColor, buttonAlpha), 16);
             ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
-            if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) ImGui::ImageWithBg(m_RestoreIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
-            else ImGui::ImageWithBg(m_MaximizeIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
+            if (Platform::WindowManager::Get().GetMainWindow()->IsMaximized()) ImGui::ImageWithBg(m_RestoreIcon.get(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
+            else ImGui::ImageWithBg(m_MaximizeIcon.get(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
 
             buttonPos += titlabarHeight + buttonSpacing;
             ImGui::SetCursorPosX(buttonPos);
@@ -261,7 +261,7 @@ namespace Nebula {
             else buttonAlpha = 25;
             draw_list->AddCircleFilled({ buttonPos + titlabarHeight / 2, titlabarHeight / 2 }, buttonSize / 2, ImColor(buttonColor, buttonColor, buttonColor, buttonAlpha), 16);
             ImGui::SetCursorPos({buttonPos + titlabarHeight / 2 - textureSize / 2, (titlabarHeight - textureSize) /2});
-            ImGui::ImageWithBg(m_CloseIcon->GetRendererID(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
+            ImGui::ImageWithBg(m_CloseIcon.get(), {static_cast<float>(textureSize), static_cast<float>(textureSize)}, {0, 0}, {1, 1}, {0, 0, 0, 0}, ImColor(buttonColor, buttonColor, buttonColor, 255));
 
             ImGui::PopStyleVar();
             ImGui::PopStyleVar();
@@ -407,7 +407,6 @@ namespace Nebula {
             Ref<Graphics::Texture2D> texture = m_Framebuffer->GetColorAttachment(1);
             std::vector<int32_t> viewport = texture->GetDataR32I();
             int32_t entity = viewport[mouse_Y * texture->GetWidth() + mouse_X];
-            NB_TRACE("Selected Entity: {0}", entity);
             m_SceneHierarchyPanel.SetSelectedEntity(entity == -1 ? Entity() : Entity(static_cast<entt::entity>(entity), m_Scene.get()));
         }
         return false;

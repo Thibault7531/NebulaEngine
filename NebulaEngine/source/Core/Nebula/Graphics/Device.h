@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 #include "CommandBuffer.h"
 #include "Shader.h"
 #include "Texture.h"

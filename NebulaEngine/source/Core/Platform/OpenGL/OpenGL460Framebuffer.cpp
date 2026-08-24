@@ -4,7 +4,7 @@
 
 #include "gtc/type_ptr.hpp"
 
-namespace Nebula {
+namespace Nebula::Graphics {
 
     OpenGL460Framebuffer::OpenGL460Framebuffer(const FramebufferSpecification &spec)
         : m_Specification(spec)
@@ -47,14 +47,14 @@ namespace Nebula {
         m_ColorAttachments.resize(m_ColorAttachmentSpecs.size());
         for (uint32_t i = 0; i < m_ColorAttachmentSpecs.size(); i++)
         {
-            m_ColorAttachments[i] = Texture2D::Create(m_Specification.width, m_Specification.height, m_ColorAttachmentSpecs[i]);
-            m_ColorAttachments[i]->BindToFrameBuffer(Texture::FramebufferSlotType::Color, i);
+            m_ColorAttachments[i] = CreateRef<OpenGL460Texture2D>(m_Specification.width, m_Specification.height, m_ColorAttachmentSpecs[i]);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_ColorAttachments[i]->GetTextureID(), 0);
         }
 
         if (m_DepthAttachmentSpec.InternalFormat != Texture::InternalFormat::None)
         {
-            m_DepthAttachment = Texture2D::Create(m_Specification.width, m_Specification.height, m_DepthAttachmentSpec);
-            m_DepthAttachment->BindToFrameBuffer(Texture::FramebufferSlotType::DepthStencil);
+            m_DepthAttachment = CreateRef<OpenGL460Texture2D>(m_Specification.width, m_Specification.height, m_DepthAttachmentSpec);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, IsDepthStencilFormat(m_DepthAttachmentSpec.InternalFormat) ? GL_DEPTH_STENCIL_ATTACHMENT : GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment->GetTextureID(), 0);
         }
 
         if (m_ColorAttachments.size() > 0)
@@ -76,19 +76,18 @@ namespace Nebula {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void OpenGL460Framebuffer::Bind()
+    void OpenGL460Framebuffer::Resize(uint32_t width, uint32_t height)
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
-        glViewport(0, 0, m_Specification.width, m_Specification.height);
-    }
+        m_Specification.width = width;
+        m_Specification.height = height;
 
-    void OpenGL460Framebuffer::Unbind()
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        Invalidate();
     }
 
     void OpenGL460Framebuffer::Clear()
     {
+        glDepthMask(GL_TRUE);
+
         for (uint32_t i = 0; i < m_ColorAttachments.size(); i++)
         {
             switch (GetColorAttachmentDataType(m_ColorAttachmentSpecs[i].InternalFormat))
@@ -109,16 +108,11 @@ namespace Nebula {
             case ColorAttachementDataType::Float: glClearNamedFramebufferfv(m_RendererID, GL_COLOR, i, glm::value_ptr(m_ClearColors[i])); break;
             }
         }
-        if (m_DepthAttachment) glClearNamedFramebufferfv(m_RendererID, GL_DEPTH, 0, &m_ClearDepth);
-        if (m_DepthAttachment) glClearNamedFramebufferiv(m_RendererID, GL_STENCIL, 0, &m_ClearStencil);
-    }
-
-    void OpenGL460Framebuffer::Resize(uint32_t width, uint32_t height)
-    {
-        m_Specification.width = width;
-        m_Specification.height = height;
-
-        Invalidate();
+        if (m_DepthAttachment)
+        {
+            if (IsDepthStencilFormat(m_DepthAttachmentSpec.InternalFormat)) glClearNamedFramebufferfi(m_RendererID, GL_DEPTH_STENCIL, 0, m_ClearDepth, m_ClearStencil);
+            else glClearNamedFramebufferfv(m_RendererID, GL_DEPTH, 0, &m_ClearDepth);
+        }
     }
 
     ColorAttachementDataType OpenGL460Framebuffer::GetColorAttachmentDataType(Texture::InternalFormat format)

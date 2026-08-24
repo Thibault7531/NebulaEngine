@@ -1,8 +1,8 @@
 #include "OpenGLVertexArray.h"
 
-#include <glad/gl.h>
+#include "OpenGLBuffer.h"
 
-namespace Nebula {
+namespace Nebula::Graphics {
 
 	static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 	{
@@ -12,8 +12,8 @@ namespace Nebula {
 		case ShaderDataType::Float2: return GL_FLOAT;
 		case ShaderDataType::Float3: return GL_FLOAT;
 		case ShaderDataType::Float4: return GL_FLOAT;
-		case ShaderDataType::Mat3: return GL_FLOAT;
-		case ShaderDataType::Mat4: return GL_FLOAT;
+		case ShaderDataType::Matrix3: return GL_FLOAT;
+		case ShaderDataType::Matrix4: return GL_FLOAT;
 		case ShaderDataType::Byte: return GL_BYTE;
 		case ShaderDataType::Byte2: return GL_BYTE;
 		case ShaderDataType::Byte3: return GL_BYTE;
@@ -47,26 +47,13 @@ namespace Nebula {
 		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
-	void OpenGLVertexArray::Bind() const
-	{
-		NB_PROFILE_FUNCTION();
-
-		glBindVertexArray(m_RendererID);
-	}
-
-	void OpenGLVertexArray::Unbind() const
-	{
-		NB_PROFILE_FUNCTION();
-
-		glBindVertexArray(0);
-	}
-
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
 	{
 		NB_PROFILE_FUNCTION();
 
 		glBindVertexArray(m_RendererID);
-		vertexBuffer->Bind();
+		Ref<OpenGLVertexBuffer> vbo = std::static_pointer_cast<OpenGLVertexBuffer>(vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo->GetBufferID());
 
 		NB_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer Layout is not correct");
 
@@ -89,8 +76,8 @@ namespace Nebula {
 					break;
 				}
 
-			case ShaderDataType::Mat3:
-			case ShaderDataType::Mat4:
+			case ShaderDataType::Matrix3:
+			case ShaderDataType::Matrix4:
 				{
 					uint8_t count = element.GetComponentCount();
 					for (uint8_t i = 0; i < count; i++)
@@ -113,7 +100,7 @@ namespace Nebula {
 			case ShaderDataType::UByte4:
 				{
 					glEnableVertexAttribArray(index);
-					glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), reinterpret_cast<const void*>(element.Offset));
+					glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToOpenGLBaseType(element.Type), GL_TRUE, layout.GetStride(), reinterpret_cast<const void*>(element.Offset));
 					index++;
 					break;
 				}
@@ -133,15 +120,20 @@ namespace Nebula {
 		}
 
 		m_VertexBuffers.push_back(vertexBuffer);
+
+		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
 		NB_PROFILE_FUNCTION();
 
+		Ref<OpenGLIndexBuffer> ibo = std::static_pointer_cast<OpenGLIndexBuffer>(indexBuffer);
+
 		glBindVertexArray(m_RendererID);
-		indexBuffer->Bind();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo->GetBufferID());
 		m_IndexBuffer = indexBuffer;
+		glBindVertexArray(0);
 	}
 
 }

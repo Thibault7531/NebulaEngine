@@ -2,7 +2,7 @@
 
 #include <stb_image.h>
 
-namespace Nebula
+namespace Nebula::Graphics
 {
 
     OpenGL460Texture2D::OpenGL460Texture2D(uint32_t width, uint32_t height, const TextureSpecification& spec)
@@ -17,7 +17,7 @@ namespace Nebula
         glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GetOpenGL460FilterType(m_Specification.MagFilter));
     }
 
-    OpenGL460Texture2D::OpenGL460Texture2D(const std::string& path, const TextureSpecification& spec)
+    OpenGL460Texture2D::OpenGL460Texture2D(const std::filesystem::path& path, const TextureSpecification& spec)
         : m_Path{path}, m_Specification{spec}
     {
         NB_PROFILE_FUNCTION();
@@ -143,32 +143,6 @@ namespace Nebula
         }
         free(data);
         return result;
-    }
-
-    void OpenGL460Texture2D::Bind(uint32_t slot) const
-    {
-        NB_PROFILE_FUNCTION();
-
-        glBindTextureUnit(slot, m_RendererID);
-    }
-
-    void OpenGL460Texture2D::BindToFrameBuffer(FramebufferSlotType slotType, uint32_t slot) const
-    {
-        GLenum attachment = 0;
-        switch (slotType)
-        {
-        case FramebufferSlotType::Color: attachment = GL_COLOR_ATTACHMENT0 + slot; break;
-        case FramebufferSlotType::Depth: attachment = GL_DEPTH_ATTACHMENT; break;
-        case FramebufferSlotType::Stencil: attachment = GL_STENCIL_ATTACHMENT; break;
-        case FramebufferSlotType::DepthStencil: attachment = GL_DEPTH_STENCIL_ATTACHMENT; break;
-        }
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, m_RendererID, 0);
-    }
-
-    void OpenGL460Texture2D::BindWithID(uint32_t id, uint32_t slot)
-    {
-        glBindTextureUnit(slot, id);
     }
 
     GLenum OpenGL460Texture2D::GetOpenGL460InternalFormat(InternalFormat format)

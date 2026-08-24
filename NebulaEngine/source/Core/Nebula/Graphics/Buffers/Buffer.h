@@ -107,9 +107,6 @@ namespace Nebula::Graphics
 
 		[[nodiscard]] virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
-
-		//static Ref<VertexBuffer> Create(uint32_t size);
-		//static Ref<VertexBuffer> Create(float* vertices, uint32_t size);
 	};
 
 	class IndexBuffer
@@ -141,7 +138,7 @@ namespace Nebula::Graphics
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
 	public:
-		static Ref<UniformBuffer> Create(const BufferLayout& layout);
+		//static Ref<UniformBuffer> Create(const BufferLayout& layout);
 	};
 
 

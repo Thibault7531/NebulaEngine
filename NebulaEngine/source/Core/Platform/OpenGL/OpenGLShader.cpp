@@ -4,7 +4,7 @@
 #include <slang.h>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace Nebula {
+namespace Nebula::Graphics {
 	bool OpenGLShader::s_IsSlangGlobalSessionCreated = false;
 	Slang::ComPtr<slang::IGlobalSession> OpenGLShader::s_GlobalSession;
 
@@ -15,25 +15,6 @@ namespace Nebula {
 
 		NB_CORE_ASSERT(false, "Unknown shader type !");
 		return 0;
-	}
-
-	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-		: m_Name(name)
-	{
-		std::unordered_map<GLenum, std::string> shaderSources;
-		shaderSources[GL_VERTEX_SHADER] = vertexSrc;
-		shaderSources[GL_FRAGMENT_SHADER] = fragmentSrc;
-		CompileGLSL(shaderSources);
-	}
-
-	OpenGLShader::OpenGLShader(const std::string& name, const std::filesystem::path& vertexPath,
-		const std::filesystem::path& fragmentPath)
-			:m_Name(name)
-	{
-		std::unordered_map<GLenum, std::string> shaderSources;
-		shaderSources[GL_VERTEX_SHADER] = ReadFile(vertexPath.string());
-		shaderSources[GL_FRAGMENT_SHADER] = ReadFile(fragmentPath.string());
-		CompileGLSL(shaderSources);
 	}
 
 	OpenGLShader::OpenGLShader(const std::filesystem::path& filepath)
@@ -56,134 +37,6 @@ namespace Nebula {
 		NB_PROFILE_FUNCTION();
 
 		glDeleteProgram(m_RendererID);
-	}
-
-	void OpenGLShader::Bind() const
-	{
-		NB_PROFILE_FUNCTION();
-
-		glUseProgram(m_RendererID);
-	}
-
-	void OpenGLShader::Unbind() const
-	{
-		NB_PROFILE_FUNCTION();
-
-		glUseProgram(0);
-	}
-
-	void OpenGLShader::SetInt(const std::string& name, const int value)
-	{
-		NB_PROFILE_FUNCTION();
-
-		UploadUniformInt(name, value);
-	}
-
-	void OpenGLShader::SetIntArray(const std::string &name, int *value, const uint32_t count)
-	{
-		NB_PROFILE_FUNCTION();
-
-		UploadUniformIntArray(name, value, count);
-	}
-
-	void OpenGLShader::SetFloat(const std::string &name, const float value)
-	{
-		NB_PROFILE_FUNCTION();
-
-		UploadUniformFloat(name, value);
-	}
-
-	void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
-	{
-		NB_PROFILE_FUNCTION();
-
-		UploadUniformFloat3(name, value);
-	}
-
-	void OpenGLShader::SetFloat4(const std::string& name, const glm::vec4& value)
-	{
-		NB_PROFILE_FUNCTION();
-
-		UploadUniformFloat4(name, value);
-	}
-
-	void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
-	{
-		NB_PROFILE_FUNCTION();
-
-		UploadUniformMat4(name, value);
-	}
-
-	void OpenGLShader::SetUniformBlock(const std::string& name, Ref<UniformBuffer> ubo)
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformBlockIndex(m_RendererID, name.c_str());
-		ubo->BindToSlot(location);
-	}
-
-	void OpenGLShader::UploadUniformInt(const std::string& name, int value) const
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform1i(location, value);
-	}
-
-	void OpenGLShader::UploadUniformIntArray(const std::string &name, const int *value, const uint32_t count) const
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform1iv(location, count, value);
-	}
-
-	void OpenGLShader::UploadUniformFloat(const std::string& name, float value) const
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform1f(location, value);
-	}
-
-	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& vector) const
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform2fv(location, 1, glm::value_ptr(vector));
-	}
-
-	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& vector) const
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform3fv(location, 1, glm::value_ptr(vector));
-	}
-
-	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& vector) const
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniform4fv(location, 1, glm::value_ptr(vector));
-	}
-
-	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
-	}
-
-	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const
-	{
-		GLint location = 0;
-		if (m_IsSlangShader) location = GetSlangUniformLocation(name);
-		else location = glGetUniformLocation(m_RendererID, name.c_str());
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	std::string OpenGLShader::ReadFile(const std::string& filepath)
@@ -361,7 +214,7 @@ namespace Nebula {
 		m_IsSlangShader = true;
 	}
 
-	uint32_t OpenGLShader::GetSlangUniformLocation(const std::string& name) const
+	uint32_t OpenGLShader::GetUniformBlockLocation(const std::string& name) const
 	{
 		slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout(0);
 		uint32_t paramCount = programLayout->getParameterCount();

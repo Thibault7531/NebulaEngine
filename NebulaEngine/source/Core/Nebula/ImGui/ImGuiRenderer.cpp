@@ -105,6 +105,11 @@ namespace Nebula
         }
 
         renderer_data.vertexBuffer = renderer_data.device->CreateVertexBuffer(drawData->TotalVtxCount > 0 ? drawData->TotalVtxCount * sizeof(ImDrawVert) : 4);
+        renderer_data.vertexBuffer->SetLayout({
+            {Graphics::ShaderDataType::Float2, "a_Position"},
+            {Graphics::ShaderDataType::Float2, "a_UV"},
+            {Graphics::ShaderDataType::UByte4, "a_Color"}
+        });
         renderer_data.indexBuffer = renderer_data.device->CreateIndexBuffer(drawData->TotalIdxCount > 0 ? drawData->TotalIdxCount * sizeof(ImDrawIdx) : 3);
         Ref<Graphics::VertexArray> vertexArray = Graphics::VertexArray::Create();
         Ref<Graphics::CommandBuffer> commandBuffer = renderer_data.device->CreateCommandBuffer();

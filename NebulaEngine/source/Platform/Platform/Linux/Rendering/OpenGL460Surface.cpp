@@ -64,9 +64,10 @@ namespace Nebula::Graphics
         SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_Window->GetNativeWindow()), m_Context);
     }
 
-    void OpenGL460Surface::Present(void* texture)
+    void OpenGL460Surface::Present(void* framebuffer)
     {
-        GLuint fbID = static_cast<GLuint>(reinterpret_cast<intptr_t>(texture));
+        NewFrame();
+        GLuint fbID = static_cast<GLuint>(reinterpret_cast<intptr_t>(framebuffer));
         if (fbID != 0) glBlitNamedFramebuffer(fbID, 0, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         SDL_GL_SwapWindow(static_cast<SDL_Window*>(m_Window->GetNativeWindow()));
     }

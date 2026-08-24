@@ -21,7 +21,7 @@ namespace Nebula::Graphics
         virtual void Resize(uint32_t width, uint32_t height) override {}
 
         virtual void NewFrame() override;
-        virtual void Present(void* texture) override;
+        virtual void Present(void* framebuffer) override;
 
     private:
         Platform::Window* m_Window;

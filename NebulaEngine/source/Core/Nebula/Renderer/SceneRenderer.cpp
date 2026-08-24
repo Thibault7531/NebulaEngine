@@ -1,10 +1,10 @@
 #include "SceneRenderer.h"
 
 #include "Renderer2D.h"
-#include "WindowManager.h"
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/Scene/Components.h"
 #include "Nebula/Scene/Entity.h"
+#include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula {
 
