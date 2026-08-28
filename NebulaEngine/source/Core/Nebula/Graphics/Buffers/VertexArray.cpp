@@ -8,7 +8,14 @@ namespace Nebula::Graphics
 {
     Ref<VertexArray> VertexArray::Create()
     {
-#ifdef NB_PLATFORM_MACOS
+#ifdef NB_PLATFORM_WINDOWS
+        switch (RendererAPI::GetAPI())
+        {
+        case Platform::GraphicsAPI::None: NB_CORE_ERROR("None is not supported on Windows!"); break;
+        case Platform::GraphicsAPI::Metal3: NB_CORE_ERROR("Metal3 is not supported on Windows!"); break;
+        case Platform::GraphicsAPI::OpenGL460: return CreateRef<OpenGLVertexArray>();
+        }
+#elifdef NB_PLATFORM_MACOS
         switch (RendererAPI::GetAPI())
         {
         case Platform::GraphicsAPI::None: NB_CORE_ERROR("None is not supported on MacOS!"); break;

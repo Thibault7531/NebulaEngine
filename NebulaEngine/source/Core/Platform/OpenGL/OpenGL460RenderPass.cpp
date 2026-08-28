@@ -91,7 +91,7 @@ namespace Nebula::Graphics
     {
         uint32_t location = m_CurrentlyBoundShaderPipeline->GetUniformBlockLocation(blockName);
         Ref<OpenGL460UniformBuffer> uniformBuffer = std::dynamic_pointer_cast<OpenGL460UniformBuffer>(buffer);
-        glBindBufferRange(GL_UNIFORM_BUFFER, location, uniformBuffer->GetBufferID(), uniformBuffer->GetLayout().GetStride() * instanceIndex, uniformBuffer->GetLayout().GetStride());
+        glBindBufferRange(GL_UNIFORM_BUFFER, location, uniformBuffer->GetBufferID(), uniformBuffer->GetAlignedStride() * instanceIndex, uniformBuffer->GetLayout().GetStride());
     }
 
     void OpenGL460RenderPass::BindTextureToSlot(Ref<Texture2D> texture, uint32_t slot)

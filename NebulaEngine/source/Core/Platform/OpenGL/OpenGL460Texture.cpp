@@ -18,7 +18,7 @@ namespace Nebula::Graphics
     }
 
     OpenGL460Texture2D::OpenGL460Texture2D(const std::filesystem::path& path, const TextureSpecification& spec)
-        : m_Path{path}, m_Specification{spec}
+        : m_Path{path.string()}, m_Specification{spec}
     {
         NB_PROFILE_FUNCTION();
 
@@ -27,7 +27,7 @@ namespace Nebula::Graphics
         stbi_uc* data = nullptr;
         {
             NB_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+            data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
         }
         NB_CORE_ASSERT(data, "Failed to load image!");
         m_Width = width;

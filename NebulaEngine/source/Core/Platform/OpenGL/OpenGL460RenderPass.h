@@ -1,5 +1,8 @@
 #pragma once
 
+#undef near
+#undef far
+
 #include "OpenGL460Framebuffer.h"
 #include "OpenGL460ShaderPipeline.h"
 #include "Nebula/Graphics/RenderPass.h"

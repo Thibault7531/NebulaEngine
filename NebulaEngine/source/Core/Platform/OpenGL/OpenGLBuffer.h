@@ -2,6 +2,7 @@
 
 #include <glad/gl.h>
 
+#include "Nebula/Graphics/Device.h"
 #include "Nebula/Graphics/Buffers/Buffer.h"
 
 namespace Nebula::Graphics {
@@ -52,7 +53,7 @@ namespace Nebula::Graphics {
 	class OpenGL460UniformBuffer : public UniformBuffer
 	{
 	public:
-		OpenGL460UniformBuffer(const BufferLayout& layout, uint32_t instances);
+		OpenGL460UniformBuffer(Device* device, const BufferLayout& layout, uint32_t instances);
 		virtual ~OpenGL460UniformBuffer();
 
 		virtual void SetData(uint32_t index, const void* data) override;
@@ -65,11 +66,14 @@ namespace Nebula::Graphics {
 
 	public:
 		GLuint GetBufferID() const { return m_RendererID; }
+		uint32_t GetAlignedStride() const { return m_AlignedStride; }
 
 	private:
+		Device* m_Device;
 		uint32_t m_RendererID;
 		BufferLayout m_Layout;
 		uint32_t m_InstanceCount;
+		uint32_t m_AlignedStride;
 	};
 
 }

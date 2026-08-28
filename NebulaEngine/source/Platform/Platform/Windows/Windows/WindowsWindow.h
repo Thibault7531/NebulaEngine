@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <winrt/Microsoft.UI.Windowing.h>
 
-#include "Platform/Nebula/CoreSystems/Rendering/Context.h"
+#include "Platform/Nebula/CoreSystems/Graphics/Surface.h"
 #include "Platform/Nebula/CoreSystems/Windows/Window.h"
 #include "Platform/Platform/Windows/Events/EventHandler.h"
 
@@ -23,8 +23,7 @@ namespace Nebula::Platform
         virtual const std::function<HitTest(int32_t, int32_t)>& GetWindowHitTest() override;
 
         virtual void OnUpdate() override;
-        virtual void SwapBuffers() override;
-        virtual void Present(uint32_t framebuffer) override;
+        virtual void Present(void* framebuffer) override;
 
         [[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetSize() const override;
         virtual void SetSize(uint32_t width, uint32_t height) override;
@@ -38,8 +37,8 @@ namespace Nebula::Platform
         virtual void SetMousePos(int32_t x, int32_t y) const override;
         virtual void CaptureMouse(bool enabled) override;
 
-        virtual void SetVSync(VSyncMode mode) override;
-        virtual VSyncMode IsVSync() const override;
+        virtual void SetVSync(Graphics::VSyncMode mode) override;
+        virtual Graphics::VSyncMode IsVSync() const override;
         virtual void SetFullscreen(bool enabled) override;
         [[nodiscard]] virtual bool IsFullscreen() const override;
         virtual void SetMaximized(bool enabled) override;
@@ -58,8 +57,7 @@ namespace Nebula::Platform
         virtual void StartInput() override {}
         virtual void StopInput() override {}
 
-        [[nodiscard]] virtual Ref<Context> GetContext() override { return m_Context; }
-        virtual void SetCurrentContext() override;
+        [[nodiscard]] virtual Ref<Graphics::Surface> GetSurface() override { return m_Context; }
 
 
     public:
@@ -74,7 +72,7 @@ namespace Nebula::Platform
         winrt::Microsoft::UI::Windowing::AppWindow m_Window;
         HWND m_Hwnd;
 
-        Ref<Context> m_Context;
+        Ref<Graphics::Surface> m_Context;
 
         std::function<void(Event&)> m_EventCallback;
         std::function<HitTest(int32_t, int32_t)> m_WindowHitTest;

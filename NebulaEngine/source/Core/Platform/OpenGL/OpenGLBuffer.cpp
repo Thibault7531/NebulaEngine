@@ -97,13 +97,17 @@ namespace Nebula::Graphics {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	OpenGL460UniformBuffer::OpenGL460UniformBuffer(const BufferLayout& layout, uint32_t instances)
-		: m_Layout{layout}, m_InstanceCount{instances}
+	OpenGL460UniformBuffer::OpenGL460UniformBuffer(Device* device, const BufferLayout& layout, uint32_t instances)
+		: m_Device{device}, m_Layout{layout}, m_InstanceCount{instances}
 	{
 		glCreateBuffers(1, &m_RendererID);
 
+		uint32_t rawStride = layout.GetStride();
+		uint32_t alignment = m_Device->GetUniformBufferAlignment();
+		m_AlignedStride = (rawStride + alignment - 1) & ~(alignment - 1);
+
 		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
-		glBufferData(GL_UNIFORM_BUFFER, layout.GetStride() * instances, nullptr, GL_STATIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, m_AlignedStride * instances, nullptr, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
@@ -126,7 +130,7 @@ namespace Nebula::Graphics {
 			if (bufferParam.Name == paramater)
 			{
 				glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
-				glBufferSubData(GL_UNIFORM_BUFFER, m_Layout.GetStride() * instanceIndex + bufferParam.Offset, bufferParam.Size, data);
+				glBufferSubData(GL_UNIFORM_BUFFER, m_AlignedStride * instanceIndex + bufferParam.Offset, bufferParam.Size, data);
 				glBindBuffer(GL_UNIFORM_BUFFER, 0);
 				return;
 			}
@@ -135,8 +139,12 @@ namespace Nebula::Graphics {
 
 	void OpenGL460UniformBuffer::SetLayout(const BufferLayout& layout)
 	{
+		uint32_t rawStride = layout.GetStride();
+		uint32_t alignment = m_Device->GetUniformBufferAlignment();
+		m_AlignedStride = (rawStride + alignment - 1) & ~(alignment - 1);
+
 		glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
-		glBufferData(GL_UNIFORM_BUFFER, layout.GetStride(), nullptr, GL_STATIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, m_AlignedStride * m_InstanceCount, nullptr, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		m_Layout = layout;
 	}

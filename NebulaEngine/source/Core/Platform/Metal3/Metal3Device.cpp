@@ -95,4 +95,8 @@ namespace Nebula::Graphics
         return 8192;
     }
 
+    uint32_t Metal3Device::GetUniformBufferAlignment()
+    {
+        return 1;
+    }
 }

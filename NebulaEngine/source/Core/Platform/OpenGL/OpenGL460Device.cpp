@@ -36,7 +36,7 @@ namespace Nebula::Graphics
 
     Ref<UniformBuffer> OpenGL460Device::CreateUniformBuffer(const BufferLayout& layout, uint32_t instances)
     {
-        return CreateRef<OpenGL460UniformBuffer>(layout, instances);
+        return CreateRef<OpenGL460UniformBuffer>(this, layout, instances);
     }
 
     Ref<Texture2D> OpenGL460Device::CreateTexture2D(uint32_t width, uint32_t height,
@@ -77,6 +77,13 @@ namespace Nebula::Graphics
         int32_t size = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &size);
         return size;
+    }
+
+    uint32_t OpenGL460Device::GetUniformBufferAlignment()
+    {
+        int32_t alignment = 0;
+        glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment);
+        return alignment;
     }
 
     Ref<Device> OpenGL460Device::CreateDefaultDevice()

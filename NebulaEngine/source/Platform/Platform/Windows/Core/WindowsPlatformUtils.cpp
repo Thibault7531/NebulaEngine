@@ -166,7 +166,8 @@ namespace Nebula::Platform
     {
         switch (api)
         {
-        case GraphicsAPI::OpenGL410: return true;
+        case GraphicsAPI::None: return false;
+        case GraphicsAPI::Metal3: return false;
         case GraphicsAPI::OpenGL460: return true;
         default: return false;
         }

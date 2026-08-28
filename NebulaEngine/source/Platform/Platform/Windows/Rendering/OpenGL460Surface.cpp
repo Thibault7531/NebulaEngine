@@ -1,4 +1,4 @@
-#include "OpenGL460Context.h"
+#include "OpenGL460Surface.h"
 
 #include <windows.ui.interop.h>
 #include <glad/wgl.h>
@@ -6,12 +6,12 @@
 
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 
-namespace Nebula::Platform
+namespace Nebula::Graphics
 {
-    bool OpenGL460Context::s_GLInitialized = false;
-    HGLRC OpenGL460Context::s_MainContext = nullptr;
+    bool OpenGL460Surface::s_GLInitialized = false;
+    HGLRC OpenGL460Surface::s_MainContext = nullptr;
 
-    OpenGL460Context::OpenGL460Context(Window* window)
+    OpenGL460Surface::OpenGL460Surface(Platform::Window* window)
         : m_Window(window)
     {
         //winrt::Microsoft::UI::Windowing::AppWindow* nativeWindow = static_cast<winrt::Microsoft::UI::Windowing::AppWindow*>(window->GetNativeWindow());
@@ -19,17 +19,7 @@ namespace Nebula::Platform
         if (hr != S_OK) NB_PLATFORM_CRITICAL("Can't get HWND for AppWindow");
 
         m_DeviceContext = GetDC(m_Handle);
-    }
 
-    OpenGL460Context::~OpenGL460Context()
-    {
-        wglMakeCurrent(nullptr, nullptr);
-        wglDeleteContext(m_Context);
-        ReleaseDC(m_Handle, m_DeviceContext);
-    }
-
-    void OpenGL460Context::Init()
-    {
         if (!s_GLInitialized) InitOpenGL();
 
         int attributes[] = {
@@ -65,12 +55,14 @@ namespace Nebula::Platform
         gladLoaderLoadGL();
     }
 
-    void OpenGL460Context::SetCurrent()
+    OpenGL460Surface::~OpenGL460Surface()
     {
-        wglMakeCurrent(m_DeviceContext, m_Context);
+        wglMakeCurrent(nullptr, nullptr);
+        wglDeleteContext(m_Context);
+        ReleaseDC(m_Handle, m_DeviceContext);
     }
 
-    void OpenGL460Context::SetVSync(VSyncMode mode)
+    void OpenGL460Surface::SetVSync(VSyncMode mode)
     {
         switch (mode)
         {
@@ -80,7 +72,7 @@ namespace Nebula::Platform
         }
     }
 
-    VSyncMode OpenGL460Context::IsVsync() const
+    VSyncMode OpenGL460Surface::IsVsync() const
     {
         int result = wglGetSwapIntervalEXT();
 
@@ -88,18 +80,20 @@ namespace Nebula::Platform
         return result ? VSyncMode::On : VSyncMode::Off;
     }
 
-    void OpenGL460Context::SwapBuffers()
+    void OpenGL460Surface::NewFrame()
     {
+        wglMakeCurrent(m_DeviceContext, m_Context);
+    }
+
+    void OpenGL460Surface::Present(void* texture)
+    {
+        NewFrame();
+        GLuint fbID = static_cast<GLuint>(reinterpret_cast<intptr_t>(texture));
+        if (fbID != 0) glBlitNamedFramebuffer(fbID, 0, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         ::SwapBuffers(m_DeviceContext);
     }
 
-    void OpenGL460Context::Present(uint32_t framebuffer)
-    {
-        glBlitNamedFramebuffer(framebuffer, 0, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        SwapBuffers();
-    }
-
-    void OpenGL460Context::InitOpenGL()
+    void OpenGL460Surface::InitOpenGL()
     {
         PIXELFORMATDESCRIPTOR pfd = {
             .nSize = sizeof(pfd),

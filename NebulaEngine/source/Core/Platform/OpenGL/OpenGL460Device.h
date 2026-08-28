@@ -34,6 +34,7 @@ namespace Nebula::Graphics
 
     public:
         virtual uint32_t GetMaximumTextureSize() override;
+        virtual uint32_t GetUniformBufferAlignment() override;
 
     public:
         static Ref<Device> CreateDefaultDevice();
