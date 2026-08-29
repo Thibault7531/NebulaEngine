@@ -6,11 +6,11 @@ struct RendererUniform
 
 struct ColorUniform
 {
-    float3 u_Color;
+    float4 u_Color;
 }
 
-ParameterBlock<RendererUniform> RendererUBO : register(b0);
-ParameterBlock<ColorUniform> ColorUBO : register(b1);
+ParameterBlock<RendererUniform> RendererUBO : register(b1);
+ParameterBlock<ColorUniform> ColorUBO : register(b2);
 
 struct VSInput
 {
@@ -42,5 +42,5 @@ VSOutput vertexMain(VSInput input)
 [shader("fragment")]
 float4 fragmentMain(FSInput input) : SV_Target
 {
-    return float4(ColorUBO.u_Color, 1.0);
+    return float4(ColorUBO.u_Color);
 }

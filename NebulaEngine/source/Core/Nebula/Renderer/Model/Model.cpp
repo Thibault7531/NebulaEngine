@@ -4,6 +4,9 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
+#include "Nebula/CoreSystems/Application/Application.h"
+#include "Nebula/Graphics/Device.h"
+
 namespace Nebula
 {
 
@@ -15,11 +18,6 @@ namespace Nebula
         NB_CORE_ASSERT(scene, "Failed to load model: {}", path);
 
         ProcessNode(scene->mRootNode, scene);
-    }
-
-    void Model::Draw()
-    {
-        for (int32_t i = 0; i < m_Meshes.size(); i++) m_Meshes[i]->Draw();
     }
 
     void Model::ProcessNode(aiNode* node, const aiScene* scene)
@@ -37,6 +35,7 @@ namespace Nebula
 
     Ref<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     {
+        Ref<Graphics::Device> device = Application::Get().GetDevice();
         std::vector<float> vertices;
         std::vector<uint32_t> indices;
 
@@ -63,15 +62,15 @@ namespace Nebula
             for (int32_t j = 0; j < face.mNumIndices; j++) indices.push_back(face.mIndices[j]);
         }
 
-        Ref<VertexArray> vertexArray = VertexArray::Create();
-        Ref<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices.size() * sizeof(float));
+        Ref<Graphics::VertexArray> vertexArray = Graphics::VertexArray::Create();
+        Ref<Graphics::VertexBuffer> vertexBuffer = device->CreateVertexBuffer(vertices.size() * sizeof(float));
         vertexBuffer->SetData(vertices.data(), vertices.size() * sizeof(float));
         vertexBuffer->SetLayout({
-            { ShaderDataType::Float3, "a_Position" },
-            { ShaderDataType::Float3, "a_Normal" }
+            { Graphics::ShaderDataType::Float3, "a_Position" },
+            { Graphics::ShaderDataType::Float3, "a_Normal" }
         });
         vertexArray->AddVertexBuffer(vertexBuffer);
-        Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(indices.data(), indices.size());
+        Ref<Graphics::IndexBuffer> indexBuffer = device->CreateIndexBuffer(indices.data(), indices.size());
         vertexArray->SetIndexBuffer(indexBuffer);
 
         return CreateRef<Mesh>(vertexArray);

@@ -4,6 +4,7 @@
 
 #include "ImGuiRenderer.h"
 #include "Nebula/CoreSystems/Application/Application.h"
+#include "Nebula/Graphics/Core/RendererAPI.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula
@@ -132,7 +133,7 @@ namespace Nebula
 		{
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			Platform::WindowManager::Get().GetMainWindow()->SetCurrentContext();
+			if (Graphics::RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460) Platform::WindowManager::Get().GetMainWindow()->GetSurface()->NewFrame();
 		}
 	}
 

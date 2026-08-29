@@ -5,7 +5,7 @@
 #include <Platform/Nebula/CoreSystems/Windows/WindowManager.h>
 
 #include "Log.h"
-#include "Metal3Context.h"
+#include "Metal3Surface.h"
 #include "PlatformUtils.h"
 #include "Metal/MTLRenderPass.hpp"
 #include "QuartzCore/CAMetalDrawable.hpp"
@@ -16,6 +16,8 @@
 #include "Metal/MTLLibrary.hpp"
 #include "Metal/MTLRenderCommandEncoder.hpp"
 #include "Metal/MTLRenderPipeline.hpp"
+#include "Platform/Nebula/CoreSystems/Graphics/Surface.h"
+#include "Platform/Nebula/CoreSystems/Graphics/GraphicsAPI.h"
 
 struct Vertex
 {
@@ -44,10 +46,11 @@ int main()
     Nebula::Ref<Nebula::Platform::Window> window = Nebula::Platform::WindowManager::Get().CreateMainWindow({.API = Nebula::Platform::GraphicsAPI::Metal3});
     window->SetEventCallback(OnEvent);
 
-    Nebula::Platform::Context* context = window->GetContext().get();
-    Nebula::Platform::Metal3Context* metalContext = (Nebula::Platform::Metal3Context*)context;
-    CA::MetalLayer* metalLayer = static_cast<CA::MetalLayer*>(metalContext->GetMetalLayer());
-    MTL::Device* metalDevice = metalLayer->device();
+    Nebula::Graphics::Surface* layer = window->GetSurface().get();
+    Nebula::Graphics::Metal3Surface* metalContext = static_cast<Nebula::Graphics::Metal3Surface*>(layer);
+    MTL::Device* metalDevice = MTL::CreateSystemDefaultDevice();
+    MTL::CommandQueue* commandQueue = metalDevice->newCommandQueue();
+    metalContext->SetDevice(metalDevice, commandQueue);
 
     Vertex vertices[3] = {
         {.Position = {-0.5f, -0.5f, 0.f}, .Color = {1.f, 0.f, 0.f}},
@@ -76,8 +79,6 @@ int main()
         NB_PLATFORM_ERROR("Could not compile Metal shader: {}", error->localizedDescription()->utf8String());
     }
 
-    MTL::CommandQueue* commandQueue = metalDevice->newCommandQueue();
-
     MTL::Function* vertexShader = library->newFunction(NS::String::string("vertexShader", NS::ASCIIStringEncoding));
     MTL::Function* fragmentShader = library->newFunction(NS::String::string("fragmentShader", NS::ASCIIStringEncoding));
 
@@ -85,19 +86,27 @@ int main()
     renderPipelineDescriptor->setLabel(NS::String::string("Triangle shader", NS::ASCIIStringEncoding));
     renderPipelineDescriptor->setVertexFunction(vertexShader);
     renderPipelineDescriptor->setFragmentFunction(fragmentShader);
-    MTL::PixelFormat pixelFormat = (MTL::PixelFormat)metalLayer->pixelFormat();
+    MTL::PixelFormat pixelFormat = MTL::PixelFormatRGBA8Unorm;
     renderPipelineDescriptor->colorAttachments()->object(0)->setPixelFormat(pixelFormat);
 
     MTL::RenderPipelineState* renderPipelineState = metalDevice->newRenderPipelineState(renderPipelineDescriptor, &error);
 
     renderPipelineDescriptor->release();
 
+    MTL::TextureDescriptor* textureDescriptor = MTL::TextureDescriptor::alloc()->init();
+    textureDescriptor->setPixelFormat(MTL::PixelFormatRGBA8Unorm);
+    textureDescriptor->setWidth(window->GetClientSize().first);
+    textureDescriptor->setHeight(window->GetClientSize().second);
+    textureDescriptor->setUsage(MTL::TextureUsageRenderTarget | MTL::TextureUsagePixelFormatView);
+
+    MTL::Texture* texture = metalDevice->newTexture(textureDescriptor);
+    textureDescriptor->release();
+
     while (s_Running)
     {
         NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
-        
-        CA::MetalDrawable* metalDrawable = metalLayer->nextDrawable();
-        while (!metalDrawable) metalDrawable = metalLayer->nextDrawable();
+
+        metalContext->NewFrame();
 
         MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
 
@@ -105,7 +114,7 @@ int main()
         renderPassDescriptor->colorAttachments()->object(0)->setLoadAction(MTL::LoadActionClear);
         renderPassDescriptor->colorAttachments()->object(0)->setStoreAction(MTL::StoreActionStore);
         renderPassDescriptor->colorAttachments()->object(0)->setClearColor(MTL::ClearColor(0.2f, 0.3f, 0.3f, 1));
-        renderPassDescriptor->colorAttachments()->object(0)->setTexture(metalLayer->nextDrawable()->texture());
+        renderPassDescriptor->colorAttachments()->object(0)->setTexture(texture);
 
         MTL::RenderCommandEncoder* renderCommandEncoder = commandBuffer->renderCommandEncoder(renderPassDescriptor);
         renderCommandEncoder->setRenderPipelineState(renderPipelineState);
@@ -116,13 +125,12 @@ int main()
         renderCommandEncoder->drawPrimitives(typeTriangle, vertexStart, vertexCount);
         renderCommandEncoder->endEncoding();
 
-        commandBuffer->presentDrawable(metalDrawable);
         commandBuffer->commit();
         commandBuffer->waitUntilCompleted();
 
         renderPassDescriptor->release();
 
-        window->SwapBuffers();
+        window->Present(texture);
         window->OnUpdate();
         
         pool->release();

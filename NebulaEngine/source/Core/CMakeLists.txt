@@ -28,24 +28,21 @@ if (nebula_cmake_platform STREQUAL Windows)
 
 elseif (nebula_cmake_platform STREQUAL MacOS)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
-         "Platform/OpenGL410/*.cpp"
+         "Platform/Metal3/*.cpp"
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
-         "Platform/OpenGL410/*.hpp"
-         "Platform/OpenGL410/*.h"
+         "Platform/Metal3/*.hpp"
+         "Platform/Metal3/*.h"
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
 elseif (nebula_cmake_platform STREQUAL Linux)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
          "Platform/OpenGL/*.cpp"
-         "Platform/OpenGL410/*.cpp"
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
          "Platform/OpenGL/*.hpp"
-         "Platform/OpenGL410/*.hpp"
          "Platform/OpenGL/*.h"
-         "Platform/OpenGL410/*.h"
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
@@ -95,19 +92,20 @@ target_link_libraries(Nebula PRIVATE
                       yaml-cpp::yaml-cpp
 )
 target_include_directories(Nebula PRIVATE
-                           ../
-                           ./
-                           ../../vendor
-                           ../../vendor/Assimp/include
-                           ${CMAKE_BINARY_DIR}/NebulaEngine/vendor/Assimp/include
-                           ../../vendor/entt/single_include
-                           ../../vendor/Glad/include
-                           ../../vendor/glm
-                           ../../vendor/glm/glm
-                           ../../vendor/imgui
-                           ../../vendor/ImGuizmo/src
-                           ../../vendor/stb_image
-                           ../../vendor/yaml-cpp/include
+        ../
+        ./
+        ../../vendor
+        ../../vendor/Assimp/include
+        ${CMAKE_BINARY_DIR}/NebulaEngine/vendor/Assimp/include
+        ../../vendor/entt/single_include
+        ../../vendor/Glad/include
+        ../../vendor/glm
+        ../../vendor/glm/glm
+        ../../vendor/imgui
+        ../../vendor/ImGuizmo/src
+        ../../vendor/metal-cpp
+        ../../vendor/stb_image
+        ../../vendor/yaml-cpp/include
 )
 
 

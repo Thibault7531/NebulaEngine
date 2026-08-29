@@ -1,22 +1,22 @@
 #include "RendererLayer.h"
 
 RendererLayer::RendererLayer()
-    : Layer{"BatchRenderer"}, m_CameraController{16.f/9.f}
+    : Layer{"BatchRenderer"}, m_CameraController{16.f/9.f}, m_Device{Nebula::Application::Get().GetDevice()}
 {
 }
 
 void RendererLayer::OnAttach()
 {
-    m_Dirt = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/dirt.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Grass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/grass_block_side.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Stone = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/stone.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Craft = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/crafting_table_front.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Deepslate = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/deepslate.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Bedrock = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() /"assets/BatchRendererExample/textures/bedrock.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Diamond = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/diamond_ore.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Iron = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/iron_ore.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Coal = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/coal_ore.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
-    m_Rainbow = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/furnace_front.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Linear, Nebula::Texture::FilterType::Nearest});
+    m_Dirt = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/dirt.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Grass = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/grass_block_side.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Stone = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/stone.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Craft = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/crafting_table_front.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Deepslate = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/deepslate.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Bedrock = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() /"assets/BatchRendererExample/textures/bedrock.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Diamond = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/diamond_ore.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Iron = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/iron_ore.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Coal = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/coal_ore.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Rainbow = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/furnace_front.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
 
     for (int Y = 0; Y < 32; Y++) {
         for (int X = 0; X < 32; X++) {
@@ -59,6 +59,8 @@ void RendererLayer::OnAttach()
             else if (Y == 28) m_World[Y][X] = m_Grass;
         }
     }
+
+    Nebula::Application::Get().GetMainFramebuffer()->SetClearColors({{ 0.1f, 0.1f, 0.1f, 1.0f }});
 }
 
 void RendererLayer::OnDetach()
@@ -74,8 +76,10 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
     Nebula::Renderer2D::ResetStats();
     {
         NB_PROFILE_SCOPE("Viewport clear");
-        Nebula::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
-        Nebula::RenderCommand::Clear();
+        Nebula::Ref<Nebula::Graphics::CommandBuffer> ClearCommandBuffer = m_Device->CreateCommandBuffer();
+        Nebula::Ref<Nebula::Graphics::RenderPass> ClearRenderPass = ClearCommandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
+        ClearRenderPass->EndRenderPass();
+        ClearCommandBuffer->Commit();
     }
 
     {

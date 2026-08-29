@@ -2,8 +2,7 @@
 
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
-#include "Platform/Platform/Linux/Rendering/OpenGL410Context.h"
-#include "Platform/Platform/Linux/Rendering/OpenGL460Context.h"
+#include "Platform/Platform/Linux/Rendering/OpenGL460Surface.h"
 
 namespace Nebula::Platform
 {
@@ -49,15 +48,18 @@ namespace Nebula::Platform
                 break;
             }
 
-        case GraphicsAPI::OpenGL410: m_Context = CreateRef<OpenGL410Context>(this); break;
-        case GraphicsAPI::OpenGL460: m_Context = CreateRef<OpenGL460Context>(this); break;
+        case GraphicsAPI::OpenGL460: m_Surface = CreateRef<Graphics::OpenGL460Surface>(this); break;
+        case GraphicsAPI::Metal3:
+            {
+                NB_PLATFORM_CRITICAL("Metal3 is not supported on Linux!");
+                break;
+            }
         }
-        m_Context->Init();
     }
 
     LinuxWindow::~LinuxWindow()
     {
-        m_Context.reset();
+        m_Surface.reset();
         SDL_DestroyWindow(m_Window);
     }
 
@@ -72,14 +74,9 @@ namespace Nebula::Platform
         CoreUtils::PumpEvents();
     }
 
-    void LinuxWindow::SwapBuffers()
+    void LinuxWindow::Present(void* framebuffer)
     {
-        m_Context->SwapBuffers();
-    }
-
-    void LinuxWindow::Present(uint32_t framebuffer)
-    {
-        m_Context->Present(framebuffer);
+        m_Surface->Present(framebuffer);
     }
 
     std::pair<uint32_t, uint32_t> LinuxWindow::GetSize() const
@@ -151,14 +148,14 @@ namespace Nebula::Platform
         SDL_CaptureMouse(enabled);
     }
 
-    void LinuxWindow::SetVSync(VSyncMode mode)
+    void LinuxWindow::SetVSync(Graphics::VSyncMode mode)
     {
-        m_Context->SetVSync(mode);
+        m_Surface->SetVSync(mode);
     }
 
-    VSyncMode LinuxWindow::IsVSync() const
+    Graphics::VSyncMode LinuxWindow::IsVSync() const
     {
-        return m_Context->IsVsync();
+        return m_Surface->IsVsync();
     }
 
     void LinuxWindow::SetFullscreen(bool enabled)
@@ -259,13 +256,8 @@ namespace Nebula::Platform
         SDL_StopTextInput(m_Window);
     }
 
-    Ref<Context> LinuxWindow::GetContext()
+    Ref<Graphics::Surface> LinuxWindow::GetSurface()
     {
-        return m_Context;
-    }
-
-    void LinuxWindow::SetCurrentContext()
-    {
-        m_Context->SetCurrent();
+        return m_Surface;
     }
 }

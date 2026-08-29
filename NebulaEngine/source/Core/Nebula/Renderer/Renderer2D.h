@@ -4,7 +4,8 @@
 #include "Cameras/EditorCamera.h"
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Cameras/OrthographicCamera.h"
-#include "Nebula/Renderer/Texture.h"
+#include "Nebula/Graphics/Texture.h"
+#include "Nebula/Graphics/Buffers/Framebuffer.h"
 
 namespace Nebula
 {
@@ -17,7 +18,7 @@ namespace Nebula
             glm::vec3 position = glm::vec3(0.0f);
             float rotation = 0.0f;
             glm::vec2 size = { 1.0f, 1.0f };
-            Ref<Texture2D> texture = nullptr;
+            Ref<Graphics::Texture2D> texture = nullptr;
             glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
             float tilingFactor = 1.0f;
             int32_t entityID = -1;
@@ -25,7 +26,7 @@ namespace Nebula
         struct QuadPropertiesAdvanced
         {
             glm::mat4 transform = glm::mat4(1.0f);
-            Ref<Texture2D> texture = nullptr;
+            Ref<Graphics::Texture2D> texture = nullptr;
             glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
             float tilingFactor = 1.0f;
             int32_t entityID = -1;
@@ -37,7 +38,9 @@ namespace Nebula
 
         static void BeginScene(const OrthographicCamera& camera);
         static void BeginScene(const Camera& camera, const glm::mat4& transform);
+        static void BeginScene(const Camera& camera, const glm::mat4& transform, Ref<Graphics::Framebuffer> framebuffer, bool clear = true);
         static void BeginScene(const EditorCamera& camera);
+        static void BeginScene(const EditorCamera& camera, Ref<Graphics::Framebuffer> framebuffer, bool clear = true);
         static void EndScene();
         static void NextBash();
         static void Flush();
@@ -55,9 +58,6 @@ namespace Nebula
         };
         static Statistics GetStatistics();
         static void ResetStats();
-
-    private:
-        static void SetupRenderState();
 
     };
 

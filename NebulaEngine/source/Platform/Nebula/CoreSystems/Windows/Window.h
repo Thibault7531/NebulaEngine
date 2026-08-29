@@ -5,8 +5,8 @@
 #include <Core/Nebula/CoreSystems/Core/Core.h>
 
 #include "Platform/Nebula/CoreSystems/Events/Event.h"
-#include "Platform/Nebula/CoreSystems/Rendering/Context.h"
-#include "Platform/Nebula/CoreSystems/Rendering/GraphicsAPI.h"
+#include "Platform/Nebula/CoreSystems/Graphics/GraphicsAPI.h"
+#include "Platform/Nebula/CoreSystems/Graphics/Surface.h"
 
 namespace Nebula::Platform
 {
@@ -72,8 +72,7 @@ namespace Nebula::Platform
         virtual const std::function<HitTest(int32_t, int32_t)>& GetWindowHitTest() = 0;
 
         virtual void OnUpdate() = 0;
-        virtual void SwapBuffers() = 0;
-        virtual void Present(uint32_t framebuffer) = 0;
+        virtual void Present(void* framebuffer) = 0;
 
         [[nodiscard]] virtual std::pair<uint32_t, uint32_t> GetSize() const = 0;
         virtual void SetSize(uint32_t width, uint32_t height) = 0;
@@ -87,8 +86,8 @@ namespace Nebula::Platform
         virtual void SetMousePos(int32_t x, int32_t y) const = 0;
         virtual void CaptureMouse(bool enabled) = 0;
 
-        virtual void SetVSync(VSyncMode mode) = 0;
-        [[nodiscard]] virtual VSyncMode IsVSync() const = 0;
+        virtual void SetVSync(Graphics::VSyncMode mode) = 0;
+        [[nodiscard]] virtual Graphics::VSyncMode IsVSync() const = 0;
         virtual void SetFullscreen(bool enabled) = 0;
         [[nodiscard]] virtual bool IsFullscreen() const = 0;
         virtual void SetMaximized(bool enabled) = 0;
@@ -107,8 +106,7 @@ namespace Nebula::Platform
         virtual void StartInput() = 0;
         virtual void StopInput() = 0;
 
-        [[nodiscard]] virtual Ref<Context> GetContext() = 0;
-        virtual void SetCurrentContext() = 0;
+        [[nodiscard]] virtual Ref<Graphics::Surface> GetSurface() = 0;
 
     public:
         WindowProperties& GetProperties() { return m_Properties; }

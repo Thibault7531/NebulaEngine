@@ -159,16 +159,16 @@ elseif (nebula_cmake_platform STREQUAL MacOS)
             "${CMAKE_SOURCE_DIR}/NebulaEngine/vendor/metal-cpp"
     )
 
-    # Metal3 Context
-    add_library(Swift-Metal3-Context STATIC)
-    target_sources(Swift-Metal3-Context PRIVATE "Platform/MacOS/Rendering/Metal3Context.swift")
-    set_target_properties(Swift-Metal3-Context PROPERTIES
-            Swift_MODULE_NAME "SwiftMetal3Context"
-            XCODE_ATTRIBUTE_PRODUCT_MODULE_NAME "SwiftMetal3Context"
+    # Metal3 Layer
+    add_library(Swift-Metal3-Surface STATIC)
+    target_sources(Swift-Metal3-Surface PRIVATE "Platform/MacOS/Rendering/Metal3Surface.swift")
+    set_target_properties(Swift-Metal3-Surface PROPERTIES
+            Swift_MODULE_NAME "SwiftMetal3Surface"
+            XCODE_ATTRIBUTE_PRODUCT_MODULE_NAME "SwiftMetal3Surface"
     )
-    target_compile_options(Swift-Metal3-Context PUBLIC "$<$<COMPILE_LANGUAGE:Swift>:-cxx-interoperability-mode=default>")
-    _swift_generate_cxx_header(Swift-Metal3-Context
-            "${CMAKE_CURRENT_SOURCE_DIR}/swift/SwiftMetal3Context.h"
+    target_compile_options(Swift-Metal3-Surface PUBLIC "$<$<COMPILE_LANGUAGE:Swift>:-cxx-interoperability-mode=default>")
+    _swift_generate_cxx_header(Swift-Metal3-Surface
+            "${CMAKE_CURRENT_SOURCE_DIR}/swift/SwiftMetal3Surface.h"
             SEARCH_PATHS
             "${CMAKE_CURRENT_SOURCE_DIR}/swift"
             "${CMAKE_SOURCE_DIR}/NebulaEngine/source"
@@ -176,37 +176,13 @@ elseif (nebula_cmake_platform STREQUAL MacOS)
             "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Nebula/CoreSystems/Windows"
             "${CMAKE_SOURCE_DIR}/NebulaEngine/vendor/metal-cpp"
     )
-    target_include_directories(Swift-Metal3-Context PUBLIC
+    target_include_directories(Swift-Metal3-Surface PUBLIC
             ../
             ../../vendor/spdlog/include
             ../../vendor/Glad/include
             ../../vendor/metal-cpp
             "${CMAKE_CURRENT_SOURCE_DIR}/swift"
             "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Nebula/CoreSystems/Windows"
-    )
-
-    # OpenGL Context
-    add_library(Swift-OpenGL-Context STATIC)
-    target_sources(Swift-OpenGL-Context PRIVATE "Platform/MacOS/Rendering/OpenGLContext.swift")
-    set_target_properties(Swift-OpenGL-Context PROPERTIES
-                          Swift_MODULE_NAME "SwiftOpenGLContext"
-                          XCODE_ATTRIBUTE_PRODUCT_MODULE_NAME "SwiftOpenGLContext"
-    )
-    target_compile_options(Swift-OpenGL-Context PUBLIC "$<$<COMPILE_LANGUAGE:Swift>:-cxx-interoperability-mode=default>")
-    _swift_generate_cxx_header(Swift-OpenGL-Context
-                               "${CMAKE_CURRENT_SOURCE_DIR}/swift/SwiftOpenGLContext.h"
-                               SEARCH_PATHS
-                               "${CMAKE_CURRENT_SOURCE_DIR}/swift"
-                               "${CMAKE_SOURCE_DIR}/NebulaEngine/source"
-                               "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform"
-                               "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Nebula/CoreSystems/Windows"
-    )
-    target_include_directories(Swift-OpenGL-Context PUBLIC
-                               ../
-                               ../../vendor/spdlog/include
-                               ../../vendor/Glad/include
-                               "${CMAKE_CURRENT_SOURCE_DIR}/swift"
-                               "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Nebula/CoreSystems/Windows"
     )
 
     # CoreUtils
@@ -299,8 +275,7 @@ elseif (nebula_cmake_platform STREQUAL MacOS)
 
     target_link_libraries(Nebula-Platform PUBLIC
             Swift-MacOS-Window
-            Swift-Metal3-Context
-            Swift-OpenGL-Context
+            Swift-Metal3-Surface
             Swift-CoreUtils
             Swift-PlatformUtils
             Swift-FileDialogs

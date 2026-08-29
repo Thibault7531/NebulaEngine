@@ -7,8 +7,7 @@
 #include <winrt/Windows.Foundation.Collections.h>
 
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
-#include "Platform/Platform/Windows/Rendering/OpenGL410Context.h"
-#include "Platform/Platform/Windows/Rendering/OpenGL460Context.h"
+#include "Platform/Platform/Windows/Rendering/OpenGL460Surface.h"
 
 namespace Nebula::Platform
 {
@@ -105,10 +104,8 @@ namespace Nebula::Platform
                 break;
             }
 
-        case GraphicsAPI::OpenGL410: m_Context = CreateRef<OpenGL410Context>(this); break;
-        case GraphicsAPI::OpenGL460: m_Context = CreateRef<OpenGL460Context>(this); break;
+        case GraphicsAPI::OpenGL460: m_Context = CreateRef<Graphics::OpenGL460Surface>(this); break;
         }
-        m_Context->Init();
     }
 
     WindowsWindow::~WindowsWindow()
@@ -155,12 +152,7 @@ namespace Nebula::Platform
         }
     }
 
-    void WindowsWindow::SwapBuffers()
-    {
-        m_Context->SwapBuffers();
-    }
-
-    void WindowsWindow::Present(uint32_t framebuffer)
+    void WindowsWindow::Present(void* framebuffer)
     {
         m_Context->Present(framebuffer);
     }
@@ -227,12 +219,12 @@ namespace Nebula::Platform
         SetCapture(enabled ? m_Hwnd : nullptr);
     }
 
-    void WindowsWindow::SetVSync(VSyncMode mode)
+    void WindowsWindow::SetVSync(Graphics::VSyncMode mode)
     {
         m_Context->SetVSync(mode);
     }
 
-    VSyncMode WindowsWindow::IsVSync() const
+    Graphics::VSyncMode WindowsWindow::IsVSync() const
     {
         return m_Context->IsVsync();
     }
@@ -348,11 +340,6 @@ namespace Nebula::Platform
             .dwTimeout = 0
         };
         FlashWindowEx(&flashInfo);
-    }
-
-    void WindowsWindow::SetCurrentContext()
-    {
-        m_Context->SetCurrent();
     }
 
     void* WindowsWindow::GetHandle()

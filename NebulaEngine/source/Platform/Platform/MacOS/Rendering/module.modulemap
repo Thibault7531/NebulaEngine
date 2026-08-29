@@ -1,9 +1,4 @@
-module NebulaOpenGLContext {
-    header "OpenGLContext.h"
-    export *
-}
-
-module NebulaMetalContext {
-    header "Metal3Context.h"
+module NebulaMetalSurface {
+    header "Metal3Surface.h"
     export *
 }

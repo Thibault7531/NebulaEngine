@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Nebula/Renderer/Buffers/Buffer.h"
-#include "Nebula/Renderer/Buffers/VertexArray.h"
+#include "Nebula/Graphics/Buffers/Buffer.h"
+#include "Nebula/Graphics/Buffers/VertexArray.h"
 
 namespace Nebula
 {
@@ -9,13 +9,13 @@ namespace Nebula
     class Mesh
     {
     public:
-        Mesh(const Ref<VertexArray>& vertexArray);
+        Mesh(const Ref<Graphics::VertexArray>& vertexArray);
         ~Mesh() = default;
 
-        void Draw();
+        Ref<Graphics::VertexArray> GetVertexArray() const { return m_VertexArray; }
 
     private:
-        Ref<VertexArray> m_VertexArray;
+        Ref<Graphics::VertexArray> m_VertexArray;
     };
 
 }

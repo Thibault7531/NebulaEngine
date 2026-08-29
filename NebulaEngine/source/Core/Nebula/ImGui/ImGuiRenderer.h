@@ -3,33 +3,25 @@
 #include <imgui.h>
 
 #include "Nebula/CoreSystems/Core/Core.h"
-#include "Nebula/Renderer/Shader.h"
-#include "Nebula/Renderer/Texture.h"
-#include "Nebula/Renderer/Buffers/VertexArray.h"
-#include "Nebula/Renderer/Core/RendererAPI.h"
+#include "Nebula/Graphics/Device.h"
+#include "Nebula/Graphics/RenderPass.h"
+#include "Nebula/Graphics/Shader.h"
+#include "Nebula/Graphics/ShaderPipeline.h"
+#include "Nebula/Graphics/Texture.h"
+#include "Nebula/Graphics/Buffers/VertexArray.h"
 
 namespace Nebula
 {
     struct RendererData
     {
-        bool HasPolygonMode = false;
-        bool HasClipOrigin = false;
+        Ref<Graphics::Device> device;
+        Graphics::ShaderLibrary shaderLibrary;
+        Ref<Graphics::ShaderPipeline> shader;
+        Ref<Graphics::UniformBuffer> uniformBuffer;
+        Ref<Graphics::VertexBuffer> vertexBuffer;
+        Ref<Graphics::IndexBuffer> indexBuffer;
 
-        Ref<Shader> shader;
-        Ref<UniformBuffer> uniformBuffer;
-        Ref<VertexBuffer> vertexBuffer;
-        Ref<IndexBuffer> indexBuffer;
-
-        std::vector<Ref<Texture>> textures;
-
-        // Last states
-        RendererAPI::BlendState BlendState;
-        bool isEnabledFaceCulling;
-        bool isEnabledDepthTest;
-        bool isEnabledStencilTest;
-        bool isEnabledScissorTest;
-        bool isEnabledPrimitiveRestart;
-        RendererAPI::PolygonMode PolygonMode;
+        std::vector<Ref<Graphics::Texture>> textures;
     };
 
     class ImGuiRenderer
@@ -40,9 +32,8 @@ namespace Nebula
 
         static void BeginFrame();
 
-        static void SetupRenderState(ImDrawData& drawData, uint32_t width, uint32_t height, Ref<VertexArray> vertexArray);
+        static void SetupRenderState(ImDrawData& drawData, uint32_t width, uint32_t height, Ref<Graphics::RenderPass> renderPass, Ref<Graphics::VertexArray> vertexArray);
         static void RenderDrawData(ImDrawData* drawData);
-        static void UndoRenderState();
 
         static void CreateTexture(ImTextureData& textureData);
         static void DestroyTexture(ImTextureData& textureData);

@@ -3,16 +3,20 @@
 #include "gtc/type_ptr.hpp"
 
 RendererLayer::RendererLayer()
-    : Layer{"Renderer2D"}, m_CameraController{16.f/9.f}, m_Position{.6f, .6f, 0.f}, m_Color{0.f, 0.f, 0.f}
+    : Layer{"Renderer2D"}, m_Device{Nebula::Application::Get().GetDevice()}, m_CameraController{16.f/9.f}, m_Position{.6f, .6f, 0.f}
 {
 }
 
 void RendererLayer::OnAttach()
 {
-    m_VAO = Nebula::VertexArray::Create();
-    m_ColorUBO = Nebula::UniformBuffer::Create({
-        {Nebula::ShaderDataType::Float3, "u_Color"}
+    m_VAO = Nebula::Graphics::VertexArray::Create();
+    m_ColorUBO = m_Device->CreateUniformBuffer({
+        { Nebula::Graphics::ShaderDataType::Float4, "u_Color" }
     });
+    m_RendererUBO = m_Device->CreateUniformBuffer({
+        { Nebula::Graphics::ShaderDataType::Matrix4, "u_ViewProjection" },
+        { Nebula::Graphics::ShaderDataType::Matrix4, "u_Transform" }
+    }, 6);
 
     float vertices[5 * 4] = {
         -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -21,11 +25,11 @@ void RendererLayer::OnAttach()
         -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
     };
 
-    Nebula::Ref<Nebula::VertexBuffer> vbo = Nebula::VertexBuffer::Create(vertices, sizeof(vertices));
+    Nebula::Ref<Nebula::Graphics::VertexBuffer> vbo = m_Device->CreateVertexBuffer(vertices, sizeof(vertices));
 
-    Nebula::BufferLayout layout = {
-        { Nebula::ShaderDataType::Float3, "a_Position" },
-        { Nebula::ShaderDataType::Float2, "a_TextCoord"}
+    Nebula::Graphics::BufferLayout layout = {
+        { Nebula::Graphics::ShaderDataType::Float3, "a_Position" },
+        { Nebula::Graphics::ShaderDataType::Float2, "a_TextCoord" }
     };
 
     vbo->SetLayout(layout);
@@ -37,15 +41,30 @@ void RendererLayer::OnAttach()
         2, 3, 0
     };
 
-    Nebula::Ref<Nebula::IndexBuffer> ibo = Nebula::IndexBuffer::Create(indices, std::size(indices));
+    Nebula::Ref<Nebula::Graphics::IndexBuffer> ibo = m_Device->CreateIndexBuffer(indices, std::size(indices));
 
     m_VAO->SetIndexBuffer(ibo);
 
-    m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColor.slang");
-    m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/Texture.slang");
+    Nebula::Graphics::VertexLayout vertexLayout = {
+        { Nebula::Graphics::ShaderDataType::Float3, "a_Position" },
+        { Nebula::Graphics::ShaderDataType::Float2, "a_TextCoord" }
+    };
+    Nebula::Graphics::BlendState blendState = {};
+    blendState.enabled = true;
+    blendState.srcColorFactor = Nebula::Graphics::BlendFactor::SourceAlpha;
+    blendState.dstColorFactor = Nebula::Graphics::BlendFactor::OneMinusSourceAlpha;
+    blendState.srcAlphaFactor = Nebula::Graphics::BlendFactor::SourceAlpha;
+    blendState.dstAlphaFactor = Nebula::Graphics::BlendFactor::OneMinusSourceAlpha;
 
-    m_Texture = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/crafting_table_front.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
-    m_Glass = Nebula::Texture2D::Create((Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/glass.png").string(), {Nebula::Texture::InternalFormat::RGBA8, Nebula::Texture::FilterType::Nearest});
+    m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColor.slang");
+    m_SolidColorShader = m_ShaderLibrary.CreatePipeline("SolidColor", vertexLayout, {Nebula::Application::Get().GetMainFramebuffer()->GetSpecification(), blendState});
+    m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/Texture.slang");
+    m_TextureShader = m_ShaderLibrary.CreatePipeline("Texture", vertexLayout, {Nebula::Application::Get().GetMainFramebuffer()->GetSpecification(), blendState});
+
+    m_Texture = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/crafting_table_front.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Nearest});
+    m_Glass = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/glass.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Nearest});
+
+    Nebula::Application::Get().GetMainFramebuffer()->SetClearColors({{.18f, .49f, .6f, 1.f}});
 }
 
 void RendererLayer::OnDetach()
@@ -69,46 +88,51 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
         m_Position -= glm::vec3(1.0f, 0.0f, 0.0f) * static_cast<float>(ts);
     }
 
-    Nebula::RenderCommand::SetClearColor({0.18f, 0.49f, 0.6f, 1.0f});
-    Nebula::RenderCommand::Clear();
-
-    Nebula::Renderer::BeginScene(m_CameraController.GetCamera());
+    for (uint32_t instance = 0; instance < m_RendererUBO->GetInstanceCount(); instance++) m_RendererUBO->SetData(instance, "u_ViewProjection", glm::value_ptr(m_CameraController.GetCamera().getViewProjectionMatrix()));
 
     const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-    Nebula::Ref<Nebula::Shader> solidColorShader = m_ShaderLibrary.Get("SolidColor");
-    solidColorShader->Bind();
-    m_ColorUBO->SetData(0, glm::value_ptr(m_Color));
-    solidColorShader->SetUniformBlock("ColorUBO", m_ColorUBO);
-    solidColorShader->Unbind();
+    m_ColorUBO->SetData(0, "u_Color", glm::value_ptr(m_Color));
+
+    Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
+    Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
+    renderPass->SetShaderPipeline(m_SolidColorShader);
 
     for (int i = 0; i < 4; i++)
     {
         glm::vec3 position = m_Position + glm::vec3(0.11f, 0.0f, 0.0f) * static_cast<float>(i);
         glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
 
-        Nebula::Renderer::Submit(solidColorShader, m_VAO, transform);
+        m_RendererUBO->SetData(i, "u_Transform", glm::value_ptr(transform));
+
+        renderPass->SetUniformBlock("ColorUBO", m_ColorUBO, 0);
+        renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, i);
+        renderPass->DrawArrayIndexed(m_VAO);
     }
 
-    m_Texture->Bind(0);
-    m_Glass->Bind(1);
+    m_RendererUBO->SetData(4, "u_Transform", glm::value_ptr(glm::mat4(1.0f)));
 
-    m_ShaderLibrary.Get("Texture")->Bind();
-    m_ShaderLibrary.Get("Texture")->SetInt("u_Texture", 0);
-    Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::mat4(1.0f));
+    renderPass->SetShaderPipeline(m_TextureShader);
+    renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 4);
+    renderPass->BindTextureToSlot(m_Texture);
+    renderPass->DrawArrayIndexed(m_VAO);
 
-    m_ShaderLibrary.Get("Texture")->Bind();
-    m_ShaderLibrary.Get("Texture")->SetInt("u_Texture", 1);
-    Nebula::Renderer::Submit(m_ShaderLibrary.Get("Texture"), m_VAO, glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f)));
+    m_RendererUBO->SetData(5, "u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f))));
 
-    Nebula::Renderer::EndScene();
+    renderPass->SetShaderPipeline(m_TextureShader);
+    renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 5);
+    renderPass->BindTextureToSlot(m_Glass);
+    renderPass->DrawArrayIndexed(m_VAO);
+
+    renderPass->EndRenderPass();
+    commandBuffer->Commit();
 }
 
 void RendererLayer::OnImGuiRender()
 {
     ImGui::Begin("Settings");
 
-    ImGui::ColorEdit3("Square color", glm::value_ptr(m_Color));
+    ImGui::ColorEdit4("Square color", glm::value_ptr(m_Color));
 
     ImGui::End();
 }
