@@ -88,7 +88,7 @@ target_link_libraries(Nebula PRIVATE
                       ImGui
                       ImGuizmo
                       slang::slang
-                      spdlog::spdlog_header_only
+                      spdlog
                       yaml-cpp::yaml-cpp
 )
 target_include_directories(Nebula PRIVATE
