@@ -29,7 +29,7 @@ namespace Nebula::Graphics
         case Platform::GraphicsAPI::Metal3: NB_CORE_ERROR("Metal3 is not supported on Linux!"); break;
         case Platform::GraphicsAPI::OpenGL460: return CreateRef<OpenGLVertexArray>();
         }
-
 #endif
+        return nullptr;
     }
 }

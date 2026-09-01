@@ -35,6 +35,7 @@ namespace Nebula::Graphics
         case Platform::GraphicsAPI::OpenGL460: return CreateRef<OpenGL460Device>();
         }
 #endif
+        return nullptr;
     }
 
 }
