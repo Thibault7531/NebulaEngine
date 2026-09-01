@@ -159,6 +159,95 @@ namespace Nebula::Graphics {
 		m_RendererID = program;
 	}
 
+	void OpenGLShader::CompileSpirv(const uint32_t* vertexBinary, uint32_t vertexBinarySize, const uint32_t* fragmentBinary, uint32_t fragmentBinarySize)
+	{
+		NB_PROFILE_FUNCTION();
+
+		GLuint program = glCreateProgram();
+		std::array<GLenum, 2> glShaderIDs;
+		int glShaderIDIndex = 0;
+
+		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+		glShaderBinary(1, &vertexShader, GL_SHADER_BINARY_FORMAT_SPIR_V, vertexBinary, vertexBinarySize);
+		glSpecializeShader(vertexShader, "main", 0, nullptr, nullptr);
+
+		GLint success = 0;
+		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+		if (success == GL_FALSE)
+		{
+			GLint maxLength = 0;
+			glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+			std::vector<GLchar> infoLog(maxLength);
+			glGetShaderInfoLog(vertexShader, maxLength, &maxLength, &infoLog[0]);
+
+			glDeleteShader(vertexShader);
+
+			NB_CORE_ERROR("{0}", infoLog.data());
+			NB_CORE_ASSERT(false, "Shader compilation failed!");
+			return;
+		}
+
+		glAttachShader(program, vertexShader);
+		glShaderIDs[glShaderIDIndex++] = vertexShader;
+
+		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+		glShaderBinary(1, &fragmentShader, GL_SHADER_BINARY_FORMAT_SPIR_V, fragmentBinary, fragmentBinarySize);
+		glSpecializeShader(fragmentShader, "main", 0, nullptr, nullptr);
+
+		success = 0;
+		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+		if (success == GL_FALSE)
+		{
+			GLint maxLength = 0;
+			glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+			std::vector<GLchar> infoLog(maxLength);
+			glGetShaderInfoLog(fragmentShader, maxLength, &maxLength, &infoLog[0]);
+
+			glDeleteShader(fragmentShader);
+
+			NB_CORE_ERROR("{0}", infoLog.data());
+			NB_CORE_ASSERT(false, "Shader compilation failed!");
+			return;
+		}
+
+		glAttachShader(program, fragmentShader);
+		glShaderIDs[glShaderIDIndex++] = fragmentShader;
+
+		glLinkProgram(program);
+
+		success = 0;
+		glGetProgramiv(program, GL_LINK_STATUS, &success);
+		if (success == GL_FALSE)
+		{
+			GLint maxLength = 0;
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+
+			std::vector<GLchar> infoLog(maxLength);
+			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+
+			glDeleteProgram(program);
+			for (auto id : glShaderIDs)
+			{
+				glDeleteShader(id);
+			}
+
+			NB_CORE_ERROR("{0}", infoLog.data());
+			NB_CORE_ASSERT(false, "Shader program linking failed!");
+			return;
+		}
+
+		for (auto id : glShaderIDs)
+		{
+			glDetachShader(program, id);
+		}
+
+		m_RendererID = program;
+	}
+
 	void OpenGLShader::CompileSlang(const std::string& shader)
 	{
 		if (!s_IsSlangGlobalSessionCreated)
@@ -168,12 +257,10 @@ namespace Nebula::Graphics {
 			s_IsSlangGlobalSessionCreated = true;
 		}
 
-		std::unordered_map<GLenum, std::string> shaderSources;
-
 		slang::SessionDesc sessionDesc = {};
 		slang::TargetDesc targetDesc = {};
-		targetDesc.format = SLANG_GLSL;
-		targetDesc.profile = s_GlobalSession->findProfile("glsl_460");
+		targetDesc.format = SLANG_SPIRV;
+		targetDesc.profile = s_GlobalSession->findProfile("spirv_1_5");
 
 		sessionDesc.targets = &targetDesc;
 		sessionDesc.targetCount = 1;
@@ -183,6 +270,9 @@ namespace Nebula::Graphics {
 
 		session->createCompileRequest(m_CompileRequest.writeRef());
 
+		int targetIndex = m_CompileRequest->addCodeGenTarget(SLANG_SPIRV);
+		m_CompileRequest->setTargetProfile(targetIndex, s_GlobalSession->findProfile("spirv_1_5"));
+
 		int translationUnitIdx = m_CompileRequest->addTranslationUnit(SLANG_SOURCE_LANGUAGE_SLANG, m_Name.c_str());
 		m_CompileRequest->addTranslationUnitSourceString(translationUnitIdx, m_Name.c_str(), shader.c_str());
 
@@ -190,26 +280,22 @@ namespace Nebula::Graphics {
 		int fragmentEntryPointIdx = m_CompileRequest->addEntryPoint(translationUnitIdx, "fragmentMain", SLANG_STAGE_FRAGMENT);
 
 		const SlangResult vertexCompileResult = m_CompileRequest->compile();
-		NB_CORE_ASSERT(SLANG_SUCCEEDED(vertexCompileResult), "Slang compilation failed !");
+		if (!SLANG_SUCCEEDED(vertexCompileResult))
+		{
+			const char* errorMsg = m_CompileRequest->getDiagnosticOutput();
+			NB_CORE_ERROR("Slang compilation failed : {0}", errorMsg);
+			return;
+		}
 
 		m_CompileRequest->getProgramWithEntryPoints(m_ProgramReflection.writeRef());
 
-		std::regex setFirstPattern(R"(\bset\s*=\s*\d+\s*,\s*)");
-		std::regex setLastPattern(R"(,\s*\bset\s*=\s*\d+)");
-		size_t outputSize = 0;
+		Slang::ComPtr<ISlangBlob> vertexBlob;
+		m_CompileRequest->getEntryPointCodeBlob(vertexEntryPointIdx, targetIndex, vertexBlob.writeRef());
 
-		std::string vertexSource = static_cast<const char*>(m_CompileRequest->getEntryPointCode(vertexEntryPointIdx, &outputSize));
-		std::string cleanedVertexSource = std::regex_replace(vertexSource, setFirstPattern, "");
-		cleanedVertexSource = std::regex_replace(cleanedVertexSource, setLastPattern, "");
+		Slang::ComPtr<ISlangBlob> fragmentBlob;
+		m_CompileRequest->getEntryPointCodeBlob(fragmentEntryPointIdx, targetIndex, fragmentBlob.writeRef());
 
-		std::string fragmentSource = static_cast<const char*>(m_CompileRequest->getEntryPointCode(fragmentEntryPointIdx, &outputSize));
-		std::string cleanedFragmentSource = std::regex_replace(fragmentSource, setFirstPattern, "");
-		cleanedFragmentSource = std::regex_replace(cleanedFragmentSource, setLastPattern, "");
-
-		shaderSources[GL_VERTEX_SHADER] = cleanedVertexSource;
-		shaderSources[GL_FRAGMENT_SHADER] = cleanedFragmentSource;
-
-		CompileGLSL(shaderSources);
+		CompileSpirv(static_cast<const uint32_t*>(vertexBlob->getBufferPointer()), static_cast<uint32_t>(vertexBlob->getBufferSize()), static_cast<const uint32_t*>(fragmentBlob->getBufferPointer()), static_cast<uint32_t>(fragmentBlob->getBufferSize()));
 		GenerateLayout();
 
 		m_IsSlangShader = true;
@@ -217,6 +303,7 @@ namespace Nebula::Graphics {
 
 	void OpenGLShader::GenerateLayout()
 	{
+		constexpr uint32_t MAX_BINDINGS_PER_SET = 16;
 		slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout();
 		uint32_t paramCount = programLayout->getParameterCount();
 
@@ -229,31 +316,28 @@ namespace Nebula::Graphics {
 			ResourceBinding res{};
 			res.Name = var->getName();
 			res.Size = typeLayout->getSize();
+			res.Set = varLayout->getBindingSpace();
+			res.Binding = (res.Set * MAX_BINDINGS_PER_SET) + varLayout->getBindingIndex();
 
 			switch (typeLayout->getKind())
 			{
 			case slang::TypeReflection::Kind::ConstantBuffer:
 			case slang::TypeReflection::Kind::ParameterBlock:
+			case slang::TypeReflection::Kind::Struct:
 				{
 					res.Type = ResourceType::UniformBuffer;
-					res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
-					res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
 					break;
 				}
 
 			case slang::TypeReflection::Kind::Resource:
 				{
 					res.Type = ResourceType::Texture;
-					res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
-					res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
 					break;
 				}
 
 			case slang::TypeReflection::Kind::SamplerState:
 				{
 					res.Type = ResourceType::Sampler;
-					res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
-					res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
 					break;
 				}
 

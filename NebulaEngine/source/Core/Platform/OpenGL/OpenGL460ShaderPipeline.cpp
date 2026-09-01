@@ -12,7 +12,7 @@ namespace Nebula::Graphics
         return m_Shader->GetUniformBlockLocation(uniformBlockName);
     }
 
-    uint32_t OpenGL460ShaderPipeline::GetVertexInputLocation(const std::string& vertexInputName)
+    uint32_t OpenGL460ShaderPipeline::GetVertexInputLocation()
     {
         return 0;
     }

@@ -4,7 +4,7 @@ struct RendererUniforms
     float4x4 u_Transform;
 }
 
-ParameterBlock<RendererUniforms> RendererUBO;
+ConstantBuffer<RendererUniforms> RendererUBO;
 
 struct VSInput
 {

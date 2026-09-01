@@ -4,7 +4,7 @@ struct Renderer2DUniforms
 }
 
 Sampler2D u_Textures[15];
-ParameterBlock<Renderer2DUniforms> Renderer2DUBO;
+ConstantBuffer<Renderer2DUniforms> Renderer2DUBO;
 
 struct VSInput
 {

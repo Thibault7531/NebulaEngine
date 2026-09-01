@@ -28,6 +28,7 @@ namespace Nebula::Graphics {
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 		void CompileGLSL(const std::unordered_map<GLenum, std::string>& shaderSources);
+		void CompileSpirv(const uint32_t* vertexBinary, uint32_t vertexBinarySize, const uint32_t* fragmentBinary, uint32_t fragmentBinarySize);
 		void CompileSlang(const std::string& shader);
 		void GenerateLayout();
 

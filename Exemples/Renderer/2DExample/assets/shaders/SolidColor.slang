@@ -9,8 +9,8 @@ struct ColorUniform
     float4 u_Color;
 }
 
-ParameterBlock<RendererUniform> RendererUBO;
-ParameterBlock<ColorUniform> ColorUBO;
+ConstantBuffer<RendererUniform> RendererUBO;
+ConstantBuffer<ColorUniform> ColorUBO;
 
 struct VSInput
 {

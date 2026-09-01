@@ -11,7 +11,7 @@ namespace Nebula::Graphics
         ~OpenGL460ShaderPipeline() = default;
 
         virtual uint32_t GetUniformBlockLocation(const std::string& uniformBlockName) override;
-        virtual uint32_t GetVertexInputLocation(const std::string& vertexInputName) override;
+        virtual uint32_t GetVertexInputLocation() override;
 
     public:
         GLuint GetShaderID();
