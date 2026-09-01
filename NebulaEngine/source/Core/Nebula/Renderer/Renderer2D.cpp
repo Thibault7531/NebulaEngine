@@ -413,6 +413,11 @@ namespace Nebula
         s_Data.Stats.QuadCount++;
     }
 
+    Ref<Graphics::Texture2D> Renderer2D::GetWhiteTexture()
+    {
+        return s_Data.WhiteTexture;
+    }
+
     Renderer2D::Statistics Renderer2D::GetStatistics()
     {
         return s_Data.Stats;

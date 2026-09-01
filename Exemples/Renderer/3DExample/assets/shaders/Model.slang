@@ -30,8 +30,8 @@ VSOutput vertexMain(VSInput input)
 {
     VSOutput output;
 
-    output.Position = mul(mul(float4(input.a_Position, 1.0), RendererUBO.u_Transform), RendererUBO.u_ViewProjection);
-    output.v_Position = input.a_Position;
+    output.v_Position = mul(float4(input.a_Position, 1), RendererUBO.u_Transform).xyz;
+    output.Position = mul(float4(output.v_Position, 1.0), RendererUBO.u_ViewProjection);
     output.v_Normal = input.a_Normal;
 
     return output;
@@ -40,5 +40,10 @@ VSOutput vertexMain(VSInput input)
 [shader("fragment")]
 float4 fragmentMain(FSInput input)
 {
-    return float4(dot(normalize(input.v_Normal), normalize(float3(0, 0, 0) - input.v_Position)) * float3(1, 1, 1), 1.0);
+    float3 lightPosition = float3(0, 0, -10);
+    float3 lightDirection = normalize(input.v_Position - lightPosition);
+    float3 normalizedNormal = normalize(input.v_Normal);
+    float3 luminance = abs(min(dot(lightDirection, normalizedNormal), 0));
+
+    return float4(luminance * float3(1, 1, 1), 1);
 }

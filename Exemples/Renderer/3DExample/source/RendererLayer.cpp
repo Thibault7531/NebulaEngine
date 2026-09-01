@@ -109,7 +109,7 @@ void RendererLayer::OnAttach()
 	m_RendererUBO = m_Device->CreateUniformBuffer({
 		{ Nebula::Graphics::ShaderDataType::Matrix4, "u_ViewProjection" },
 		{ Nebula::Graphics::ShaderDataType::Matrix4, "u_Transform" },
-	}, 3);
+	}, 4);
 }
 
 void RendererLayer::OnDetach()
@@ -136,19 +136,28 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 	renderPass->BindTextureToSlot(m_Texture);
 	renderPass->DrawArrayIndexed(m_VAO);
 
-	m_RendererUBO->SetData(1, "u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f))));
+	m_RendererUBO->SetData(1, "u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-0.5f, -0.5f, -10.5f))));
 
 	renderPass->SetShaderPipeline(m_TextureShader);
 	renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 1);
 	renderPass->SetCullMode(Nebula::Graphics::CullMode::Front);
 	renderPass->SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::DepthCompareFunction::Less, .depthWrite = true});
+	renderPass->BindTextureToSlot(Nebula::Renderer2D::GetWhiteTexture());
+	renderPass->DrawArrayIndexed(m_VAO);
+
+	m_RendererUBO->SetData(2, "u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f))));
+
+	renderPass->SetShaderPipeline(m_TextureShader);
+	renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 2);
+	renderPass->SetCullMode(Nebula::Graphics::CullMode::Front);
+	renderPass->SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::DepthCompareFunction::Less, .depthWrite = true});
 	renderPass->BindTextureToSlot(m_Glass);
 	renderPass->DrawArrayIndexed(m_VAO);
 
-	m_RendererUBO->SetData(2, "u_Transform", glm::value_ptr(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f, 0.0f)), glm::vec3(0.01f))));
+	m_RendererUBO->SetData(3, "u_Transform", glm::value_ptr(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f, 0.0f)), glm::vec3(0.01f))));
 
 	renderPass->SetShaderPipeline(m_ModelShader);
-	renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 2);
+	renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 3);
 	renderPass->SetCullMode(Nebula::Graphics::CullMode::Front);
 	renderPass->SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::DepthCompareFunction::Less, .depthWrite = true});
 	for (auto& mesh : m_Backpack->GetMeshes())

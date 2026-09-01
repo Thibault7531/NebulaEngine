@@ -48,6 +48,8 @@ namespace Nebula
         static void DrawQuad(const QuadProperties& properties);
         static void DrawQuad(const QuadPropertiesAdvanced& properties);
 
+        static Ref<Graphics::Texture2D> GetWhiteTexture();
+
         struct Statistics
         {
             uint32_t DrawCalls = 0;
