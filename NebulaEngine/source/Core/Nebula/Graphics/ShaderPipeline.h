@@ -182,6 +182,6 @@ namespace Nebula::Graphics
         virtual ~ShaderPipeline() = default;
 
         virtual uint32_t GetUniformBlockLocation(const std::string& uniformBlockName) = 0;
-        virtual uint32_t GetVertexInputLocation(const std::string& vertexInputName) = 0;
+        virtual uint32_t GetVertexInputLocation() = 0;
     };
 }

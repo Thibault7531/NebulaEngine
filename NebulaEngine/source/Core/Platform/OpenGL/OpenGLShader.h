@@ -21,7 +21,7 @@ namespace Nebula::Graphics {
 
 	public:
 		uint32_t GetSlangUniformLocation(const std::string& name) const;
-		uint32_t GetUniformBlockLocation(const std::string& name) const;
+		uint32_t GetUniformBlockLocation(const std::string& name);
 		GLuint GetShaderID() const { return m_RendererID; }
 
 	private:
@@ -29,6 +29,7 @@ namespace Nebula::Graphics {
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 		void CompileGLSL(const std::unordered_map<GLenum, std::string>& shaderSources);
 		void CompileSlang(const std::string& shader);
+		void GenerateLayout();
 
 	private:
 		uint32_t m_RendererID;
@@ -37,6 +38,7 @@ namespace Nebula::Graphics {
 		bool m_IsSlangShader = false;
 		Slang::ComPtr<slang::ICompileRequest> m_CompileRequest;
 		Slang::ComPtr<slang::IComponentType> m_ProgramReflection;
+		ShaderReflectionLayout m_Layout;
 
 	private:
 		static bool s_IsSlangGlobalSessionCreated;

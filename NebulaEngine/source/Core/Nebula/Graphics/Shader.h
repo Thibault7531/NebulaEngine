@@ -8,6 +8,32 @@
 
 namespace Nebula::Graphics
 {
+    enum class ResourceType
+    {
+        UniformBuffer, StorageBuffer, Texture, Sampler, PushConstant
+    };
+    enum class ShaderStage : uint8_t
+    {
+        Vertex = 1 << 0, Fragment = 1 << 1, Compute = 1 << 2
+    };
+
+    struct ResourceBinding
+    {
+        std::string Name;
+        ResourceType Type;
+        uint32_t Set;
+        uint32_t Binding;
+        uint32_t Size;
+        uint8_t StageFlags;
+    };
+
+    struct ShaderReflectionLayout
+    {
+        std::vector<ResourceBinding> Resources;
+        std::unordered_map<std::string, uint32_t> ResourceIndex;
+        uint32_t VertexBufferLocation;
+    };
+
     class Shader
     {
     public:

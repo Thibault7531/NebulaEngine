@@ -100,7 +100,7 @@ namespace Nebula::Graphics
     void Metal3RenderPass::BindVertexBuffer(Ref<VertexBuffer> vertexBuffer)
     {
         Ref<Metal3VertexBuffer> metalBuffer = std::dynamic_pointer_cast<Metal3VertexBuffer>(vertexBuffer);
-        m_RenderCommandEncoder->setVertexBuffer(metalBuffer->GetBuffer(), 0, m_CurrentlyBoundShaderPipeline->GetVertexInputLocation("input"));
+        m_RenderCommandEncoder->setVertexBuffer(metalBuffer->GetBuffer(), 0, m_CurrentlyBoundShaderPipeline->GetVertexInputLocation());
     }
 
     void Metal3RenderPass::DrawIndexed(Ref<IndexBuffer> indexBuffer, uint32_t elementCount)

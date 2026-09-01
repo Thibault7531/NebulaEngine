@@ -210,66 +210,64 @@ namespace Nebula::Graphics {
 		shaderSources[GL_FRAGMENT_SHADER] = cleanedFragmentSource;
 
 		CompileGLSL(shaderSources);
+		GenerateLayout();
 
 		m_IsSlangShader = true;
 	}
 
-	uint32_t OpenGLShader::GetUniformBlockLocation(const std::string& name) const
+	void OpenGLShader::GenerateLayout()
 	{
-		slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout(0);
+		slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout();
 		uint32_t paramCount = programLayout->getParameterCount();
 
-		uint32_t paramIndex = 0;
-		slang::VariableLayoutReflection* uniformLayout = nullptr;
-		while (paramIndex < paramCount && !uniformLayout)
+		for (uint32_t i = 0; i < paramCount; i++)
 		{
-			slang::VariableLayoutReflection* paramLayout = programLayout->getParameterByIndex(paramIndex);
-			if (strcmp(paramLayout->getVariable()->getName(), name.c_str()) == 0) uniformLayout = paramLayout;
-			paramIndex++;
-		}
+			auto varLayout = programLayout->getParameterByIndex(i);
+			auto var = varLayout->getVariable();
+			auto typeLayout = varLayout->getTypeLayout();
 
-		if (uniformLayout)
-		{
-			slang::TypeReflection* type = uniformLayout->getTypeLayout()->getType();
-			switch (type->getKind())
+			ResourceBinding res{};
+			res.Name = var->getName();
+			res.Size = typeLayout->getSize();
+
+			switch (typeLayout->getKind())
 			{
-			case slang::TypeReflection::Kind::Resource:
-				{
-					SlangResourceShape shape = type->getResourceShape();
-					uint32_t baseShape = shape & SLANG_RESOURCE_BASE_SHAPE_MASK;
-
-					if (baseShape == SLANG_TEXTURE_2D)
-					{
-						return uniformLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
-					}
-					return 0;
-				}
-
 			case slang::TypeReflection::Kind::ConstantBuffer:
 			case slang::TypeReflection::Kind::ParameterBlock:
-			case slang::TypeReflection::Kind::Struct:
 				{
-					return uniformLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+					res.Type = ResourceType::UniformBuffer;
+					res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+					res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
+					break;
 				}
 
-			case slang::TypeReflection::Kind::Scalar:
-			case slang::TypeReflection::Kind::Vector:
-			case slang::TypeReflection::Kind::Matrix:
+			case slang::TypeReflection::Kind::Resource:
 				{
-					uint32_t categoryCount = uniformLayout->getCategoryCount();
-					for (uint32_t i = 0; i < categoryCount; i++)
-					{
-						slang::ParameterCategory category = uniformLayout->getCategoryByIndex(i);
-						if (category == slang::ParameterCategory::Uniform) return uniformLayout->getOffset(category);
-					}
+					res.Type = ResourceType::Texture;
+					res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+					res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
+					break;
 				}
 
-			default:
+			case slang::TypeReflection::Kind::SamplerState:
 				{
-					return 0;
+					res.Type = ResourceType::Sampler;
+					res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+					res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
+					break;
 				}
+
+			default: continue;
 			}
+
+			m_Layout.ResourceIndex[res.Name] = m_Layout.ResourceIndex.size();
+			m_Layout.Resources.push_back(res);
 		}
-		return 0;
+	}
+
+	uint32_t OpenGLShader::GetUniformBlockLocation(const std::string& name)
+	{
+		ResourceBinding resource = m_Layout.Resources[m_Layout.ResourceIndex[name]];
+		return resource.Binding;
 	}
 }

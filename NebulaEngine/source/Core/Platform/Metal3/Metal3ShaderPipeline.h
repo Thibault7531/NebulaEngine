@@ -14,7 +14,7 @@ namespace Nebula::Graphics
         ~Metal3ShaderPipeline() override;
 
         virtual uint32_t GetUniformBlockLocation(const std::string& uniformBlockName) override { return m_Shader->GetUniformBlockLocation(uniformBlockName); }
-        virtual uint32_t GetVertexInputLocation(const std::string& vertexInputName) override { return m_Shader->GetVertexInputLocation(vertexInputName); }
+        virtual uint32_t GetVertexInputLocation() override { return m_Shader->GetVertexInputLocation(); }
 
     public:
         static MTL::VertexFormat GetMetal3VertexFormat(ShaderDataType type);

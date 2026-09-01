@@ -5,7 +5,7 @@ struct RendererUniform
 }
 
 Sampler2D u_Texture;
-ParameterBlock<RendererUniform> RendererUBO : register(b1);
+ParameterBlock<RendererUniform> RendererUBO;
 
 struct VSInput
 {

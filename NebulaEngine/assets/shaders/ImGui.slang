@@ -4,7 +4,7 @@ struct ImGuiRendererUniforms
 }
 
 Sampler2D u_Texture;
-ParameterBlock<ImGuiRendererUniforms> ImGuiUBO : register(b1);
+ParameterBlock<ImGuiRendererUniforms> ImGuiUBO;
 
 struct VSInput
 {

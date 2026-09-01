@@ -20,11 +20,11 @@ namespace Nebula::Graphics
             VertexAttribute attribute = layout.GetElements()[index];
             vertexDescriptor->attributes()->object(index)->setFormat(GetMetal3VertexFormat(attribute.Type));
             vertexDescriptor->attributes()->object(index)->setOffset(attribute.Offset);
-            vertexDescriptor->attributes()->object(index)->setBufferIndex(0);
+            vertexDescriptor->attributes()->object(index)->setBufferIndex(m_Shader->GetVertexInputLocation());
         }
-        vertexDescriptor->layouts()->object(0)->setStride(layout.GetStride());
-        vertexDescriptor->layouts()->object(0)->setStepFunction(MTL::VertexStepFunctionPerVertex);
-        vertexDescriptor->layouts()->object(0)->setStepRate(1);
+        vertexDescriptor->layouts()->object(m_Shader->GetVertexInputLocation())->setStride(layout.GetStride());
+        vertexDescriptor->layouts()->object(m_Shader->GetVertexInputLocation())->setStepFunction(MTL::VertexStepFunctionPerVertex);
+        vertexDescriptor->layouts()->object(m_Shader->GetVertexInputLocation())->setStepRate(1);
         renderPipelineDescriptor->setVertexDescriptor(vertexDescriptor);
 
         uint32_t colorAttachmentIndex = 0;

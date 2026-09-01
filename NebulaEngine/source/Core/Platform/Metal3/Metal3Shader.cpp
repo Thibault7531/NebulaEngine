@@ -101,49 +101,72 @@ namespace Nebula::Graphics
     	std::string fragmentSource = static_cast<const char*>(compileRequest->getEntryPointCode(fragmentEntryPointIdx, &outputSize));
 
     	CompileMSL(device, vertexSource, fragmentSource);
+    	GenerateLayout();
+    }
+
+	void Metal3Shader::GenerateLayout()
+    {
+    	slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout();
+    	uint32_t paramCount = programLayout->getParameterCount();
+    	uint32_t maxBinding = 0;
+
+    	for (uint32_t i = 0; i < paramCount; i++)
+    	{
+    		auto varLayout = programLayout->getParameterByIndex(i);
+    		auto var = varLayout->getVariable();
+    		auto typeLayout = varLayout->getTypeLayout();
+
+    		ResourceBinding res{};
+    		res.Name = var->getName();
+    		res.Size = typeLayout->getSize();
+
+    		switch (typeLayout->getKind())
+    		{
+    		case slang::TypeReflection::Kind::ConstantBuffer:
+    		case slang::TypeReflection::Kind::ParameterBlock:
+    			{
+    				res.Type = ResourceType::UniformBuffer;
+    				res.Binding = varLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
+    				res.Set = varLayout->getBindingSpace(slang::ParameterCategory::ConstantBuffer);
+    				maxBinding = std::max(res.Binding, maxBinding);
+    				break;
+    			}
+
+    		case slang::TypeReflection::Kind::Resource:
+    			{
+    				res.Type = ResourceType::Texture;
+    				res.Binding = varLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
+    				res.Set = varLayout->getBindingSpace(slang::ParameterCategory::ConstantBuffer);
+    				maxBinding = std::max(res.Binding, maxBinding);
+    				break;
+    			}
+
+    		case slang::TypeReflection::Kind::SamplerState:
+    			{
+    				res.Type = ResourceType::Sampler;
+    				res.Binding = varLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
+    				res.Set = varLayout->getBindingSpace(slang::ParameterCategory::ConstantBuffer);
+    				maxBinding = std::max(res.Binding, maxBinding);
+    				break;
+    			}
+
+    		default: continue;
+    		}
+
+    		m_Layout.ResourceIndex[res.Name] = m_Layout.ResourceIndex.size();
+    		m_Layout.Resources.push_back(res);
+    		m_Layout.VertexBufferLocation = maxBinding + 1;
+    	}
     }
 
 	uint32_t Metal3Shader::GetUniformBlockLocation(const std::string& uniformBlockName)
 	{
-    	slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout();
-    	uint32_t paramCount = programLayout->getParameterCount();
-
-    	uint32_t paramIndex = 0;
-    	slang::VariableLayoutReflection* uniformLayout = nullptr;
-    	while (paramIndex < paramCount && !uniformLayout)
-    	{
-    		slang::VariableLayoutReflection* paramLayout = programLayout->getParameterByIndex(paramIndex);
-    		if (strcmp(paramLayout->getName(), uniformBlockName.c_str()) == 0) uniformLayout = paramLayout;
-    		paramIndex++;
-    	}
-
-    	if (uniformLayout)
-    	{
-    		return uniformLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
-    	}
-    	return 0;
+    	ResourceBinding resource = m_Layout.Resources[m_Layout.ResourceIndex[uniformBlockName]];
+    	return resource.Binding;
 	}
 
-	uint32_t Metal3Shader::GetVertexInputLocation(const std::string& vertexInputName)
+	uint32_t Metal3Shader::GetVertexInputLocation()
 	{
-    	slang::ProgramLayout* programLayout = m_ProgramReflection->getLayout(0);
-    	uint32_t paramCount = programLayout->getParameterCount();
-
-    	uint32_t paramIndex = 0;
-    	slang::VariableLayoutReflection* bufferLayout = nullptr;
-    	while (paramIndex < paramCount && !bufferLayout)
-    	{
-    		slang::VariableLayoutReflection* paramLayout = programLayout->getParameterByIndex(paramIndex);
-    		if (strcmp(paramLayout->getName(), vertexInputName.c_str()) == 0) bufferLayout = paramLayout;
-    		paramIndex++;
-    	}
-
-    	if (bufferLayout)
-    	{
-    		slang::TypeLayoutReflection* typeLayout = bufferLayout->getTypeLayout();
-    		slang::VariableLayoutReflection* firstParam = typeLayout->getFieldByIndex(0);
-    		return firstParam->getOffset(slang::ParameterCategory::VertexInput);
-    	}
-    	return 0;
+    	return m_Layout.VertexBufferLocation;
 	}
 }

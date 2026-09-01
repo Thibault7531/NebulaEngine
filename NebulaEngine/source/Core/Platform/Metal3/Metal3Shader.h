@@ -28,13 +28,14 @@ namespace Nebula::Graphics
         std::string ReadFile(const std::filesystem::path& path);
         void CompileMSL(MTL::Device* device, const std::string& vertexSource, const std::string& fragmentSource);
         void CompileSlang(MTL::Device* device, const std::string& source);
+        void GenerateLayout();
 
     public:
         MTL::Function* GetVertexFunction() { return m_VertexFunction; }
         MTL::Function* GetFragmentFunction() { return m_FragmentFunction; }
 
         uint32_t GetUniformBlockLocation(const std::string& uniformBlockName);
-        uint32_t GetVertexInputLocation(const std::string& vertexInputName);
+        uint32_t GetVertexInputLocation();
 
     private:
         std::string m_Name;
@@ -47,6 +48,7 @@ namespace Nebula::Graphics
         // TODO: Implement shader layout caching
         Slang::ComPtr<slang::ISession> m_Session;
         Slang::ComPtr<slang::IComponentType> m_ProgramReflection;
+        ShaderReflectionLayout m_Layout;
 
     private:
         static bool s_IsSlangGlobalSessionCreated;
