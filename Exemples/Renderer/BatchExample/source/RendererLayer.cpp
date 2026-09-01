@@ -1,5 +1,7 @@
 #include "RendererLayer.h"
 
+#include <random>
+
 RendererLayer::RendererLayer()
     : Layer{"BatchRenderer"}, m_CameraController{16.f/9.f}, m_Device{Nebula::Application::Get().GetDevice()}
 {
@@ -18,27 +20,30 @@ void RendererLayer::OnAttach()
     m_Coal = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/coal_ore.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
     m_Rainbow = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/BatchRendererExample/textures/furnace_front.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Linear, Nebula::Graphics::Texture::FilterType::Nearest});
 
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist(0, INT_MAX);
     for (int Y = 0; Y < 32; Y++) {
         for (int X = 0; X < 32; X++) {
             if (Y == 0) m_World[Y][X] = m_Bedrock;
             else if (Y < 12) m_World[Y][X] = m_Deepslate;
             else if (Y == 12) {
-                int random = std::rand();
+                int random = dist(mt);
                 if (random % 4 == 0) m_World[Y][X] = m_Stone;
                 else m_World[Y][X] = m_Deepslate;
             }
             else if (Y == 13) {
-                int random = std::rand();
+                int random = dist(mt);
                 if (random % 3 == 0) m_World[Y][X] = m_Stone;
                 else m_World[Y][X] = m_Deepslate;
             }
             else if (Y == 14) {
-                int random = std::rand();
+                int random = dist(mt);
                 if (random % 2 == 0) m_World[Y][X] = m_Stone;
                 else m_World[Y][X] = m_Deepslate;
             }
             else if (Y < 24) {
-                int random = std::rand();
+                int random = dist(mt);
                 if (random % 256 == 0) m_World[Y][X] = m_Rainbow;
                 else if (random % 128 == 0) m_World[Y][X] = m_Diamond;
                 else if (random % 12 == 0) m_World[Y][X] = m_Iron;
@@ -46,12 +51,12 @@ void RendererLayer::OnAttach()
                 else m_World[Y][X] = m_Stone;
             }
             else if (Y == 24) {
-                int random = std::rand();
+                int random = dist(mt);
                 if (random % 2 == 0) m_World[Y][X] = m_Stone;
                 else m_World[Y][X] = m_Dirt;
             }
             else if (Y == 25) {
-                int random = std::rand();
+                int random = dist(mt);
                 if (random % 4 == 0) m_World[Y][X] = m_Stone;
                 else m_World[Y][X] = m_Dirt;
             }
