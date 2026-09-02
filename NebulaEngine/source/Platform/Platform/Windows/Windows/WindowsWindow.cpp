@@ -17,6 +17,8 @@ namespace Nebula::Platform
     {
         m_Properties = props;
 
+        NB_PLATFORM_INFO("Creating window {0} ({1}, {2})", m_Properties.Title, m_Properties.Width, m_Properties.Height);
+
         winrt::Microsoft::UI::Windowing::AppWindowPresenter presenter = nullptr;
 
         switch (m_Properties.Style)
@@ -110,6 +112,7 @@ namespace Nebula::Platform
 
     WindowsWindow::~WindowsWindow()
     {
+        NB_PLATFORM_INFO("Destroying window {0}", m_Properties.Title);
         m_Context.reset();
         m_Window.Destroy();
     }

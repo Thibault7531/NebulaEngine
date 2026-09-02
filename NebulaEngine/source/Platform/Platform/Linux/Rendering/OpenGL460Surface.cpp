@@ -27,6 +27,11 @@ namespace Nebula::Graphics
         }
 
         m_Context = SDL_GL_CreateContext(static_cast<SDL_Window*>(m_Window->GetNativeWindow()));
+        if (!m_Context)
+        {
+            NB_PLATFORM_ERROR("Failed to create OpenGL context: {0}", SDL_GetError());
+            return;
+        }
         OpenGL460Surface::NewFrame();
 
         if (!s_GLInitialized)

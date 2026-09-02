@@ -26,9 +26,7 @@ namespace Nebula
         int MouseButtonsDown;
         uint32_t MouseWindowID;
 
-        char* ClipboardTextData;
-
-        PlatformData() { memset((void*)this, 0, sizeof(*this)); }
+        std::string ClipboardTextData;
     };
 
     struct ViewportData

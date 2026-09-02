@@ -113,6 +113,7 @@ namespace Nebula::Platform
         SetClipboardData(CF_UNICODETEXT, (HANDLE)text.c_str());
 
         CloseClipboard();
+        NB_PLATFORM_DEBUG("Set clipboard text: {0}", text);
     }
 
     std::string Clipboard::GetText()

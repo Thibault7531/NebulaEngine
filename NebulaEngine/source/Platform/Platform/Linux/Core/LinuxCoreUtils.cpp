@@ -2,11 +2,13 @@
 
 #include <SDL3/SDL.h>
 
+#include "Platform/Nebula/CoreSystems/Core/Log.h"
+
 namespace Nebula::Platform
 {
     void CoreUtils::InitThread()
     {
-        SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
+        if (!SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO)) NB_PLATFORM_CRITICAL("Failed to initialize SDL: {0}", SDL_GetError());
     }
 
     void CoreUtils::InitThread_MT()

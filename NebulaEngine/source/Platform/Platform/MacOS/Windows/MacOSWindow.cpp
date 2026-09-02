@@ -1,11 +1,14 @@
 #include "MacOSWindow.h"
 
+#include "Platform/Nebula/CoreSystems/Core/Log.h"
+
 namespace Nebula::Platform
 {
     MacOSWindow::MacOSWindow(WindowProperties props)
         : m_EventHandler{this}, m_NativeWindow{SwiftMacOSWindow::CreateMacOSWindow(props, m_EventHandler)}
     {
         m_Properties = props;
+        NB_PLATFORM_INFO("Creating window {0} ({1}, {2})", m_Properties.Title, m_Properties.Width, m_Properties.Height);
         if (m_Properties.API == GraphicsAPI::Metal3)
         {
             m_GrahicsSurface = m_NativeWindow.GetMetal3Context().GetSharedPointer();
@@ -14,6 +17,7 @@ namespace Nebula::Platform
 
     MacOSWindow::~MacOSWindow()
     {
+        NB_PLATFORM_INFO("Destroying window {0}", m_Properties.Title);
         m_NativeWindow.Destroy();
     }
 

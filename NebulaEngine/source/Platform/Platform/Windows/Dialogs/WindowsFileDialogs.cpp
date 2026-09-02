@@ -6,6 +6,7 @@
 #include <winrt/Windows.Foundation.Collections.h>
 
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
+#include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula::Platform
@@ -47,6 +48,7 @@ namespace Nebula::Platform
 
         auto result = request.GetResults();
         if (!result) return;
+        NB_PLATFORM_DEBUG("Opening file: {0}", winrt::to_string(result.Path()));
         callback(winrt::to_string(result.Path()));
     }
 
@@ -93,6 +95,7 @@ namespace Nebula::Platform
 
         auto result = request.GetResults();
         if (!result) return;
+        NB_PLATFORM_DEBUG("Saving file: {0}", filelist[0]);
         callback(winrt::to_string(result.Path()));
     }
 }

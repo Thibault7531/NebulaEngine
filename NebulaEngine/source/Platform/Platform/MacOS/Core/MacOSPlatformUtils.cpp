@@ -71,6 +71,7 @@ namespace Nebula::Platform
     void Clipboard::SetText(const std::string& text)
     {
         SwiftPlatformUtils::SetText(text);
+        NB_PLATFORM_DEBUG("Set clipboard text: {0}", text);
     }
 
     std::string Clipboard::GetText()

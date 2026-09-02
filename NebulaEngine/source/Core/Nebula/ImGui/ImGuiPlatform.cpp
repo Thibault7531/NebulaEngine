@@ -65,8 +65,6 @@ namespace Nebula
 
         ShutdownMultipleViewports();
 
-        delete platform_data.ClipboardTextData;
-
         io.BackendPlatformName = nullptr;
         io.BackendPlatformUserData = nullptr;
         io.BackendFlags &= ~(ImGuiBackendFlags_HasMouseCursors | ImGuiBackendFlags_HasSetMousePos | ImGuiBackendFlags_HasGamepad | ImGuiBackendFlags_PlatformHasViewports | ImGuiBackendFlags_HasMouseHoveredViewport);
@@ -472,10 +470,9 @@ namespace Nebula
         ImGuiIO& io = ImGui::GetIO();
         auto* backend_data = static_cast<PlatformData*>(io.BackendPlatformUserData);
 
-        std::string sdl_clipboard_text = Platform::Clipboard::GetText();
-        backend_data->ClipboardTextData = sdl_clipboard_text.data();
+        backend_data->ClipboardTextData = Platform::Clipboard::GetText();
 
-        return backend_data->ClipboardTextData;
+        return backend_data->ClipboardTextData.c_str();
     }
 
     Ref<Platform::Window> ImGuiPlatform::GetWindowFromViewportID(ImGuiID viewport_id)

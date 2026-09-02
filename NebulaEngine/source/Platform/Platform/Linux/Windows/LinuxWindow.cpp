@@ -11,6 +11,8 @@ namespace Nebula::Platform
     {
         m_Properties = props;
 
+        NB_PLATFORM_INFO("Creating window {0} ({1}, {2})", m_Properties.Title, m_Properties.Width, m_Properties.Height);
+
         SDL_WindowFlags windowFlags = 0;
         if (m_Properties.Minimized) windowFlags |= SDL_WINDOW_MINIMIZED;
         if (m_Properties.Maximized) windowFlags |= SDL_WINDOW_MAXIMIZED;
@@ -59,6 +61,7 @@ namespace Nebula::Platform
 
     LinuxWindow::~LinuxWindow()
     {
+        NB_PLATFORM_INFO("Destroying window {0}", m_Properties.Title);
         m_Surface.reset();
         SDL_DestroyWindow(m_Window);
     }

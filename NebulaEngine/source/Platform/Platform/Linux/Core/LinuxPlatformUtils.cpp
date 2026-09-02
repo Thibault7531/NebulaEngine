@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 
+#include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula::Platform
@@ -139,11 +140,15 @@ namespace Nebula::Platform
     void Clipboard::SetText(const std::string& text)
     {
         SDL_SetClipboardText(text.c_str());
+        NB_PLATFORM_DEBUG("Set clipboard text: {0}", text);
     }
 
     std::string Clipboard::GetText()
     {
-        return SDL_GetClipboardText();
+        const char* text = SDL_GetClipboardText();
+        std::string textStr = text;
+        SDL_free((void*)text);
+        return textStr;
     }
 
     Ref<Window> WindowUtils::GetForegroundWindow()

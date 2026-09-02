@@ -3,6 +3,7 @@
 #include <SDL3/SDL_dialog.h>
 
 #include "Core/Nebula/CoreSystems/Core/Log.h"
+#include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 #include "Platform/Nebula/Dialogs/FileDialogs.h"
 
@@ -47,6 +48,7 @@ namespace Nebula::Platform
         {
             auto* callbackData = static_cast<callback_data*>(data);
             auto callback = *callbackData->callback;
+            NB_PLATFORM_DEBUG("Opening file: {0}", filelist[0]);
             if (*filelist != nullptr) callback(filelist[0]);
             callbackData->called = true;
         }, &data, static_cast<SDL_Window*>(WindowManager::Get().GetMainWindow()->GetHandle()), filters.data(), filters.size(), nullptr, false);
@@ -75,6 +77,7 @@ namespace Nebula::Platform
         {
             auto* callbackData = static_cast<callback_data*>(data);
             auto callback = *callbackData->callback;
+            NB_PLATFORM_DEBUG("Saving file: {0}", filelist[0]);
             if (*filelist != nullptr) callback(filelist[0]);
             callbackData->called = true;
         }, &data, static_cast<SDL_Window*>(WindowManager::Get().GetMainWindow()->GetHandle()), filters.data(), filters.size(), nullptr);
