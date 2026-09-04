@@ -5,6 +5,7 @@
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.UI.ViewManagement.h>
 
+#include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
@@ -107,10 +108,16 @@ namespace Nebula::Platform
 
     void Clipboard::SetText(const std::string& text)
     {
-        OpenClipboard(nullptr);
+        if (!OpenClipboard(nullptr)) return;
+        EmptyClipboard();
 
-        SetClipboardData(CF_TEXT, (HANDLE)text.c_str());
-        SetClipboardData(CF_UNICODETEXT, (HANDLE)text.c_str());
+        HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, text.length() + 1);
+        if (!hMem) return;
+        LPVOID hMemPtr = GlobalLock(hMem);
+        memcpy_s(hMemPtr, text.length() + 1, text.c_str(), text.length() + 1);
+        GlobalUnlock(hMem);
+
+        SetClipboardData(CF_TEXT, hMem);
 
         CloseClipboard();
         NB_PLATFORM_DEBUG("Set clipboard text: {0}", text);
@@ -124,9 +131,7 @@ namespace Nebula::Platform
             return "";
 
         h = GetClipboardData(CF_TEXT);
-
-        std::string text;
-        strcpy_s(text.data(), 1024, static_cast<const char*>(h));
+        std::string text = static_cast<const char*>(h);
 
         CloseClipboard();
 

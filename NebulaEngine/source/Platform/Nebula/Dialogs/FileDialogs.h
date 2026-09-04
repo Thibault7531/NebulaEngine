@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "Platform/Nebula/CoreSystems/Core/Log.h"
-
 namespace Nebula::Platform
 {
     enum class FileType
@@ -34,7 +32,6 @@ namespace Nebula::Platform
 
         void OnFileSelected(const std::string& path) const
         {
-            NB_PLATFORM_DEBUG("File selected: {0}", path);
             m_Callback(path);
         }
 

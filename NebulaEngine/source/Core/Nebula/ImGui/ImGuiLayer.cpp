@@ -5,6 +5,7 @@
 #include "ImGuiRenderer.h"
 #include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/Graphics/Core/RendererAPI.h"
+#include "Platform/Nebula/CoreSystems/Input/Input.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
 
 namespace Nebula
@@ -85,6 +86,7 @@ namespace Nebula
 			ImGuiIO& io = ImGui::GetIO();
 			event.Handled |= event.IsInCategory(Platform::EventCategoryMouse) & io.WantCaptureMouse;
 			event.Handled |= event.IsInCategory(Platform::EventCategoryKeyboard) & io.WantCaptureKeyboard;
+			if (event.GetEventType() == Platform::EventType::KeyPressed) event.Handled &= !Platform::Input::IsGlobalKey(dynamic_cast<Platform::KeyPressedEvent*>(&event)->GetKeyCode());
 		}
 	}
 

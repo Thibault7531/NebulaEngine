@@ -47,6 +47,21 @@ namespace Nebula::Graphics
         SDL_GL_DestroyContext(m_Context);
     }
 
+    std::string OpenGL460Surface::GetAPIVersion() const
+    {
+        return reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    }
+
+    std::string OpenGL460Surface::GetAPIVendor() const
+    {
+        return reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    }
+
+    std::string OpenGL460Surface::GetAPIRenderer() const
+    {
+        return reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    }
+
     void OpenGL460Surface::SetVSync(VSyncMode mode)
     {
         if (mode == VSyncMode::Off) SDL_GL_SetSwapInterval(0);

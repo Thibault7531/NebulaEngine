@@ -2,6 +2,8 @@
 
 #include <random>
 
+#include "Nebula/Debug/ImGuiDebugWindow.h"
+
 RendererLayer::RendererLayer()
     : Layer{"BatchRenderer"}, m_CameraController{16.f/9.f}, m_Device{Nebula::Application::Get().GetDevice()}
 {
@@ -125,9 +127,33 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 
 void RendererLayer::OnImGuiRender()
 {
+    if (m_ShowImGuiMenuBar)
+    {
+        ImGui::BeginMainMenuBar();
+        {
+            ImGui::BeginMenu("Nebula Engine", false);
+            if (ImGui::BeginMenu("Debug"))
+            {
+                if (ImGui::MenuItem("Show Debug Window", 0, m_ShowImGuiDebugWindow)) m_ShowImGuiDebugWindow = !m_ShowImGuiDebugWindow;
+                ImGui::EndMenu();
+            }
+        }
+        ImGui::EndMainMenuBar();
+    }
+
+    if (m_ShowImGuiDebugWindow) Nebula::Debug::ShowDebugWindow();
 }
 
 void RendererLayer::OnEvent(Nebula::Platform::Event& event)
 {
     m_CameraController.OnEvent(event);
+
+    Nebula::Platform::EventDispatcher dispatcher(event);
+    dispatcher.Dispatch<Nebula::Platform::KeyPressedEvent>(NB_BIND_EVENT_FN(OnKeyPressedEvent));
+}
+
+bool RendererLayer::OnKeyPressedEvent(Nebula::Platform::KeyPressedEvent& event)
+{
+    if (event.GetKeyCode() == KeyboardKey::LeftAlt) m_ShowImGuiMenuBar = !m_ShowImGuiMenuBar;
+    return false;
 }

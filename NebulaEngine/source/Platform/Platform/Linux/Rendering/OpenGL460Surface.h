@@ -14,6 +14,10 @@ namespace Nebula::Graphics
         OpenGL460Surface(Platform::Window* window);
         virtual ~OpenGL460Surface();
 
+        virtual std::string GetAPIVersion() const override;
+        virtual std::string GetAPIVendor() const override;
+        virtual std::string GetAPIRenderer() const override;
+
         virtual void SetDevice(void* device, void* commandQueue) override {}
 
         virtual void SetVSync(VSyncMode mode) override;

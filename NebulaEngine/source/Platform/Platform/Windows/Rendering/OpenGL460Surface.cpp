@@ -62,6 +62,21 @@ namespace Nebula::Graphics
         ReleaseDC(m_Handle, m_DeviceContext);
     }
 
+    std::string OpenGL460Surface::GetAPIVersion() const
+    {
+        return reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    }
+
+    std::string OpenGL460Surface::GetAPIVendor() const
+    {
+        return reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    }
+
+    std::string OpenGL460Surface::GetAPIRenderer() const
+    {
+        return reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    }
+
     void OpenGL460Surface::SetVSync(VSyncMode mode)
     {
         switch (mode)

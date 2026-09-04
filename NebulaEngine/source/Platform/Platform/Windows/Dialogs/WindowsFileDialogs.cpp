@@ -95,7 +95,7 @@ namespace Nebula::Platform
 
         auto result = request.GetResults();
         if (!result) return;
-        NB_PLATFORM_DEBUG("Saving file: {0}", filelist[0]);
+        NB_PLATFORM_DEBUG("Saving file: {0}", winrt::to_string(result.Path()));
         callback(winrt::to_string(result.Path()));
     }
 }

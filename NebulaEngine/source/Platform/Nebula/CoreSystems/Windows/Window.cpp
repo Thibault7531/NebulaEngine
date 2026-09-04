@@ -24,4 +24,14 @@ namespace Nebula::Platform
 
     }
 
+    std::string Window::GetWindowStyleName(WindowStyle style)
+    {
+        switch (style)
+        {
+        case WindowStyle::Default: return "Default";
+        case WindowStyle::BorderlessInteractive: return "Borderless Interactive";
+        case WindowStyle::BorderlessFullscreen: return "Borderless Fullscreen";
+        case WindowStyle::ExclusiveFullscreen: return "Exclusive Fullscreen";
+        }
+    }
 }

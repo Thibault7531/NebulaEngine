@@ -265,7 +265,7 @@ namespace Nebula
 
         int keycode = event.GetKeyChar();
         io.AddInputCharacter(keycode);
-        return true;
+        return false;
     }
 
     bool ImGuiPlatform::OnKeyPressedEvent(const Platform::KeyPressedEvent& event) const
@@ -332,7 +332,7 @@ namespace Nebula
 
         viewport->PlatformRequestClose = true;
 
-        return true;
+        return false;
     }
 
     bool ImGuiPlatform::OnWindowMovedEvent(const Platform::WindowMovedEvent& event) const
@@ -343,7 +343,7 @@ namespace Nebula
 
         viewport->PlatformRequestMove = true;
 
-        return true;
+        return false;
     }
 
     bool ImGuiPlatform::OnWindowResizedEvent(const Platform::WindowResizedEvent& event) const
@@ -357,7 +357,7 @@ namespace Nebula
         viewport_data->GraphicsSurface->Resize(event.GetWidth(), event.GetHeight());
         viewport_data->Framebuffer->Resize(event.GetWidth(), event.GetHeight());
 
-        return true;
+        return false;
     }
 
     void ImGuiPlatform::UpdateMonitors()

@@ -15,6 +15,9 @@ public:
     virtual void OnImGuiRender() override;
     virtual void OnEvent(Nebula::Platform::Event& event) override;
 
+public:
+    bool OnKeyPressedEvent(Nebula::Platform::KeyPressedEvent& event);
+
 private:
     Nebula::OrthographicCameraController m_CameraController;
 
@@ -40,4 +43,7 @@ private:
     };
 
     glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
+
+    bool m_ShowImGuiMenuBar = false;
+    bool m_ShowImGuiDebugWindow = false;
 };

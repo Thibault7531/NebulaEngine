@@ -18,6 +18,15 @@ namespace Nebula::Platform
         static float GetMouseX();
         static float GetMouseY();
 
+        inline static bool IsGlobalKey(KeyboardKey keycode)
+        {
+            switch (keycode)
+            {
+            case KeyboardKey::LeftAlt: return true;
+            default: return false;
+            }
+        }
+
     public:
         static int32_t GetNativeKeyCode(KeyboardKey keycode);
     };

@@ -86,6 +86,12 @@ if (nebula_cmake_platform STREQUAL Windows)
             COMMAND ${CMAKE_COMMAND}
             ARGS -E copy "${CMAKE_BINARY_DIR}/_deps/slang_prebuilt-src/bin/slang-compiler.dll" "$<TARGET_FILE_DIR:3DRendererExample>/slang-compiler.dll"
     )
+    add_custom_command(
+            TARGET 3DRendererExample
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            ARGS -E copy "${CMAKE_BINARY_DIR}/_deps/slang_prebuilt-src/bin/slang-glslang.dll" "$<TARGET_FILE_DIR:3DRendererExample>/slang-glslang.dll"
+    )
 
 elseif (nebula_cmake_platform STREQUAL MacOS)
     set_target_properties(3DRendererExample PROPERTIES

@@ -11,6 +11,7 @@
 
 #include "Nebula.h"
 #include "Nebula/CoreSystems/Application/Application.h"
+#include "Nebula/Debug/ImGuiDebugWindow.h"
 #include "Nebula/Graphics/Core/RendererAPI.h"
 #include "Nebula/Scene/SceneSerializer.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
@@ -208,6 +209,14 @@ namespace Nebula {
             rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
             m_TitleBarButtons.emplace_back(rect);
 
+            if (ImGui::BeginMenu("Debug"))
+            {
+                if (ImGui::MenuItem("Show Debug Window", 0, m_ShowDebugWindow)) m_ShowDebugWindow = !m_ShowDebugWindow;
+                ImGui::EndMenu();
+            }
+            rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
+            m_TitleBarButtons.emplace_back(rect);
+
 #ifdef NB_PLATFORM_LINUX
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {0, 0});
             ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
@@ -341,6 +350,8 @@ namespace Nebula {
         ImGui::PopStyleVar();
 
         m_SceneHierarchyPanel.OnImGuiRender();
+
+        if (m_ShowDebugWindow) Debug::ShowDebugWindow();
 
         if (IsFirstRender)
         {

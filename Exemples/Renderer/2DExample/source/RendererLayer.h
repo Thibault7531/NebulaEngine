@@ -15,6 +15,9 @@ public:
     virtual void OnImGuiRender() override;
     virtual void OnEvent(Nebula::Platform::Event& event) override;
 
+public:
+    bool OnKeyPressedEvent(Nebula::Platform::KeyPressedEvent& event);
+
 private:
     Nebula::Ref<Nebula::Graphics::Device> m_Device;
     Nebula::Graphics::ShaderLibrary m_ShaderLibrary;
@@ -31,4 +34,7 @@ private:
 
     glm::vec3 m_Position;
     glm::vec4 m_Color {0.f, 0.f, 0.f, 1.f};
+
+    bool m_ShowImGuiMenuBar = false;
+    bool m_ShowImGuiDebugWindow = false;
 };

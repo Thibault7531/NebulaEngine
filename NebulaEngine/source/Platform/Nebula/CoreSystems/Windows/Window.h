@@ -118,6 +118,7 @@ namespace Nebula::Platform
 
     public:
         static Ref<Window> Create(const WindowProperties& props);
+        static std::string GetWindowStyleName(WindowStyle style);
 
     protected:
         WindowProperties m_Properties;

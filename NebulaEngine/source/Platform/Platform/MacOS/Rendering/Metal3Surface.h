@@ -17,6 +17,10 @@ namespace Nebula::Graphics
 
         virtual void SetDevice(void* device, void* commandQueue) override;
 
+        virtual std::string GetAPIVersion() const override;
+        virtual std::string GetAPIVendor() const override;
+        virtual std::string GetAPIRenderer() const override;
+
         virtual void SetVSync(VSyncMode mode) override;
         virtual VSyncMode IsVsync() const override;
         virtual void Resize(uint32_t width, uint32_t height) override;
@@ -27,10 +31,14 @@ namespace Nebula::Graphics
     public:
         void* GetMetalLayer() { return m_MetalLayer; }
 
+    public:
+        static std::string GPUFamilyToString(void* gpuFamily);
+
     private:
         SwiftMetal3Surface::Metal3Surface m_NativeMetal3Surface;
 
         void* m_MetalLayer = nullptr;
+        void* m_MetalDevice = nullptr;
         void* m_MetalCommandQueue = nullptr;
 
         void* m_MetalDrawable = nullptr;

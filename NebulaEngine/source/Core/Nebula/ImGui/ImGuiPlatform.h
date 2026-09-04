@@ -22,9 +22,9 @@ namespace Nebula
 
         Ref<Platform::Cursor> MouseCursors[ImGuiMouseCursor_COUNT];
         Ref<Platform::Cursor> MouseLastCursor{};
-        int MousePendingLeaveFrame;
-        int MouseButtonsDown;
-        uint32_t MouseWindowID;
+        int MousePendingLeaveFrame = 0;
+        int MouseButtonsDown = 0;
+        uint32_t MouseWindowID = 0;
 
         std::string ClipboardTextData;
     };

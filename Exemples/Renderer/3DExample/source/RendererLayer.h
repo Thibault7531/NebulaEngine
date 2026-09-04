@@ -15,6 +15,9 @@ public:
     virtual void OnImGuiRender() override;
     virtual void OnEvent(Nebula::Platform::Event& event) override;
 
+public:
+    bool OnKeyPressedEvent(Nebula::Platform::KeyPressedEvent& event);
+
 private:
     Nebula::Ref<Nebula::Graphics::Device> m_Device;
 
@@ -30,4 +33,7 @@ private:
     Nebula::Ref<Nebula::Model> m_Backpack;
 
     Nebula::PerspectiveCameraController m_CameraController;
+
+    bool m_ShowImGuiMenuBar = false;
+    bool m_ShowImGuiDebugWindow = false;
 };
