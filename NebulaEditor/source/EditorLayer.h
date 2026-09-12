@@ -8,6 +8,7 @@
 #include "Nebula/CoreSystems/Application/Layer.h"
 #include "Nebula/Graphics/Buffers/Framebuffer.h"
 #include "Nebula/Renderer/Cameras/EditorCamera.h"
+#include "Panels/ContentBrowserPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 
 namespace Nebula {
@@ -50,6 +51,7 @@ namespace Nebula {
 
         // Panels
         SceneHierarchyPanel m_SceneHierarchyPanel;
+        ContentBrowserPanel m_ContentBrowserPanel;
 
         bool IsFirstRender = true;
         std::vector<glm::vec4> m_TitleBarButtons{};

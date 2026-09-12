@@ -350,6 +350,7 @@ namespace Nebula {
         ImGui::PopStyleVar();
 
         m_SceneHierarchyPanel.OnImGuiRender();
+        m_ContentBrowserPanel.OnImGuiRender();
 
         if (m_ShowDebugWindow) Debug::ShowDebugWindow();
 
