@@ -106,24 +106,24 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 
         m_RendererUBO->SetData(i, "u_Transform", glm::value_ptr(transform));
 
-        renderPass->SetUniformBlock("ColorUBO", m_ColorUBO, 0);
-        renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, i);
-        renderPass->DrawArrayIndexed(m_VAO);
+        renderPass->SetUniformBlock("ColorUBO", m_ColorUBO, 0)
+            .SetUniformBlock("RendererUBO", m_RendererUBO, i)
+            .DrawArrayIndexed(m_VAO);
     }
 
     m_RendererUBO->SetData(4, "u_Transform", glm::value_ptr(glm::mat4(1.0f)));
 
-    renderPass->SetShaderPipeline(m_TextureShader);
-    renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 4);
-    renderPass->BindTextureToSlot(m_Texture);
-    renderPass->DrawArrayIndexed(m_VAO);
+    renderPass->SetShaderPipeline(m_TextureShader)
+        .SetUniformBlock("RendererUBO", m_RendererUBO, 4)
+        .BindTextureToSlot(m_Texture)
+        .DrawArrayIndexed(m_VAO);
 
     m_RendererUBO->SetData(5, "u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-0.25f, -0.25f, 0.0f))));
 
-    renderPass->SetShaderPipeline(m_TextureShader);
-    renderPass->SetUniformBlock("RendererUBO", m_RendererUBO, 5);
-    renderPass->BindTextureToSlot(m_Glass);
-    renderPass->DrawArrayIndexed(m_VAO);
+    renderPass->SetShaderPipeline(m_TextureShader)
+        .SetUniformBlock("RendererUBO", m_RendererUBO, 5)
+        .BindTextureToSlot(m_Glass)
+        .DrawArrayIndexed(m_VAO);
 
     renderPass->EndRenderPass();
     commandBuffer->Commit();

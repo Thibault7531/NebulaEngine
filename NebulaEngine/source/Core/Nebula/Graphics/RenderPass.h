@@ -37,25 +37,25 @@ namespace Nebula::Graphics
 
         virtual Ref<Framebuffer> GetFramebuffer() const = 0;
 
-        virtual void SetCullMode(CullMode mode) = 0;
-        virtual void SetDepthStencilState(DepthStencilState state) = 0;
+        virtual RenderPass& SetCullMode(CullMode mode) = 0;
+        virtual RenderPass& SetDepthStencilState(DepthStencilState state) = 0;
 
-        virtual void SetViewport(double x, double y, double width, double height, double near, double far) = 0;
-        virtual void SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
+        virtual RenderPass& SetViewport(double x, double y, double width, double height, double near, double far) = 0;
+        virtual RenderPass& SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 
-        virtual void SetShaderPipeline(Ref<ShaderPipeline> pipeline) = 0;
-        virtual void SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer, uint32_t instanceIndex = 0) = 0;
-        virtual void BindTextureToSlot(Ref<Texture2D> texture, uint32_t slot = 0) = 0;
-        virtual void BindTextureToSlot(Texture2D* texture, uint32_t slot = 0) = 0;
+        virtual RenderPass& SetShaderPipeline(Ref<ShaderPipeline> pipeline) = 0;
+        virtual RenderPass& SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer, uint32_t instanceIndex = 0) = 0;
+        virtual RenderPass& BindTextureToSlot(Ref<Texture2D> texture, uint32_t slot = 0) = 0;
+        virtual RenderPass& BindTextureToSlot(Texture2D* texture, uint32_t slot = 0) = 0;
 
-        virtual void BindVertexBuffer(Ref<VertexBuffer> vertexBuffer) = 0;
+        virtual RenderPass& BindVertexBuffer(Ref<VertexBuffer> vertexBuffer) = 0;
 
-        virtual void DrawIndexed(Ref<IndexBuffer> indexBuffer, uint32_t elementCount = 0) = 0;
-        virtual void DrawIndexedOffset(Ref<IndexBuffer> indexBuffer, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset) = 0;
+        virtual RenderPass& DrawIndexed(Ref<IndexBuffer> indexBuffer, uint32_t elementCount = 0) = 0;
+        virtual RenderPass& DrawIndexedOffset(Ref<IndexBuffer> indexBuffer, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset) = 0;
 
-        virtual void DrawArrayIndexed(Ref<VertexArray> vertexArray, uint32_t elementCount = 0) = 0;
-        virtual void DrawArrayIndexedOffset(Ref<VertexArray> vertexArray, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset) = 0;
+        virtual RenderPass& DrawArrayIndexed(Ref<VertexArray> vertexArray, uint32_t elementCount = 0) = 0;
+        virtual RenderPass& DrawArrayIndexedOffset(Ref<VertexArray> vertexArray, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset) = 0;
 ;
-        virtual void EndRenderPass() = 0;
+        virtual RenderPass& EndRenderPass() = 0;
     };
 }

@@ -152,8 +152,8 @@ namespace Nebula
         spec.blendState = blendState;
         s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
 
-        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
-        s_Data.RenderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
+        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
+            .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.getViewProjectionMatrix()));
 
         s_Data.QuadIndexCount = 0;
@@ -194,8 +194,8 @@ namespace Nebula
         spec.blendState = blendState;
         s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
 
-        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
-        s_Data.RenderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
+        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
+            .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
         glm::mat4 viewProjection = camera.GetProjectionMatrix() * glm::inverse(transform);
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(viewProjection));
 
@@ -236,8 +236,8 @@ namespace Nebula
         spec.blendState = blendState;
         s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
 
-        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None);
-        s_Data.RenderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
+        s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
+            .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.GetViewProjectionMatrix()));
 
         s_Data.QuadIndexCount = 0;
@@ -280,8 +280,8 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        s_Data.RenderPass->SetShaderPipeline(s_Data.QuadShader);
-        s_Data.RenderPass->SetUniformBlock("Renderer2DUBO", s_Data.QuadUniformBuffer);
+        s_Data.RenderPass->SetShaderPipeline(s_Data.QuadShader)
+            .SetUniformBlock("Renderer2DUBO", s_Data.QuadUniformBuffer);
         for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++) s_Data.RenderPass->BindTextureToSlot(s_Data.TextureSlots[i], i);
         for (uint32_t i = s_Data.TextureSlotIndex; i < s_Data.MaxTextureSlots; i++) s_Data.RenderPass->BindTextureToSlot(s_Data.WhiteTexture, i);
 

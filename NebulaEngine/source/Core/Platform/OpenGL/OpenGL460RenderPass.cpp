@@ -17,7 +17,7 @@ namespace Nebula::Graphics
         glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer->GetBufferID());
     }
 
-    void OpenGL460RenderPass::SetCullMode(CullMode mode)
+    RenderPass& OpenGL460RenderPass::SetCullMode(CullMode mode)
     {
         switch (mode)
         {
@@ -37,9 +37,11 @@ namespace Nebula::Graphics
                 glCullFace(GL_BACK);
             }
         }
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::SetDepthStencilState(DepthStencilState state)
+    RenderPass& OpenGL460RenderPass::SetDepthStencilState(DepthStencilState state)
     {
         if (state.depthWrite)
         {
@@ -52,23 +54,29 @@ namespace Nebula::Graphics
             glDisable(GL_DEPTH_TEST);
             glDepthMask(GL_FALSE);
         }
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::SetViewport(double x, double y, double width, double height, double near, double far)
+    RenderPass& OpenGL460RenderPass::SetViewport(double x, double y, double width, double height, double near, double far)
     {
         glViewport(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height));
         glDepthRange(near, far);
 
         m_Viewport = { static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height) };
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+    RenderPass& OpenGL460RenderPass::SetScissor(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
     {
         glScissor(x, m_Viewport.w - y - height, width, height);
         glEnable(GL_SCISSOR_TEST);
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::SetShaderPipeline(Ref<ShaderPipeline> pipeline)
+    RenderPass& OpenGL460RenderPass::SetShaderPipeline(Ref<ShaderPipeline> pipeline)
     {
         m_CurrentlyBoundShaderPipeline = std::dynamic_pointer_cast<OpenGL460ShaderPipeline>(pipeline);
         glUseProgram(m_CurrentlyBoundShaderPipeline->GetShaderID());
@@ -84,40 +92,52 @@ namespace Nebula::Graphics
         {
             glDisable(GL_BLEND);
         }
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer,
+    RenderPass& OpenGL460RenderPass::SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer,
         uint32_t instanceIndex)
     {
         uint32_t location = m_CurrentlyBoundShaderPipeline->GetUniformBlockLocation(blockName);
         Ref<OpenGL460UniformBuffer> uniformBuffer = std::dynamic_pointer_cast<OpenGL460UniformBuffer>(buffer);
         glBindBufferRange(GL_UNIFORM_BUFFER, location, uniformBuffer->GetBufferID(), uniformBuffer->GetAlignedStride() * instanceIndex, uniformBuffer->GetLayout().GetStride());
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::BindTextureToSlot(Ref<Texture2D> texture, uint32_t slot)
+    RenderPass& OpenGL460RenderPass::BindTextureToSlot(Ref<Texture2D> texture, uint32_t slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, reinterpret_cast<OpenGL460Texture2D*>(texture.get())->GetTextureID());
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::BindTextureToSlot(Texture2D* texture, uint32_t slot)
+    RenderPass& OpenGL460RenderPass::BindTextureToSlot(Texture2D* texture, uint32_t slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, reinterpret_cast<OpenGL460Texture2D*>(texture)->GetTextureID());
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::BindVertexBuffer(Ref<VertexBuffer> vertexBuffer)
+    RenderPass& OpenGL460RenderPass::BindVertexBuffer(Ref<VertexBuffer> vertexBuffer)
     {
         Ref<OpenGLVertexBuffer> vertexBufferOpenGL = std::dynamic_pointer_cast<OpenGLVertexBuffer>(vertexBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBufferOpenGL->GetBufferID());
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::DrawIndexed(Ref<IndexBuffer> indexBuffer, uint32_t elementCount)
+    RenderPass& OpenGL460RenderPass::DrawIndexed(Ref<IndexBuffer> indexBuffer, uint32_t elementCount)
     {
         DrawIndexedOffset(indexBuffer, elementCount, 0, 0);
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::DrawIndexedOffset(Ref<IndexBuffer> indexBuffer, uint32_t elementCount,
+    RenderPass& OpenGL460RenderPass::DrawIndexedOffset(Ref<IndexBuffer> indexBuffer, uint32_t elementCount,
         uint32_t indexOffset, uint32_t vertexOffset)
     {
         Ref<OpenGLIndexBuffer> indexBufferOpenGL = std::dynamic_pointer_cast<OpenGLIndexBuffer>(indexBuffer);
@@ -125,14 +145,18 @@ namespace Nebula::Graphics
         glDrawElements(GL_TRIANGLES, elementCount ? elementCount : indexBufferOpenGL->GetCount(), GetOpenGL460DataType(indexBufferOpenGL->GetDataType()),
             reinterpret_cast<const void*>(static_cast<intptr_t>(indexOffset)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::DrawArrayIndexed(Ref<VertexArray> vertexArray, uint32_t elementCount)
+    RenderPass& OpenGL460RenderPass::DrawArrayIndexed(Ref<VertexArray> vertexArray, uint32_t elementCount)
     {
         DrawArrayIndexedOffset(vertexArray, elementCount, 0, 0);
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::DrawArrayIndexedOffset(Ref<VertexArray> vertexArray, uint32_t elementCount,
+    RenderPass& OpenGL460RenderPass::DrawArrayIndexedOffset(Ref<VertexArray> vertexArray, uint32_t elementCount,
         uint32_t indexOffset, uint32_t vertexOffset)
     {
         Ref<OpenGLIndexBuffer> indexBufferOpenGL = std::dynamic_pointer_cast<OpenGLIndexBuffer>(vertexArray->GetIndexBuffer());
@@ -141,12 +165,16 @@ namespace Nebula::Graphics
         glDrawElementsBaseVertex(GL_TRIANGLES, elementCount ? elementCount : indexBufferOpenGL->GetCount(), GetOpenGL460DataType(indexBufferOpenGL->GetDataType()),
             reinterpret_cast<const void*>(static_cast<intptr_t>(indexOffset)), vertexOffset);
         glBindVertexArray(0);
+
+        return *this;
     }
 
-    void OpenGL460RenderPass::EndRenderPass()
+    RenderPass& OpenGL460RenderPass::EndRenderPass()
     {
         glDisable(GL_SCISSOR_TEST);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        return *this;
     }
 
     GLint OpenGL460RenderPass::GetOpenGL460DepthCompareFunction(DepthCompareFunction function)
