@@ -9,11 +9,17 @@ namespace Nebula
     class ContentBrowserPanel
     {
     public:
-        ContentBrowserPanel() = default;
+        ContentBrowserPanel();
 
         void OnImGuiRender();
 
     private:
-        std::filesystem::path m_CurrentDirectory = "assets";
+        void DisplayNavigationBar();
+
+    private:
+        std::filesystem::path m_CurrentDirectory;
+
+        std::vector<std::filesystem::path> m_History{};
+        uint32_t m_CurrentHistoryIndex = 0;
     };
 }

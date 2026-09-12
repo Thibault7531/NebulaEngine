@@ -232,7 +232,7 @@ namespace Nebula
 		colors[ImGuiCol_TextSelectedBg] = ImVec4(0.18f, 0.59f, 0.71f, 0.35f);
 
 		// Separators
-		colors[ImGuiCol_Separator] = ImVec4(0.18f, 0.59f, 0.71f, 0.25f);
+		colors[ImGuiCol_Separator] = ImVec4(0.2f, 0.22f, 0.25f, 1.0f);
 		colors[ImGuiCol_SeparatorHovered] = ImVec4(0.22f, 0.65f, 0.77f, 0.78f);
 		colors[ImGuiCol_SeparatorActive] = ImVec4(0.15f, 0.51f, 0.63f, 1.00f);
 
