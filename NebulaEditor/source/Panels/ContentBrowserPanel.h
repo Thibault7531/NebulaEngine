@@ -14,6 +14,10 @@ namespace Nebula
         void OnImGuiRender();
 
     private:
+        void SetNavigationButtonColors();
+        void ResetNavigationButtonColors();
+        void SetNavigationBarColors();
+        void ResetNavigationBarColors();
         void DisplayNavigationBar();
 
     private:

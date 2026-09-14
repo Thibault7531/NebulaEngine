@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "imgui.h"
+#include "Nebula/CoreSystems/Application/Application.h"
 
 namespace Nebula
 {
@@ -52,6 +53,50 @@ namespace Nebula
         ImGui::End();
     }
 
+    void ContentBrowserPanel::SetNavigationButtonColors()
+    {
+        if (ImGuiLayer::s_ImGuiTheme == Platform::Theme::ThemeType::Dark)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.1f, 0.1f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.1f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+        }
+    }
+
+    void ContentBrowserPanel::ResetNavigationButtonColors()
+    {
+        ImGui::PopStyleColor(3);
+    }
+
+    void ContentBrowserPanel::SetNavigationBarColors()
+    {
+        if (ImGuiLayer::s_ImGuiTheme == Platform::Theme::ThemeType::Dark)
+        {
+            ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.1f, 0.1f, .0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.1f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+        }
+    }
+
+    void ContentBrowserPanel::ResetNavigationBarColors()
+    {
+        ImGui::PopStyleColor(4);
+    }
+
     void ContentBrowserPanel::DisplayNavigationBar()
     {
         float barHeight = ImGui::GetFrameHeight();
@@ -60,9 +105,7 @@ namespace Nebula
 
         ImGui::BeginChild("NavigationBar", ImVec2(0.0f, barHeight), 0, ImGuiWindowFlags_NoScrollbar);
         {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.1f, 0.1f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+            SetNavigationButtonColors();
 
             float buttonSize = ImGui::GetFrameHeight();
             ImGui::BeginDisabled(m_CurrentHistoryIndex == 0);
@@ -95,12 +138,12 @@ namespace Nebula
             }
             ImGui::EndDisabled();
 
-            ImGui::PopStyleColor(3);
+            ResetNavigationButtonColors();
 
             ImGui::SameLine();
 
             uint32_t size = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2;
-            ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
+            SetNavigationBarColors();
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(2.0f, 0.0f));
             ImGui::BeginChild("DirPath", ImVec2(0, size));
             {
@@ -111,9 +154,6 @@ namespace Nebula
                     dirTree.emplace(dirTree.begin(), currentPath.filename().string());
                     currentPath = currentPath.parent_path();
                 }
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.2f, 0.0f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
                 if (ImGui::Button("/"))
                 {
@@ -144,10 +184,9 @@ namespace Nebula
                     }
                 }
                 ImGui::PopStyleVar(2);
-                ImGui::PopStyleColor(3);
             }
             ImGui::EndChild();
-            ImGui::PopStyleColor();
+            ResetNavigationBarColors();
         }
         ImGui::EndChild();
 
