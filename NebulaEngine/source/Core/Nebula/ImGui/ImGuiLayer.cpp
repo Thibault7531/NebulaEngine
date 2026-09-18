@@ -174,6 +174,7 @@ namespace Nebula
 		style.ChildBorderSize = 1.0f;
 		style.PopupBorderSize = 1.0f;
 		style.FrameBorderSize = 0.0f;
+		style.TabBorderSize = 0.0f;
 
 		// Main
 		colors[ImGuiCol_WindowBg] = ImVec4(0.119f, 0.123f, 0.129f, 1.0f);
@@ -277,8 +278,8 @@ namespace Nebula
 		style.WindowBorderSize = 1.0f;
 		style.ChildBorderSize = 1.0f;
 		style.PopupBorderSize = 1.0f;
-		style.FrameBorderSize = 1.0f;
-		style.TabBorderSize = 1.0f;
+		style.FrameBorderSize = 0.0f;
+		style.TabBorderSize = 0.0f;
 
 		// Main Colors (Light Backgrounds)
 		colors[ImGuiCol_WindowBg]         = ImVec4(0.94f, 0.94f, 0.95f, 1.00f); // Soft light grey

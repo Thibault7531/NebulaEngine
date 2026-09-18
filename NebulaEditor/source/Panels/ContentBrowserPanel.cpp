@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "imgui.h"
+#include "nanosvgrast.h"
 #include "Nebula/CoreSystems/Application/Application.h"
 
 namespace Nebula
@@ -13,6 +14,37 @@ namespace Nebula
     {
         m_History.push_back(std::filesystem::absolute(s_StartingPath));
         m_CurrentDirectory = std::filesystem::absolute(s_StartingPath);
+
+        m_Device = Application::Get().GetDevice();
+
+        m_IconSize = 16;
+        NSVGrasterizer* rasterizer = nsvgCreateRasterizer();
+
+        NSVGimage* leftArrowImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "chevron-left.svg").string().c_str(), "px", 96);
+        auto* pixels = static_cast<unsigned char*>(malloc(m_IconSize * m_IconSize * 4));
+        nsvgRasterize(rasterizer, leftArrowImage, 0, 0, m_IconSize/leftArrowImage->width, pixels, m_IconSize, m_IconSize, m_IconSize * 4);
+        m_LeftArrowIcon = m_Device->CreateTexture2D(m_IconSize, m_IconSize, Graphics::Texture::InternalFormat::RGBA8);
+        m_LeftArrowIcon->SetData(pixels, m_IconSize * m_IconSize * 4, Graphics::Texture::DataFormat::RGBA);
+        free(pixels);
+        nsvgDelete(leftArrowImage);
+
+        NSVGimage* rightArrowImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "chevron-right.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(m_IconSize * m_IconSize * 4));
+        nsvgRasterize(rasterizer, rightArrowImage, 0, 0, m_IconSize/rightArrowImage->width, pixels, m_IconSize, m_IconSize, m_IconSize * 4);
+        m_RightArrowIcon = m_Device->CreateTexture2D(m_IconSize, m_IconSize, Graphics::Texture::InternalFormat::RGBA8);
+        m_RightArrowIcon->SetData(pixels, m_IconSize * m_IconSize * 4, Graphics::Texture::DataFormat::RGBA);
+        free(pixels);
+        nsvgDelete(rightArrowImage);
+
+        NSVGimage* upArrowImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "chevron-up.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(m_IconSize * m_IconSize * 4));
+        nsvgRasterize(rasterizer, upArrowImage, 0, 0, m_IconSize/upArrowImage->width, pixels, m_IconSize, m_IconSize, m_IconSize * 4);
+        m_TopArrowIcon = m_Device->CreateTexture2D(m_IconSize, m_IconSize, Graphics::Texture::InternalFormat::RGBA8);
+        m_TopArrowIcon->SetData(pixels, m_IconSize * m_IconSize * 4, Graphics::Texture::DataFormat::RGBA);
+        free(pixels);
+        nsvgDelete(upArrowImage);
+
+        nsvgDeleteRasterizer(rasterizer);
     }
 
     void ContentBrowserPanel::OnImGuiRender()
@@ -109,7 +141,7 @@ namespace Nebula
 
             float buttonSize = ImGui::GetFrameHeight();
             ImGui::BeginDisabled(m_CurrentHistoryIndex == 0);
-            if (ImGui::Button("<", ImVec2(buttonSize, buttonSize)))
+            if (ImGui::ImageButton("NavBack", m_LeftArrowIcon.get(), ImVec2(m_IconSize, m_IconSize)))
             {
                 m_CurrentDirectory = m_History[--m_CurrentHistoryIndex];
             }
@@ -118,7 +150,7 @@ namespace Nebula
             ImGui::SameLine();
 
             ImGui::BeginDisabled(m_CurrentHistoryIndex == m_History.size() - 1);
-            if (ImGui::Button(">", ImVec2(buttonSize, buttonSize)))
+            if (ImGui::ImageButton("NavForward", m_RightArrowIcon.get(), ImVec2(m_IconSize, m_IconSize)))
             {
                 m_CurrentDirectory = m_History[++m_CurrentHistoryIndex];
             }
@@ -127,7 +159,7 @@ namespace Nebula
             ImGui::SameLine();
 
             ImGui::BeginDisabled(!m_CurrentDirectory.has_parent_path());
-            if (ImGui::Button("▲", ImVec2(buttonSize, buttonSize)))
+            if (ImGui::ImageButton("NavUp", m_TopArrowIcon.get(), ImVec2(m_IconSize, m_IconSize)))
             {
                 if (m_CurrentDirectory.parent_path() != m_CurrentDirectory)
                 {
