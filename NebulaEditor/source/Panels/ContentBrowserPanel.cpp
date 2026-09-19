@@ -8,7 +8,7 @@
 
 namespace Nebula
 {
-    constexpr std::string s_StartingPath = "assets";
+    const std::string s_StartingPath = "assets";
 
     ContentBrowserPanel::ContentBrowserPanel()
     {
@@ -18,6 +18,7 @@ namespace Nebula
         m_Device = Application::Get().GetDevice();
 
         m_IconSize = 16;
+        m_ThumbnailSize = 96;
         NSVGrasterizer* rasterizer = nsvgCreateRasterizer();
 
         NSVGimage* leftArrowImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "chevron-left.svg").string().c_str(), "px", 96);
@@ -44,6 +45,22 @@ namespace Nebula
         free(pixels);
         nsvgDelete(upArrowImage);
 
+        NSVGimage* folderImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "folder.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(m_ThumbnailSize * m_ThumbnailSize * 4));
+        nsvgRasterize(rasterizer, folderImage, 0, 0, m_ThumbnailSize/folderImage->width, pixels, m_ThumbnailSize, m_ThumbnailSize, m_ThumbnailSize * 4);
+        m_FolderIcon = m_Device->CreateTexture2D(m_ThumbnailSize, m_ThumbnailSize, Graphics::Texture::InternalFormat::RGBA8);
+        m_FolderIcon->SetData(pixels, m_ThumbnailSize * m_ThumbnailSize * 4, Graphics::Texture::DataFormat::RGBA);
+        free(pixels);
+        nsvgDelete(folderImage);
+
+        NSVGimage* fileImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "file.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(m_ThumbnailSize * m_ThumbnailSize * 4));
+        nsvgRasterize(rasterizer, fileImage, 0, 0, m_ThumbnailSize/fileImage->width, pixels, m_ThumbnailSize, m_ThumbnailSize, m_ThumbnailSize * 4);
+        m_FileIcon = m_Device->CreateTexture2D(m_ThumbnailSize, m_ThumbnailSize, Graphics::Texture::InternalFormat::RGBA8);
+        m_FileIcon->SetData(pixels, m_ThumbnailSize * m_ThumbnailSize * 4, Graphics::Texture::DataFormat::RGBA);
+        free(pixels);
+        nsvgDelete(fileImage);
+
         nsvgDeleteRasterizer(rasterizer);
     }
 
@@ -58,6 +75,7 @@ namespace Nebula
         ImGui::PopStyleColor();
         ImGui::Spacing();
 
+        /*
         for (auto& dirEntry : std::filesystem::directory_iterator{m_CurrentDirectory})
         {
             if (dirEntry.is_directory())
@@ -79,6 +97,30 @@ namespace Nebula
             else
             {
                 ImGui::Text("%s", dirEntry.path().filename().string().c_str());
+            }
+        }
+        */
+
+        float thumbnailSize = 96.f;
+        float padding = 16.f;
+        float cellSize = thumbnailSize + padding;
+
+        float panelWidth = ImGui::GetContentRegionAvail().x;
+        int columnCount = std::floor(panelWidth / cellSize);
+        if (columnCount < 1) columnCount = 1;
+
+        if (ImGui::BeginTable("ContentGrid", columnCount))
+        {
+            for (auto& dirEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
+            {
+                ImGui::TableNextColumn();
+                DisplayAssetCard(dirEntry, thumbnailSize, padding);
+            }
+            ImGui::EndTable();
+
+            if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+            {
+                m_SelectedItem.clear();
             }
         }
 
@@ -125,6 +167,29 @@ namespace Nebula
     }
 
     void ContentBrowserPanel::ResetNavigationBarColors()
+    {
+        ImGui::PopStyleColor(4);
+    }
+
+    void ContentBrowserPanel::SetAssetCardColors()
+    {
+        if (ImGuiLayer::s_ImGuiTheme == Platform::Theme::ThemeType::Dark)
+        {
+            ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.10f, 0.1f, 0.1f, .0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.0f));
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.0f));
+        }
+    }
+
+    void ContentBrowserPanel::ResetAssetCardColors()
     {
         ImGui::PopStyleColor(4);
     }
@@ -223,5 +288,66 @@ namespace Nebula
         ImGui::EndChild();
 
         ImGui::PopStyleVar();
+    }
+
+    void ContentBrowserPanel::DisplayAssetCard(const std::filesystem::directory_entry& dirEntry, float thumbnailSize, float padding)
+    {
+        float cellSize = thumbnailSize + padding;
+
+        ImGui::PushID(dirEntry.path().string().c_str());
+
+        ImGui::BeginGroup();
+
+        Ref<Graphics::Texture2D> thumbnail = dirEntry.is_directory() ? m_FolderIcon : m_FileIcon;
+
+        SetAssetCardColors();
+        ImGui::ImageButton("##thumb", thumbnail.get(), ImVec2(thumbnailSize, thumbnailSize));
+        ResetAssetCardColors();
+
+        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + cellSize);
+        ImVec2 textSize = ImGui::CalcTextSize(dirEntry.path().filename().string().c_str(), 0, false, cellSize);
+        ImGui::SetCursorPosX( ImGui::GetCursorPosX() + (cellSize - textSize.x) * 0.5f );
+        ImGui::TextUnformatted(dirEntry.path().filename().string().c_str());
+        ImGui::PopTextWrapPos();
+
+        ImGui::EndGroup();
+
+        bool isSelected = dirEntry.path() == m_SelectedItem;
+        bool isHovered = ImGui::IsItemHovered();
+
+        if (isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        {
+            if (isSelected) m_SelectedItem.clear();
+            else m_SelectedItem = dirEntry.path();
+        }
+
+        if (isSelected || isHovered)
+        {
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+            ImVec2 minRect = ImGui::GetItemRectMin();
+            ImVec2 maxRect = ImGui::GetItemRectMax();
+
+            maxRect.y += 4.f;
+
+            ImU32 highlightColor = isSelected ? ImGui::GetColorU32(ImVec4(0.3f, 0.3f, 0.3f, 0.3f)) : ImGui::GetColorU32(ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
+
+            drawList->AddRectFilled(minRect, maxRect, highlightColor, ImGui::GetStyle().FrameRounding);
+        }
+
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+        {
+            if (dirEntry.is_directory())
+            {
+                if (m_CurrentHistoryIndex != m_History.size() - 1)
+                {
+                    m_History.erase(m_History.begin() + m_CurrentHistoryIndex + 1, m_History.end());
+                }
+                m_CurrentDirectory = dirEntry.path();
+                m_History.push_back(m_CurrentDirectory);
+                m_CurrentHistoryIndex++;
+            }
+        }
+
+        ImGui::PopID();
     }
 }
