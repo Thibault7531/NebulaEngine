@@ -75,32 +75,6 @@ namespace Nebula
         ImGui::PopStyleColor();
         ImGui::Spacing();
 
-        /*
-        for (auto& dirEntry : std::filesystem::directory_iterator{m_CurrentDirectory})
-        {
-            if (dirEntry.is_directory())
-            {
-                if (ImGui::Button(dirEntry.path().filename().string().c_str()))
-                {
-                    if (dirEntry.path() != m_CurrentDirectory)
-                    {
-                        if (m_CurrentHistoryIndex != m_History.size() - 1)
-                        {
-                            m_History.erase(m_History.begin() + m_CurrentHistoryIndex + 1, m_History.end());
-                        }
-                        m_CurrentDirectory = dirEntry.path();
-                        m_History.push_back(m_CurrentDirectory);
-                        m_CurrentHistoryIndex++;
-                    }
-                }
-            }
-            else
-            {
-                ImGui::Text("%s", dirEntry.path().filename().string().c_str());
-            }
-        }
-        */
-
         float thumbnailSize = 96.f;
         float padding = 16.f;
         float cellSize = thumbnailSize + padding;
@@ -111,7 +85,17 @@ namespace Nebula
 
         if (ImGui::BeginTable("ContentGrid", columnCount))
         {
+            std::vector<std::filesystem::directory_entry> dirEntries;
             for (auto& dirEntry : std::filesystem::directory_iterator(m_CurrentDirectory))
+            {
+                dirEntries.push_back(dirEntry);
+            }
+            std::sort(dirEntries.begin(), dirEntries.end(), [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b)
+            {
+                if (a.is_directory() != b.is_directory()) return a.is_directory() > b.is_directory();
+                return a.path().filename().string() < b.path().filename().string();
+            });
+            for (const auto& dirEntry : dirEntries)
             {
                 ImGui::TableNextColumn();
                 DisplayAssetCard(dirEntry, thumbnailSize, padding);
