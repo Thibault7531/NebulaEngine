@@ -61,6 +61,14 @@ namespace Nebula
         free(pixels);
         nsvgDelete(fileImage);
 
+        NSVGimage* sceneImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "file-axis-3d.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(m_ThumbnailSize * m_ThumbnailSize * 4));
+        nsvgRasterize(rasterizer, sceneImage, 0, 0, m_ThumbnailSize/sceneImage->width, pixels, m_ThumbnailSize, m_ThumbnailSize, m_ThumbnailSize * 4);
+        m_SceneIcon = m_Device->CreateTexture2D(m_ThumbnailSize, m_ThumbnailSize, Graphics::Texture::InternalFormat::RGBA8);
+        m_SceneIcon->SetData(pixels, m_ThumbnailSize * m_ThumbnailSize * 4, Graphics::Texture::DataFormat::RGBA);
+        free(pixels);
+        nsvgDelete(sceneImage);
+
         nsvgDeleteRasterizer(rasterizer);
     }
 
@@ -277,22 +285,27 @@ namespace Nebula
     void ContentBrowserPanel::DisplayAssetCard(const std::filesystem::directory_entry& dirEntry, float thumbnailSize, float padding)
     {
         float cellSize = thumbnailSize + padding;
+        Ref<Graphics::Texture2D> thumbnail = dirEntry.is_directory() ? m_FolderIcon : GetIconForAsset(dirEntry.path());
 
         ImGui::PushID(dirEntry.path().string().c_str());
 
-        ImGui::BeginGroup();
+        ImGui::BeginChild("##assetCard", ImVec2(0, 0), ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
 
-        Ref<Graphics::Texture2D> thumbnail = dirEntry.is_directory() ? m_FolderIcon : m_FileIcon;
+        SetDragDropSource(dirEntry.path(), thumbnail);
+
+        ImGui::BeginGroup();
 
         SetAssetCardColors();
         ImGui::ImageButton("##thumb", thumbnail.get(), ImVec2(thumbnailSize, thumbnailSize));
         ResetAssetCardColors();
+        SetDragDropSource(dirEntry.path(), thumbnail);
 
         ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + cellSize);
         ImVec2 textSize = ImGui::CalcTextSize(dirEntry.path().filename().string().c_str(), 0, false, cellSize);
         ImGui::SetCursorPosX( ImGui::GetCursorPosX() + (cellSize - textSize.x) * 0.5f );
         ImGui::TextUnformatted(dirEntry.path().filename().string().c_str());
         ImGui::PopTextWrapPos();
+        ImGui::Dummy(ImVec2(0, 4.f));
 
         ImGui::EndGroup();
 
@@ -311,8 +324,6 @@ namespace Nebula
             ImVec2 minRect = ImGui::GetItemRectMin();
             ImVec2 maxRect = ImGui::GetItemRectMax();
 
-            maxRect.y += 4.f;
-
             ImU32 highlightColor = isSelected ? ImGui::GetColorU32(ImVec4(0.3f, 0.3f, 0.3f, 0.3f)) : ImGui::GetColorU32(ImVec4(0.3f, 0.3f, 0.3f, 0.2f));
 
             drawList->AddRectFilled(minRect, maxRect, highlightColor, ImGui::GetStyle().FrameRounding);
@@ -330,8 +341,37 @@ namespace Nebula
                 m_History.push_back(m_CurrentDirectory);
                 m_CurrentHistoryIndex++;
             }
+            if (IsSceneFile(dirEntry.path()))
+            {
+                m_OpenSceneCallback(dirEntry.path());
+            }
         }
 
+        ImGui::EndChild();
+
         ImGui::PopID();
+    }
+
+    void ContentBrowserPanel::SetDragDropSource(const std::filesystem::path& path, Ref<Graphics::Texture2D> thumbnail)
+    {
+        if (IsSceneFile(path))
+        {
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+            {
+                ImGui::SetDragDropPayload("NBSCENE_DRAG", path.c_str(), path.string().size() + 1);
+                ImGui::Image(thumbnail.get(), ImVec2(32.f, 32.f));
+                ImGui::EndDragDropSource();
+            }
+        }
+    }
+
+    Ref<Graphics::Texture2D> ContentBrowserPanel::GetIconForAsset(const std::filesystem::path& path)
+    {
+        if (IsSceneFile(path))
+        {
+            return m_SceneIcon;
+        }
+
+        return m_FileIcon;
     }
 }

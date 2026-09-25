@@ -36,6 +36,10 @@ namespace Nebula {
         m_Camera = EditorCamera(30.f, m_ViewportSize.x / m_ViewportSize.y, 0.1f, 1000.f);
 
         m_SceneHierarchyPanel.SetContext(m_Scene);
+        m_ContentBrowserPanel.SetOpenSceneCallback([&](std::filesystem::path path)
+        {
+            OpenScene(path);
+        });
 
         Platform::WindowManager::Get().GetMainWindow()->SetVSync(Graphics::VSyncMode::Adaptive);
         Platform::WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
@@ -210,7 +214,8 @@ namespace Nebula {
 
             if (ImGui::BeginMenu("Debug"))
             {
-                if (ImGui::MenuItem("Show Debug Window", 0, m_ShowDebugWindow)) m_ShowDebugWindow = !m_ShowDebugWindow;
+                if (ImGui::MenuItem("Show Nebula Debug Window", 0, m_ShowNebulaDebugWindow)) m_ShowNebulaDebugWindow = !m_ShowNebulaDebugWindow;
+                if (ImGui::MenuItem("Show ImGui Demo Window", 0, m_ShowImGuiDemoWindow)) m_ShowImGuiDemoWindow = !m_ShowImGuiDemoWindow;
                 ImGui::EndMenu();
             }
             rect = {ImGui::GetItemRectMin().x - window_pos.first, ImGui::GetItemRectMin().y - window_pos.second, ImGui::GetItemRectMax().x - window_pos.first, ImGui::GetItemRectMax().y - window_pos.second};
@@ -307,6 +312,16 @@ namespace Nebula {
             }
             ImGui::Image(m_Framebuffer->GetColorAttachment().get(), { m_ViewportSize.x, m_ViewportSize.y }, uv0, uv1);
 
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("NBSCENE_DRAG"))
+                {
+                    OpenScene(static_cast<const char*>(payload->Data));
+                }
+
+                ImGui::EndDragDropTarget();
+            }
+
             ImGuizmo::Enable(true);
             ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
             Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -351,7 +366,8 @@ namespace Nebula {
         m_SceneHierarchyPanel.OnImGuiRender();
         m_ContentBrowserPanel.OnImGuiRender();
 
-        if (m_ShowDebugWindow) Debug::ShowDebugWindow();
+        if (m_ShowNebulaDebugWindow) Debug::ShowDebugWindow();
+        if (m_ShowImGuiDemoWindow) ImGui::ShowDemoWindow();
 
         if (IsFirstRender)
         {
@@ -378,6 +394,14 @@ namespace Nebula {
             SceneSerializer serializer(m_Scene);
             serializer.Deserialize(path);
         });
+    }
+
+    void EditorLayer::OpenScene(const std::filesystem::path& path)
+    {
+        NewScene();
+
+        SceneSerializer serializer(m_Scene);
+        serializer.Deserialize(path);
     }
 
     void EditorLayer::SaveSceneAs()

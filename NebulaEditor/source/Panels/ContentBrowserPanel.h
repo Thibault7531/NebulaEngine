@@ -13,6 +13,8 @@ namespace Nebula
     public:
         ContentBrowserPanel();
 
+        void SetOpenSceneCallback(std::function<void(std::filesystem::path)> callback) { m_OpenSceneCallback = callback; }
+
         void OnImGuiRender();
 
     private:
@@ -24,6 +26,12 @@ namespace Nebula
         void ResetAssetCardColors();
         void DisplayNavigationBar();
         void DisplayAssetCard(const std::filesystem::directory_entry& dirEntry, float thumbnailSize, float padding);
+        void SetDragDropSource(const std::filesystem::path& path, Ref<Graphics::Texture2D> thumbnail);
+
+    private:
+        Ref<Graphics::Texture2D> GetIconForAsset(const std::filesystem::path& path);
+
+        bool IsSceneFile(const std::filesystem::path& path) { return path.extension() == ".nbscene"; }
 
     private:
         std::filesystem::path m_CurrentDirectory;
@@ -40,5 +48,8 @@ namespace Nebula
         Ref<Graphics::Texture2D> m_TopArrowIcon;
         Ref<Graphics::Texture2D> m_FolderIcon;
         Ref<Graphics::Texture2D> m_FileIcon;
+        Ref<Graphics::Texture2D> m_SceneIcon;
+
+        std::function<void(std::filesystem::path)> m_OpenSceneCallback;
     };
 }

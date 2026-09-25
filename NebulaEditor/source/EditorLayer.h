@@ -27,6 +27,7 @@ namespace Nebula {
 
         void NewScene();
         void OpenScene();
+        void OpenScene(const std::filesystem::path& path);
         void SaveSceneAs();
 
     private:
@@ -56,7 +57,9 @@ namespace Nebula {
         bool IsFirstRender = true;
         std::vector<glm::vec4> m_TitleBarButtons{};
 
-        bool m_ShowDebugWindow = false;
+        bool m_ShowNebulaDebugWindow = false;
+        bool m_ShowImGuiDemoWindow = false;
+
 
         Ref<Graphics::Texture2D> m_CloseIcon;
         Ref<Graphics::Texture2D> m_MaximizeIcon;
