@@ -19,19 +19,19 @@ Supported Platforms:
 ## Dependencies
 
 Requirements for building on Windows:
-- CMake 4.0
+- CMake 4.1.2
 - Clang
 - NuGet
 - Windows 10.0.26100.0 SDK
 - Windows App SDK 2.1.3
 
 Requirements for building on macOS:
-- CMake 4.0
+- CMake 4.1.2
 - Clang
 - XCode
 
 Requirements for building on Linux:
-- CMake 4.0
+- CMake 4.1.2
 - Clang
 
 ## Credits
@@ -52,7 +52,7 @@ Libraries used:
 - [SDL3](https://www.libsdl.org/) (Linux only)
 - [Slang](https://github.com/shader-slang/slang)
 - [spdlog](https://github.com/gabime/spdlog)
-- [std_image](https://github.com/nothings/stb)
+- [stb_image](https://github.com/nothings/stb)
 - [C++/WinRT](https://github.com/microsoft/cppwinrt) (Windows only)
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 - [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/) (Windows only)
