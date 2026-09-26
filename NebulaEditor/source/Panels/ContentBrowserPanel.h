@@ -32,6 +32,7 @@ namespace Nebula
         Ref<Graphics::Texture2D> GetIconForAsset(const std::filesystem::path& path);
 
         bool IsSceneFile(const std::filesystem::path& path) { return path.extension() == ".nbscene"; }
+        bool IsTextureFile(const std::filesystem::path& path);
 
     private:
         std::filesystem::path m_CurrentDirectory;
@@ -49,6 +50,7 @@ namespace Nebula
         Ref<Graphics::Texture2D> m_FolderIcon;
         Ref<Graphics::Texture2D> m_FileIcon;
         Ref<Graphics::Texture2D> m_SceneIcon;
+        Ref<Graphics::Texture2D> m_TextureIcon;
 
         std::function<void(std::filesystem::path)> m_OpenSceneCallback;
     };

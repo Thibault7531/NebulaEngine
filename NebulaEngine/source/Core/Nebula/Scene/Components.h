@@ -5,6 +5,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/quaternion.hpp>
 
+#include "Nebula/Graphics/Texture.h"
 #include "Nebula/Renderer/Cameras/SceneCamera.h"
 #include "Nebula/Scene/ScriptableEntity.h"
 
@@ -47,6 +48,8 @@ namespace Nebula
     struct SpriteRendererComponent
     {
         glm::vec4 Color{1.0f};
+        Ref<Graphics::Texture2D> Texture{nullptr};
+        float TilingFactor = 1.0f;
 
         SpriteRendererComponent() = default;
         SpriteRendererComponent(const SpriteRendererComponent&) = default;

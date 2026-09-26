@@ -69,6 +69,14 @@ namespace Nebula
         free(pixels);
         nsvgDelete(sceneImage);
 
+        NSVGimage* textureImage = nsvgParseFromFile((Platform::Files::GetResourcesPath() / "assets" / "NebulaEditor" / "icons" / "file-image.svg").string().c_str(), "px", 96);
+        pixels = static_cast<unsigned char*>(malloc(m_ThumbnailSize * m_ThumbnailSize * 4));
+        nsvgRasterize(rasterizer, textureImage, 0, 0, m_ThumbnailSize/textureImage->width, pixels, m_ThumbnailSize, m_ThumbnailSize, m_ThumbnailSize * 4);
+        m_TextureIcon = m_Device->CreateTexture2D(m_ThumbnailSize, m_ThumbnailSize, Graphics::Texture::InternalFormat::RGBA8);
+        m_TextureIcon->SetData(pixels, m_ThumbnailSize * m_ThumbnailSize * 4, Graphics::Texture::DataFormat::RGBA);
+        free(pixels);
+        nsvgDelete(textureImage);
+
         nsvgDeleteRasterizer(rasterizer);
     }
 
@@ -363,6 +371,16 @@ namespace Nebula
                 ImGui::EndDragDropSource();
             }
         }
+
+        if (IsTextureFile(path))
+        {
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+            {
+                ImGui::SetDragDropPayload("TEXTURE_DRAG", path.c_str(), path.string().size() + 1);
+                ImGui::Image(thumbnail.get(), ImVec2(32.f, 32.f));
+                ImGui::EndDragDropSource();
+            }
+        }
     }
 
     Ref<Graphics::Texture2D> ContentBrowserPanel::GetIconForAsset(const std::filesystem::path& path)
@@ -371,7 +389,19 @@ namespace Nebula
         {
             return m_SceneIcon;
         }
+        if (IsTextureFile(path))
+        {
+            return m_TextureIcon;
+        }
 
         return m_FileIcon;
+    }
+
+    bool ContentBrowserPanel::IsTextureFile(const std::filesystem::path& path)
+    {
+        if (path.extension() == ".jpg" || path.extension() == ".jpeg") return true;
+        if (path.extension() == ".png") return true;
+
+        return false;
     }
 }

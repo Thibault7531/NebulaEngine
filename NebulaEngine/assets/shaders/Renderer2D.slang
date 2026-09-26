@@ -10,7 +10,7 @@ struct VSInput
 {
     float3 a_Position;
     float4 a_Color;
-    float a_TexIndex;
+    nointerpolation float a_TexIndex;
     float2 a_TexCoord;
     float a_TilingFactor;
     int a_EntityID;
@@ -61,7 +61,7 @@ FSOutput fragmentMain(FSInput input)
 {
     FSOutput output;
 
-    switch (int(input.v_TexIndex))
+    switch (int(round(input.v_TexIndex)))
     {
     case 0: output.Color = u_Textures[0].Sample(input.v_TexCoord * input.v_TilingFactor); break;
     case 1: output.Color = u_Textures[1].Sample(input.v_TexCoord * input.v_TilingFactor); break;

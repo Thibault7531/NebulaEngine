@@ -4,6 +4,7 @@
 #include <imgui_internal.h>
 #include <gtc/type_ptr.hpp>
 
+#include "Nebula/CoreSystems/Application/Application.h"
 #include "Nebula/ImGui/ImGuiLayer.h"
 #include "Nebula/Scene/Components.h"
 
@@ -251,76 +252,87 @@ namespace Nebula
         {
             auto& camera = component.Camera;
 
-                ImGui::Checkbox("Primary", &component.Primary);
+            ImGui::Checkbox("Primary", &component.Primary);
 
-                const char* projectionTypes[] = { "Perspective", "Orthographic" };
-                const char* currentProjectionType = projectionTypes[static_cast<int>(camera.GetProjectionType())];
+            const char* projectionTypes[] = { "Perspective", "Orthographic" };
+            const char* currentProjectionType = projectionTypes[static_cast<int>(camera.GetProjectionType())];
 
-                if (ImGui::BeginCombo("Projection", currentProjectionType))
+            if (ImGui::BeginCombo("Projection", currentProjectionType))
+            {
+                for (int i = 0; i < 2; i++)
                 {
-                    for (int i = 0; i < 2; i++)
+                    bool isSelected = (currentProjectionType == projectionTypes[i]);
+                    if (ImGui::Selectable(projectionTypes[i], isSelected))
                     {
-                        bool isSelected = (currentProjectionType == projectionTypes[i]);
-                        if (ImGui::Selectable(projectionTypes[i], isSelected))
-                        {
-                            currentProjectionType = projectionTypes[i];
-                            camera.SetProjectionType(static_cast<SceneCamera::ProjectionType>(i));
-                        }
-
-                        if (isSelected) ImGui::SetItemDefaultFocus();
+                        currentProjectionType = projectionTypes[i];
+                        camera.SetProjectionType(static_cast<SceneCamera::ProjectionType>(i));
                     }
 
-                    ImGui::EndCombo();
+                    if (isSelected) ImGui::SetItemDefaultFocus();
                 }
 
-                if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
+                ImGui::EndCombo();
+            }
+
+            if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
+            {
+                float verticalFOV = glm::degrees(camera.GetPerspectiveVerticalFOV());
+                if (ImGui::DragFloat("FOV", &verticalFOV))
                 {
-                    float verticalFOV = glm::degrees(camera.GetPerspectiveVerticalFOV());
-                    if (ImGui::DragFloat("FOV", &verticalFOV))
-                    {
-                        camera.SetPerspectiveVerticalFOV(glm::radians(verticalFOV));
-                    }
-
-                    float nearClip = camera.GetPerspectiveNearClip();
-                    if (ImGui::DragFloat("Near Clip", &nearClip))
-                    {
-                        camera.SetPerspectiveNearClip(nearClip);
-                    }
-
-                    float farClip = camera.GetPerspectiveFarClip();
-                    if (ImGui::DragFloat("Far Clip", &farClip))
-                    {
-                        camera.SetPerspectiveFarClip(farClip);
-                    }
+                    camera.SetPerspectiveVerticalFOV(glm::radians(verticalFOV));
                 }
 
-                if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+                float nearClip = camera.GetPerspectiveNearClip();
+                if (ImGui::DragFloat("Near Clip", &nearClip))
                 {
-                    float size = camera.GetOrthographicSize();
-                    if (ImGui::DragFloat("Size", &size))
-                    {
-                        camera.SetOrthographicSize(size);
-                    }
-
-                    float nearClip = camera.GetOrthographicNearClip();
-                    if (ImGui::DragFloat("Near Clip", &nearClip))
-                    {
-                        camera.SetOrthographicNearClip(nearClip);
-                    }
-
-                    float farClip = camera.GetOrthographicFarClip();
-                    if (ImGui::DragFloat("Far Clip", &farClip))
-                    {
-                        camera.SetOrthographicFarClip(farClip);
-                    }
-
-                    ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+                    camera.SetPerspectiveNearClip(nearClip);
                 }
+
+                float farClip = camera.GetPerspectiveFarClip();
+                if (ImGui::DragFloat("Far Clip", &farClip))
+                {
+                    camera.SetPerspectiveFarClip(farClip);
+                }
+            }
+
+            if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+            {
+                float size = camera.GetOrthographicSize();
+                if (ImGui::DragFloat("Size", &size))
+                {
+                    camera.SetOrthographicSize(size);
+                }
+
+                float nearClip = camera.GetOrthographicNearClip();
+                if (ImGui::DragFloat("Near Clip", &nearClip))
+                {
+                    camera.SetOrthographicNearClip(nearClip);
+                }
+
+                float farClip = camera.GetOrthographicFarClip();
+                if (ImGui::DragFloat("Far Clip", &farClip))
+                {
+                    camera.SetOrthographicFarClip(farClip);
+                }
+
+                ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+            }
         });
 
         DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
         {
             ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+
+            ImGui::Button("Texture");
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_DRAG"))
+                {
+                    component.Texture = Application::Get().GetDevice()->CreateTexture2D(static_cast<const char*>(payload->Data), Graphics::Texture2D::InternalFormat::None);
+                }
+                ImGui::EndDragDropTarget();
+            }
+            ImGui::DragFloat("Tiling factor", &component.TilingFactor);
         });
     }
 

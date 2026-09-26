@@ -73,7 +73,7 @@ namespace Nebula {
 		{
 			auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
-			Renderer2D::DrawQuad({.transform = transform.GetTransform(), .color = sprite.Color});
+			Renderer2D::DrawQuad({.transform = transform.GetTransform(), .texture = sprite.Texture, .color = sprite.Color, .tilingFactor = sprite.TilingFactor});
 		}
 
 		Renderer2D::EndScene();
@@ -90,7 +90,7 @@ namespace Nebula {
 		{
 			auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
-			Renderer2D::DrawQuad({.transform = transform.GetTransform(), .color = sprite.Color, .entityID = static_cast<int32_t>(entity)});
+			Renderer2D::DrawQuad({.transform = transform.GetTransform(), .texture = sprite.Texture, .color = sprite.Color, .tilingFactor = sprite.TilingFactor, .entityID = static_cast<int32_t>(entity)});
 		}
 
 		Renderer2D::EndScene();
