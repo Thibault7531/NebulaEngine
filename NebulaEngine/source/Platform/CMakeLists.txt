@@ -68,18 +68,19 @@ elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
 else ()
     target_compile_definitions(Nebula-Platform PUBLIC NB_DIST)
 endif ()
+target_compile_definitions(Nebula-Platform PUBLIC VK_NO_PROTOTYPES)
+target_compile_definitions(Nebula-Platform PUBLIC VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1)
 
 
 # Libraries
-target_link_libraries(Nebula-Platform PRIVATE
-    GLAD
-)
 target_include_directories(Nebula-Platform PRIVATE
-    ../
-    ../../vendor/spdlog/include
-    ../../vendor/Glad/include
-    ../../vendor/metal-cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/swift
+                           ../
+                           ../../vendor/spdlog/include
+                           ../../vendor/Glad/include
+                           ../../vendor/metal-cpp
+                           ../../vendor/volk
+                           ../../vendor/Vulkan-Headers/include
+                           ${CMAKE_CURRENT_SOURCE_DIR}/swift
 )
 
 
@@ -88,10 +89,12 @@ if (nebula_cmake_platform STREQUAL Windows)
     target_compile_definitions(Nebula-Platform PUBLIC NB_PLATFORM_WINDOWS)
 
     target_link_libraries(Nebula-Platform PRIVATE
-        WindowsApp
-        OneCoreUAP
-        GLAD_WGL
-        opengl32
+                          GLAD
+                          GLAD_WGL
+                          OneCoreUAP
+                          opengl32
+                          volk
+                          WindowsApp
     )
 
     add_dependencies(Nebula-Platform generate_winrt)
@@ -117,6 +120,8 @@ elseif (nebula_cmake_platform STREQUAL Linux)
 
     target_link_libraries(Nebula-Platform PRIVATE
                           SDL3::SDL3
+                          GLAD
+                          volk
                           ${EGL_LIBRARIES}
     )
 

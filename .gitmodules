@@ -26,3 +26,12 @@
 [submodule "NebulaEngine/vendor/metal-cpp"]
 	path = NebulaEngine/vendor/metal-cpp
 	url = https://github.com/apple/metal-cpp.git
+[submodule "NebulaEngine/vendor/volk"]
+	path = NebulaEngine/vendor/volk
+	url = https://github.com/zeux/volk.git
+[submodule "NebulaEngine/vendor/vma-hpp"]
+	path = NebulaEngine/vendor/vma-hpp
+	url = https://github.com/YaaZ/VulkanMemoryAllocator-Hpp.git
+[submodule "NebulaEngine/vendor/Vulkan-Headers"]
+	path = NebulaEngine/vendor/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git

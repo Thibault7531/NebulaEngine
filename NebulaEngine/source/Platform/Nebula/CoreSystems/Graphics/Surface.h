@@ -20,11 +20,13 @@ namespace Nebula::Graphics
         virtual std::string GetAPIVendor() const = 0;
         virtual std::string GetAPIRenderer() const = 0;
 
-        virtual void SetDevice(void* device, void* commandQueue) = 0;
+        virtual void SetInstance(void* instance) = 0;
+        virtual void SetDevice(void* physicalDevice, void* logicalDevice, void* commandQueue) = 0;
+        virtual void* GetSurface() const = 0;
 
         virtual void SetVSync(VSyncMode mode) = 0;
         [[nodiscard]] virtual VSyncMode IsVsync() const = 0;
-        virtual std::string GetVSyncModeString() const { return GetVSyncModeString(IsVsync()); }
+        std::string GetVSyncModeString() const { return GetVSyncModeString(IsVsync()); }
         virtual void Resize(uint32_t width, uint32_t height) = 0;
 
         virtual void NewFrame() = 0;

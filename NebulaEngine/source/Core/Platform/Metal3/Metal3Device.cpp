@@ -25,7 +25,7 @@ namespace Nebula::Graphics
     void Metal3Device::SetSurfaceDevice(Ref<Surface> surface)
     {
         Ref<Metal3Surface> nativeSurface = std::dynamic_pointer_cast<Metal3Surface>(surface);
-        nativeSurface->SetDevice(m_Device, m_CommandQueue);
+        nativeSurface->SetDevice(nullptr, m_Device, m_CommandQueue);
     }
 
     Ref<VertexBuffer> Metal3Device::CreateVertexBuffer(uint32_t size)

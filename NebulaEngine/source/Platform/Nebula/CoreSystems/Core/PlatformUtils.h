@@ -81,6 +81,8 @@ namespace Nebula::Platform
     {
     public:
         static bool isGraphicsAPISupported(GraphicsAPI api);
+
+        static std::vector<const char*> getRequiredInstanceExtensions(GraphicsAPI api);
     };
 
 }

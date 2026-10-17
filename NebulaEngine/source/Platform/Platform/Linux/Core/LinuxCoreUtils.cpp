@@ -8,6 +8,7 @@ namespace Nebula::Platform
 {
     void CoreUtils::InitThread()
     {
+        SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland");
         if (!SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO)) NB_PLATFORM_CRITICAL("Failed to initialize SDL: {0}", SDL_GetError());
     }
 

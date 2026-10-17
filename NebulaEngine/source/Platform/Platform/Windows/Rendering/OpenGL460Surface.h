@@ -16,7 +16,9 @@ namespace Nebula::Graphics
         OpenGL460Surface(Platform::Window* window);
         virtual ~OpenGL460Surface();
 
-        virtual void SetDevice(void* device, void* commandQueue) override {}
+        virtual void SetInstance(void* instance) override {}
+        virtual void SetDevice(void* physicalDevice, void* logicalDevice, void* commandQueue) override {}
+        virtual void* GetSurface() const override { return m_Context; }
 
         virtual std::string GetAPIVersion() const override;
         virtual std::string GetAPIVendor() const override;

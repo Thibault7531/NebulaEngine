@@ -15,11 +15,16 @@ namespace Nebula::Graphics
     {
     }
 
-    void Metal3Surface::SetDevice(void* device, void* commandQueue)
+    void Metal3Surface::SetDevice(void* physicalDevice, void* logicalDevice, void* commandQueue)
     {
-        m_NativeMetal3Surface.SetDevice(device);
-        m_MetalDevice = device;
+        m_NativeMetal3Surface.SetDevice(logicalDevice);
+        m_MetalDevice = logicalDevice;
         m_MetalCommandQueue = static_cast<MTL::CommandQueue*>(commandQueue);
+    }
+
+    void* Metal3Surface::GetSurface() const
+    {
+        return m_MetalLayer;
     }
 
     std::string Metal3Surface::GetAPIVersion() const

@@ -18,7 +18,9 @@ namespace Nebula::Graphics
         virtual std::string GetAPIVendor() const override;
         virtual std::string GetAPIRenderer() const override;
 
-        virtual void SetDevice(void* device, void* commandQueue) override {}
+        virtual void SetInstance(void* instance) override {}
+        virtual void SetDevice(void* device, void* logicalDevice, void* commandQueue) override {}
+        virtual void* GetSurface() const override { return m_Context; }
 
         virtual void SetVSync(VSyncMode mode) override;
         virtual VSyncMode IsVsync() const override;

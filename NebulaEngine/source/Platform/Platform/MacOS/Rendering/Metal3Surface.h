@@ -15,7 +15,9 @@ namespace Nebula::Graphics
         Metal3Surface(void* window);
         ~Metal3Surface();
 
-        virtual void SetDevice(void* device, void* commandQueue) override;
+        virtual void SetInstance(void* instance) override {}
+        virtual void SetDevice(void* physicalDevice, void* logicalDevice, void* commandQueue) override;
+        virtual void* GetSurface() const override;
 
         virtual std::string GetAPIVersion() const override;
         virtual std::string GetAPIVendor() const override;
@@ -53,7 +55,7 @@ namespace Nebula::Graphics
         Ref<Metal3Surface> GetSharedPointer() { return m_Pointer; }
         void* GetPointer() { return m_Pointer.get(); }
 
-        virtual void SetDevice(void* device, void* commandQueue) { m_Pointer->SetDevice(device, commandQueue); }
+        virtual void SetDevice(void* device, void* commandQueue) { m_Pointer->SetDevice(nullptr, device, commandQueue); }
 
         virtual void SetVSync(VSyncMode mode) { m_Pointer->SetVSync(mode); }
         virtual VSyncMode IsVsync() const { return m_Pointer->IsVsync(); }

@@ -4,6 +4,7 @@
 
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
+#include "SDL3/SDL_vulkan.h"
 
 namespace Nebula::Platform
 {
@@ -180,7 +181,25 @@ namespace Nebula::Platform
         case GraphicsAPI::None: return false;
         case GraphicsAPI::OpenGL460: return true;
         case GraphicsAPI::Metal3: return false;
+        case GraphicsAPI::Vulkan: return true;
         default: return false;
         }
+    }
+
+    std::vector<const char*> Graphics::getRequiredInstanceExtensions(GraphicsAPI api)
+    {
+        switch (api)
+        {
+        case GraphicsAPI::None: return {};
+        case GraphicsAPI::Metal3: return {};
+        case GraphicsAPI::OpenGL460: return {};
+        case GraphicsAPI::Vulkan:
+            {
+                uint32_t count;
+                auto extensions = SDL_Vulkan_GetInstanceExtensions(&count);
+                return std::vector<const char*>(extensions, extensions + count);
+            }
+        }
+        return {};
     }
 }

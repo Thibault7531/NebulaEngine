@@ -1,3 +1,5 @@
+#define VK_USE_PLATFORM_WIN32_KHR
+
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 
 #include <Windows.h>
@@ -8,6 +10,8 @@
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Nebula/CoreSystems/Input/KeyCodes.h"
 #include "Platform/Nebula/CoreSystems/Windows/WindowManager.h"
+#include "vulkan/vulkan_core.h"
+#include "vulkan/vulkan_win32.h"
 
 namespace Nebula::Platform
 {
@@ -177,5 +181,15 @@ namespace Nebula::Platform
         case GraphicsAPI::OpenGL460: return true;
         default: return false;
         }
+    }
+
+    std::vector<const char*> Graphics::getRequiredInstanceExtensions(GraphicsAPI api)
+    {
+        std::vector<const char*> extensions = {
+            VK_KHR_SURFACE_EXTENSION_NAME,
+            VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+        };
+
+        return extensions;
     }
 }

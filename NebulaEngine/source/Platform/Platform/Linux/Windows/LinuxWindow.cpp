@@ -1,5 +1,6 @@
 #include "LinuxWindow.h"
 
+#include "../Rendering/VulkanSurface.h"
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "Platform/Platform/Linux/Rendering/OpenGL460Surface.h"
@@ -34,7 +35,8 @@ namespace Nebula::Platform
             if (m_Properties.isResizable) windowFlags |= SDL_WINDOW_RESIZABLE;
         }
 
-        windowFlags |= SDL_WINDOW_OPENGL;
+        if (m_Properties.API == GraphicsAPI::OpenGL460) windowFlags |= SDL_WINDOW_OPENGL;
+        if (m_Properties.API == GraphicsAPI::Vulkan) windowFlags |= SDL_WINDOW_VULKAN;
 
         m_Window = SDL_CreateWindow(m_Properties.Title.c_str(), m_Properties.Width, m_Properties.Height, windowFlags);
         SDL_SetWindowPosition(m_Window, m_Properties.x, m_Properties.y);
@@ -56,6 +58,7 @@ namespace Nebula::Platform
                 NB_PLATFORM_CRITICAL("Metal3 is not supported on Linux!");
                 break;
             }
+        case GraphicsAPI::Vulkan: m_Surface = CreateRef<Graphics::VulkanSurface>(this); break;
         }
     }
 

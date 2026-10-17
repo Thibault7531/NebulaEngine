@@ -50,7 +50,7 @@ int main()
     Nebula::Graphics::Metal3Surface* metalContext = static_cast<Nebula::Graphics::Metal3Surface*>(layer);
     MTL::Device* metalDevice = MTL::CreateSystemDefaultDevice();
     MTL::CommandQueue* commandQueue = metalDevice->newCommandQueue();
-    metalContext->SetDevice(metalDevice, commandQueue);
+    metalContext->SetDevice(nullptr, metalDevice, commandQueue);
 
     Vertex vertices[3] = {
         {.Position = {-0.5f, -0.5f, 0.f}, .Color = {1.f, 0.f, 0.f}},

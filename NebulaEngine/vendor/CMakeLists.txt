@@ -112,6 +112,24 @@ add_subdirectory(slang)
 add_subdirectory(spdlog)
 
 
+# vma-hpp
+
+add_subdirectory(vma-hpp)
+
+
+# volk
+
+add_subdirectory(volk)
+if (nebula_cmake_platform STREQUAL Windows)
+    target_compile_definitions(volk PRIVATE VK_USE_PLATFORM_WIN32_KHR)
+endif ()
+
+
+# Vulkan
+
+
+
+
 # YAML
 
 option(YAML_MSVC_SHARED_RT "" OFF)
