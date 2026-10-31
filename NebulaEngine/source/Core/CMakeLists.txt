@@ -15,13 +15,13 @@ file(GLOB_RECURSE NebulaHeaderFiles
 if (nebula_cmake_platform STREQUAL Windows)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
          "Platform/OpenGL/*.cpp"
-         "Platform/OpenGL410/*.cpp"
+         "Platform/Vulkan/*.cpp"
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
          "Platform/OpenGL/*.hpp"
-         "Platform/OpenGL410/*.hpp"
+         "Platform/Vulkan/*.hpp"
          "Platform/OpenGL/*.h"
-         "Platform/OpenGL410/*.h"
+         "Platform/Vulkan/*.h"
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
@@ -39,10 +39,13 @@ elseif (nebula_cmake_platform STREQUAL MacOS)
 elseif (nebula_cmake_platform STREQUAL Linux)
     file(GLOB_RECURSE NebulaPlatformSourceFiles
          "Platform/OpenGL/*.cpp"
+         "Platform/Vulkan/*.cpp"
     )
     file(GLOB_RECURSE NebulaPlatformHeaderFiles
          "Platform/OpenGL/*.hpp"
+         "Platform/Vulkan/*.hpp"
          "Platform/OpenGL/*.h"
+         "Platform/Vulkan/*.h"
     )
     list(APPEND NebulaSourceFiles ${NebulaPlatformSourceFiles})
     list(APPEND NebulaHeaderFiles ${NebulaPlatformHeaderFiles})
@@ -92,21 +95,24 @@ target_link_libraries(Nebula PRIVATE
                       yaml-cpp::yaml-cpp
 )
 target_include_directories(Nebula PRIVATE
-        ../
-        ./
-        ../../vendor
-        ../../vendor/Assimp/include
-        ${CMAKE_BINARY_DIR}/NebulaEngine/vendor/Assimp/include
-        ../../vendor/entt/single_include
-        ../../vendor/Glad/include
-        ../../vendor/glm
-        ../../vendor/glm/glm
-        ../../vendor/imgui
-        ../../vendor/ImGuizmo/src
-        ../../vendor/metal-cpp
-        ../../vendor/nanosvg
-        ../../vendor/stb_image
-        ../../vendor/yaml-cpp/include
+                           ../
+                           ./
+                           ../../vendor
+                           ../../vendor/Assimp/include
+                           ${CMAKE_BINARY_DIR}/NebulaEngine/vendor/Assimp/include
+                           ../../vendor/entt/single_include
+                           ../../vendor/Glad/include
+                           ../../vendor/glm
+                           ../../vendor/glm/glm
+                           ../../vendor/imgui
+                           ../../vendor/ImGuizmo/src
+                           ../../vendor/metal-cpp
+                           ../../vendor/nanosvg
+                           ../../vendor/stb_image
+                           ../../vendor/vma-hpp/include
+                           ../../vendor/vma-hpp/VulkanMemoryAllocator/include
+                           ../../vendor/Vulkan-Headers/include
+                           ../../vendor/yaml-cpp/include
 )
 
 

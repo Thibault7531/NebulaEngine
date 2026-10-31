@@ -179,6 +179,7 @@ namespace Nebula::Platform
         case GraphicsAPI::None: return false;
         case GraphicsAPI::Metal3: return false;
         case GraphicsAPI::OpenGL460: return true;
+        case GraphicsAPI::Vulkan: return true;
         default: return false;
         }
     }

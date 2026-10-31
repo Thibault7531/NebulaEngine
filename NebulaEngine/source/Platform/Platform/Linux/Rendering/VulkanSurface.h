@@ -39,8 +39,5 @@ namespace Nebula::Graphics
 
         VkSurfaceKHR m_Surface;
         VkSurfaceCapabilitiesKHR m_SurfaceCapabilities{};
-
-        static bool s_Initialized;
-        static bool s_InstanceInitialized;
     };
 }
