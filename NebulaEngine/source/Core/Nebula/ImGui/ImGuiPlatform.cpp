@@ -163,7 +163,7 @@ namespace Nebula
         viewport_data->Window = platform_data.Window;
         viewport_data->WindowOwned = false;
         viewport_data->GraphicsSurface = platform_data.Window->GetSurface();
-        viewport_data->Framebuffer = Application::Get().GetMainFramebuffer();
+        viewport_data->Swapchain = Application::Get().GetMainWindowSwapchain();
         main_viewport->PlatformUserData = viewport_data;
         main_viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(platform_data.Window->GetID()));
     }
@@ -355,7 +355,7 @@ namespace Nebula
 
         viewport->PlatformRequestResize = true;
         viewport_data->GraphicsSurface->Resize(event.GetWidth(), event.GetHeight());
-        viewport_data->Framebuffer->Resize(event.GetWidth(), event.GetHeight());
+        viewport_data->Swapchain->Resize(event.GetWidth(), event.GetHeight());
 
         return false;
     }
@@ -652,7 +652,7 @@ namespace Nebula
                 props.Width,
                 props.Height
             };
-            viewport_data->Framebuffer = Application::Get().GetDevice()->CreateFramebuffer(spec);
+            viewport_data->Swapchain = Application::Get().GetDevice()->CreateSwapchain(viewport_data->GraphicsSurface, spec, 0);
         }
 
         viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(viewport_data->Window->GetID()));
@@ -764,7 +764,7 @@ namespace Nebula
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
         if (viewport_data->GraphicsSurface)
         {
-            viewport_data->GraphicsSurface->Present(viewport_data->Framebuffer->GetNativeFramebuffer());
+            viewport_data->Swapchain->Present();
         }
     }
 

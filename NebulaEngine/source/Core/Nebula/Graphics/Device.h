@@ -4,6 +4,7 @@
 
 #include "CommandBuffer.h"
 #include "Shader.h"
+#include "SwapChain.h"
 #include "Texture.h"
 #include "Buffers/Buffer.h"
 #include "Buffers/Framebuffer.h"
@@ -33,6 +34,9 @@ namespace Nebula::Graphics
         virtual Ref<Texture2D> CreateTexture2D(std::filesystem::path path, const Texture::TextureSpecification& spec) = 0;
 
         virtual Ref<Framebuffer> CreateFramebuffer(const FramebufferSpecification& spec) = 0;
+        virtual Ref<Framebuffer> CreateFramebufferForSwapchain(const FramebufferSpecification& spec, uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture) = 0;
+
+        virtual Ref<SwapChain> CreateSwapchain(Ref<Surface> surface, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) = 0;
 
         virtual Ref<Shader> CreateShader(const std::filesystem::path& path) = 0;
         virtual Ref<ShaderPipeline> CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout,  const PipelineSpecification& spec) = 0;

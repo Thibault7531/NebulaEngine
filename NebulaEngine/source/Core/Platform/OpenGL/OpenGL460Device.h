@@ -25,6 +25,9 @@ namespace Nebula::Graphics
         virtual Ref<Texture2D> CreateTexture2D(std::filesystem::path path, const Texture::TextureSpecification& spec) override;
 
         virtual Ref<Framebuffer> CreateFramebuffer(const FramebufferSpecification& spec) override;
+        virtual Ref<Framebuffer> CreateFramebufferForSwapchain(const FramebufferSpecification& spec, uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture) override;
+
+        virtual Ref<SwapChain> CreateSwapchain(Ref<Surface> surface, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) override;
 
         virtual Ref<Shader> CreateShader(const std::filesystem::path& path) override;
         virtual Ref<ShaderPipeline> CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout, const PipelineSpecification& spec) override;

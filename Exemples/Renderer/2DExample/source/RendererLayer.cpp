@@ -58,14 +58,14 @@ void RendererLayer::OnAttach()
     blendState.dstAlphaFactor = Nebula::Graphics::BlendFactor::OneMinusSourceAlpha;
 
     m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColor.slang");
-    m_SolidColorShader = m_ShaderLibrary.CreatePipeline("SolidColor", vertexLayout, {Nebula::Application::Get().GetMainFramebuffer()->GetSpecification(), blendState});
+    m_SolidColorShader = m_ShaderLibrary.CreatePipeline("SolidColor", vertexLayout, {Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification(), blendState});
     m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/Texture.slang");
-    m_TextureShader = m_ShaderLibrary.CreatePipeline("Texture", vertexLayout, {Nebula::Application::Get().GetMainFramebuffer()->GetSpecification(), blendState});
+    m_TextureShader = m_ShaderLibrary.CreatePipeline("Texture", vertexLayout, {Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification(), blendState});
 
     m_Texture = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/crafting_table_front.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Nearest});
     m_Glass = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/glass.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Nearest});
 
-    Nebula::Application::Get().GetMainFramebuffer()->SetClearColors({{.18f, .49f, .6f, 1.f}});
+    Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->SetClearColors({{.18f, .49f, .6f, 1.f}});
 }
 
 void RendererLayer::OnDetach()
@@ -96,7 +96,7 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
     m_ColorUBO->SetData(0, "u_Color", glm::value_ptr(m_Color));
 
     Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
-    Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
+    Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), true);
     renderPass->SetShaderPipeline(m_SolidColorShader);
 
     for (int i = 0; i < 4; i++)

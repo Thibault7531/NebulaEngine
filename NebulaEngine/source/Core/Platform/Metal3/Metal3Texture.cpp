@@ -44,7 +44,7 @@ namespace Nebula::Graphics
         stbi_set_flip_vertically_on_load(1);
         stbi_uc* data = nullptr;
         {
-            NB_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
+            NB_PROFILE_SCOPE("stbi_load - Metal3Texture2D::Metal3Texture2D(const std::string&)");
             stbi_info(path.c_str(), &width, &height, &components);
             data = stbi_load(path.c_str(), &width, &height, &channels, components == 3 ? 4 : 0);
             if (components == 3) channels = 4;

@@ -131,7 +131,7 @@ namespace Nebula
         NB_PROFILE_FUNCTION();
 
         s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
-        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), false);
+        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), false);
 
         Graphics::VertexLayout layout = {
             { Graphics::ShaderDataType::Float3, "a_Position" },
@@ -148,7 +148,7 @@ namespace Nebula
         blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
         blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
         Graphics::PipelineSpecification spec;
-        spec.framebufferSpec = Application::Get().GetMainFramebuffer()->GetSpecification();
+        spec.framebufferSpec = Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
         spec.blendState = blendState;
         s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
 
@@ -164,7 +164,7 @@ namespace Nebula
 
     void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
     {
-        BeginScene(camera, transform, Application::Get().GetMainFramebuffer(), false);
+        BeginScene(camera, transform, Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), false);
     }
 
     void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform,
@@ -207,7 +207,7 @@ namespace Nebula
 
     void Renderer2D::BeginScene(const EditorCamera& camera)
     {
-        BeginScene(camera, Application::Get().GetMainFramebuffer(), false);
+        BeginScene(camera, Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), false);
     }
 
     void Renderer2D::BeginScene(const EditorCamera& camera, Ref<Graphics::Framebuffer> framebuffer, bool clear)

@@ -27,7 +27,6 @@ namespace Nebula::Graphics {
         virtual float GetClearDepth() const override { return m_ClearDepth; }
 
         [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
-        virtual void* GetNativeFramebuffer() override { return reinterpret_cast<void*>(m_RendererID); }
 
         virtual void Resize(uint32_t width, uint32_t height) override;
 

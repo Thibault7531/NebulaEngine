@@ -38,7 +38,7 @@ namespace Nebula {
 
 	void SceneRenderer::RenderScene(Ref<Scene> scene)
 	{
-		RenderScene(scene, Application::Get().GetMainFramebuffer());
+		RenderScene(scene, Application::Get().GetMainWindowSwapchain()->GetCurrentFrame());
 	}
 
 	void SceneRenderer::RenderScene(Ref<Scene> scene, Ref<Graphics::Framebuffer> framebuffer)
@@ -54,7 +54,7 @@ namespace Nebula {
 
 	void SceneRenderer::RenderSceneEditor(Ref<Scene> scene, const EditorCamera& camera)
 	{
-		RenderSceneEditor(scene, camera, Application::Get().GetMainFramebuffer());
+		RenderSceneEditor(scene, camera, Application::Get().GetMainWindowSwapchain()->GetCurrentFrame());
 	}
 
 	void SceneRenderer::RenderSceneEditor(Ref<Scene> scene, const EditorCamera& camera,

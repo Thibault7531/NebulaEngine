@@ -6,6 +6,8 @@
 
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 #include "vk_mem_alloc.hpp"
+#include "VulkanFramebuffer.h"
+#include "VulkanSwapChain.h"
 #include "volk/volk.h"
 
 namespace Nebula::Graphics
@@ -19,7 +21,7 @@ namespace Nebula::Graphics
         {
             volkInitialize();
 
-            VkApplicationInfo applicationInfo;
+            VkApplicationInfo applicationInfo{};
             applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
             applicationInfo.pApplicationName = Platform::Files::GetAppName().c_str();
             applicationInfo.pEngineName = "NebulaEngine";
@@ -62,7 +64,7 @@ namespace Nebula::Graphics
             }
 #endif
 
-            VkInstanceCreateInfo instanceCreateInfo;
+            VkInstanceCreateInfo instanceCreateInfo{};
             instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
             instanceCreateInfo.pApplicationInfo = &applicationInfo;
             instanceCreateInfo.enabledLayerCount = validationLayerEnabled ? validationLayers.size() : 0;
@@ -163,13 +165,32 @@ namespace Nebula::Graphics
     Ref<IndexBuffer> VulkanDevice::CreateIndexBuffer(uint32_t* data, uint32_t count) {}
     Ref<UniformBuffer> VulkanDevice::CreateUniformBuffer(const BufferLayout& layout, uint32_t instances) {}
 
-    Ref<Texture2D> VulkanDevice::CreateTexture2D(uint32_t width, uint32_t height,
-        const Texture::TextureSpecification& spec) {}
+    Ref<Texture2D> VulkanDevice::CreateTexture2D(uint32_t width, uint32_t height, const Texture::TextureSpecification& spec)
+    {
+        return CreateRef<VulkanTexture2D>(this, width, height, spec);
+    }
 
-    Ref<Texture2D> VulkanDevice::
-    CreateTexture2D(std::filesystem::path path, const Texture::TextureSpecification& spec) {}
+    Ref<Texture2D> VulkanDevice::CreateTexture2D(std::filesystem::path path, const Texture::TextureSpecification& spec)
+    {
+        return CreateRef<VulkanTexture2D>(this, path, spec);
+    }
 
-    Ref<Framebuffer> VulkanDevice::CreateFramebuffer(const FramebufferSpecification& spec) {}
+    Ref<Framebuffer> VulkanDevice::CreateFramebuffer(const FramebufferSpecification& spec)
+    {
+        return CreateRef<VulkanFramebuffer>(this, spec);
+    }
+
+    Ref<Framebuffer> VulkanDevice::CreateFramebufferForSwapchain(const FramebufferSpecification& spec,
+        uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture)
+    {
+        return CreateRef<VulkanFramebuffer>(this, spec, swapchainTextureIndex, swapchainTexture);
+    }
+
+    Ref<SwapChain> VulkanDevice::CreateSwapchain(Ref<Surface> surface, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex)
+    {
+        return CreateRef<VulkanSwapChain>(this, surface, framebufferSpec, swapchainTextureIndex);
+    }
+
     Ref<Shader> VulkanDevice::CreateShader(const std::filesystem::path& path) {}
 
     Ref<ShaderPipeline> VulkanDevice::CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout,

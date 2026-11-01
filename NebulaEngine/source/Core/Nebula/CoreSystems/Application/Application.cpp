@@ -39,9 +39,7 @@ namespace Nebula
 		Graphics::RendererAPI::Init(api);
 
 		m_Device = Graphics::Device::CreateDefaultDevice();
-		m_Device->SetSurfaceDevice(m_MainWindow->GetSurface());
-
-		m_MainFramebuffer = m_Device->CreateFramebuffer({m_MainWindow->GetClientSize().first, m_MainWindow->GetClientSize().second});
+		m_Swapchain = m_Device->CreateSwapchain(m_MainWindow->GetSurface(), {m_MainWindow->GetClientSize().first, m_MainWindow->GetClientSize().second}, 0);
 
 		SceneRenderer::Init();
 		Renderer2D::Init();
@@ -170,7 +168,7 @@ namespace Nebula
 			m_ImGuiLayer->End();
 		}
 
-		m_MainWindow->Present(m_MainFramebuffer->GetNativeFramebuffer());
+		m_Swapchain->Present();
 	}
 
 	void Application::Shutdown()
@@ -190,7 +188,7 @@ namespace Nebula
 
 		SceneRenderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 		m_MainWindow->GetSurface()->Resize(e.GetWidth(), e.GetHeight());
-		m_MainFramebuffer->Resize(e.GetWidth(), e.GetHeight());
+		m_Swapchain->Resize(e.GetWidth(), e.GetHeight());
 
 		return false;
 	}

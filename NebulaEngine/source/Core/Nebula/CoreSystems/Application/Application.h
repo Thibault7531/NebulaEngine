@@ -4,6 +4,7 @@
 #include "LayerStack.h"
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Nebula/Graphics/Device.h"
+#include "Nebula/Graphics/SwapChain.h"
 #include "Nebula/ImGui/ImGuiLayer.h"
 #include "Nebula/Graphics/Buffers/Framebuffer.h"
 #include "Platform/Nebula/CoreSystems/Events/WindowEvents.h"
@@ -29,7 +30,7 @@ namespace Nebula {
 		void PopOverlay(Layer* layer);
 
 		Ref<Graphics::Device> GetDevice() const { return m_Device; }
-		Ref<Graphics::Framebuffer> GetMainFramebuffer() const { return m_MainFramebuffer; }
+		Ref<Graphics::SwapChain> GetMainWindowSwapchain() const { return m_Swapchain; }
 		ImGuiLayer* GetImGuiLayer() const { return m_ImGuiLayer; }
 
 		inline static Application& Get() { return *s_Instance; }
@@ -43,8 +44,8 @@ namespace Nebula {
 
 	private:
 		Ref<Platform::Window> m_MainWindow;
+		Ref<Graphics::SwapChain> m_Swapchain;
 		Ref<Graphics::Device> m_Device;
-		Ref<Graphics::Framebuffer> m_MainFramebuffer;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		bool m_Minimized = false;

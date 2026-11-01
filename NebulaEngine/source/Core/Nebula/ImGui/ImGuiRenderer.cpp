@@ -114,7 +114,7 @@ namespace Nebula
         Ref<Graphics::VertexArray> vertexArray = Graphics::VertexArray::Create();
         Ref<Graphics::CommandBuffer> commandBuffer = renderer_data.device->CreateCommandBuffer();
         ViewportData* viewport_data = static_cast<ViewportData*>(drawData->OwnerViewport->PlatformUserData);
-        Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(viewport_data->Framebuffer, false);
+        Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(viewport_data->Swapchain->GetCurrentFrame(), false);
         SetupRenderState(*drawData, width, height, renderPass, vertexArray);
 
         ImVec2 clip_off = drawData->DisplayPos;

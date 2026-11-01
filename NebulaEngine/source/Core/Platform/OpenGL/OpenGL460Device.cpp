@@ -56,6 +56,12 @@ namespace Nebula::Graphics
         return CreateRef<OpenGL460Framebuffer>(spec);
     }
 
+    Ref<Framebuffer> OpenGL460Device::CreateFramebufferForSwapchain(const FramebufferSpecification& spec,
+        uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture) {}
+
+    Ref<SwapChain> OpenGL460Device::CreateSwapchain(Ref<Surface> surface,
+        const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) {}
+
     Ref<Shader> OpenGL460Device::CreateShader(const std::filesystem::path& path)
     {
         return CreateRef<OpenGLShader>(path);
