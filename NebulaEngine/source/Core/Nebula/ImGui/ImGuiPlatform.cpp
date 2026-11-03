@@ -764,7 +764,7 @@ namespace Nebula
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
         if (viewport_data->GraphicsSurface)
         {
-            viewport_data->Swapchain->Present();
+            viewport_data->Swapchain->Present(nullptr);
         }
     }
 

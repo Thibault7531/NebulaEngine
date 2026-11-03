@@ -37,6 +37,9 @@ namespace Nebula::Graphics
 
         virtual Ref<CommandBuffer> CreateCommandBuffer() override;
 
+        virtual Ref<Semaphore> CreateSemaphore() override;
+        virtual Ref<Fence> CreateFence(bool signaled) override;
+
     public:
         virtual uint32_t GetMaximumTextureSize() override;
         virtual uint32_t GetUniformBufferAlignment() override;
@@ -44,6 +47,7 @@ namespace Nebula::Graphics
     public:
         vk::PhysicalDevice GetVKPhysicalDevice() const { return m_PhysicalDevice; }
         vk::Device GetVKLogicalDevice() const { return m_LogicalDevice; }
+        vk::Queue GetVKGraphicsQueue() const { return m_GraphicsQueue; }
         vma::Allocator GetVMAAllocator() const { return m_Allocator; }
 
     private:

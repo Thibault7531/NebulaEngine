@@ -168,7 +168,7 @@ namespace Nebula
 			m_ImGuiLayer->End();
 		}
 
-		m_Swapchain->Present();
+		m_Swapchain->Present(nullptr);
 	}
 
 	void Application::Shutdown()

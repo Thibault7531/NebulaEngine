@@ -6,7 +6,9 @@
 
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 #include "vk_mem_alloc.hpp"
+#include "VulkanFence.h"
 #include "VulkanFramebuffer.h"
+#include "VulkanSemaphore.h"
 #include "VulkanSwapChain.h"
 #include "volk/volk.h"
 
@@ -197,6 +199,17 @@ namespace Nebula::Graphics
         const PipelineSpecification& spec) {}
 
     Ref<CommandBuffer> VulkanDevice::CreateCommandBuffer() {}
+
+    Ref<Semaphore> VulkanDevice::CreateSemaphore()
+    {
+        return CreateRef<VulkanSemaphore>(this);
+    }
+
+    Ref<Fence> VulkanDevice::CreateFence(bool signaled)
+    {
+        return CreateRef<VulkanFence>(this, signaled);
+    }
+
     uint32_t VulkanDevice::GetMaximumTextureSize() {}
     uint32_t VulkanDevice::GetUniformBufferAlignment() {}
 }

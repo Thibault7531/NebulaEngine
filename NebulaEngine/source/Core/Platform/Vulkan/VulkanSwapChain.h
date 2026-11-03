@@ -1,6 +1,8 @@
 #pragma once
 
 #include "VulkanDevice.h"
+#include "VulkanFence.h"
+#include "VulkanSemaphore.h"
 #include "Platform/Nebula/CoreSystems/Graphics/Surface.h"
 #include "Nebula/Graphics/Device.h"
 #include "Nebula/Graphics/SwapChain.h"
@@ -18,7 +20,8 @@ namespace Nebula::Graphics
 
         virtual void NewFrame() override;
         virtual Ref<Framebuffer> GetCurrentFrame() override;
-        virtual void Present() override;
+        virtual Ref<Semaphore> GetImageAcquiredSemaphore() override;
+        virtual void Present(Ref<Semaphore> renderCompleteSemaphore) override;
 
     public:
         void Invalidate();
@@ -33,6 +36,10 @@ namespace Nebula::Graphics
 
         vk::SwapchainKHR m_Swapchain;
         uint8_t m_MaxFramesInFlight;
+        uint8_t m_CurrentFrameIndex;
+        uint32_t m_CurrentFramebufferIndex;
         std::vector<Ref<Framebuffer>> m_Framebuffers;
+        std::vector<Ref<VulkanFence>> m_Fences;
+        std::vector<Ref<VulkanSemaphore>> m_ImageAcquiredSemaphores;
     };
 }

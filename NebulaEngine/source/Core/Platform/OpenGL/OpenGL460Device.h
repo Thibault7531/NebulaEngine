@@ -34,6 +34,9 @@ namespace Nebula::Graphics
 
         virtual Ref<CommandBuffer> CreateCommandBuffer() override;
 
+        virtual Ref<Semaphore> CreateSemaphore() override { return nullptr; }
+        virtual Ref<Fence> CreateFence(bool signaled) override { return nullptr; }
+
 
     public:
         virtual uint32_t GetMaximumTextureSize() override;

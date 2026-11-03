@@ -134,7 +134,7 @@ namespace Nebula {
         }
 
         Ref<Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
-        Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), true);
+        Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), true);
         renderPass->EndRenderPass();
         commandBuffer->Commit();
 
