@@ -130,7 +130,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
+        s_Data.CommandBuffer = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
         s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), false);
 
         Graphics::VertexLayout layout = {
@@ -172,7 +172,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
+        s_Data.CommandBuffer = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
         s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, clear);
 
         Graphics::VertexLayout layout = {
@@ -214,7 +214,7 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
+        s_Data.CommandBuffer = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
         s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, clear);
 
         Graphics::VertexLayout layout = {
@@ -266,8 +266,7 @@ namespace Nebula
         Ref<Graphics::Framebuffer> framebuffer = s_Data.RenderPass->GetFramebuffer();
 
         Flush();
-
-        s_Data.CommandBuffer = s_Data.Device->CreateCommandBuffer();
+        s_Data.CommandBuffer = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
         s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, false);
 
         s_Data.QuadIndexCount = 0;
@@ -288,7 +287,7 @@ namespace Nebula
         s_Data.RenderPass->DrawArrayIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 
         s_Data.RenderPass->EndRenderPass();
-        s_Data.CommandBuffer->Commit();
+        Application::Get().GetDevice()->GetGraphicsQueue()->SubmitCommandBuffer(s_Data.CommandBuffer);
 
         s_Data.Stats.DrawCalls++;
     }

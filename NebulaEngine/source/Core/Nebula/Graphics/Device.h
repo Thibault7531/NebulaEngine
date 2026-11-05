@@ -3,8 +3,7 @@
 #include <filesystem>
 
 #include "CommandBuffer.h"
-#include "Fence.h"
-#include "Semaphore.h"
+#include "Queue.h"
 #include "Shader.h"
 #include "SwapChain.h"
 #include "Texture.h"
@@ -43,14 +42,11 @@ namespace Nebula::Graphics
         virtual Ref<Shader> CreateShader(const std::filesystem::path& path) = 0;
         virtual Ref<ShaderPipeline> CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout,  const PipelineSpecification& spec) = 0;
 
-        virtual Ref<CommandBuffer> CreateCommandBuffer() = 0;
-
-        virtual Ref<Semaphore> CreateSemaphore() = 0;
-        virtual Ref<Fence> CreateFence(bool signaled = false) = 0;
-
     public:
         virtual uint32_t GetMaximumTextureSize() = 0;
         virtual uint32_t GetUniformBufferAlignment() = 0;
+
+        virtual Ref<Queue> GetGraphicsQueue() = 0;
 
     public:
         static Ref<Device> CreateDefaultDevice();

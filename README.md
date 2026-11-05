@@ -33,7 +33,6 @@ Requirements for building on macOS:
 Requirements for building on Linux:
 - CMake 4.1.2
 - Clang
-- vulkan-headers
 - vulkan-validation-layers
 
 ## Credits

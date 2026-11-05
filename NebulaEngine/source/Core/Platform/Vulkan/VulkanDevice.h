@@ -35,19 +35,16 @@ namespace Nebula::Graphics
         virtual Ref<Shader> CreateShader(const std::filesystem::path& path) override;
         virtual Ref<ShaderPipeline> CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout, const PipelineSpecification& spec) override;
 
-        virtual Ref<CommandBuffer> CreateCommandBuffer() override;
-
-        virtual Ref<Semaphore> CreateSemaphore() override;
-        virtual Ref<Fence> CreateFence(bool signaled) override;
-
     public:
         virtual uint32_t GetMaximumTextureSize() override;
         virtual uint32_t GetUniformBufferAlignment() override;
 
+        virtual Ref<Queue> GetGraphicsQueue() override { return m_GraphicsQueue; }
+
     public:
         vk::PhysicalDevice GetVKPhysicalDevice() const { return m_PhysicalDevice; }
         vk::Device GetVKLogicalDevice() const { return m_LogicalDevice; }
-        vk::Queue GetVKGraphicsQueue() const { return m_GraphicsQueue; }
+        uint32_t GetVKGraphicsQueueFamily() const { return m_GraphicsQueueFamily; }
         vma::Allocator GetVMAAllocator() const { return m_Allocator; }
 
     private:
@@ -56,7 +53,7 @@ namespace Nebula::Graphics
         vma::Allocator m_Allocator;
 
         uint32_t m_GraphicsQueueFamily;
-        vk::Queue m_GraphicsQueue;
+        Ref<Queue> m_GraphicsQueue;
 
         static bool s_InstanceInitialized;
         static vk::Instance s_Instance;

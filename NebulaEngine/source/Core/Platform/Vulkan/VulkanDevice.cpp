@@ -6,9 +6,9 @@
 
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 #include "vk_mem_alloc.hpp"
-#include "VulkanFence.h"
+#include "VulkanBuffer.h"
 #include "VulkanFramebuffer.h"
-#include "VulkanSemaphore.h"
+#include "VulkanQueue.h"
 #include "VulkanSwapChain.h"
 #include "volk/volk.h"
 
@@ -130,7 +130,7 @@ namespace Nebula::Graphics
         deviceCreateInfo.pEnabledFeatures = &enabledVKFeatures;
         m_LogicalDevice = m_PhysicalDevice.createDevice(deviceCreateInfo);
 
-        m_GraphicsQueue = m_LogicalDevice.getQueue(m_GraphicsQueueFamily, 0);
+        m_GraphicsQueue = CreateRef<VulkanQueue>(this, Queue::QueueType::Graphics);
 
         vma::VulkanFunctions vkFunctions;
         vkFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
@@ -160,12 +160,35 @@ namespace Nebula::Graphics
         surface->SetDevice(&m_PhysicalDevice, &m_LogicalDevice, nullptr);
     }
 
-    Ref<VertexBuffer> VulkanDevice::CreateVertexBuffer(uint32_t size) {}
-    Ref<VertexBuffer> VulkanDevice::CreateVertexBuffer(const void* data, uint32_t size) {}
-    Ref<IndexBuffer> VulkanDevice::CreateIndexBuffer(uint32_t count) {}
-    Ref<IndexBuffer> VulkanDevice::CreateIndexBuffer(uint16_t* data, uint32_t count) {}
-    Ref<IndexBuffer> VulkanDevice::CreateIndexBuffer(uint32_t* data, uint32_t count) {}
-    Ref<UniformBuffer> VulkanDevice::CreateUniformBuffer(const BufferLayout& layout, uint32_t instances) {}
+    Ref<VertexBuffer> VulkanDevice::CreateVertexBuffer(uint32_t size)
+    {
+        return CreateRef<VulkanVertexBuffer>(this, size);
+    }
+
+    Ref<VertexBuffer> VulkanDevice::CreateVertexBuffer(const void* data, uint32_t size)
+    {
+        return CreateRef<VulkanVertexBuffer>(this, data, size);
+    }
+
+    Ref<IndexBuffer> VulkanDevice::CreateIndexBuffer(uint32_t count)
+    {
+        return CreateRef<VulkanIndexBuffer>(this, count);
+    }
+
+    Ref<IndexBuffer> VulkanDevice::CreateIndexBuffer(uint16_t* data, uint32_t count)
+    {
+        return CreateRef<VulkanIndexBuffer>(this, data, count);
+    }
+
+    Ref<IndexBuffer> VulkanDevice::CreateIndexBuffer(uint32_t* data, uint32_t count)
+    {
+        return CreateRef<VulkanIndexBuffer>(this, data, count);
+    }
+
+    Ref<UniformBuffer> VulkanDevice::CreateUniformBuffer(const BufferLayout& layout, uint32_t instances)
+    {
+        return CreateRef<VulkanUniformBuffer>(this, layout, instances);
+    }
 
     Ref<Texture2D> VulkanDevice::CreateTexture2D(uint32_t width, uint32_t height, const Texture::TextureSpecification& spec)
     {
@@ -182,8 +205,7 @@ namespace Nebula::Graphics
         return CreateRef<VulkanFramebuffer>(this, spec);
     }
 
-    Ref<Framebuffer> VulkanDevice::CreateFramebufferForSwapchain(const FramebufferSpecification& spec,
-        uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture)
+    Ref<Framebuffer> VulkanDevice::CreateFramebufferForSwapchain(const FramebufferSpecification& spec, uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture)
     {
         return CreateRef<VulkanFramebuffer>(this, spec, swapchainTextureIndex, swapchainTexture);
     }
@@ -195,21 +217,16 @@ namespace Nebula::Graphics
 
     Ref<Shader> VulkanDevice::CreateShader(const std::filesystem::path& path) {}
 
-    Ref<ShaderPipeline> VulkanDevice::CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout,
-        const PipelineSpecification& spec) {}
+    Ref<ShaderPipeline> VulkanDevice::CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout, const PipelineSpecification& spec) {}
 
-    Ref<CommandBuffer> VulkanDevice::CreateCommandBuffer() {}
-
-    Ref<Semaphore> VulkanDevice::CreateSemaphore()
+    uint32_t VulkanDevice::GetMaximumTextureSize()
     {
-        return CreateRef<VulkanSemaphore>(this);
+        vk::PhysicalDeviceProperties properties = m_PhysicalDevice.getProperties();
+        return properties.limits.maxImageDimension2D;
     }
 
-    Ref<Fence> VulkanDevice::CreateFence(bool signaled)
-    {
-        return CreateRef<VulkanFence>(this, signaled);
+    uint32_t VulkanDevice::GetUniformBufferAlignment() {
+        vk::PhysicalDeviceProperties properties = m_PhysicalDevice.getProperties();
+        return properties.limits.minUniformBufferOffsetAlignment;
     }
-
-    uint32_t VulkanDevice::GetMaximumTextureSize() {}
-    uint32_t VulkanDevice::GetUniformBufferAlignment() {}
 }

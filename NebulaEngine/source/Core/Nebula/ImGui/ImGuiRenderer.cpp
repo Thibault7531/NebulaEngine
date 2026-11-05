@@ -112,7 +112,7 @@ namespace Nebula
         });
         renderer_data.indexBuffer = renderer_data.device->CreateIndexBuffer(drawData->TotalIdxCount > 0 ? drawData->TotalIdxCount * sizeof(ImDrawIdx) : 3);
         Ref<Graphics::VertexArray> vertexArray = Graphics::VertexArray::Create();
-        Ref<Graphics::CommandBuffer> commandBuffer = renderer_data.device->CreateCommandBuffer();
+        Ref<Graphics::CommandBuffer> commandBuffer = renderer_data.device->GetGraphicsQueue()->CreateCommandBuffer();
         ViewportData* viewport_data = static_cast<ViewportData*>(drawData->OwnerViewport->PlatformUserData);
         Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(viewport_data->Swapchain->GetCurrentFrame(), false);
         SetupRenderState(*drawData, width, height, renderPass, vertexArray);
@@ -157,7 +157,7 @@ namespace Nebula
         }
 
         renderPass->EndRenderPass();
-        commandBuffer->Commit();
+        Application::Get().GetDevice()->GetGraphicsQueue()->SubmitCommandBuffer(commandBuffer);
     }
 
     void ImGuiRenderer::CreateTexture(ImTextureData& textureData)

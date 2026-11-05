@@ -73,11 +73,6 @@ namespace Nebula::Graphics
         return CreateRef<OpenGL460ShaderPipeline>(std::dynamic_pointer_cast<OpenGLShader>(shader), layout, spec);
     }
 
-    Ref<CommandBuffer> OpenGL460Device::CreateCommandBuffer()
-    {
-        return CreateRef<OpenGL460CommandBuffer>();
-    }
-
     uint32_t OpenGL460Device::GetMaximumTextureSize()
     {
         int32_t size = 0;

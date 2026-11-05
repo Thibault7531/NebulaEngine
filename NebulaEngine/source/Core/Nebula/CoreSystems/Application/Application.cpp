@@ -145,7 +145,7 @@ namespace Nebula
 
 	void Application::Render()
 	{
-		m_MainWindow->GetSurface()->NewFrame();
+		m_Swapchain->NewFrame();
 
 		std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
 		const Timestep timestep = std::chrono::duration_cast<std::chrono::steady_clock::duration>(time - m_LastFrameTime).count() / 1000000000.f;
@@ -168,7 +168,7 @@ namespace Nebula
 			m_ImGuiLayer->End();
 		}
 
-		m_Swapchain->Present(nullptr);
+		m_Swapchain->Present();
 	}
 
 	void Application::Shutdown()

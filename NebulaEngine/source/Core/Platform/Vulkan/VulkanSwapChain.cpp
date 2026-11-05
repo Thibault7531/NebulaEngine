@@ -1,5 +1,6 @@
 #include "VulkanSwapChain.h"
 
+#include "VulkanQueue.h"
 #include "VulkanTexture.h"
 
 namespace Nebula::Graphics
@@ -28,9 +29,14 @@ namespace Nebula::Graphics
 
     void VulkanSwapChain::NewFrame()
     {
-        m_Fences[m_CurrentFrameIndex]->Wait();
+        vk::Result result = m_Device->GetVKLogicalDevice().waitForFences(1, &m_FrameSlots[m_CurrentFrameSlotIndex + 1].Fence, true, UINT64_MAX);
+        if (result != vk::Result::eSuccess)
+        {
+            NB_CORE_ERROR("Failed to wait for fence: {}", static_cast<int>(result));
+            return;
+        }
 
-        vk::Result result = m_Device->GetVKLogicalDevice().acquireNextImageKHR(m_Swapchain, 0, m_ImageAcquiredSemaphores[m_CurrentFrameIndex]->GetVulkanSemaphore(), nullptr, &m_CurrentFramebufferIndex);
+        result = m_Device->GetVKLogicalDevice().acquireNextImageKHR(m_Swapchain, UINT64_MAX, m_FrameSlots[m_CurrentFrameSlotIndex + 1].ImageAcquiredSemaphore, nullptr, &m_CurrentFrameIndex);
         if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
         {
             Invalidate();
@@ -43,28 +49,33 @@ namespace Nebula::Graphics
             return;
         }
 
-        m_Fences[m_CurrentFrameIndex]->Reset();
+        result = m_Device->GetVKLogicalDevice().resetFences(1, &m_FrameSlots[m_CurrentFrameSlotIndex + 1].Fence);
+        if (result != vk::Result::eSuccess)
+        {
+            NB_CORE_ERROR("Failed to reset fence: {}", static_cast<int>(result));
+            return;
+        }
+
+        Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
+        graphicsQueue->NewFrame(m_FrameSlots[m_CurrentFrameSlotIndex].RenderCompleteSemaphore);
     }
 
-    Ref<Framebuffer> VulkanSwapChain::GetCurrentFrame() { return m_Framebuffers[m_CurrentFramebufferIndex]; }
+    Ref<Framebuffer> VulkanSwapChain::GetCurrentFrame() { return m_Framebuffers[m_CurrentFrameIndex]; }
 
-    void VulkanSwapChain::Present(Ref<Semaphore> renderCompleteSemaphore)
+    void VulkanSwapChain::Present()
     {
-        vk::Semaphore renderCompleteVKSemaphore = nullptr;
-        if (renderCompleteSemaphore)
-        {
-            renderCompleteVKSemaphore = std::dynamic_pointer_cast<VulkanSemaphore>(renderCompleteSemaphore)->GetVulkanSemaphore();
-        }
+        Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
+        graphicsQueue->EndFrame(m_FrameSlots[m_CurrentFrameSlotIndex].ImageAcquiredSemaphore);
 
         vk::PresentInfoKHR presentInfo;
         presentInfo.sType = vk::StructureType::ePresentInfoKHR;
-        presentInfo.waitSemaphoreCount = renderCompleteVKSemaphore ? 1 : 0;
-        presentInfo.pWaitSemaphores = renderCompleteVKSemaphore ? &renderCompleteVKSemaphore : nullptr;
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = &m_FrameSlots[m_CurrentFrameSlotIndex].RenderCompleteSemaphore;
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = &m_Swapchain;
-        presentInfo.pImageIndices = &m_CurrentFramebufferIndex;
+        presentInfo.pImageIndices = &m_CurrentFrameSlotIndex;
 
-        vk::Result result = m_Device->GetVKGraphicsQueue().presentKHR(&presentInfo);
+        vk::Result result = graphicsQueue->GetVKQueue().presentKHR(&presentInfo);
         if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
         {
             Invalidate();
@@ -76,7 +87,7 @@ namespace Nebula::Graphics
             return;
         }
 
-        m_CurrentFrameIndex = (m_CurrentFrameIndex + 1) % m_MaxFramesInFlight;
+        m_CurrentFrameSlotIndex = (m_CurrentFrameSlotIndex + 1) % m_MaxFramesInFlight;
     }
 
     void VulkanSwapChain::Invalidate()
@@ -85,14 +96,15 @@ namespace Nebula::Graphics
         {
             m_Device->GetVKLogicalDevice().waitIdle();
 
-            for (auto& semaphore : m_ImageAcquiredSemaphores)
+            for (auto& slot : m_FrameSlots)
             {
-                semaphore.reset();
+                m_Device->GetVKLogicalDevice().destroyFence(slot.Fence);
+                m_Device->GetVKLogicalDevice().destroySemaphore(slot.ImageAcquiredSemaphore);
+                m_Device->GetVKLogicalDevice().destroySemaphore(slot.RenderCompleteSemaphore);
             }
-
-            for (auto& fence : m_Fences)
+            for (auto& framebuffer : m_Framebuffers)
             {
-                fence.reset();
+                framebuffer.reset();
             }
         }
 
@@ -118,22 +130,26 @@ namespace Nebula::Graphics
         swapchainCreateInfo.oldSwapchain = m_Swapchain;
         m_Swapchain = m_Device->GetVKLogicalDevice().createSwapchainKHR(swapchainCreateInfo);
 
-        m_MaxFramesInFlight = surfaceCapabilities.maxImageCount == 0 ? 3 : surfaceCapabilities.maxImageCount;
-        m_Framebuffers = std::vector<Ref<Framebuffer>>(m_MaxFramesInFlight);
+        vk::FenceCreateInfo fenceCreateInfo;
+        fenceCreateInfo.sType = vk::StructureType::eFenceCreateInfo;
+        fenceCreateInfo.flags = vk::FenceCreateFlagBits::eSignaled;
+
+        vk::SemaphoreCreateInfo semaphoreCreateInfo;
+        semaphoreCreateInfo.sType = vk::StructureType::eSemaphoreCreateInfo;
+
         std::vector<vk::Image> swapchainImages = m_Device->GetVKLogicalDevice().getSwapchainImagesKHR(m_Swapchain);
+        m_MaxFramesInFlight = std::min(3, static_cast<int32_t>(swapchainImages.size()));
+        m_FrameSlots = std::vector<VulkanFrameSlot>(m_MaxFramesInFlight);
+        m_Framebuffers = std::vector<Ref<Framebuffer>>(swapchainImages.size());
         for (uint32_t index = 0; index < swapchainImages.size(); index++)
         {
             Ref<Texture2D> texture = CreateRef<VulkanTexture2D>(m_Device, swapchainExtent.width, swapchainExtent.height, swapchainImages[index], m_FramebufferSpec.AttachmentSpec.Attachments[m_SwapchainTextureIndex]);
             m_Framebuffers[index] = m_Device->CreateFramebufferForSwapchain(m_FramebufferSpec, m_SwapchainTextureIndex, texture);
+            m_FrameSlots[index].Fence = m_Device->GetVKLogicalDevice().createFence(fenceCreateInfo);
+            m_FrameSlots[index].ImageAcquiredSemaphore = m_Device->GetVKLogicalDevice().createSemaphore(semaphoreCreateInfo);
+            m_FrameSlots[index].RenderCompleteSemaphore = m_Device->GetVKLogicalDevice().createSemaphore(semaphoreCreateInfo);
         }
-        m_Fences = std::vector<Ref<VulkanFence>>(m_MaxFramesInFlight);
-        m_ImageAcquiredSemaphores = std::vector<Ref<VulkanSemaphore>>(m_MaxFramesInFlight);
-        for (uint32_t index = 0; index < m_MaxFramesInFlight; index++)
-        {
-            m_Fences[index] = std::dynamic_pointer_cast<VulkanFence>(m_Device->CreateFence(true));
-            m_ImageAcquiredSemaphores[index] = std::dynamic_pointer_cast<VulkanSemaphore>(m_Device->CreateSemaphore());
-        }
-        m_CurrentFrameIndex = 0;
+        m_CurrentFrameSlotIndex = 0;
 
         if (swapchainCreateInfo.oldSwapchain)
         {

@@ -32,15 +32,12 @@ namespace Nebula::Graphics
         virtual Ref<Shader> CreateShader(const std::filesystem::path& path) override;
         virtual Ref<ShaderPipeline> CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout, const PipelineSpecification& spec) override;
 
-        virtual Ref<CommandBuffer> CreateCommandBuffer() override;
-
-        virtual Ref<Semaphore> CreateSemaphore() override { return nullptr; }
-        virtual Ref<Fence> CreateFence(bool signaled) override { return nullptr; }
-
 
     public:
         virtual uint32_t GetMaximumTextureSize() override;
         virtual uint32_t GetUniformBufferAlignment() override;
+
+        virtual Ref<Queue> GetGraphicsQueue() override { return nullptr; }
 
     public:
         static Ref<Device> CreateDefaultDevice();

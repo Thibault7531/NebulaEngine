@@ -10,8 +10,9 @@ namespace Nebula::Graphics
         OpenGL460CommandBuffer() = default;
         ~OpenGL460CommandBuffer() = default;
 
-        virtual Ref<RenderPass> CreateRenderPass(Ref<Framebuffer> framebuffer, bool clear) override;
+        virtual void Begin() override {}
+        virtual void End() override {}
 
-        virtual void Commit() override {}
+        virtual Ref<RenderPass> CreateRenderPass(Ref<Framebuffer> framebuffer, bool clear) override;
     };
 }

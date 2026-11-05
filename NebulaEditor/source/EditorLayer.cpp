@@ -133,10 +133,10 @@ namespace Nebula {
             DoesViewportFit = true;
         }
 
-        Ref<Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
+        Ref<Graphics::CommandBuffer> commandBuffer = m_Device->GetGraphicsQueue()->CreateCommandBuffer();
         Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), true);
         renderPass->EndRenderPass();
-        commandBuffer->Commit();
+        Application::Get().GetDevice()->GetGraphicsQueue()->SubmitCommandBuffer(commandBuffer);
 
         SceneRenderer::RenderSceneEditor(m_Scene, m_Camera, m_Framebuffer);
     }
