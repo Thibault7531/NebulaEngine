@@ -241,7 +241,14 @@ namespace Nebula
             { Graphics::ShaderDataType::Float2, "a_UV" },
             { Graphics::ShaderDataType::UByte4, "a_Color" }
         };
-        renderer_data.shader = renderer_data.shaderLibrary.CreatePipeline("ImGui", pipelineLayout, {.framebufferSpec = {}, .blendState = blendState});
+        Graphics::PipelineSpecification pipelineSpec;
+        pipelineSpec.stages = {
+            { Graphics::ShaderStage::Vertex, renderer_data.shaderLibrary.Get("ImGui"), "vertexMain" },
+            { Graphics::ShaderStage::Fragment, renderer_data.shaderLibrary.Get("ImGui"), "fragmentMain" }
+        };
+        renderer_data.shader = Application::Get().GetDevice()->CreateShaderPipeline(pipelineLayout, pipelineSpec);
+        pipelineSpec.framebufferSpec = {};
+        pipelineSpec.blendState = blendState;
         renderer_data.uniformBuffer = renderer_data.device->CreateUniformBuffer({
             {Graphics::ShaderDataType::Matrix4, "u_ProjectionMatrix"}
         });

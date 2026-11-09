@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
-#include "Nebula/Graphics/Shader.h"
+#include "Nebula/Graphics/ShaderModule.h"
 #include "Nebula/Graphics/Buffers/VertexArray.h"
 #include "Cameras/Camera.h"
 #include "Nebula/CoreSystems/Application/Application.h"
@@ -30,7 +30,7 @@ namespace Nebula
         static constexpr uint32_t MaxTextureSlots = 15;
 
         Ref<Graphics::Device> Device;
-        Graphics::ShaderLibrary ShaderLibrary;
+        Graphics::ShaderModuleLibrary ShaderLibrary;
         Ref<Graphics::VertexArray> QuadVertexArray;
         Ref<Graphics::VertexBuffer> QuadVertexBuffer;
         Ref<Graphics::ShaderPipeline> QuadShader;
@@ -148,9 +148,13 @@ namespace Nebula
         blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
         blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
         Graphics::PipelineSpecification spec;
+        spec.stages = {
+            { Graphics::ShaderStage::Vertex, s_Data.ShaderLibrary.Get("Renderer2D"), "vertexMain" },
+            { Graphics::ShaderStage::Fragment, s_Data.ShaderLibrary.Get("Renderer2D"), "fragmentMain" }
+        };
         spec.framebufferSpec = Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
         spec.blendState = blendState;
-        s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
+        s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
             .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
@@ -190,9 +194,13 @@ namespace Nebula
         blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
         blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
         Graphics::PipelineSpecification spec;
+        spec.stages = {
+            { Graphics::ShaderStage::Vertex, s_Data.ShaderLibrary.Get("Renderer2D"), "vertexMain" },
+            { Graphics::ShaderStage::Fragment, s_Data.ShaderLibrary.Get("Renderer2D"), "fragmentMain" }
+        };
         spec.framebufferSpec = framebuffer->GetSpecification();
         spec.blendState = blendState;
-        s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
+        s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
             .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
@@ -232,9 +240,13 @@ namespace Nebula
         blendState.srcAlphaFactor = Graphics::BlendFactor::SourceAlpha;
         blendState.dstAlphaFactor = Graphics::BlendFactor::OneMinusSourceAlpha;
         Graphics::PipelineSpecification spec;
+        spec.stages = {
+            { Graphics::ShaderStage::Vertex, s_Data.ShaderLibrary.Get("Renderer2D"), "vertexMain" },
+            { Graphics::ShaderStage::Fragment, s_Data.ShaderLibrary.Get("Renderer2D"), "fragmentMain" }
+        };
         spec.framebufferSpec = framebuffer->GetSpecification();
         spec.blendState = blendState;
-        s_Data.QuadShader = s_Data.ShaderLibrary.CreatePipeline("Renderer2D", layout, spec);
+        s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
             .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});

@@ -20,7 +20,7 @@ public:
 
 private:
     Nebula::Ref<Nebula::Graphics::Device> m_Device;
-    Nebula::Graphics::ShaderLibrary m_ShaderLibrary;
+    Nebula::Graphics::ShaderModuleLibrary m_ShaderLibrary;
     Nebula::Ref<Nebula::Graphics::ShaderPipeline> m_SolidColorShader;
     Nebula::Ref<Nebula::Graphics::ShaderPipeline> m_TextureShader;
 

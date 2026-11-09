@@ -4,7 +4,7 @@
 
 #include "CommandBuffer.h"
 #include "Queue.h"
-#include "Shader.h"
+#include "ShaderModule.h"
 #include "SwapChain.h"
 #include "Texture.h"
 #include "Buffers/Buffer.h"
@@ -39,8 +39,8 @@ namespace Nebula::Graphics
 
         virtual Ref<SwapChain> CreateSwapchain(Ref<Surface> surface, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) = 0;
 
-        virtual Ref<Shader> CreateShader(const std::filesystem::path& path) = 0;
-        virtual Ref<ShaderPipeline> CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout,  const PipelineSpecification& spec) = 0;
+        virtual Ref<ShaderModule> CreateShaderModule(const std::filesystem::path& path) = 0;
+        virtual Ref<ShaderPipeline> CreateShaderPipeline(const VertexLayout& layout,  const PipelineSpecification& spec) = 0;
 
     public:
         virtual uint32_t GetMaximumTextureSize() = 0;

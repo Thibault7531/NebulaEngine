@@ -62,15 +62,14 @@ namespace Nebula::Graphics
     Ref<SwapChain> OpenGL460Device::CreateSwapchain(Ref<Surface> surface,
         const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) {}
 
-    Ref<Shader> OpenGL460Device::CreateShader(const std::filesystem::path& path)
+    Ref<ShaderModule> OpenGL460Device::CreateShaderModule(const std::filesystem::path& path)
     {
         return CreateRef<OpenGLShader>(path);
     }
 
-    Ref<ShaderPipeline> OpenGL460Device::CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout,
-        const PipelineSpecification& spec)
+    Ref<ShaderPipeline> OpenGL460Device::CreateShaderPipeline(const VertexLayout& layout, const PipelineSpecification& spec)
     {
-        return CreateRef<OpenGL460ShaderPipeline>(std::dynamic_pointer_cast<OpenGLShader>(shader), layout, spec);
+        return CreateRef<OpenGL460ShaderPipeline>(layout, spec);
     }
 
     uint32_t OpenGL460Device::GetMaximumTextureSize()

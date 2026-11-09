@@ -2,9 +2,8 @@
 
 namespace Nebula::Graphics
 {
-    OpenGL460ShaderPipeline::OpenGL460ShaderPipeline(Ref<OpenGLShader> shader, VertexLayout layout,
-        const PipelineSpecification& spec)
-            : m_Shader{shader}, m_Specification{spec}
+    OpenGL460ShaderPipeline::OpenGL460ShaderPipeline(const VertexLayout& layout, const PipelineSpecification& spec)
+            : m_Specification{spec}
     {}
 
     uint32_t OpenGL460ShaderPipeline::GetUniformBlockLocation(const std::string& uniformBlockName)

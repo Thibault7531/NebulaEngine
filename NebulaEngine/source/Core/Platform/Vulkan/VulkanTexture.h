@@ -32,6 +32,7 @@ namespace Nebula::Graphics
 
     public:
         static vk::Format GetVulkanInternalFormat(InternalFormat format);
+        static uint32_t GetVulkanBytesPerPixel(InternalFormat format);
 
     private:
         TextureSpecification m_Spec;

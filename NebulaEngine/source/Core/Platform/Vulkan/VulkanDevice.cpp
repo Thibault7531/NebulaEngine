@@ -9,6 +9,8 @@
 #include "VulkanBuffer.h"
 #include "VulkanFramebuffer.h"
 #include "VulkanQueue.h"
+#include "VulkanShaderModule.h"
+#include "VulkanShaderPipeline.h"
 #include "VulkanSwapChain.h"
 #include "volk/volk.h"
 
@@ -215,9 +217,15 @@ namespace Nebula::Graphics
         return CreateRef<VulkanSwapChain>(this, surface, framebufferSpec, swapchainTextureIndex);
     }
 
-    Ref<Shader> VulkanDevice::CreateShader(const std::filesystem::path& path) {}
+    Ref<ShaderModule> VulkanDevice::CreateShaderModule(const std::filesystem::path& path)
+    {
+        return CreateRef<VulkanShaderModule>(this, path);
+    }
 
-    Ref<ShaderPipeline> VulkanDevice::CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout, const PipelineSpecification& spec) {}
+    Ref<ShaderPipeline> VulkanDevice::CreateShaderPipeline(const VertexLayout& layout, const PipelineSpecification& spec)
+    {
+        return CreateRef<VulkanShaderPipeline>(this, layout, spec);
+    }
 
     uint32_t VulkanDevice::GetMaximumTextureSize()
     {

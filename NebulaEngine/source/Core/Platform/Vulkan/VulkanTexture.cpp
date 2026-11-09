@@ -73,7 +73,7 @@ namespace Nebula::Graphics
         vma::Allocator allocator = m_Device->GetVMAAllocator();
 
         vma::AllocationCreateInfo allocInfo;
-        allocInfo.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite;
+        allocInfo.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead | vma::AllocationCreateFlagBits::eMapped;
         allocInfo.usage = vma::MemoryUsage::eAuto;
 
         auto [allocation, image] = allocator.createImage(imageCreateInfo, allocInfo, &m_AllocationInfo);
@@ -101,7 +101,30 @@ namespace Nebula::Graphics
 
     void VulkanTexture2D::SetData(void* data, uint32_t size, DataFormat format, DataType dataType)
     {
-        memcpy(m_AllocationInfo.pMappedData, data, size);
+        vk::DeviceSize imageSize = m_Width * m_Height * GetVulkanBytesPerPixel(m_Spec.InternalFormat);
+
+        vk::BufferCreateInfo bufferCreateInfo;
+        bufferCreateInfo.sType = vk::StructureType::eBufferCreateInfo;
+        bufferCreateInfo.size = imageSize;
+        bufferCreateInfo.usage = vk::BufferUsageFlagBits::eTransferSrc;
+        bufferCreateInfo.sharingMode = vk::SharingMode::eExclusive;
+
+        vma::AllocationCreateInfo allocationCreateInfo;
+        allocationCreateInfo.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead | vma::AllocationCreateFlagBits::eMapped;
+        allocationCreateInfo.usage = vma::MemoryUsage::eAuto;
+
+        vk::Buffer stagingBuffer;
+        vma::Allocation stagingBufferAllocation;
+        vma::AllocationInfo stagingBufferAllocationInfo;
+        auto [allocation, buffer] = m_Device->GetVMAAllocator().createBuffer(bufferCreateInfo, allocationCreateInfo, &stagingBufferAllocationInfo);
+        stagingBuffer = buffer;
+        stagingBufferAllocation = allocation;
+
+        memcpy(stagingBufferAllocationInfo.pMappedData, data, size);
+
+        NB_CORE_ASSERT(false, "Texture data upload not implemented yet! This will require command buffers and a transfer queue.");
+
+        m_Device->GetVMAAllocator().destroyBuffer(stagingBuffer, stagingBufferAllocation);
     }
 
     std::vector<uint8_t> VulkanTexture2D::GetDataR8()
@@ -150,5 +173,19 @@ namespace Nebula::Graphics
         case InternalFormat::Depth24Stencil8: return vk::Format::eD24UnormS8Uint;
         }
         return vk::Format::eUndefined;
+    }
+
+    uint32_t VulkanTexture2D::GetVulkanBytesPerPixel(InternalFormat format)
+    {
+        switch (format)
+        {
+        case InternalFormat::None: return 0;
+        case InternalFormat::RGB8: return 3;
+        case InternalFormat::RGBA8: return 4;
+        case InternalFormat::R32I: return 4;
+        case InternalFormat::R32UI: return 4;
+        case InternalFormat::Depth24Stencil8: return 4;
+        }
+        return 0;
     }
 }

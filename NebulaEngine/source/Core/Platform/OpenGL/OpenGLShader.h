@@ -6,12 +6,12 @@
 #include <string>
 #include <glad/gl.h>
 
-#include "Nebula/Graphics/Shader.h"
+#include "Nebula/Graphics/ShaderModule.h"
 #include "Nebula/Graphics/Buffers/Buffer.h"
 
 namespace Nebula::Graphics {
 
-	class OpenGLShader : public Shader
+	class OpenGLShader : public ShaderModule
 	{
 	public:
 		OpenGLShader(const std::filesystem::path& filepath);

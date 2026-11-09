@@ -161,6 +161,10 @@ namespace Nebula::Graphics
 
 	uint32_t Metal3Shader::GetUniformBlockLocation(const std::string& uniformBlockName)
 	{
+    	if (m_Layout.ResourceIndex.find(uniformBlockName) == m_Layout.ResourceIndex.end())
+		{
+			return 0;
+		}
     	ResourceBinding resource = m_Layout.Resources[m_Layout.ResourceIndex[uniformBlockName]];
     	return resource.Binding;
 	}

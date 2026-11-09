@@ -32,8 +32,8 @@ namespace Nebula::Graphics
 
         virtual Ref<SwapChain> CreateSwapchain(Ref<Surface> surface, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) override;
 
-        virtual Ref<Shader> CreateShader(const std::filesystem::path& path) override;
-        virtual Ref<ShaderPipeline> CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout, const PipelineSpecification& spec) override;
+        virtual Ref<ShaderModule> CreateShaderModule(const std::filesystem::path& path) override;
+        virtual Ref<ShaderPipeline> CreateShaderPipeline(const VertexLayout& layout, const PipelineSpecification& spec) override;
 
     public:
         virtual uint32_t GetMaximumTextureSize() override;

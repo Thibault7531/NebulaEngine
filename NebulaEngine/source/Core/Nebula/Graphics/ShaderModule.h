@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <glm/glm.hpp>
 
-#include "ShaderPipeline.h"
 #include "Nebula/CoreSystems/Core/Core.h"
 
 namespace Nebula::Graphics
@@ -34,32 +33,30 @@ namespace Nebula::Graphics
         uint32_t VertexBufferLocation;
     };
 
-    class Shader
+    class ShaderModule
     {
     public:
-        virtual ~Shader() = default;
+        virtual ~ShaderModule() = default;
 
         [[nodiscard]] virtual const std::string& GetName() const = 0;
     };
 
-    class ShaderLibrary
+    class ShaderModuleLibrary
     {
     public:
-        ShaderLibrary() = default;
-        ~ShaderLibrary();
+        ShaderModuleLibrary() = default;
+        ~ShaderModuleLibrary();
 
-        void Add(const std::string& name, const Ref<Shader>& shader);
-        void Add(const Ref<Shader>& shader);
-        Ref<Shader> Load(const std::filesystem::path& filepath);
-        Ref<Shader> Load(const std::string& name, const std::filesystem::path& filepath);
+        void Add(const std::string& name, const Ref<ShaderModule>& shader);
+        void Add(const Ref<ShaderModule>& shader);
+        Ref<ShaderModule> Load(const std::filesystem::path& filepath);
+        Ref<ShaderModule> Load(const std::string& name, const std::filesystem::path& filepath);
         void Clear();
 
-        Ref<Shader> Get(const std::string& name);
+        Ref<ShaderModule> Get(const std::string& name);
 
         [[nodiscard]] bool Exists(const std::string& name) const;
-
-        Ref<ShaderPipeline> CreatePipeline(const std::string& shaderName, const VertexLayout& layout, const PipelineSpecification& spec);
     private:
-        std::unordered_map<std::string, Ref<Shader>> m_Shaders;
+        std::unordered_map<std::string, Ref<ShaderModule>> m_Shaders;
     };
 }

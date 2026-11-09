@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ShaderModule.h"
 #include "Buffers/Framebuffer.h"
 
 namespace Nebula::Graphics
@@ -170,8 +171,16 @@ namespace Nebula::Graphics
         BlendOperation alphaOperation = BlendOperation::Add;
     };
 
+    struct Stage
+    {
+        ShaderStage ShaderStage;
+        Ref<ShaderModule> Module;
+        std::string EntryPoint;
+    };
+
     struct PipelineSpecification
     {
+        std::vector<Stage> stages;
         FramebufferSpecification framebufferSpec;
         BlendState blendState;
     };

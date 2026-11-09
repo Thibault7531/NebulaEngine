@@ -4,7 +4,7 @@
 #include <slang.h>
 
 #include "Metal/Metal.hpp"
-#include "Nebula/Graphics/Shader.h"
+#include "Nebula/Graphics/ShaderModule.h"
 
 namespace Nebula::Graphics
 {
@@ -16,7 +16,7 @@ namespace Nebula::Graphics
         uint32_t byteOffset;
     };
 
-    class Metal3Shader : public Shader
+    class Metal3Shader : public ShaderModule
     {
     public:
         Metal3Shader(MTL::Device* device, const std::filesystem::path& path);
