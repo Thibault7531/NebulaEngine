@@ -30,6 +30,8 @@ private:
 
     Nebula::Ref<Nebula::Graphics::Texture2D> m_Texture, m_Glass;
 
+    std::vector<Nebula::Ref<Nebula::Graphics::CommandBuffer>> m_CommandBuffers;
+
     Nebula::OrthographicCameraController m_CameraController;
 
     glm::vec3 m_Position;

@@ -112,6 +112,7 @@ namespace Nebula::Graphics
         enabledVK12Features.descriptorBindingVariableDescriptorCount = true;
         enabledVK12Features.runtimeDescriptorArray = true;
         enabledVK12Features.bufferDeviceAddress = true;
+        enabledVK12Features.timelineSemaphore = true;
 
         vk::PhysicalDeviceVulkan13Features enabledVK13Features;
         enabledVK13Features.sType = vk::StructureType::ePhysicalDeviceVulkan13Features;
@@ -119,18 +120,26 @@ namespace Nebula::Graphics
         enabledVK13Features.synchronization2 = true;
         enabledVK13Features.dynamicRendering = true;
 
+        vk::PhysicalDeviceVulkan14Features enabledVK14Features;
+        enabledVK14Features.sType = vk::StructureType::ePhysicalDeviceVulkan14Features;
+        enabledVK14Features.pNext = &enabledVK13Features;
+        enabledVK14Features.pushDescriptor = true;
+        enabledVK14Features.dynamicRenderingLocalRead = true;
+
         vk::PhysicalDeviceFeatures enabledVKFeatures;
         enabledVKFeatures.samplerAnisotropy = true;
 
         vk::DeviceCreateInfo deviceCreateInfo;
         deviceCreateInfo.sType = vk::StructureType::eDeviceCreateInfo;
-        deviceCreateInfo.pNext = &enabledVK13Features;
+        deviceCreateInfo.pNext = &enabledVK14Features;
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
         deviceCreateInfo.enabledExtensionCount = deviceExtensions.size();
         deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
         deviceCreateInfo.pEnabledFeatures = &enabledVKFeatures;
         m_LogicalDevice = m_PhysicalDevice.createDevice(deviceCreateInfo);
+
+        VULKAN_HPP_DEFAULT_DISPATCHER.init(m_LogicalDevice);
 
         m_GraphicsQueue = CreateRef<VulkanQueue>(this, Queue::QueueType::Graphics);
 
@@ -160,6 +169,14 @@ namespace Nebula::Graphics
     {
         surface->SetInstance(&s_Instance);
         surface->SetDevice(&m_PhysicalDevice, &m_LogicalDevice, nullptr);
+    }
+
+    void VulkanDevice::WaitIdle()
+    {
+        m_LogicalDevice.waitIdle();
+
+        Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_GraphicsQueue);
+        graphicsQueue->GetVKQueue().waitIdle();
     }
 
     Ref<VertexBuffer> VulkanDevice::CreateVertexBuffer(uint32_t size)

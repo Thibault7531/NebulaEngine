@@ -6,7 +6,7 @@ namespace Nebula::Graphics
             : m_Specification{spec}
     {}
 
-    uint32_t OpenGL460ShaderPipeline::GetUniformBlockLocation(const std::string& uniformBlockName)
+    uint32_t OpenGL460ShaderPipeline::GetUniformBlockBinding(const std::string& uniformBlockName)
     {
         return m_Shader->GetUniformBlockLocation(uniformBlockName);
     }

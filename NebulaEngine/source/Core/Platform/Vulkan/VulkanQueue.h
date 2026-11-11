@@ -19,7 +19,7 @@ namespace Nebula::Graphics
 
     public:
         void NewFrame(vk::Semaphore imageAcquiredSemaphore);
-        void EndFrame(vk::Semaphore renderCompleteSemaphore);
+        void EndFrame(vk::Semaphore renderCompleteSemaphore, vk::Fence frameFence);
 
         vk::Queue GetVKQueue() const { return m_Queue; }
         vk::CommandPool GetVKCommandPool() const { return m_CommandPool; }

@@ -15,5 +15,8 @@ namespace Nebula::Graphics
         virtual void NewFrame() = 0;
         virtual Ref<Framebuffer> GetCurrentFrame() = 0;
         virtual void Present() = 0;
+
+        virtual uint32_t GetMaxFramesInFlight() const = 0;
+        virtual uint32_t GetCurrentFrameIndex() const = 0;
     };
 }

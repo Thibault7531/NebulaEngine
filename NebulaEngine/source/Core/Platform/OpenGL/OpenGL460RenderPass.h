@@ -39,7 +39,7 @@ namespace Nebula::Graphics
         virtual RenderPass& EndRenderPass() override;
 
     private:
-        GLint GetOpenGL460DepthCompareFunction(DepthCompareFunction function);
+        GLint GetOpenGL460DepthCompareFunction(CompareFunction function);
         GLenum GetOpenGL460DataType(BufferDataType type);
         static GLenum GetOpenGL460BlendOperation(BlendOperation operation);
         static GLenum GetOpenGL460BlendFactor(BlendFactor factor);

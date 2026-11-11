@@ -18,9 +18,11 @@ namespace Nebula
         Graphics::ShaderModuleLibrary shaderLibrary;
         Ref<Graphics::ShaderPipeline> shader;
         Ref<Graphics::UniformBuffer> uniformBuffer;
-        Ref<Graphics::VertexBuffer> vertexBuffer;
-        Ref<Graphics::IndexBuffer> indexBuffer;
 
+        uint32_t currentFrameIndex = 0;
+        std::vector<Ref<Graphics::CommandBuffer>> commandBuffers;
+        std::vector<Ref<Graphics::VertexBuffer>> vertexBuffers;
+        std::vector<Ref<Graphics::IndexBuffer>> indexBuffers;
         std::vector<Ref<Graphics::Texture>> textures;
     };
 

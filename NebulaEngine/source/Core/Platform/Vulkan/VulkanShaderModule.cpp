@@ -38,7 +38,7 @@ namespace Nebula::Graphics
         slang::SessionDesc sessionDesc;
         sessionDesc.targets = slangTargets.data();
         sessionDesc.targetCount = slangTargets.size();
-        sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
+        sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_ROW_MAJOR;
         sessionDesc.compilerOptionEntries = slangOptions.data();
         sessionDesc.compilerOptionEntryCount = slangOptions.size();
         Slang::ComPtr<slang::ISession> session;
@@ -73,7 +73,8 @@ namespace Nebula::Graphics
 
             ResourceBinding res{};
             res.Name = var->getName();
-            res.Size = typeLayout->getSize();
+            res.Size = typeLayout->getSize(slang::ParameterCategory::ConstantBuffer);
+            res.Offset = varLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
 
             switch (typeLayout->getKind())
             {
@@ -81,8 +82,8 @@ namespace Nebula::Graphics
             case slang::TypeReflection::Kind::ParameterBlock:
                 {
                     res.Type = ResourceType::UniformBuffer;
-                    res.Binding = varLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
-                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::ConstantBuffer);
+                    res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
                     maxBinding = std::max(res.Binding, maxBinding);
                     break;
                 }
@@ -90,8 +91,8 @@ namespace Nebula::Graphics
             case slang::TypeReflection::Kind::Resource:
                 {
                     res.Type = ResourceType::Texture;
-                    res.Binding = varLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
-                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::ConstantBuffer);
+                    res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
                     maxBinding = std::max(res.Binding, maxBinding);
                     break;
                 }
@@ -99,8 +100,8 @@ namespace Nebula::Graphics
             case slang::TypeReflection::Kind::SamplerState:
                 {
                     res.Type = ResourceType::Sampler;
-                    res.Binding = varLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
-                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::ConstantBuffer);
+                    res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
+                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
                     maxBinding = std::max(res.Binding, maxBinding);
                     break;
                 }

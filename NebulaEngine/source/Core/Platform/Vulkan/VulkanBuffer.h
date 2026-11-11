@@ -17,6 +17,9 @@ namespace Nebula::Graphics
         virtual const BufferLayout& GetLayout() const override { return m_Layout; }
         virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 
+    public:
+        vk::Buffer GetVKBuffer() const { return m_Buffer; }
+
     private:
         VulkanDevice* m_Device;
         BufferLayout m_Layout;
@@ -39,6 +42,9 @@ namespace Nebula::Graphics
 
         virtual uint32_t GetCount() const override { return m_Count; }
         virtual BufferDataType GetDataType() const override { return m_DataType; }
+
+    public:
+        vk::Buffer GetVKBuffer() const { return m_Buffer; }
 
     private:
         VulkanDevice* m_Device;
@@ -63,6 +69,9 @@ namespace Nebula::Graphics
 
         virtual const BufferLayout& GetLayout() const override { return m_Layout; }
         virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
+
+    public:
+        vk::Buffer GetVKBuffer() const { return m_Buffer; }
 
     private:
         VulkanDevice* m_Device;

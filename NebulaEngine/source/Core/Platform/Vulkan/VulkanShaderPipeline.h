@@ -11,8 +11,16 @@ namespace Nebula::Graphics
         VulkanShaderPipeline(Device* device, const VertexLayout& layout, const PipelineSpecification& spec);
         ~VulkanShaderPipeline() override;
 
-        virtual uint32_t GetUniformBlockLocation(const std::string& uniformBlockName) override;
+        virtual ShaderStage GetUniformBlockShaderStage(const std::string& uniformBlockName) override;
+        virtual uint32_t GetUniformBlockBinding(const std::string& uniformBlockName) override;
+        virtual uint32_t GetUniformBlockSet(const std::string& uniformBlockName) override;
+        virtual ResourceBinding GetUniformBlockResourceBinding(const std::string& uniformBlockName) override;
         virtual uint32_t GetVertexInputLocation() override { return 0; }
+
+    public:
+        vk::PipelineLayout GetVKPipelineLayout() const { return m_PipelineLayout; }
+        vk::Pipeline GetVKPipeline() const { return m_Pipeline; }
+        vk::DescriptorType GetVKDescriptorType(ResourceType type);
 
     public:
         static vk::Format GetVulkanVertexFormat(ShaderDataType type);

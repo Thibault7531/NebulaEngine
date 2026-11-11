@@ -12,7 +12,7 @@ namespace Nebula::Graphics
         glDisable(GL_SCISSOR_TEST);
         if (clear) m_Framebuffer->Clear();
         OpenGL460RenderPass::SetCullMode(CullMode::None);
-        OpenGL460RenderPass::SetDepthStencilState(DepthStencilState{DepthCompareFunction::Less, false});
+        OpenGL460RenderPass::SetDepthStencilState(DepthStencilState{false, false, CompareFunction::Less});
         OpenGL460RenderPass::SetViewport(0, 0, m_Framebuffer->GetSpecification().width, m_Framebuffer->GetSpecification().height, 0.f, 1.f);
         glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer->GetBufferID());
     }
@@ -99,7 +99,7 @@ namespace Nebula::Graphics
     RenderPass& OpenGL460RenderPass::SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer,
         uint32_t instanceIndex)
     {
-        uint32_t location = m_CurrentlyBoundShaderPipeline->GetUniformBlockLocation(blockName);
+        uint32_t location = m_CurrentlyBoundShaderPipeline->GetUniformBlockBinding(blockName);
         Ref<OpenGL460UniformBuffer> uniformBuffer = std::dynamic_pointer_cast<OpenGL460UniformBuffer>(buffer);
         glBindBufferRange(GL_UNIFORM_BUFFER, location, uniformBuffer->GetBufferID(), uniformBuffer->GetAlignedStride() * instanceIndex, uniformBuffer->GetLayout().GetStride());
 
@@ -177,18 +177,18 @@ namespace Nebula::Graphics
         return *this;
     }
 
-    GLint OpenGL460RenderPass::GetOpenGL460DepthCompareFunction(DepthCompareFunction function)
+    GLint OpenGL460RenderPass::GetOpenGL460DepthCompareFunction(CompareFunction function)
     {
         switch (function)
         {
-        case DepthCompareFunction::Never: return GL_NEVER;
-        case DepthCompareFunction::Less: return GL_LESS;
-        case DepthCompareFunction::Equal: return GL_EQUAL;
-        case DepthCompareFunction::LessEqual: return GL_LEQUAL;
-        case DepthCompareFunction::Greater: return GL_GREATER;
-        case DepthCompareFunction::NotEqual: return GL_NOTEQUAL;
-        case DepthCompareFunction::GreaterEqual: return GL_GEQUAL;
-        case DepthCompareFunction::Always: return GL_ALWAYS;
+        case CompareFunction::Never: return GL_NEVER;
+        case CompareFunction::Less: return GL_LESS;
+        case CompareFunction::Equal: return GL_EQUAL;
+        case CompareFunction::LessEqual: return GL_LEQUAL;
+        case CompareFunction::Greater: return GL_GREATER;
+        case CompareFunction::NotEqual: return GL_NOTEQUAL;
+        case CompareFunction::GreaterEqual: return GL_GEQUAL;
+        case CompareFunction::Always: return GL_ALWAYS;
         }
     }
 

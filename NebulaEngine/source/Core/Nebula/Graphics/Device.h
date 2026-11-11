@@ -22,6 +22,8 @@ namespace Nebula::Graphics
 
         virtual void SetSurfaceDevice(Ref<Surface> surface) = 0;
 
+        virtual void WaitIdle() = 0;
+
         virtual Ref<VertexBuffer> CreateVertexBuffer(uint32_t size) = 0;
         virtual Ref<VertexBuffer> CreateVertexBuffer(const void* data, uint32_t size) = 0;
 

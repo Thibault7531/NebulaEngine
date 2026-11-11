@@ -23,6 +23,7 @@ namespace Nebula::Graphics
         uint32_t Set;
         uint32_t Binding;
         uint32_t Size;
+        uint32_t Offset;
         uint8_t StageFlags;
     };
 
@@ -31,6 +32,16 @@ namespace Nebula::Graphics
         std::vector<ResourceBinding> Resources;
         std::unordered_map<std::string, uint32_t> ResourceIndex;
         uint32_t VertexBufferLocation;
+
+        uint32_t GetSetCount() const
+        {
+            uint32_t maxSet = 0;
+            for (const auto& resource : Resources)
+            {
+                maxSet = std::max(maxSet, resource.Set);
+            }
+            return maxSet + 1;
+        }
     };
 
     class ShaderModule

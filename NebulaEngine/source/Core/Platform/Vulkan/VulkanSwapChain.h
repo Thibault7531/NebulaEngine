@@ -27,6 +27,9 @@ namespace Nebula::Graphics
         virtual Ref<Framebuffer> GetCurrentFrame() override;
         virtual void Present() override;
 
+        virtual uint32_t GetMaxFramesInFlight() const override { return m_MaxFramesInFlight; }
+        virtual uint32_t GetCurrentFrameIndex() const override { return m_CurrentFrameSlotIndex; }
+
     public:
         void Invalidate();
 
@@ -42,7 +45,7 @@ namespace Nebula::Graphics
         uint8_t m_MaxFramesInFlight;
         uint32_t m_CurrentFrameSlotIndex;
         std::vector<VulkanFrameSlot> m_FrameSlots;
-        uint32_t m_CurrentFrameIndex;
+        uint32_t m_CurrentFrameIndex = 0;
         std::vector<Ref<Framebuffer>> m_Framebuffers;
     };
 }

@@ -31,8 +31,18 @@ namespace Nebula::Graphics
         bool operator==(const Texture2D& other) const override;
 
     public:
+        vk::ImageLayout GetVKImageLayout() const { return m_TextureLayout; }
+        void SetVKImageLayout(vk::ImageLayout layout) { m_TextureLayout = layout; }
+        vk::Image GetVKImage() const { return m_Texture; }
+        vk::ImageView GetVKImageView() const { return m_TextureView; }
+        vk::Sampler GetVKSampler() const { return m_Sampler; }
+
+        void CheckFormatSupport();
+
+    public:
         static vk::Format GetVulkanInternalFormat(InternalFormat format);
         static uint32_t GetVulkanBytesPerPixel(InternalFormat format);
+        static vk::Filter GetVulkanFilterType(FilterType filter);
 
     private:
         TextureSpecification m_Spec;
@@ -43,5 +53,8 @@ namespace Nebula::Graphics
         vma::Allocation m_Allocation;
         vma::AllocationInfo m_AllocationInfo;
         vk::Image m_Texture;
+        vk::ImageView m_TextureView;
+        vk::ImageLayout m_TextureLayout = vk::ImageLayout::eUndefined;
+        vk::Sampler m_Sampler;
     };
 }

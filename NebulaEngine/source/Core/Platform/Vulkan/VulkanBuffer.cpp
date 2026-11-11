@@ -47,6 +47,7 @@ namespace Nebula::Graphics
     void VulkanVertexBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
     {
         memcpy(static_cast<char*>(m_AllocationInfo.pMappedData) + offset, data, size);
+        m_Device->GetVMAAllocator().flushAllocation(m_Allocation, offset, size);
     }
 
     VulkanIndexBuffer::VulkanIndexBuffer(Device* device, uint32_t count)
@@ -114,6 +115,7 @@ namespace Nebula::Graphics
         m_DataType = BufferDataType::UInt16;
         m_Count = count;
         memcpy(static_cast<char*>(m_AllocationInfo.pMappedData) + offset, indices, count * sizeof(uint16_t));
+        m_Device->GetVMAAllocator().flushAllocation(m_Allocation, offset, count * sizeof(uint16_t));
     }
 
     void VulkanIndexBuffer::SetData(uint32_t* indices, uint32_t count, uint32_t offset)
@@ -121,6 +123,7 @@ namespace Nebula::Graphics
         m_DataType = BufferDataType::UInt32;
         m_Count = count;
         memcpy(static_cast<char*>(m_AllocationInfo.pMappedData) + offset, indices, count * sizeof(uint32_t));
+        m_Device->GetVMAAllocator().flushAllocation(m_Allocation, offset, count * sizeof(uint32_t));
     }
 
     VulkanUniformBuffer::VulkanUniformBuffer(Device* device, const BufferLayout& layout, uint32_t instances)

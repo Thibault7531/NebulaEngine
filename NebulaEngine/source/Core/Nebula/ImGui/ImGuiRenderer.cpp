@@ -60,7 +60,7 @@ namespace Nebula
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
 
         renderPass->SetCullMode(Graphics::CullMode::None);
-        renderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Always, .depthWrite = false});
+        renderPass->SetDepthStencilState({.depthWrite = false, .depthCompareFunction = Graphics::CompareFunction::Always});
         renderPass->SetViewport(0, 0, width, height, 0.f, 1.f);
 
         float L = drawData.DisplayPos.x;
@@ -81,8 +81,8 @@ namespace Nebula
         renderer_data.uniformBuffer->SetData(0, &ortho_projection);
         renderPass->SetUniformBlock("ImGuiUBO", renderer_data.uniformBuffer);
 
-        vertexArray->AddVertexBuffer(renderer_data.vertexBuffer);
-        vertexArray->SetIndexBuffer(renderer_data.indexBuffer);
+        vertexArray->AddVertexBuffer(renderer_data.vertexBuffers[renderer_data.currentFrameIndex]);
+        vertexArray->SetIndexBuffer(renderer_data.indexBuffers[renderer_data.currentFrameIndex]);
     }
 
     void ImGuiRenderer::RenderDrawData(ImDrawData* drawData)
@@ -104,16 +104,18 @@ namespace Nebula
             }
         }
 
-        renderer_data.vertexBuffer = renderer_data.device->CreateVertexBuffer(drawData->TotalVtxCount > 0 ? drawData->TotalVtxCount * sizeof(ImDrawVert) : 4);
-        renderer_data.vertexBuffer->SetLayout({
+        ViewportData* viewport_data = static_cast<ViewportData*>(drawData->OwnerViewport->PlatformUserData);
+        renderer_data.currentFrameIndex = viewport_data->Swapchain->GetCurrentFrameIndex();
+        renderer_data.vertexBuffers[renderer_data.currentFrameIndex] = renderer_data.device->CreateVertexBuffer(drawData->TotalVtxCount > 0 ? drawData->TotalVtxCount * sizeof(ImDrawVert) : 4);
+        renderer_data.vertexBuffers[renderer_data.currentFrameIndex]->SetLayout({
             {Graphics::ShaderDataType::Float2, "a_Position"},
             {Graphics::ShaderDataType::Float2, "a_UV"},
             {Graphics::ShaderDataType::UByte4, "a_Color"}
         });
-        renderer_data.indexBuffer = renderer_data.device->CreateIndexBuffer(drawData->TotalIdxCount > 0 ? drawData->TotalIdxCount * sizeof(ImDrawIdx) : 3);
+        renderer_data.indexBuffers[renderer_data.currentFrameIndex] = renderer_data.device->CreateIndexBuffer(drawData->TotalIdxCount > 0 ? drawData->TotalIdxCount : 3);
         Ref<Graphics::VertexArray> vertexArray = Graphics::VertexArray::Create();
-        Ref<Graphics::CommandBuffer> commandBuffer = renderer_data.device->GetGraphicsQueue()->CreateCommandBuffer();
-        ViewportData* viewport_data = static_cast<ViewportData*>(drawData->OwnerViewport->PlatformUserData);
+        Ref<Graphics::CommandBuffer> commandBuffer = renderer_data.commandBuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        commandBuffer->Begin();
         Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(viewport_data->Swapchain->GetCurrentFrame(), false);
         SetupRenderState(*drawData, width, height, renderPass, vertexArray);
 
@@ -129,8 +131,8 @@ namespace Nebula
             const uint32_t vtx_buffer_size = cmdList->VtxBuffer.Size * sizeof(ImDrawVert);
             const uint32_t idx_buffer_size = cmdList->IdxBuffer.Size;
 
-            renderer_data.vertexBuffer->SetData(cmdList->VtxBuffer.Data, vtx_buffer_size, vtxOffset);
-            renderer_data.indexBuffer->SetData((uint16_t*)cmdList->IdxBuffer.Data, idx_buffer_size, idxOffset);
+            renderer_data.vertexBuffers[renderer_data.currentFrameIndex]->SetData(cmdList->VtxBuffer.Data, vtx_buffer_size, vtxOffset);
+            renderer_data.indexBuffers[renderer_data.currentFrameIndex]->SetData((uint16_t*)cmdList->IdxBuffer.Data, idx_buffer_size, idxOffset);
 
             for (uint32_t cmd_i = 0; cmd_i < cmdList->CmdBuffer.Size; cmd_i++)
             {
@@ -148,7 +150,7 @@ namespace Nebula
 
                     renderPass->SetScissor(clip_min.x, clip_min.y, clip_max.x - clip_min.x, clip_max.y - clip_min.y);
                     renderPass->BindTextureToSlot(reinterpret_cast<Graphics::Texture2D*>(cmd->GetTexID()), 0);
-                    renderPass->DrawArrayIndexedOffset(vertexArray, cmd->ElemCount, idxOffset + cmd->IdxOffset * sizeof(ImDrawIdx), vtxOffset/sizeof(ImDrawVert) + cmd->VtxOffset);
+                    renderPass->DrawArrayIndexedOffset(vertexArray, cmd->ElemCount, idxOffset/sizeof(ImDrawIdx) + cmd->IdxOffset, vtxOffset/sizeof(ImDrawVert) + cmd->VtxOffset);
                 }
             }
 
@@ -157,6 +159,7 @@ namespace Nebula
         }
 
         renderPass->EndRenderPass();
+        commandBuffer->End();
         Application::Get().GetDevice()->GetGraphicsQueue()->SubmitCommandBuffer(commandBuffer);
     }
 
@@ -179,6 +182,7 @@ namespace Nebula
     {
         ImGuiIO& io = ImGui::GetIO();
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
+        renderer_data.device->WaitIdle();
 
         uint32_t i = 0;
         bool found = false;
@@ -207,6 +211,7 @@ namespace Nebula
     {
         ImGuiIO& io = ImGui::GetIO();
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
+        renderer_data.device->WaitIdle();
 
         if (textureData.Status == ImTextureStatus_WantCreate)
         {
@@ -239,19 +244,26 @@ namespace Nebula
         Graphics::VertexLayout pipelineLayout = {
             { Graphics::ShaderDataType::Float2, "a_Position" },
             { Graphics::ShaderDataType::Float2, "a_UV" },
-            { Graphics::ShaderDataType::UByte4, "a_Color" }
+            { Graphics::ShaderDataType::UByte4, "a_Color"}
         };
         Graphics::PipelineSpecification pipelineSpec;
         pipelineSpec.stages = {
             { Graphics::ShaderStage::Vertex, renderer_data.shaderLibrary.Get("ImGui"), "vertexMain" },
             { Graphics::ShaderStage::Fragment, renderer_data.shaderLibrary.Get("ImGui"), "fragmentMain" }
         };
-        renderer_data.shader = Application::Get().GetDevice()->CreateShaderPipeline(pipelineLayout, pipelineSpec);
-        pipelineSpec.framebufferSpec = {};
+        pipelineSpec.framebufferSpec = Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
         pipelineSpec.blendState = blendState;
+        renderer_data.shader = Application::Get().GetDevice()->CreateShaderPipeline(pipelineLayout, pipelineSpec);
         renderer_data.uniformBuffer = renderer_data.device->CreateUniformBuffer({
             {Graphics::ShaderDataType::Matrix4, "u_ProjectionMatrix"}
         });
+
+        uint32_t maxFramesInFlight = Application::Get().GetMainWindowSwapchain()->GetMaxFramesInFlight();
+        for (uint32_t i = 0; i < maxFramesInFlight; i++) {
+            renderer_data.commandBuffers.push_back(renderer_data.device->GetGraphicsQueue()->CreateCommandBuffer());
+        }
+        renderer_data.vertexBuffers.resize(maxFramesInFlight);
+        renderer_data.indexBuffers.resize(maxFramesInFlight);
     }
 
     void ImGuiRenderer::DestroyDeviceObjects()
@@ -261,8 +273,6 @@ namespace Nebula
 
         renderer_data.shader.reset();
         renderer_data.uniformBuffer.reset();
-        renderer_data.vertexBuffer.reset();
-        renderer_data.indexBuffer.reset();
     }
 
     void ImGuiRenderer::RenderWindow(ImGuiViewport* viewport, void*)

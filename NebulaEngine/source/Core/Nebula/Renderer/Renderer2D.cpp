@@ -157,7 +157,7 @@ namespace Nebula
         s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
-            .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
+            .SetDepthStencilState({.depthCompareFunction = Graphics::CompareFunction::Less, .depthWrite = true});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.getViewProjectionMatrix()));
 
         s_Data.QuadIndexCount = 0;
@@ -203,7 +203,7 @@ namespace Nebula
         s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
-            .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
+            .SetDepthStencilState({.depthCompareFunction = Graphics::CompareFunction::Less, .depthWrite = true});
         glm::mat4 viewProjection = camera.GetProjectionMatrix() * glm::inverse(transform);
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(viewProjection));
 
@@ -249,7 +249,7 @@ namespace Nebula
         s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
-            .SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Less, .depthWrite = true});
+            .SetDepthStencilState({.depthCompareFunction = Graphics::CompareFunction::Less, .depthWrite = true});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.GetViewProjectionMatrix()));
 
         s_Data.QuadIndexCount = 0;

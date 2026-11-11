@@ -5,6 +5,7 @@ namespace Nebula::Graphics
     VulkanFramebuffer::VulkanFramebuffer(Device* device, FramebufferSpecification framebufferSpec)
         : m_Spec{framebufferSpec}, m_Device{device}
     {
+        CheckFormatSupport();
         for (Texture::TextureSpecification attachment : m_Spec.AttachmentSpec.Attachments)
         {
             if (IsDepthStencilFormat(attachment.InternalFormat)) m_DepthAttachmentSpec = attachment;
@@ -19,6 +20,7 @@ namespace Nebula::Graphics
         Ref<Texture2D> swapchainTexture)
             : m_Spec{framebufferSpec}, m_SwapchainTextureIndex{swapchainTextureIndex}, m_SwapchainTexture{std::dynamic_pointer_cast<VulkanTexture2D>(swapchainTexture)}, m_Device{device}
     {
+        CheckFormatSupport();
         for (Texture::TextureSpecification attachment : m_Spec.AttachmentSpec.Attachments)
         {
             if (IsDepthStencilFormat(attachment.InternalFormat)) m_DepthAttachmentSpec = attachment;
@@ -40,6 +42,26 @@ namespace Nebula::Graphics
         m_Spec.width = width;
         m_Spec.height = height;
         Invalidate();
+    }
+
+    void VulkanFramebuffer::CheckFormatSupport()
+    {
+        for (auto& attachmentSpec : m_Spec.AttachmentSpec.Attachments)
+        {
+            switch (attachmentSpec.InternalFormat)
+            {
+                case Texture::InternalFormat::Depth24Stencil8:
+                    {
+                        VulkanDevice* vulkanDevice = dynamic_cast<VulkanDevice*>(m_Device);
+                        vk::FormatProperties formatProperties = vulkanDevice->GetVKPhysicalDevice().getFormatProperties(vk::Format::eD24UnormS8Uint);
+                        if (!(formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment))
+                        {
+                            attachmentSpec.InternalFormat = Texture::InternalFormat::Depth32Stencil8;
+                            CheckFormatSupport();
+                        }
+                    }
+            }
+        }
     }
 
     void VulkanFramebuffer::Invalidate()

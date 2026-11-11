@@ -10,7 +10,7 @@ struct VSInput
 {
     float3 a_Position;
     float4 a_Color;
-    nointerpolation float a_TexIndex;
+    float a_TexIndex;
     float2 a_TexCoord;
     float a_TilingFactor;
     int a_EntityID;
@@ -20,7 +20,7 @@ struct VSOutput
 {
     float4 Position : SV_Position;
     float4 v_Color;
-    float v_TexIndex;
+    nointerpolation float v_TexIndex;
     float2 v_TexCoord;
     float v_TilingFactor;
     int v_EntityID;

@@ -19,7 +19,9 @@ namespace Nebula::Graphics {
         virtual void SetClearDepth(float depth) override { m_ClearDepth = depth; }
         virtual void SetClearStencil(int32_t stencil) override { m_ClearStencil = stencil; }
 
+        virtual uint32_t GetColorAttachmentCount() const override { return m_ColorAttachments.size(); }
         virtual Ref<Texture2D> GetColorAttachment(uint32_t index) const override { return std::dynamic_pointer_cast<Texture2D>(m_ColorAttachments[index]); }
+        virtual Ref<Texture2D> GetSwapchainColorAttachment() const override { return GetColorAttachment(0); }
         virtual const std::vector<Texture::TextureSpecification>& GetColorAttachmentSpecs() const override { return m_ColorAttachmentSpecs; }
         virtual const std::vector<glm::vec4>& GetClearColors() const override { return m_ClearColors; }
         virtual Ref<Texture2D> GetDepthAttachment() const override { return std::dynamic_pointer_cast<Texture2D>(m_DepthAttachment); }

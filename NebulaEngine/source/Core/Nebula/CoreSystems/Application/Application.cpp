@@ -141,6 +141,8 @@ namespace Nebula
 
 			m_MainWindow->OnUpdate();
 		}
+
+		m_Device->WaitIdle();
 	}
 
 	void Application::Render()

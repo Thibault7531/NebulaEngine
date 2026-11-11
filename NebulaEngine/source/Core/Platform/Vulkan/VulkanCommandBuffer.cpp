@@ -1,5 +1,7 @@
 #include "VulkanCommandBuffer.h"
 
+#include "VulkanRenderPass.h"
+
 namespace Nebula::Graphics
 {
     VulkanCommandBuffer::VulkanCommandBuffer(Device* device, Queue* queue)
@@ -35,6 +37,6 @@ namespace Nebula::Graphics
 
     Ref<RenderPass> VulkanCommandBuffer::CreateRenderPass(Ref<Framebuffer> framebuffer, bool clear)
     {
-        return nullptr;
+        return CreateRef<VulkanRenderPass>(m_Device, this, framebuffer, clear);
     }
 }

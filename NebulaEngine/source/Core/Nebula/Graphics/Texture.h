@@ -17,7 +17,8 @@ namespace Nebula::Graphics
             RGBA8,
             R32I,
             R32UI,
-            Depth24Stencil8
+            Depth24Stencil8,
+            Depth32Stencil8
         };
 
         enum class DataFormat

@@ -59,6 +59,7 @@ namespace Nebula::Graphics
         }
         waitSemaphores.push_back(m_Semaphore);
         waitValues.push_back(m_LastSyncPoint.Value);
+        std::vector<vk::PipelineStageFlags> waitStages(waitSemaphores.size(), vk::PipelineStageFlagBits::eAllCommands);
 
         vk::CommandBuffer nativeCommandBuffer;
         if (commandBuffer)
@@ -73,7 +74,7 @@ namespace Nebula::Graphics
 
         vk::TimelineSemaphoreSubmitInfo timelineSemaphoreSubmitInfo;
         timelineSemaphoreSubmitInfo.sType = vk::StructureType::eTimelineSemaphoreSubmitInfo;
-        timelineSemaphoreSubmitInfo.waitSemaphoreValueCount = waitSyncPoints.size();
+        timelineSemaphoreSubmitInfo.waitSemaphoreValueCount = waitValues.size();
         timelineSemaphoreSubmitInfo.pWaitSemaphoreValues = waitValues.data();
         timelineSemaphoreSubmitInfo.signalSemaphoreValueCount = 1;
         timelineSemaphoreSubmitInfo.pSignalSemaphoreValues = &newSyncPoint.Value;
@@ -82,6 +83,7 @@ namespace Nebula::Graphics
         submitInfo.sType = vk::StructureType::eSubmitInfo;
         submitInfo.pNext = &timelineSemaphoreSubmitInfo;
         submitInfo.waitSemaphoreCount = waitSemaphores.size();
+        submitInfo.pWaitDstStageMask = waitStages.data();
         submitInfo.pWaitSemaphores = waitSemaphores.data();
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = &m_Semaphore;
@@ -114,10 +116,13 @@ namespace Nebula::Graphics
         timelineSemaphoreSubmitInfo.signalSemaphoreValueCount = 1;
         timelineSemaphoreSubmitInfo.pSignalSemaphoreValues = &newSyncPoint.Value;
 
+        vk::PipelineStageFlags waitStage[] = { vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands };
+
         vk::SubmitInfo submitInfo;
         submitInfo.sType = vk::StructureType::eSubmitInfo;
         submitInfo.pNext = &timelineSemaphoreSubmitInfo;
         submitInfo.waitSemaphoreCount = waitSemaphores.size();
+        submitInfo.pWaitDstStageMask = waitStage;
         submitInfo.pWaitSemaphores = waitSemaphores.data();
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = &m_Semaphore;
@@ -131,7 +136,7 @@ namespace Nebula::Graphics
         m_LastSyncPoint = newSyncPoint;
     }
 
-    void VulkanQueue::EndFrame(vk::Semaphore renderCompleteSemaphore)
+    void VulkanQueue::EndFrame(vk::Semaphore renderCompleteSemaphore, vk::Fence frameFence)
     {
         std::vector<uint64_t> signalValues = { m_LastSyncPoint.Value + 1, 0 };
         std::vector<vk::Semaphore> signalSemaphores = { m_Semaphore, renderCompleteSemaphore };
@@ -147,15 +152,18 @@ namespace Nebula::Graphics
         timelineSemaphoreSubmitInfo.signalSemaphoreValueCount = signalValues.size();
         timelineSemaphoreSubmitInfo.pSignalSemaphoreValues = signalValues.data();
 
+        vk::PipelineStageFlags waitStage[] = { vk::PipelineStageFlagBits::eAllCommands, vk::PipelineStageFlagBits::eAllCommands };
+
         vk::SubmitInfo submitInfo;
         submitInfo.sType = vk::StructureType::eSubmitInfo;
         submitInfo.pNext = &timelineSemaphoreSubmitInfo;
         submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitDstStageMask = waitStage;
         submitInfo.pWaitSemaphores = &m_Semaphore;
         submitInfo.signalSemaphoreCount = signalSemaphores.size();
         submitInfo.pSignalSemaphores = signalSemaphores.data();
 
-        vk::Result result = m_Queue.submit(1, &submitInfo, nullptr);
+        vk::Result result = m_Queue.submit(1, &submitInfo, frameFence);
         if (result != vk::Result::eSuccess)
         {
             NB_CORE_ERROR("Failed to submit command buffer: {}", static_cast<int>(result));

@@ -133,7 +133,7 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 	renderPass->SetShaderPipeline(m_TextureShader)
 		.SetUniformBlock("RendererUBO", m_RendererUBO, 0)
 		.SetCullMode(Nebula::Graphics::CullMode::Front)
-		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::DepthCompareFunction::Less, .depthWrite = true})
+		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::CompareFunction::Less, .depthWrite = true})
 		.BindTextureToSlot(m_Texture)
 		.DrawArrayIndexed(m_VAO);
 
@@ -142,7 +142,7 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 	renderPass->SetShaderPipeline(m_TextureShader)
 		.SetUniformBlock("RendererUBO", m_RendererUBO, 1)
 		.SetCullMode(Nebula::Graphics::CullMode::Front)
-		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::DepthCompareFunction::Less, .depthWrite = true})
+		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::CompareFunction::Less, .depthWrite = true})
 		.BindTextureToSlot(Nebula::Renderer2D::GetWhiteTexture())
 		.DrawArrayIndexed(m_VAO);
 
@@ -151,7 +151,7 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 	renderPass->SetShaderPipeline(m_TextureShader)
 		.SetUniformBlock("RendererUBO", m_RendererUBO, 2)
 		.SetCullMode(Nebula::Graphics::CullMode::Front)
-		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::DepthCompareFunction::Less, .depthWrite = true})
+		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::CompareFunction::Less, .depthWrite = true})
 		.BindTextureToSlot(m_Glass)
 		.DrawArrayIndexed(m_VAO);
 
@@ -160,7 +160,7 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 	renderPass->SetShaderPipeline(m_ModelShader)
 		.SetUniformBlock("RendererUBO", m_RendererUBO, 3)
 		.SetCullMode(Nebula::Graphics::CullMode::Front)
-		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::DepthCompareFunction::Less, .depthWrite = true});
+		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::CompareFunction::Less, .depthWrite = true});
 	for (auto& mesh : m_Backpack->GetMeshes())
 	{
 		renderPass->DrawArrayIndexed(mesh->GetVertexArray());

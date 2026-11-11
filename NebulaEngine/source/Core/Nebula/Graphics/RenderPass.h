@@ -12,7 +12,7 @@ namespace Nebula::Graphics
         Back
     };
 
-    enum class DepthCompareFunction
+    enum class CompareFunction
     {
         Never,
         Less,
@@ -24,10 +24,31 @@ namespace Nebula::Graphics
         Always
     };
 
+    enum class StencilOperation
+    {
+        Keep,
+        Zero,
+        Replace,
+        Increment,
+        IncrementWrap,
+        Decrement,
+        DecrementWrap,
+        Invert
+    };
+
     struct DepthStencilState
     {
-        DepthCompareFunction depthCompareFunction;
+        bool depthTest;
         bool depthWrite;
+        CompareFunction depthCompareFunction;
+
+        bool stencilTest;
+        uint32_t stencilWriteMask;
+        uint32_t stencilCompareMask;
+        CompareFunction stencilCompareFunction;
+        StencilOperation stencilPassOperation;
+        StencilOperation stencilFailOperation;
+        StencilOperation stencilDepthFailOperation;
     };
 
     class RenderPass

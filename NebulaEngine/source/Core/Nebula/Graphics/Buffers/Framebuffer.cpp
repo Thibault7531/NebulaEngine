@@ -24,6 +24,7 @@ namespace Nebula::Graphics
         switch (format)
         {
         case Texture::InternalFormat::Depth24Stencil8: return true;
+        case Texture::InternalFormat::Depth32Stencil8: return true;
         default: return false;
         }
     }

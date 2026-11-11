@@ -53,7 +53,9 @@ namespace Nebula::Graphics
         virtual void SetClearDepth(float depth) = 0;
         virtual void SetClearStencil(int32_t stencil) = 0;
 
+        virtual uint32_t GetColorAttachmentCount() const = 0;
         virtual Ref<Texture2D> GetColorAttachment(uint32_t index = 0) const = 0;
+        virtual Ref<Texture2D> GetSwapchainColorAttachment() const = 0;
         virtual const std::vector<Texture::TextureSpecification>& GetColorAttachmentSpecs() const = 0;
         virtual const std::vector<glm::vec4>& GetClearColors() const = 0;
         virtual Ref<Texture2D> GetDepthAttachment() const = 0;

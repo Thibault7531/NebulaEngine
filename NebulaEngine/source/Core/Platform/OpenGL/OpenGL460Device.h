@@ -12,6 +12,8 @@ namespace Nebula::Graphics
 
         virtual void SetSurfaceDevice(Ref<Surface> surface) override {}
 
+        virtual void WaitIdle() override {}
+
         virtual Ref<VertexBuffer> CreateVertexBuffer(uint32_t size) override;
         virtual Ref<VertexBuffer> CreateVertexBuffer(const void* data, uint32_t size) override;
 

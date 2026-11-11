@@ -29,14 +29,14 @@ namespace Nebula::Graphics
 
     void VulkanSwapChain::NewFrame()
     {
-        vk::Result result = m_Device->GetVKLogicalDevice().waitForFences(1, &m_FrameSlots[m_CurrentFrameSlotIndex + 1].Fence, true, UINT64_MAX);
+        vk::Result result = m_Device->GetVKLogicalDevice().waitForFences(1, &m_FrameSlots[m_CurrentFrameSlotIndex].Fence, true, UINT64_MAX);
         if (result != vk::Result::eSuccess)
         {
             NB_CORE_ERROR("Failed to wait for fence: {}", static_cast<int>(result));
             return;
         }
 
-        result = m_Device->GetVKLogicalDevice().acquireNextImageKHR(m_Swapchain, UINT64_MAX, m_FrameSlots[m_CurrentFrameSlotIndex + 1].ImageAcquiredSemaphore, nullptr, &m_CurrentFrameIndex);
+        result = m_Device->GetVKLogicalDevice().acquireNextImageKHR(m_Swapchain, UINT64_MAX, m_FrameSlots[m_CurrentFrameSlotIndex].ImageAcquiredSemaphore, nullptr, &m_CurrentFrameIndex);
         if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
         {
             Invalidate();
@@ -49,7 +49,7 @@ namespace Nebula::Graphics
             return;
         }
 
-        result = m_Device->GetVKLogicalDevice().resetFences(1, &m_FrameSlots[m_CurrentFrameSlotIndex + 1].Fence);
+        result = m_Device->GetVKLogicalDevice().resetFences(1, &m_FrameSlots[m_CurrentFrameSlotIndex].Fence);
         if (result != vk::Result::eSuccess)
         {
             NB_CORE_ERROR("Failed to reset fence: {}", static_cast<int>(result));
@@ -57,7 +57,7 @@ namespace Nebula::Graphics
         }
 
         Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
-        graphicsQueue->NewFrame(m_FrameSlots[m_CurrentFrameSlotIndex].RenderCompleteSemaphore);
+        graphicsQueue->NewFrame(m_FrameSlots[m_CurrentFrameSlotIndex].ImageAcquiredSemaphore);
     }
 
     Ref<Framebuffer> VulkanSwapChain::GetCurrentFrame() { return m_Framebuffers[m_CurrentFrameIndex]; }
@@ -65,7 +65,7 @@ namespace Nebula::Graphics
     void VulkanSwapChain::Present()
     {
         Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
-        graphicsQueue->EndFrame(m_FrameSlots[m_CurrentFrameSlotIndex].ImageAcquiredSemaphore);
+        graphicsQueue->EndFrame(m_FrameSlots[m_CurrentFrameSlotIndex].RenderCompleteSemaphore, m_FrameSlots[m_CurrentFrameSlotIndex].Fence);
 
         vk::PresentInfoKHR presentInfo;
         presentInfo.sType = vk::StructureType::ePresentInfoKHR;
