@@ -105,7 +105,6 @@ namespace Nebula::Graphics
 
         const std::vector<const char*> deviceExtensions = {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-            VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
         };
 
         vk::PhysicalDeviceVulkan12Features enabledVK12Features;

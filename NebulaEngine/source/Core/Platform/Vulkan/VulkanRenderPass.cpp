@@ -154,7 +154,7 @@ namespace Nebula::Graphics
         writeDescriptorSet.descriptorType = vk::DescriptorType::eUniformBuffer;
         writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
 
-        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), m_CurrentlyBoundShaderPipeline->GetUniformBlockSet(blockName), 1, &writeDescriptorSet);
+        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), m_CurrentlyBoundShaderPipeline->GetUniformBlockSet(blockName), 1, &writeDescriptorSet);
 
         return *this;
     }
@@ -178,7 +178,7 @@ namespace Nebula::Graphics
         writeDescriptorSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
         writeDescriptorSet.pImageInfo = &descriptorImageInfo;
 
-        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
+        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
 
         return *this;
     }
@@ -202,7 +202,7 @@ namespace Nebula::Graphics
         writeDescriptorSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
         writeDescriptorSet.pImageInfo = &descriptorImageInfo;
 
-        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
+        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
 
         return *this;
     }
