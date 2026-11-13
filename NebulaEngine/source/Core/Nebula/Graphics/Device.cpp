@@ -20,6 +20,7 @@ namespace Nebula::Graphics
         case Platform::GraphicsAPI::None: NB_CORE_ERROR("None is not supported on Windows!"); break;
         case Platform::GraphicsAPI::Metal3: NB_CORE_ERROR("Metal3 is not supported on Windows!"); break;
         case Platform::GraphicsAPI::OpenGL460: return CreateRef<OpenGL460Device>();
+        case Platform::GraphicsAPI::Vulkan: return CreateRef<VulkanDevice>();
         default: NB_CORE_ERROR("No supported Graphics API found!"); break;
         }
 #elifdef NB_PLATFORM_MACOS
@@ -36,7 +37,8 @@ namespace Nebula::Graphics
         case Platform::GraphicsAPI::None: NB_CORE_ERROR("None is not supported on Linux!"); break;
         case Platform::GraphicsAPI::Metal3: NB_CORE_ERROR("Metal3 is not supported on Linux!"); break;
         case Platform::GraphicsAPI::OpenGL460: return CreateRef<OpenGL460Device>();
-        default: return CreateRef<VulkanDevice>(); break;
+        case Platform::GraphicsAPI::Vulkan: return CreateRef<VulkanDevice>();
+        default: NB_CORE_ERROR("No supported Graphics API found!"); break;
         }
 #endif
         return nullptr;

@@ -4,6 +4,9 @@
 #include "VulkanShaderPipeline.h"
 #include "VulkanTexture.h"
 
+#undef near
+#undef far
+
 namespace Nebula::Graphics
 {
     VulkanRenderPass::VulkanRenderPass(Device* device, CommandBuffer* commandBuffer, Ref<Framebuffer> framebuffer, bool clear)
@@ -151,7 +154,7 @@ namespace Nebula::Graphics
         writeDescriptorSet.descriptorType = vk::DescriptorType::eUniformBuffer;
         writeDescriptorSet.pBufferInfo = &descriptorBufferInfo;
 
-        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), m_CurrentlyBoundShaderPipeline->GetUniformBlockSet(blockName), 1, &writeDescriptorSet);
+        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), m_CurrentlyBoundShaderPipeline->GetUniformBlockSet(blockName), 1, &writeDescriptorSet);
 
         return *this;
     }
@@ -175,7 +178,7 @@ namespace Nebula::Graphics
         writeDescriptorSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
         writeDescriptorSet.pImageInfo = &descriptorImageInfo;
 
-        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
+        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
 
         return *this;
     }
@@ -199,7 +202,7 @@ namespace Nebula::Graphics
         writeDescriptorSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
         writeDescriptorSet.pImageInfo = &descriptorImageInfo;
 
-        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
+        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSetKHR(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
 
         return *this;
     }

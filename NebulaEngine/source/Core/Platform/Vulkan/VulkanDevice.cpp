@@ -103,7 +103,10 @@ namespace Nebula::Graphics
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &qfPriorities;
 
-        const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+        const std::vector<const char*> deviceExtensions = {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+            VK_KHR_PUSH_DESCRIPTOR_EXTENSION_NAME,
+        };
 
         vk::PhysicalDeviceVulkan12Features enabledVK12Features;
         enabledVK12Features.sType = vk::StructureType::ePhysicalDeviceVulkan12Features;

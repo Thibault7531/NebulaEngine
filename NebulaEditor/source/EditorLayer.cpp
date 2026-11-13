@@ -419,7 +419,7 @@ namespace Nebula {
         NewScene();
 
         SceneSerializer serializer(m_Scene);
-        serializer.Deserialize(path);
+        serializer.Deserialize(path.string());
     }
 
     void EditorLayer::SaveSceneAs()

@@ -8,7 +8,7 @@
 
 namespace Nebula
 {
-    const std::string s_StartingPath = Platform::Files::GetResourcesPath() / "assets";
+    const std::string s_StartingPath = (Platform::Files::GetResourcesPath() / "assets").string();
 
     ContentBrowserPanel::ContentBrowserPanel()
     {

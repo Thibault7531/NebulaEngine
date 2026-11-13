@@ -73,7 +73,7 @@ namespace Nebula::Graphics
         stbi_uc* data = nullptr;
         {
             NB_PROFILE_SCOPE("stbi_load - VulkanTexture2D::VulkanTexture2D(const std::string&)");
-            data = stbi_load(path.c_str(), &width, &height, &channels, 4);
+            data = stbi_load(path.string().c_str(), &width, &height, &channels, 4);
         }
         NB_CORE_ASSERT(data, "Failed to load image!");
 
