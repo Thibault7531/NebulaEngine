@@ -128,6 +128,7 @@ namespace Nebula::Graphics
 
         vk::PhysicalDeviceFeatures enabledVKFeatures;
         enabledVKFeatures.samplerAnisotropy = true;
+        enabledVKFeatures.independentBlend = true;
 
         vk::DeviceCreateInfo deviceCreateInfo;
         deviceCreateInfo.sType = vk::StructureType::eDeviceCreateInfo;
@@ -241,7 +242,16 @@ namespace Nebula::Graphics
 
     Ref<ShaderPipeline> VulkanDevice::CreateShaderPipeline(const VertexLayout& layout, const PipelineSpecification& spec)
     {
-        return CreateRef<VulkanShaderPipeline>(this, layout, spec);
+        auto it = m_ShaderPipelineCache.find(spec);
+        if (it != m_ShaderPipelineCache.end())
+        {
+            return it->second;
+        }
+
+        Ref<ShaderPipeline> pipeline = CreateRef<VulkanShaderPipeline>(this, layout, spec);
+        m_ShaderPipelineCache[spec] = pipeline;
+
+        return pipeline;
     }
 
     uint32_t VulkanDevice::GetMaximumTextureSize()

@@ -37,7 +37,7 @@ namespace Nebula
         Ref<Graphics::UniformBuffer> QuadUniformBuffer;
         Ref<Graphics::Texture2D> WhiteTexture;
 
-        Ref<Graphics::CommandBuffer> CommandBuffer;
+        std::vector<Ref<Graphics::CommandBuffer>> CommandBuffers;
         Ref<Graphics::RenderPass> RenderPass;
 
         uint32_t QuadIndexCount = 0;
@@ -107,6 +107,12 @@ namespace Nebula
         s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t), Graphics::Texture::DataFormat::RGBA);
 
         s_Data.TextureSlots[0] = s_Data.WhiteTexture;
+
+        s_Data.CommandBuffers.resize(Application::Get().GetMainWindowSwapchain()->GetMaxFramesInFlight());
+        for (uint32_t i = 0; i < s_Data.CommandBuffers.size(); i++)
+        {
+            s_Data.CommandBuffers[i] = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
+        }
     }
 
     void Renderer2D::Shutdown()
@@ -120,6 +126,13 @@ namespace Nebula
         s_Data.WhiteTexture.reset();
         s_Data.ShaderLibrary.Clear();
 
+        s_Data.RenderPass.reset();
+
+        for (uint32_t i = 0; i < s_Data.CommandBuffers.size(); i++)
+        {
+            s_Data.CommandBuffers[i].reset();
+        }
+
         delete s_Data.QuadVertexBufferBase;
 
         for (uint32_t i = 0; i < Renderer2DData::MaxTextureSlots; i++)
@@ -130,8 +143,9 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        s_Data.CommandBuffer = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
-        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), false);
+        Ref<Graphics::CommandBuffer> commandBuffer = s_Data.CommandBuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        commandBuffer->Begin();
+        s_Data.RenderPass = commandBuffer->CreateRenderPass(Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), false);
 
         Graphics::VertexLayout layout = {
             { Graphics::ShaderDataType::Float3, "a_Position" },
@@ -157,7 +171,7 @@ namespace Nebula
         s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
-            .SetDepthStencilState({.depthCompareFunction = Graphics::CompareFunction::Less, .depthWrite = true});
+            .SetDepthStencilState({.depthTest = true, .depthWrite = true, .depthCompareFunction = Graphics::CompareFunction::Less});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.getViewProjectionMatrix()));
 
         s_Data.QuadIndexCount = 0;
@@ -176,8 +190,9 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        s_Data.CommandBuffer = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
-        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, clear);
+        Ref<Graphics::CommandBuffer> commandBuffer = s_Data.CommandBuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        commandBuffer->Begin();
+        s_Data.RenderPass = commandBuffer->CreateRenderPass(framebuffer, clear);
 
         Graphics::VertexLayout layout = {
             { Graphics::ShaderDataType::Float3, "a_Position" },
@@ -203,7 +218,7 @@ namespace Nebula
         s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
-            .SetDepthStencilState({.depthCompareFunction = Graphics::CompareFunction::Less, .depthWrite = true});
+            .SetDepthStencilState({.depthTest = true, .depthWrite = true, .depthCompareFunction = Graphics::CompareFunction::Less});
         glm::mat4 viewProjection = camera.GetProjectionMatrix() * glm::inverse(transform);
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(viewProjection));
 
@@ -222,8 +237,9 @@ namespace Nebula
     {
         NB_PROFILE_FUNCTION();
 
-        s_Data.CommandBuffer = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
-        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, clear);
+        Ref<Graphics::CommandBuffer> commandBuffer = s_Data.CommandBuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        commandBuffer->Begin();
+        s_Data.RenderPass = commandBuffer->CreateRenderPass(framebuffer, clear);
 
         Graphics::VertexLayout layout = {
             { Graphics::ShaderDataType::Float3, "a_Position" },
@@ -249,7 +265,7 @@ namespace Nebula
         s_Data.QuadShader = Application::Get().GetDevice()->CreateShaderPipeline(layout, spec);
 
         s_Data.RenderPass->SetCullMode(Graphics::CullMode::None)
-            .SetDepthStencilState({.depthCompareFunction = Graphics::CompareFunction::Less, .depthWrite = true});
+            .SetDepthStencilState({.depthTest = true, .depthWrite = true, .depthCompareFunction = Graphics::CompareFunction::Less});
         s_Data.QuadUniformBuffer->SetData(0, glm::value_ptr(camera.GetViewProjectionMatrix()));
 
         s_Data.QuadIndexCount = 0;
@@ -278,8 +294,9 @@ namespace Nebula
         Ref<Graphics::Framebuffer> framebuffer = s_Data.RenderPass->GetFramebuffer();
 
         Flush();
-        s_Data.CommandBuffer = s_Data.Device->GetGraphicsQueue()->CreateCommandBuffer();
-        s_Data.RenderPass = s_Data.CommandBuffer->CreateRenderPass(framebuffer, false);
+        s_Data.Device->WaitIdle();
+        Ref<Graphics::CommandBuffer> commandBuffer = s_Data.CommandBuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        s_Data.RenderPass = commandBuffer->CreateRenderPass(framebuffer, false);
 
         s_Data.QuadIndexCount = 0;
         s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
@@ -299,7 +316,9 @@ namespace Nebula
         s_Data.RenderPass->DrawArrayIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 
         s_Data.RenderPass->EndRenderPass();
-        Application::Get().GetDevice()->GetGraphicsQueue()->SubmitCommandBuffer(s_Data.CommandBuffer);
+        Ref<Graphics::CommandBuffer> commandBuffer = s_Data.CommandBuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        commandBuffer->End();
+        s_Data.Device->GetGraphicsQueue()->SubmitCommandBuffer(commandBuffer);
 
         s_Data.Stats.DrawCalls++;
     }

@@ -11,6 +11,8 @@ namespace Nebula::Graphics
         FramebufferAttachmentSpecification() = default;
         FramebufferAttachmentSpecification(std::initializer_list<Texture::TextureSpecification> elements)
             : Attachments(elements) {}
+
+        bool operator==(const FramebufferAttachmentSpecification& other) const = default;
     };
 
     struct FramebufferSpecification
@@ -24,16 +26,7 @@ namespace Nebula::Graphics
 
         bool SwapChainTarget = false;
 
-        uint64_t hash() const
-        {
-            uint64_t hash = 0xcbf29ce484222325ULL;
-            for (auto attachment : AttachmentSpec.Attachments)
-            {
-                hash ^= static_cast<uint32_t>(attachment.InternalFormat);
-                hash *= 0x100000001b3ULL;
-            }
-            return hash;
-        }
+        bool operator==(const FramebufferSpecification& other) const = default;
     };
 
     enum class ColorAttachementDataType

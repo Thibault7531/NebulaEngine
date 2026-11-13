@@ -3,6 +3,8 @@
 #include "VulkanShaderModule.h"
 #include "VulkanTexture.h"
 
+#include <map>
+
 namespace Nebula::Graphics
 {
     VulkanShaderPipeline::VulkanShaderPipeline(Device* device, const VertexLayout& layout, const PipelineSpecification& spec)
@@ -21,30 +23,40 @@ namespace Nebula::Graphics
         std::vector<vk::DescriptorSetLayout> descriptorSetLayouts(pipelineSetCount, nullptr);
         for (uint32_t i = 0; i < pipelineSetCount; i++)
         {
-            std::vector<vk::DescriptorSetLayoutBinding> setBindings;
-            std::vector<Ref<VulkanShaderModule>> shaderModulesParsed;
+            std::map<uint32_t, vk::DescriptorSetLayoutBinding> bindingsByIndex;
             for (const auto& stage : m_Specification.stages)
             {
-                if (std::find(shaderModulesParsed.begin(), shaderModulesParsed.end(), std::dynamic_pointer_cast<VulkanShaderModule>(stage.Module)) != shaderModulesParsed.end())
-                {
-                    continue;
-                }
-                shaderModulesParsed.push_back(std::dynamic_pointer_cast<VulkanShaderModule>(stage.Module));
                 Ref<VulkanShaderModule> vulkanShaderModule = std::dynamic_pointer_cast<VulkanShaderModule>(stage.Module);
                 for (const auto& resource : vulkanShaderModule->GetLayout().Resources)
                 {
                     if (resource.Set == i)
                     {
-                        vk::DescriptorSetLayoutBinding binding;
-                        binding.binding = resource.Binding;
-                        binding.descriptorType = GetVKDescriptorType(resource.Type);
-                        binding.descriptorCount = 1;
-                        binding.stageFlags = vk::ShaderStageFlagBits::eAll;
-                        setBindings.push_back(binding);
+                        const vk::DescriptorType descriptorType = GetVKDescriptorType(resource.Type);
+                        auto [binding, inserted] = bindingsByIndex.try_emplace(resource.Binding);
+                        if (inserted)
+                        {
+                            binding->second.binding = resource.Binding;
+                            binding->second.descriptorType = descriptorType;
+                            binding->second.descriptorCount = resource.DescriptorCount;
+                        }
+                        else
+                        {
+                            NB_CORE_ASSERT(binding->second.descriptorType == descriptorType,
+                                "Vulkan resource binding has conflicting descriptor types");
+                            NB_CORE_ASSERT(binding->second.descriptorCount == resource.DescriptorCount,
+                                "Vulkan resource binding has conflicting descriptor counts");
+                        }
+                        binding->second.stageFlags |= GetVulkanShaderStage(stage.ShaderStage);
                     }
                 }
             }
 
+            std::vector<vk::DescriptorSetLayoutBinding> setBindings;
+            setBindings.reserve(bindingsByIndex.size());
+            for (const auto& [binding, descriptor] : bindingsByIndex)
+            {
+                setBindings.push_back(descriptor);
+            }
             vk::DescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo;
             descriptorSetLayoutCreateInfo.sType = vk::StructureType::eDescriptorSetLayoutCreateInfo;
             descriptorSetLayoutCreateInfo.bindingCount = setBindings.size();
@@ -116,7 +128,9 @@ namespace Nebula::Graphics
             vk::DynamicState::eDepthBoundsTestEnable,
             vk::DynamicState::eDepthBounds,
             vk::DynamicState::eStencilTestEnable,
-            vk::DynamicState::eStencilOp
+            vk::DynamicState::eStencilOp,
+            vk::DynamicState::eStencilCompareMask,
+            vk::DynamicState::eStencilWriteMask,
         };
         vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo;
         dynamicStateCreateInfo.sType = vk::StructureType::ePipelineDynamicStateCreateInfo;
@@ -143,20 +157,37 @@ namespace Nebula::Graphics
         renderingCreateInfo.pColorAttachmentFormats = colorAttachmentFormats.data();
         renderingCreateInfo.depthAttachmentFormat = depthAttachmentFormat;
 
-        vk::PipelineColorBlendAttachmentState blendAttachment;
-        blendAttachment.blendEnable = m_Specification.blendState.enabled;
-        blendAttachment.srcColorBlendFactor = GetVulkanBlendFactor(m_Specification.blendState.srcColorFactor);
-        blendAttachment.dstColorBlendFactor = GetVulkanBlendFactor(m_Specification.blendState.dstColorFactor);
-        blendAttachment.colorBlendOp = GetVulkanBlendOperation(m_Specification.blendState.colorOperation);
-        blendAttachment.srcAlphaBlendFactor = GetVulkanBlendFactor(m_Specification.blendState.srcAlphaFactor);
-        blendAttachment.dstAlphaBlendFactor = GetVulkanBlendFactor(m_Specification.blendState.dstAlphaFactor);
-        blendAttachment.alphaBlendOp = GetVulkanBlendOperation(m_Specification.blendState.alphaOperation);
-        blendAttachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
+        uint32_t colorAttachmentCount = 0;
+        for (const auto& attachmentSpec : m_Specification.framebufferSpec.AttachmentSpec.Attachments)
+        {
+            if (!Framebuffer::IsDepthFormat(attachmentSpec.InternalFormat) && !Framebuffer::IsDepthStencilFormat(attachmentSpec.InternalFormat))
+            {
+                colorAttachmentCount++;
+            }
+        }
 
+        std::vector<vk::PipelineColorBlendAttachmentState> blendAttachments(colorAttachmentCount);
+        for (uint32_t i = 0; i < colorAttachmentCount; i++)
+        {
+            if (i < m_Specification.framebufferSpec.AttachmentSpec.Attachments.size())
+            {
+                Texture::InternalFormat format = m_Specification.framebufferSpec.AttachmentSpec.Attachments[i].InternalFormat;
+                vk::FormatProperties properties = m_Device->GetVKPhysicalDevice().getFormatProperties(VulkanTexture2D::GetVulkanInternalFormat(format));
+
+                blendAttachments[i].blendEnable = m_Specification.blendState.enabled && (properties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eColorAttachmentBlend);
+                blendAttachments[i].srcColorBlendFactor = GetVulkanBlendFactor(m_Specification.blendState.srcColorFactor);
+                blendAttachments[i].dstColorBlendFactor = GetVulkanBlendFactor(m_Specification.blendState.dstColorFactor);
+                blendAttachments[i].colorBlendOp = GetVulkanBlendOperation(m_Specification.blendState.colorOperation);
+                blendAttachments[i].srcAlphaBlendFactor = GetVulkanBlendFactor(m_Specification.blendState.srcAlphaFactor);
+                blendAttachments[i].dstAlphaBlendFactor = GetVulkanBlendFactor(m_Specification.blendState.dstAlphaFactor);
+                blendAttachments[i].alphaBlendOp = GetVulkanBlendOperation(m_Specification.blendState.alphaOperation);
+                blendAttachments[i].colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
+            }
+        }
         vk::PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo;
         colorBlendStateCreateInfo.sType = vk::StructureType::ePipelineColorBlendStateCreateInfo;
-        colorBlendStateCreateInfo.attachmentCount = 1;
-        colorBlendStateCreateInfo.pAttachments = &blendAttachment;
+        colorBlendStateCreateInfo.attachmentCount = blendAttachments.size();
+        colorBlendStateCreateInfo.pAttachments = blendAttachments.data();
 
         vk::PipelineRasterizationStateCreateInfo rasterizationStateCreateInfo;
         rasterizationStateCreateInfo.sType = vk::StructureType::ePipelineRasterizationStateCreateInfo;
@@ -253,6 +284,23 @@ namespace Nebula::Graphics
         return resourceBinding;
     }
 
+    ResourceBinding VulkanShaderPipeline::GetResourceBinding(ResourceType type) const
+    {
+        for (const auto& stage : m_Specification.stages)
+        {
+            const Ref<VulkanShaderModule> module =
+                std::dynamic_pointer_cast<VulkanShaderModule>(stage.Module);
+            for (const auto& resource : module->GetLayout().Resources)
+            {
+                if (resource.Type == type)
+                {
+                    return resource;
+                }
+            }
+        }
+        return {};
+    }
+
     vk::DescriptorType VulkanShaderPipeline::GetVKDescriptorType(ResourceType type)
     {
         switch (type)
@@ -263,6 +311,7 @@ namespace Nebula::Graphics
         case ResourceType::Sampler: return vk::DescriptorType::eSampler;
         case ResourceType::PushConstant: return vk::DescriptorType::eUniformBuffer;
         }
+        return vk::DescriptorType::eUniformBuffer;
     }
 
     vk::Format VulkanShaderPipeline::GetVulkanVertexFormat(ShaderDataType type)

@@ -57,6 +57,8 @@ namespace Nebula::Graphics
         uint32_t m_GraphicsQueueFamily;
         Ref<Queue> m_GraphicsQueue;
 
+        std::unordered_map<PipelineSpecification, Ref<ShaderPipeline>, PipelineSpecificationHash> m_ShaderPipelineCache;
+
         static bool s_InstanceInitialized;
         static vk::Instance s_Instance;
     };

@@ -18,7 +18,7 @@ namespace Nebula::Graphics
 
     VulkanFramebuffer::VulkanFramebuffer(Device* device, FramebufferSpecification framebufferSpec, uint32_t swapchainTextureIndex,
         Ref<Texture2D> swapchainTexture)
-            : m_Spec{framebufferSpec}, m_SwapchainTextureIndex{swapchainTextureIndex}, m_SwapchainTexture{std::dynamic_pointer_cast<VulkanTexture2D>(swapchainTexture)}, m_Device{device}
+            : m_Spec{framebufferSpec}, m_SwapchainTextureIndex{static_cast<int32_t>(swapchainTextureIndex)}, m_SwapchainTexture{std::dynamic_pointer_cast<VulkanTexture2D>(swapchainTexture)}, m_Device{device}
     {
         CheckFormatSupport();
         for (Texture::TextureSpecification attachment : m_Spec.AttachmentSpec.Attachments)

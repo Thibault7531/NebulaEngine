@@ -14,6 +14,68 @@
 
 namespace Nebula::Graphics
 {
+    inline void HashCombine(size_t& seed, size_t value)
+    {
+        seed ^= value + 0x9e3779b97f4a7c15ULL + (seed << 6) + (seed >> 2);
+    }
+
+    template<typename T>
+    inline void HashCombineValue(size_t& seed, const T& value)
+    {
+        HashCombine(seed, std::hash<T>{}(value));
+    }
+
+    inline size_t Hash(const Stage& stage)
+    {
+        size_t hash = 0;
+        HashCombineValue(hash, stage.ShaderStage);
+        HashCombineValue(hash, stage.Module);
+        return hash;
+    }
+
+    inline size_t Hash(const BlendState& blendState)
+    {
+        size_t hash = 0;
+        HashCombineValue(hash, blendState.enabled);
+        HashCombineValue(hash, blendState.srcColorFactor);
+        HashCombineValue(hash, blendState.dstColorFactor);
+        HashCombineValue(hash, blendState.colorOperation);
+        HashCombineValue(hash, blendState.srcAlphaFactor);
+        HashCombineValue(hash, blendState.dstAlphaFactor);
+        HashCombineValue(hash, blendState.alphaOperation);
+        return hash;
+    }
+
+    inline size_t Hash(const FramebufferSpecification& framebufferSpec)
+    {
+        size_t hash = 0;
+        HashCombineValue(hash, framebufferSpec.width);
+        HashCombineValue(hash, framebufferSpec.height);
+        HashCombineValue(hash, framebufferSpec.samples);
+        for (const auto& attachment : framebufferSpec.AttachmentSpec.Attachments)
+        {
+            HashCombineValue(hash, attachment.InternalFormat);
+            HashCombineValue(hash, attachment.MinFilter);
+            HashCombineValue(hash, attachment.MagFilter);
+        }
+        HashCombineValue(hash, framebufferSpec.SwapChainTarget);
+        return hash;
+    }
+
+    struct PipelineSpecificationHash
+    {
+        size_t operator()(const PipelineSpecification& spec) const
+        {
+            size_t hash = 0;
+            for (const auto& stage : spec.stages)
+            {
+                HashCombine(hash, Hash(stage));
+            }
+            HashCombine(hash, Hash(spec.blendState));
+            HashCombine(hash, Hash(spec.framebufferSpec));
+            return hash;
+        }
+    };
 
     class Device
     {

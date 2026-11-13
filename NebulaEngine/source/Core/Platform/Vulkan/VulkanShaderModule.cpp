@@ -1,5 +1,7 @@
 #include "VulkanShaderModule.h"
 
+#include <limits>
+
 namespace Nebula::Graphics
 {
     bool VulkanShaderModule::s_IsSlangGlobalSessionCreated = false;
@@ -61,57 +63,148 @@ namespace Nebula::Graphics
 
     void VulkanShaderModule::GenerateLayout(Slang::ComPtr<slang::IModule> module)
     {
+        m_Layout = {};
         slang::ProgramLayout* programLayout = module->getLayout();
-        uint32_t paramCount = programLayout->getParameterCount();
-        uint32_t maxBinding = 0;
+        const uint32_t paramCount = programLayout->getParameterCount();
 
         for (uint32_t i = 0; i < paramCount; i++)
         {
-            auto varLayout = programLayout->getParameterByIndex(i);
-            auto var = varLayout->getVariable();
-            auto typeLayout = varLayout->getTypeLayout();
+            slang::VariableLayoutReflection* variableLayout = programLayout->getParameterByIndex(i);
+            slang::TypeLayoutReflection* typeLayout = variableLayout->getTypeLayout();
+            if (!typeLayout || !variableLayout->getVariable())
+            {
+                continue;
+            }
 
-            ResourceBinding res{};
-            res.Name = var->getName();
-            res.Size = typeLayout->getSize(slang::ParameterCategory::ConstantBuffer);
-            res.Offset = varLayout->getOffset(slang::ParameterCategory::ConstantBuffer);
+            uint32_t descriptorCount = 1;
+            while (typeLayout->isArray())
+            {
+                const size_t elementCount = typeLayout->getElementCount(programLayout);
+                if (elementCount != SLANG_UNBOUNDED_SIZE && elementCount != SLANG_UNKNOWN_SIZE &&
+                    elementCount > 0 && elementCount <= std::numeric_limits<uint32_t>::max())
+                {
+                    const uint32_t count = static_cast<uint32_t>(elementCount);
+                    if (descriptorCount > std::numeric_limits<uint32_t>::max() / count)
+                    {
+                        descriptorCount = std::numeric_limits<uint32_t>::max();
+                    }
+                    else
+                    {
+                        descriptorCount *= count;
+                    }
+                }
+                typeLayout = typeLayout->getElementTypeLayout();
+            }
 
+            ResourceType resourceType;
             switch (typeLayout->getKind())
             {
             case slang::TypeReflection::Kind::ConstantBuffer:
             case slang::TypeReflection::Kind::ParameterBlock:
-                {
-                    res.Type = ResourceType::UniformBuffer;
-                    res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
-                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
-                    maxBinding = std::max(res.Binding, maxBinding);
-                    break;
-                }
-
+                resourceType = ResourceType::UniformBuffer;
+                break;
+            case slang::TypeReflection::Kind::ShaderStorageBuffer:
+                resourceType = ResourceType::StorageBuffer;
+                break;
             case slang::TypeReflection::Kind::Resource:
-                {
-                    res.Type = ResourceType::Texture;
-                    res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
-                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
-                    maxBinding = std::max(res.Binding, maxBinding);
-                    break;
-                }
-
+            case slang::TypeReflection::Kind::TextureBuffer:
+                resourceType = ResourceType::Texture;
+                break;
             case slang::TypeReflection::Kind::SamplerState:
-                {
-                    res.Type = ResourceType::Sampler;
-                    res.Binding = varLayout->getOffset(slang::ParameterCategory::DescriptorTableSlot);
-                    res.Set = varLayout->getBindingSpace(slang::ParameterCategory::DescriptorTableSlot);
-                    maxBinding = std::max(res.Binding, maxBinding);
-                    break;
-                }
-
-            default: continue;
+                resourceType = ResourceType::Sampler;
+                break;
+            default:
+                continue;
             }
 
-            m_Layout.ResourceIndex[res.Name] = m_Layout.ResourceIndex.size();
-            m_Layout.Resources.push_back(res);
-            m_Layout.VertexBufferLocation = maxBinding + 1;
+            const auto bindingCategory = slang::ParameterCategory::DescriptorTableSlot;
+            const size_t binding = variableLayout->getOffset(bindingCategory);
+            const size_t set = variableLayout->getBindingSpace(bindingCategory);
+            if (binding == SLANG_UNKNOWN_SIZE || binding == SLANG_UNBOUNDED_SIZE ||
+                set == SLANG_UNKNOWN_SIZE || set == SLANG_UNBOUNDED_SIZE ||
+                binding > std::numeric_limits<uint32_t>::max() ||
+                set > std::numeric_limits<uint32_t>::max())
+            {
+                NB_CORE_ERROR("Vulkan shader resource '{0}' has an unresolved binding",
+                    variableLayout->getVariable()->getName());
+                continue;
+            }
+
+            ResourceBinding resource;
+            resource.Name = variableLayout->getVariable()->getName();
+            resource.Type = resourceType;
+            resource.Set = static_cast<uint32_t>(set);
+            resource.Binding = static_cast<uint32_t>(binding);
+            const size_t uniformSize = typeLayout->getSize(
+                resourceType == ResourceType::UniformBuffer
+                    ? slang::ParameterCategory::ConstantBuffer
+                    : slang::ParameterCategory::Uniform);
+            const size_t uniformOffset = variableLayout->getOffset(
+                resourceType == ResourceType::UniformBuffer
+                    ? slang::ParameterCategory::ConstantBuffer
+                    : slang::ParameterCategory::Uniform);
+            resource.Size = uniformSize == SLANG_UNKNOWN_SIZE || uniformSize == SLANG_UNBOUNDED_SIZE
+                ? 0
+                : static_cast<uint32_t>(std::min(uniformSize,
+                    static_cast<size_t>(std::numeric_limits<uint32_t>::max())));
+            resource.Offset = uniformOffset == SLANG_UNKNOWN_SIZE || uniformOffset == SLANG_UNBOUNDED_SIZE
+                ? 0
+                : static_cast<uint32_t>(std::min(uniformOffset,
+                    static_cast<size_t>(std::numeric_limits<uint32_t>::max())));
+            resource.DescriptorCount = descriptorCount;
+
+            if (m_Layout.ResourceIndex.contains(resource.Name))
+            {
+                NB_CORE_ERROR("Duplicate Vulkan shader resource name '{0}'", resource.Name);
+                continue;
+            }
+
+            m_Layout.ResourceIndex[resource.Name] = static_cast<uint32_t>(m_Layout.Resources.size());
+            m_Layout.Resources.push_back(resource);
+        }
+
+        uint32_t entrypointCount = programLayout->getEntryPointCount();
+        for (uint32_t i = 0; i < entrypointCount; i++)
+        {
+            slang::EntryPointLayout* entrypointLayout = programLayout->getEntryPointByIndex(i);
+            if (entrypointLayout->getStage() != SLANG_STAGE_FRAGMENT)
+            {
+                continue;
+            }
+
+            slang::VariableLayoutReflection* resultVar = entrypointLayout->getResultVarLayout();
+            if (resultVar)
+            {
+                slang::TypeLayoutReflection* resultTypeLayout = resultVar->getTypeLayout();
+                slang::TypeReflection::Kind resultKind = resultTypeLayout->getKind();
+
+                uint32_t location = resultVar->getOffset(slang::ParameterCategory::VaryingOutput);
+
+                if (resultKind == slang::TypeReflection::Kind::Struct)
+                {
+                    uint32_t fieldCount = resultTypeLayout->getFieldCount();
+                    for (uint32_t j = 0; j < fieldCount; j++)
+                    {
+                        slang::VariableLayoutReflection* fieldVar = resultTypeLayout->getFieldByIndex(j);
+                        slang::TypeLayoutReflection* fieldTypeLayout = fieldVar->getTypeLayout();
+                        slang::TypeReflection::Kind fieldKind = fieldTypeLayout->getKind();
+                        if (fieldKind == slang::TypeReflection::Kind::Resource)
+                        {
+                            if (fieldVar->getSemanticName() && std::string(fieldVar->getSemanticName()) == "SV_Target")
+                            {
+                                m_Layout.colorAttachmentCount++;
+                            }
+                        }
+                    }
+                }
+                else if (resultKind == slang::TypeReflection::Kind::Resource)
+                {
+                    if (resultVar->getSemanticName() && std::string(resultVar->getSemanticName()) == "SV_Target")
+                    {
+                        m_Layout.colorAttachmentCount++;
+                    }
+                }
+            }
         }
     }
 }

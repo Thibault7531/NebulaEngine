@@ -169,6 +169,8 @@ namespace Nebula::Graphics
         BlendFactor srcAlphaFactor = BlendFactor::One;
         BlendFactor dstAlphaFactor = BlendFactor::Zero;
         BlendOperation alphaOperation = BlendOperation::Add;
+
+        bool operator==(const BlendState&) const = default;
     };
 
     struct Stage
@@ -176,6 +178,8 @@ namespace Nebula::Graphics
         ShaderStage ShaderStage;
         Ref<ShaderModule> Module;
         std::string EntryPoint;
+
+        bool operator==(const Stage&) const = default;
     };
 
     struct PipelineSpecification
@@ -183,6 +187,8 @@ namespace Nebula::Graphics
         std::vector<Stage> stages;
         FramebufferSpecification framebufferSpec;
         BlendState blendState;
+
+        bool operator==(const PipelineSpecification&) const = default;
     };
 
     class ShaderPipeline

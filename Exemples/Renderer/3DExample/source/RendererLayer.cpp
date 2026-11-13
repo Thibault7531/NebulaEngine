@@ -96,8 +96,22 @@ void RendererLayer::OnAttach()
 	blendState.dstColorFactor = Nebula::Graphics::BlendFactor::OneMinusSourceAlpha;
 	blendState.srcAlphaFactor = Nebula::Graphics::BlendFactor::SourceAlpha;
 	blendState.dstAlphaFactor = Nebula::Graphics::BlendFactor::OneMinusSourceAlpha;
-	m_TextureShader = m_ShaderLibrary.CreatePipeline("Texture", textureVertexLayout, {.framebufferSpec = Nebula::Application::Get().GetMainFramebuffer()->GetSpecification(), .blendState = blendState});
-	m_ModelShader = m_ShaderLibrary.CreatePipeline("Model", modelVertexLayout, {.framebufferSpec = Nebula::Application::Get().GetMainFramebuffer()->GetSpecification()});
+	Nebula::Graphics::PipelineSpecification texturePipelineSpec;
+	texturePipelineSpec.blendState = blendState;
+	texturePipelineSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
+	texturePipelineSpec.stages = {
+		{ Nebula::Graphics::ShaderStage::Vertex, m_ShaderLibrary.Get("Texture"), "vertexMain" },
+		{ Nebula::Graphics::ShaderStage::Fragment, m_ShaderLibrary.Get("Texture"), "fragmentMain" }
+	};
+	m_TextureShader = m_Device->CreateShaderPipeline(textureVertexLayout, texturePipelineSpec);
+	Nebula::Graphics::PipelineSpecification modelPipelineSpec;
+	modelPipelineSpec.blendState = blendState;
+	modelPipelineSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
+	modelPipelineSpec.stages = {
+		{ Nebula::Graphics::ShaderStage::Vertex, m_ShaderLibrary.Get("Model"), "vertexMain" },
+		{ Nebula::Graphics::ShaderStage::Fragment, m_ShaderLibrary.Get("Model"), "fragmentMain" }
+	};
+	m_ModelShader = m_Device->CreateShaderPipeline(modelVertexLayout, modelPipelineSpec);
 
 	m_Texture = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/3DRendererExample/textures/crafting_table_front.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Nearest});
 	m_Glass = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/3DRendererExample/textures/glass.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Nearest});
@@ -106,11 +120,15 @@ void RendererLayer::OnAttach()
 
 	m_CameraController.GetCamera().setPosition({0.f, 0.f, 3.f});
 
-	Nebula::Application::Get().GetMainFramebuffer()->SetClearColors({{0.18f, 0.49f, 0.6f, 1.f}});
 	m_RendererUBO = m_Device->CreateUniformBuffer({
 		{ Nebula::Graphics::ShaderDataType::Matrix4, "u_ViewProjection" },
 		{ Nebula::Graphics::ShaderDataType::Matrix4, "u_Transform" },
 	}, 4);
+
+	m_CommandBuffers.resize(Nebula::Application::Get().GetMainWindowSwapchain()->GetMaxFramesInFlight());
+	for (uint32_t i = 0; i < m_CommandBuffers.size(); i++) {
+		m_CommandBuffers[i] = m_Device->GetGraphicsQueue()->CreateCommandBuffer();
+	}
 }
 
 void RendererLayer::OnDetach()
@@ -121,19 +139,27 @@ void RendererLayer::OnDetach()
 
 void RendererLayer::OnUpdate(Nebula::Timestep ts)
 {
+	Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->SetClearColors({{0.18f, 0.49f, 0.6f, 1.f}});
+
 	m_CameraController.OnUpdate(ts);
 
 	for (uint32_t instance = 0; instance < m_RendererUBO->GetInstanceCount(); instance++) m_RendererUBO->SetData(instance, "u_ViewProjection", glm::value_ptr(m_CameraController.GetCamera().getViewProjectionMatrix()));
 
 	m_RendererUBO->SetData(0, "u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f))));
 
-	Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
-	Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
+	Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_CommandBuffers[Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+	commandBuffer->Begin();
+	Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), true);
 
+	Nebula::Graphics::DepthStencilState depthStencilState{};
+	depthStencilState.depthTest = true;
+	depthStencilState.depthWrite = true;
+	depthStencilState.depthCompareFunction = Nebula::Graphics::CompareFunction::Less;
+	depthStencilState.stencilTest = false;
 	renderPass->SetShaderPipeline(m_TextureShader)
 		.SetUniformBlock("RendererUBO", m_RendererUBO, 0)
-		.SetCullMode(Nebula::Graphics::CullMode::Front)
-		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::CompareFunction::Less, .depthWrite = true})
+		.SetCullMode(Nebula::Graphics::CullMode::Back)
+		.SetDepthStencilState(depthStencilState)
 		.BindTextureToSlot(m_Texture)
 		.DrawArrayIndexed(m_VAO);
 
@@ -141,33 +167,36 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 
 	renderPass->SetShaderPipeline(m_TextureShader)
 		.SetUniformBlock("RendererUBO", m_RendererUBO, 1)
-		.SetCullMode(Nebula::Graphics::CullMode::Front)
-		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::CompareFunction::Less, .depthWrite = true})
+		.SetCullMode(Nebula::Graphics::CullMode::Back)
+		.SetDepthStencilState(depthStencilState)
 		.BindTextureToSlot(Nebula::Renderer2D::GetWhiteTexture())
 		.DrawArrayIndexed(m_VAO);
 
 	m_RendererUBO->SetData(2, "u_Transform", glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, -1.0f))));
 
+	depthStencilState.depthWrite = false;
 	renderPass->SetShaderPipeline(m_TextureShader)
 		.SetUniformBlock("RendererUBO", m_RendererUBO, 2)
-		.SetCullMode(Nebula::Graphics::CullMode::Front)
-		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::CompareFunction::Less, .depthWrite = true})
+		.SetCullMode(Nebula::Graphics::CullMode::Back)
+		.SetDepthStencilState(depthStencilState)
 		.BindTextureToSlot(m_Glass)
 		.DrawArrayIndexed(m_VAO);
 
 	m_RendererUBO->SetData(3, "u_Transform", glm::value_ptr(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f, 0.0f)), glm::vec3(0.01f))));
 
+	depthStencilState.depthWrite = true;
 	renderPass->SetShaderPipeline(m_ModelShader)
 		.SetUniformBlock("RendererUBO", m_RendererUBO, 3)
-		.SetCullMode(Nebula::Graphics::CullMode::Front)
-		.SetDepthStencilState({.depthCompareFunction = Nebula::Graphics::CompareFunction::Less, .depthWrite = true});
+		.SetCullMode(Nebula::Graphics::CullMode::Back)
+		.SetDepthStencilState(depthStencilState);
 	for (auto& mesh : m_Backpack->GetMeshes())
 	{
 		renderPass->DrawArrayIndexed(mesh->GetVertexArray());
 	}
 
 	renderPass->EndRenderPass();
-	commandBuffer->Commit();
+	commandBuffer->End();
+	m_Device->GetGraphicsQueue()->SubmitCommandBuffer(commandBuffer);
 }
 
 void RendererLayer::OnImGuiRender()

@@ -30,6 +30,8 @@ private:
     Nebula::Ref<Nebula::Graphics::Texture2D> m_Texture;
     Nebula::Ref<Nebula::Graphics::Texture2D> m_Glass;
 
+    std::vector<Nebula::Ref<Nebula::Graphics::CommandBuffer>> m_CommandBuffers;
+
     Nebula::Ref<Nebula::Model> m_Backpack;
 
     Nebula::PerspectiveCameraController m_CameraController;

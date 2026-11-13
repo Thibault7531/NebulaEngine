@@ -46,7 +46,7 @@ namespace Nebula::Graphics
         int32_t m_ClearStencil = 1;
 
         FramebufferSpecification m_Spec;
-        uint32_t m_SwapchainTextureIndex;
+        int32_t m_SwapchainTextureIndex = -1;
         Ref<VulkanTexture2D> m_SwapchainTexture;
         Device* m_Device;
     };

@@ -33,7 +33,7 @@ namespace Nebula::Graphics
         }
         else
         {
-            imageCreateInfo.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst;
+            imageCreateInfo.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc;
             imageCreateInfo.tiling = vk::ImageTiling::eLinear;
         }
 
@@ -355,29 +355,374 @@ namespace Nebula::Graphics
 
     std::vector<uint8_t> VulkanTexture2D::GetDataR8()
     {
+        NB_CORE_ASSERT(GetVulkanBytesPerPixel(m_Spec.InternalFormat) == 1, "GetDataR8() can only be called on textures with 1 byte per pixel.");
+        vk::DeviceSize imageSize = m_Width * m_Height * GetVulkanBytesPerPixel(m_Spec.InternalFormat);
+
+        vk::BufferCreateInfo bufferCreateInfo;
+        bufferCreateInfo.sType = vk::StructureType::eBufferCreateInfo;
+        bufferCreateInfo.size = imageSize;
+        bufferCreateInfo.usage = vk::BufferUsageFlagBits::eTransferDst;
+        bufferCreateInfo.sharingMode = vk::SharingMode::eExclusive;
+
+        vma::AllocationCreateInfo allocationCreateInfo;
+        allocationCreateInfo.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead | vma::AllocationCreateFlagBits::eMapped;
+        allocationCreateInfo.usage = vma::MemoryUsage::eAuto;
+
+        vk::Buffer stagingBuffer;
+        vma::Allocation stagingBufferAllocation;
+        vma::AllocationInfo stagingBufferAllocationInfo;
+        auto [allocation, buffer] = m_Device->GetVMAAllocator().createBuffer(bufferCreateInfo, allocationCreateInfo, &stagingBufferAllocationInfo);
+        stagingBuffer = buffer;
+        stagingBufferAllocation = allocation;
+
+        vk::ImageMemoryBarrier2 imageBarrier;
+        imageBarrier.sType = vk::StructureType::eImageMemoryBarrier2;
+        imageBarrier.oldLayout = m_TextureLayout;
+        imageBarrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;
+        m_TextureLayout = vk::ImageLayout::eTransferSrcOptimal;
+        imageBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageBarrier.image = m_Texture;
+        imageBarrier.subresourceRange = vk::ImageSubresourceRange(Framebuffer::IsDepthStencilFormat(m_Spec.InternalFormat) ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1);
+        imageBarrier.srcAccessMask = vk::AccessFlagBits2::eNone;
+        imageBarrier.dstAccessMask = vk::AccessFlagBits2::eTransferRead;
+        imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eTransfer;
+
+        Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
+
+        vk::CommandBufferAllocateInfo commandBufferAllocateInfo;
+        commandBufferAllocateInfo.sType = vk::StructureType::eCommandBufferAllocateInfo;
+        commandBufferAllocateInfo.commandPool = graphicsQueue->GetVKCommandPool();
+        commandBufferAllocateInfo.commandBufferCount = 1;
+
+        vk::CommandBuffer commandBuffer = m_Device->GetVKLogicalDevice().allocateCommandBuffers(commandBufferAllocateInfo)[0];
+        commandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+
+        vk::DependencyInfo dependencyInfo;
+        dependencyInfo.sType = vk::StructureType::eDependencyInfo;
+        dependencyInfo.imageMemoryBarrierCount = 1;
+        dependencyInfo.pImageMemoryBarriers = &imageBarrier;
+        commandBuffer.pipelineBarrier2(dependencyInfo);
+
+        vk::BufferImageCopy region;
+        region.bufferOffset = 0;
+        region.bufferRowLength = 0;
+        region.bufferImageHeight = 0;
+        region.imageSubresource.aspectMask = Framebuffer::IsDepthStencilFormat(m_Spec.InternalFormat) ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor;
+        region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.baseArrayLayer = 0;
+        region.imageSubresource.layerCount = 1;
+        region.imageOffset = vk::Offset3D(0, 0, 0);
+        region.imageExtent = vk::Extent3D(m_Width, m_Height, 1);
+        commandBuffer.copyImageToBuffer(m_Texture, vk::ImageLayout::eTransferSrcOptimal, stagingBuffer, 1, &region);
+
+        imageBarrier.oldLayout = m_TextureLayout;
+        imageBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        m_TextureLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        imageBarrier.srcAccessMask = vk::AccessFlagBits2::eTransferRead;
+        imageBarrier.dstAccessMask = vk::AccessFlagBits2::eShaderRead;
+        imageBarrier.srcStageMask = vk::PipelineStageFlagBits2::eTransfer;
+        imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader;
+
+        commandBuffer.pipelineBarrier2(dependencyInfo);
+
+        commandBuffer.end();
+
+        vk::SubmitInfo submitInfo;
+        submitInfo.sType = vk::StructureType::eSubmitInfo;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+        submitInfo.waitSemaphoreCount = 0;
+        submitInfo.pWaitSemaphores = nullptr;
+        submitInfo.signalSemaphoreCount = 0;
+        submitInfo.pSignalSemaphores = nullptr;
+
+        graphicsQueue->GetVKQueue().submit(submitInfo, nullptr);
+        graphicsQueue->GetVKQueue().waitIdle();
+
         std::vector<uint8_t> data(m_Width * m_Height);
-        memcpy(data.data(), m_AllocationInfo.pMappedData, m_Width * m_Height * sizeof(uint8_t));
+        memcpy(data.data(), stagingBufferAllocationInfo.pMappedData, m_Width * m_Height * sizeof(uint8_t));
+        m_Device->GetVMAAllocator().destroyBuffer(stagingBuffer, stagingBufferAllocation);
         return data;
     }
 
     std::vector<int32_t> VulkanTexture2D::GetDataR32I()
     {
+        NB_CORE_ASSERT(GetVulkanBytesPerPixel(m_Spec.InternalFormat) == 4, "GetDataR32I() can only be called on textures with 4 bytes per pixel.");
+        vk::DeviceSize imageSize = m_Width * m_Height * GetVulkanBytesPerPixel(m_Spec.InternalFormat);
+
+        vk::BufferCreateInfo bufferCreateInfo;
+        bufferCreateInfo.sType = vk::StructureType::eBufferCreateInfo;
+        bufferCreateInfo.size = imageSize;
+        bufferCreateInfo.usage = vk::BufferUsageFlagBits::eTransferDst;
+        bufferCreateInfo.sharingMode = vk::SharingMode::eExclusive;
+
+        vma::AllocationCreateInfo allocationCreateInfo;
+        allocationCreateInfo.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead | vma::AllocationCreateFlagBits::eMapped;
+        allocationCreateInfo.usage = vma::MemoryUsage::eAuto;
+
+        vk::Buffer stagingBuffer;
+        vma::Allocation stagingBufferAllocation;
+        vma::AllocationInfo stagingBufferAllocationInfo;
+        auto [allocation, buffer] = m_Device->GetVMAAllocator().createBuffer(bufferCreateInfo, allocationCreateInfo, &stagingBufferAllocationInfo);
+        stagingBuffer = buffer;
+        stagingBufferAllocation = allocation;
+
+        vk::ImageMemoryBarrier2 imageBarrier;
+        imageBarrier.sType = vk::StructureType::eImageMemoryBarrier2;
+        imageBarrier.oldLayout = m_TextureLayout;
+        imageBarrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;
+        m_TextureLayout = vk::ImageLayout::eTransferSrcOptimal;
+        imageBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageBarrier.image = m_Texture;
+        imageBarrier.subresourceRange = vk::ImageSubresourceRange(Framebuffer::IsDepthStencilFormat(m_Spec.InternalFormat) ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1);
+        imageBarrier.srcAccessMask = vk::AccessFlagBits2::eNone;
+        imageBarrier.dstAccessMask = vk::AccessFlagBits2::eTransferRead;
+        imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eTransfer;
+
+        Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
+
+        vk::CommandBufferAllocateInfo commandBufferAllocateInfo;
+        commandBufferAllocateInfo.sType = vk::StructureType::eCommandBufferAllocateInfo;
+        commandBufferAllocateInfo.commandPool = graphicsQueue->GetVKCommandPool();
+        commandBufferAllocateInfo.commandBufferCount = 1;
+
+        vk::CommandBuffer commandBuffer = m_Device->GetVKLogicalDevice().allocateCommandBuffers(commandBufferAllocateInfo)[0];
+        commandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+
+        vk::DependencyInfo dependencyInfo;
+        dependencyInfo.sType = vk::StructureType::eDependencyInfo;
+        dependencyInfo.imageMemoryBarrierCount = 1;
+        dependencyInfo.pImageMemoryBarriers = &imageBarrier;
+        commandBuffer.pipelineBarrier2(dependencyInfo);
+
+        vk::BufferImageCopy region;
+        region.bufferOffset = 0;
+        region.bufferRowLength = 0;
+        region.bufferImageHeight = 0;
+        region.imageSubresource.aspectMask = Framebuffer::IsDepthStencilFormat(m_Spec.InternalFormat) ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor;
+        region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.baseArrayLayer = 0;
+        region.imageSubresource.layerCount = 1;
+        region.imageOffset = vk::Offset3D(0, 0, 0);
+        region.imageExtent = vk::Extent3D(m_Width, m_Height, 1);
+        commandBuffer.copyImageToBuffer(m_Texture, vk::ImageLayout::eTransferSrcOptimal, stagingBuffer, 1, &region);
+
+        imageBarrier.oldLayout = m_TextureLayout;
+        imageBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        m_TextureLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        imageBarrier.srcAccessMask = vk::AccessFlagBits2::eTransferRead;
+        imageBarrier.dstAccessMask = vk::AccessFlagBits2::eShaderRead;
+        imageBarrier.srcStageMask = vk::PipelineStageFlagBits2::eTransfer;
+        imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader;
+
+        commandBuffer.pipelineBarrier2(dependencyInfo);
+
+        commandBuffer.end();
+
+        vk::SubmitInfo submitInfo;
+        submitInfo.sType = vk::StructureType::eSubmitInfo;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+        submitInfo.waitSemaphoreCount = 0;
+        submitInfo.pWaitSemaphores = nullptr;
+        submitInfo.signalSemaphoreCount = 0;
+        submitInfo.pSignalSemaphores = nullptr;
+
+        graphicsQueue->GetVKQueue().submit(submitInfo, nullptr);
+        graphicsQueue->GetVKQueue().waitIdle();
+
         std::vector<int32_t> data(m_Width * m_Height);
-        memcpy(data.data(), m_AllocationInfo.pMappedData, m_Width * m_Height * sizeof(int32_t));
+        m_Device->GetVMAAllocator().flushAllocation(stagingBufferAllocation, 0, imageSize);
+        memcpy(data.data(), stagingBufferAllocationInfo.pMappedData, m_Width * m_Height * sizeof(int32_t));
+        m_Device->GetVMAAllocator().destroyBuffer(stagingBuffer, stagingBufferAllocation);
         return data;
     }
 
     std::vector<uint32_t> VulkanTexture2D::GetDataR32UI()
     {
+        NB_CORE_ASSERT(GetVulkanBytesPerPixel(m_Spec.InternalFormat) == 4, "GetDataR32UI() can only be called on textures with 4 bytes per pixel.");
+        vk::DeviceSize imageSize = m_Width * m_Height * GetVulkanBytesPerPixel(m_Spec.InternalFormat);
+
+        vk::BufferCreateInfo bufferCreateInfo;
+        bufferCreateInfo.sType = vk::StructureType::eBufferCreateInfo;
+        bufferCreateInfo.size = imageSize;
+        bufferCreateInfo.usage = vk::BufferUsageFlagBits::eTransferDst;
+        bufferCreateInfo.sharingMode = vk::SharingMode::eExclusive;
+
+        vma::AllocationCreateInfo allocationCreateInfo;
+        allocationCreateInfo.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead | vma::AllocationCreateFlagBits::eMapped;
+        allocationCreateInfo.usage = vma::MemoryUsage::eAuto;
+
+        vk::Buffer stagingBuffer;
+        vma::Allocation stagingBufferAllocation;
+        vma::AllocationInfo stagingBufferAllocationInfo;
+        auto [allocation, buffer] = m_Device->GetVMAAllocator().createBuffer(bufferCreateInfo, allocationCreateInfo, &stagingBufferAllocationInfo);
+        stagingBuffer = buffer;
+        stagingBufferAllocation = allocation;
+
+        vk::ImageMemoryBarrier2 imageBarrier;
+        imageBarrier.sType = vk::StructureType::eImageMemoryBarrier2;
+        imageBarrier.oldLayout = m_TextureLayout;
+        imageBarrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;
+        m_TextureLayout = vk::ImageLayout::eTransferSrcOptimal;
+        imageBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageBarrier.image = m_Texture;
+        imageBarrier.subresourceRange = vk::ImageSubresourceRange(Framebuffer::IsDepthStencilFormat(m_Spec.InternalFormat) ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1);
+        imageBarrier.srcAccessMask = vk::AccessFlagBits2::eNone;
+        imageBarrier.dstAccessMask = vk::AccessFlagBits2::eTransferRead;
+        imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eTransfer;
+
+        Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
+
+        vk::CommandBufferAllocateInfo commandBufferAllocateInfo;
+        commandBufferAllocateInfo.sType = vk::StructureType::eCommandBufferAllocateInfo;
+        commandBufferAllocateInfo.commandPool = graphicsQueue->GetVKCommandPool();
+        commandBufferAllocateInfo.commandBufferCount = 1;
+
+        vk::CommandBuffer commandBuffer = m_Device->GetVKLogicalDevice().allocateCommandBuffers(commandBufferAllocateInfo)[0];
+        commandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+
+        vk::DependencyInfo dependencyInfo;
+        dependencyInfo.sType = vk::StructureType::eDependencyInfo;
+        dependencyInfo.imageMemoryBarrierCount = 1;
+        dependencyInfo.pImageMemoryBarriers = &imageBarrier;
+        commandBuffer.pipelineBarrier2(dependencyInfo);
+
+        vk::BufferImageCopy region;
+        region.bufferOffset = 0;
+        region.bufferRowLength = 0;
+        region.bufferImageHeight = 0;
+        region.imageSubresource.aspectMask = Framebuffer::IsDepthStencilFormat(m_Spec.InternalFormat) ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor;
+        region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.baseArrayLayer = 0;
+        region.imageSubresource.layerCount = 1;
+        region.imageOffset = vk::Offset3D(0, 0, 0);
+        region.imageExtent = vk::Extent3D(m_Width, m_Height, 1);
+        commandBuffer.copyImageToBuffer(m_Texture, vk::ImageLayout::eTransferSrcOptimal, stagingBuffer, 1, &region);
+
+        imageBarrier.oldLayout = m_TextureLayout;
+        imageBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        m_TextureLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        imageBarrier.srcAccessMask = vk::AccessFlagBits2::eTransferRead;
+        imageBarrier.dstAccessMask = vk::AccessFlagBits2::eShaderRead;
+        imageBarrier.srcStageMask = vk::PipelineStageFlagBits2::eTransfer;
+        imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader;
+
+        commandBuffer.pipelineBarrier2(dependencyInfo);
+
+        commandBuffer.end();
+
+        vk::SubmitInfo submitInfo;
+        submitInfo.sType = vk::StructureType::eSubmitInfo;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+        submitInfo.waitSemaphoreCount = 0;
+        submitInfo.pWaitSemaphores = nullptr;
+        submitInfo.signalSemaphoreCount = 0;
+        submitInfo.pSignalSemaphores = nullptr;
+
+        graphicsQueue->GetVKQueue().submit(submitInfo, nullptr);
+        graphicsQueue->GetVKQueue().waitIdle();
+
         std::vector<uint32_t> data(m_Width * m_Height);
-        memcpy(data.data(), m_AllocationInfo.pMappedData, m_Width * m_Height * sizeof(uint32_t));
+        memcpy(data.data(), stagingBufferAllocationInfo.pMappedData, m_Width * m_Height * sizeof(uint32_t));
+        m_Device->GetVMAAllocator().destroyBuffer(stagingBuffer, stagingBufferAllocation);
         return data;
     }
 
     std::vector<glm::vec4> VulkanTexture2D::GetDataRGBA8()
     {
+        NB_CORE_ASSERT(GetVulkanBytesPerPixel(m_Spec.InternalFormat) == 4, "GetDataRGBA8() can only be called on textures with 4 bytes per pixel.");
+        vk::DeviceSize imageSize = m_Width * m_Height * GetVulkanBytesPerPixel(m_Spec.InternalFormat);
+
+        vk::BufferCreateInfo bufferCreateInfo;
+        bufferCreateInfo.sType = vk::StructureType::eBufferCreateInfo;
+        bufferCreateInfo.size = imageSize;
+        bufferCreateInfo.usage = vk::BufferUsageFlagBits::eTransferDst;
+        bufferCreateInfo.sharingMode = vk::SharingMode::eExclusive;
+
+        vma::AllocationCreateInfo allocationCreateInfo;
+        allocationCreateInfo.flags = vma::AllocationCreateFlagBits::eHostAccessSequentialWrite | vma::AllocationCreateFlagBits::eHostAccessAllowTransferInstead | vma::AllocationCreateFlagBits::eMapped;
+        allocationCreateInfo.usage = vma::MemoryUsage::eAuto;
+
+        vk::Buffer stagingBuffer;
+        vma::Allocation stagingBufferAllocation;
+        vma::AllocationInfo stagingBufferAllocationInfo;
+        auto [allocation, buffer] = m_Device->GetVMAAllocator().createBuffer(bufferCreateInfo, allocationCreateInfo, &stagingBufferAllocationInfo);
+        stagingBuffer = buffer;
+        stagingBufferAllocation = allocation;
+
+        vk::ImageMemoryBarrier2 imageBarrier;
+        imageBarrier.sType = vk::StructureType::eImageMemoryBarrier2;
+        imageBarrier.oldLayout = m_TextureLayout;
+        imageBarrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;
+        m_TextureLayout = vk::ImageLayout::eTransferSrcOptimal;
+        imageBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        imageBarrier.image = m_Texture;
+        imageBarrier.subresourceRange = vk::ImageSubresourceRange(Framebuffer::IsDepthStencilFormat(m_Spec.InternalFormat) ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1);
+        imageBarrier.srcAccessMask = vk::AccessFlagBits2::eNone;
+        imageBarrier.dstAccessMask = vk::AccessFlagBits2::eTransferRead;
+        imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eTransfer;
+
+        Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
+
+        vk::CommandBufferAllocateInfo commandBufferAllocateInfo;
+        commandBufferAllocateInfo.sType = vk::StructureType::eCommandBufferAllocateInfo;
+        commandBufferAllocateInfo.commandPool = graphicsQueue->GetVKCommandPool();
+        commandBufferAllocateInfo.commandBufferCount = 1;
+
+        vk::CommandBuffer commandBuffer = m_Device->GetVKLogicalDevice().allocateCommandBuffers(commandBufferAllocateInfo)[0];
+        commandBuffer.begin(vk::CommandBufferBeginInfo(vk::CommandBufferUsageFlagBits::eOneTimeSubmit));
+
+        vk::DependencyInfo dependencyInfo;
+        dependencyInfo.sType = vk::StructureType::eDependencyInfo;
+        dependencyInfo.imageMemoryBarrierCount = 1;
+        dependencyInfo.pImageMemoryBarriers = &imageBarrier;
+        commandBuffer.pipelineBarrier2(dependencyInfo);
+
+        vk::BufferImageCopy region;
+        region.bufferOffset = 0;
+        region.bufferRowLength = 0;
+        region.bufferImageHeight = 0;
+        region.imageSubresource.aspectMask = Framebuffer::IsDepthStencilFormat(m_Spec.InternalFormat) ? vk::ImageAspectFlagBits::eDepth : vk::ImageAspectFlagBits::eColor;
+        region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.baseArrayLayer = 0;
+        region.imageSubresource.layerCount = 1;
+        region.imageOffset = vk::Offset3D(0, 0, 0);
+        region.imageExtent = vk::Extent3D(m_Width, m_Height, 1);
+        commandBuffer.copyImageToBuffer(m_Texture, vk::ImageLayout::eTransferSrcOptimal, stagingBuffer, 1, &region);
+
+        imageBarrier.oldLayout = m_TextureLayout;
+        imageBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        m_TextureLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        imageBarrier.srcAccessMask = vk::AccessFlagBits2::eTransferRead;
+        imageBarrier.dstAccessMask = vk::AccessFlagBits2::eShaderRead;
+        imageBarrier.srcStageMask = vk::PipelineStageFlagBits2::eTransfer;
+        imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader;
+
+        commandBuffer.pipelineBarrier2(dependencyInfo);
+
+        commandBuffer.end();
+
+        vk::SubmitInfo submitInfo;
+        submitInfo.sType = vk::StructureType::eSubmitInfo;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+        submitInfo.waitSemaphoreCount = 0;
+        submitInfo.pWaitSemaphores = nullptr;
+        submitInfo.signalSemaphoreCount = 0;
+        submitInfo.pSignalSemaphores = nullptr;
+
+        graphicsQueue->GetVKQueue().submit(submitInfo, nullptr);
+        graphicsQueue->GetVKQueue().waitIdle();
+
         std::vector<glm::vec4> data(m_Width * m_Height);
-        memcpy(data.data(), m_AllocationInfo.pMappedData, m_Width * m_Height * sizeof(glm::vec4));
+        memcpy(data.data(), stagingBufferAllocationInfo.pMappedData, m_Width * m_Height * sizeof(glm::vec4));
+        m_Device->GetVMAAllocator().destroyBuffer(stagingBuffer, stagingBufferAllocation);
         return data;
     }
 

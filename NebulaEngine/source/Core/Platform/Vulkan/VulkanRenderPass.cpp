@@ -14,7 +14,7 @@ namespace Nebula::Graphics
         for (uint32_t colorAttachmentIndex = 0; colorAttachmentIndex < framebuffer->GetColorAttachmentCount(); colorAttachmentIndex++)
         {
             Ref<VulkanTexture2D> colorAttachment = std::dynamic_pointer_cast<VulkanTexture2D>(framebuffer->GetColorAttachment(colorAttachmentIndex));
-            vk::Image colorAttachmentImage =colorAttachment->GetVKImage();
+            vk::Image colorAttachmentImage = colorAttachment->GetVKImage();
             vk::ImageMemoryBarrier2 imageBarrier;
             imageBarrier.sType = vk::StructureType::eImageMemoryBarrier2;
             imageBarrier.image = colorAttachmentImage;
@@ -81,7 +81,7 @@ namespace Nebula::Graphics
         m_CommandBuffer->GetVKCommandBuffer().beginRendering(renderingInfo);
 
         VulkanRenderPass::SetCullMode(CullMode::None);
-        VulkanRenderPass::SetDepthStencilState(DepthStencilState{false, false, CompareFunction::Less, false, 0xFF, 0xFF, CompareFunction::Always, StencilOperation::Keep, StencilOperation::Keep, StencilOperation::Keep});
+        VulkanRenderPass::SetDepthStencilState(DepthStencilState{false, false, CompareFunction::Greater, false, 0xFF, 0xFF, CompareFunction::Always, StencilOperation::Keep, StencilOperation::Keep, StencilOperation::Keep});
         VulkanRenderPass::SetViewport(0, 0, framebuffer->GetSpecification().width, framebuffer->GetSpecification().height, 0.f, 1.f);
         VulkanRenderPass::SetScissor(0, 0, framebuffer->GetSpecification().width, framebuffer->GetSpecification().height);
     }
@@ -159,6 +159,8 @@ namespace Nebula::Graphics
     RenderPass& VulkanRenderPass::BindTextureToSlot(Ref<Texture2D> texture, uint32_t slot)
     {
         Ref<VulkanTexture2D> vulkanTexture = std::dynamic_pointer_cast<VulkanTexture2D>(texture);
+        const ResourceBinding textureBinding =
+            m_CurrentlyBoundShaderPipeline->GetResourceBinding(ResourceType::Texture);
 
         vk::DescriptorImageInfo descriptorImageInfo;
         descriptorImageInfo.imageView = vulkanTexture->GetVKImageView();
@@ -167,12 +169,13 @@ namespace Nebula::Graphics
 
         vk::WriteDescriptorSet writeDescriptorSet;
         writeDescriptorSet.sType = vk::StructureType::eWriteDescriptorSet;
-        writeDescriptorSet.dstBinding = slot;
+        writeDescriptorSet.dstBinding = textureBinding.Binding;
+        writeDescriptorSet.dstArrayElement = textureBinding.DescriptorCount > 1 ? slot : 0;
         writeDescriptorSet.descriptorCount = 1;
         writeDescriptorSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
         writeDescriptorSet.pImageInfo = &descriptorImageInfo;
 
-        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), 0, 1, &writeDescriptorSet);
+        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
 
         return *this;
     }
@@ -180,6 +183,8 @@ namespace Nebula::Graphics
     RenderPass& VulkanRenderPass::BindTextureToSlot(Texture2D* texture, uint32_t slot)
     {
         auto* vulkanTexture = dynamic_cast<VulkanTexture2D*>(texture);
+        const ResourceBinding textureBinding =
+            m_CurrentlyBoundShaderPipeline->GetResourceBinding(ResourceType::Texture);
 
         vk::DescriptorImageInfo descriptorImageInfo;
         descriptorImageInfo.imageView = vulkanTexture->GetVKImageView();
@@ -188,12 +193,13 @@ namespace Nebula::Graphics
 
         vk::WriteDescriptorSet writeDescriptorSet;
         writeDescriptorSet.sType = vk::StructureType::eWriteDescriptorSet;
-        writeDescriptorSet.dstBinding = slot;
+        writeDescriptorSet.dstBinding = textureBinding.Binding;
+        writeDescriptorSet.dstArrayElement = textureBinding.DescriptorCount > 1 ? slot : 0;
         writeDescriptorSet.descriptorCount = 1;
         writeDescriptorSet.descriptorType = vk::DescriptorType::eCombinedImageSampler;
         writeDescriptorSet.pImageInfo = &descriptorImageInfo;
 
-        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), 0, 1, &writeDescriptorSet);
+        m_CommandBuffer->GetVKCommandBuffer().pushDescriptorSet(vk::PipelineBindPoint::eGraphics, m_CurrentlyBoundShaderPipeline->GetVKPipelineLayout(), textureBinding.Set, 1, &writeDescriptorSet);
 
         return *this;
     }
@@ -236,23 +242,47 @@ namespace Nebula::Graphics
     {
         m_CommandBuffer->GetVKCommandBuffer().endRendering();
 
-        Ref<VulkanTexture2D> swapchainColorAttachment = std::dynamic_pointer_cast<VulkanTexture2D>(m_Framebuffer->GetSwapchainColorAttachment());
-        vk::ImageMemoryBarrier2 imagePresentBarrier;
-        imagePresentBarrier.sType = vk::StructureType::eImageMemoryBarrier2;
-        imagePresentBarrier.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput;
-        imagePresentBarrier.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite;
-        imagePresentBarrier.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput;
-        imagePresentBarrier.dstAccessMask = vk::AccessFlagBits2::eNone;
-        imagePresentBarrier.oldLayout = swapchainColorAttachment->GetVKImageLayout();
-        imagePresentBarrier.newLayout = vk::ImageLayout::ePresentSrcKHR;
-        swapchainColorAttachment->SetVKImageLayout(vk::ImageLayout::ePresentSrcKHR);
-        imagePresentBarrier.image = swapchainColorAttachment->GetVKImage();
-        imagePresentBarrier.subresourceRange = vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1);
+        uint32_t colorAttachmentCount = m_Framebuffer->GetColorAttachmentCount();
+        std::vector<vk::ImageMemoryBarrier2> imageBarriers;
+        for (uint32_t colorAttachmentIndex = 0; colorAttachmentIndex < colorAttachmentCount; colorAttachmentIndex++)
+        {
+            Ref<VulkanTexture2D> colorAttachment = std::dynamic_pointer_cast<VulkanTexture2D>(m_Framebuffer->GetColorAttachment(colorAttachmentIndex));
+            if (colorAttachment == m_Framebuffer->GetSwapchainColorAttachment())
+            {
+                vk::ImageMemoryBarrier2 imagePresentBarrier;
+                imagePresentBarrier.sType = vk::StructureType::eImageMemoryBarrier2;
+                imagePresentBarrier.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput;
+                imagePresentBarrier.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite;
+                imagePresentBarrier.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput;
+                imagePresentBarrier.dstAccessMask = vk::AccessFlagBits2::eNone;
+                imagePresentBarrier.oldLayout = colorAttachment->GetVKImageLayout();
+                imagePresentBarrier.newLayout = vk::ImageLayout::ePresentSrcKHR;
+                colorAttachment->SetVKImageLayout(vk::ImageLayout::ePresentSrcKHR);
+                imagePresentBarrier.image = colorAttachment->GetVKImage();
+                imagePresentBarrier.subresourceRange = vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1);
+                imageBarriers.push_back(imagePresentBarrier);
+            }
+            else
+            {
+                vk::ImageMemoryBarrier2 imageBarrier;
+                imageBarrier.sType = vk::StructureType::eImageMemoryBarrier2;
+                imageBarrier.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput;
+                imageBarrier.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite;
+                imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eFragmentShader;
+                imageBarrier.dstAccessMask = vk::AccessFlagBits2::eNone;
+                imageBarrier.oldLayout = colorAttachment->GetVKImageLayout();
+                imageBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+                colorAttachment->SetVKImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal);
+                imageBarrier.image = colorAttachment->GetVKImage();
+                imageBarrier.subresourceRange = vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1);
+                imageBarriers.push_back(imageBarrier);
+            }
+        }
 
         vk::DependencyInfo imagePresentDependencyInfo;
         imagePresentDependencyInfo.sType = vk::StructureType::eDependencyInfo;
-        imagePresentDependencyInfo.imageMemoryBarrierCount = 1;
-        imagePresentDependencyInfo.pImageMemoryBarriers = &imagePresentBarrier;
+        imagePresentDependencyInfo.imageMemoryBarrierCount = imageBarriers.size();
+        imagePresentDependencyInfo.pImageMemoryBarriers = imageBarriers.data();
         m_CommandBuffer->GetVKCommandBuffer().pipelineBarrier2(imagePresentDependencyInfo);
 
         return *this;

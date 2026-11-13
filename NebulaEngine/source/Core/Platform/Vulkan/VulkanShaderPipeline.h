@@ -16,6 +16,7 @@ namespace Nebula::Graphics
         virtual uint32_t GetUniformBlockSet(const std::string& uniformBlockName) override;
         virtual ResourceBinding GetUniformBlockResourceBinding(const std::string& uniformBlockName) override;
         virtual uint32_t GetVertexInputLocation() override { return 0; }
+        ResourceBinding GetResourceBinding(ResourceType type) const;
 
     public:
         vk::PipelineLayout GetVKPipelineLayout() const { return m_PipelineLayout; }
