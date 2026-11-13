@@ -23,10 +23,7 @@ namespace Nebula::Graphics
         virtual uint32_t GetHeight() const override { return m_Height; }
 
         virtual void SetData(void* data, uint32_t size, DataFormat format, DataType dataType) override;
-        virtual std::vector<uint8_t> GetDataR8() override;
-        virtual std::vector<int32_t> GetDataR32I() override;
-        virtual std::vector<uint32_t> GetDataR32UI() override;
-        virtual std::vector<glm::vec4> GetDataRGBA8() override;
+        virtual std::vector<uint8_t> GetRawData() override;
 
         bool operator==(const Texture2D& other) const override;
 

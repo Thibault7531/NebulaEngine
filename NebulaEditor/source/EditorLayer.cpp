@@ -460,9 +460,9 @@ namespace Nebula {
             if (mouse_X >= m_ViewportSize.x || mouse_Y >= m_ViewportSize.y) return false;
             m_Device->WaitIdle();
             Ref<Graphics::Texture2D> texture = m_Framebuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()]->GetColorAttachment(1);
-            std::vector<int32_t> viewport = texture->GetDataR32I();
+            std::vector<int32_t> viewport = texture->GetData<int32_t>();
             int32_t entity = viewport[mouse_Y * texture->GetWidth() + mouse_X];
-            m_SceneHierarchyPanel.SetSelectedEntity(entity == -1 ? Entity() : Entity(static_cast<entt::entity>(entity), m_Scene.get()));
+            m_SceneHierarchyPanel.SetSelectedEntity(entity < 0 ? Entity() : Entity(static_cast<entt::entity>(entity), m_Scene.get()));
         }
         return false;
     }
