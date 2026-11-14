@@ -1,7 +1,11 @@
 #pragma once
+
 #include "ShaderPipeline.h"
 #include "Buffers/Buffer.h"
 #include "Buffers/VertexArray.h"
+
+#undef near
+#undef far
 
 namespace Nebula::Graphics
 {

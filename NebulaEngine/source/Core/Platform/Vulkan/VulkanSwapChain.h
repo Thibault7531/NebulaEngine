@@ -12,6 +12,11 @@ namespace Nebula::Graphics
     {
         vk::Fence Fence;
         vk::Semaphore ImageAcquiredSemaphore;
+    };
+
+    struct VulkanFrame
+    {
+        Ref<Framebuffer> Framebuffer;
         vk::Semaphore RenderCompleteSemaphore;
     };
 
@@ -46,6 +51,6 @@ namespace Nebula::Graphics
         uint32_t m_CurrentFrameSlotIndex;
         std::vector<VulkanFrameSlot> m_FrameSlots;
         uint32_t m_CurrentFrameIndex = 0;
-        std::vector<Ref<Framebuffer>> m_Framebuffers;
+        std::vector<VulkanFrame> m_Frames;
     };
 }

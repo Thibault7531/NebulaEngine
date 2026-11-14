@@ -73,6 +73,16 @@ namespace Nebula::Platform
                 size.Height = m_Properties.Height;
                 m_Window.ResizeClient(size);
 
+                auto clientSize = m_Window.ClientSize();
+                if (clientSize.Width != m_Properties.Width || clientSize.Height != m_Properties.Height)
+                {
+                    NB_PLATFORM_WARN("Known Windows App SDK bug: client size ({0}, {1}) does not match requested size ({2}, {3})", clientSize.Width, clientSize.Height, m_Properties.Width, m_Properties.Height);
+                    winrt::Windows::Graphics::SizeInt32 newSize;
+                    newSize.Width = m_Properties.Width + (m_Properties.Width - clientSize.Width);
+                    newSize.Height = m_Properties.Height + (m_Properties.Height - clientSize.Height);
+                    m_Window.ResizeClient(newSize);
+                }
+
                 break;
             }
 
@@ -81,7 +91,7 @@ namespace Nebula::Platform
                 winrt::Windows::Graphics::SizeInt32 size;
                 size.Width = m_Properties.Width;
                 size.Height = m_Properties.Height;
-                m_Window.Resize(size);
+                m_Window.ResizeClient(size);
                 break;
             }
 
@@ -183,7 +193,19 @@ namespace Nebula::Platform
     void WindowsWindow::SetClientSize(uint32_t width, uint32_t height)
     {
         if (GetProperties().Style == WindowStyle::BorderlessFullscreen) m_Window.Resize({static_cast<int32_t>(width), static_cast<int32_t>(height)});
-        else m_Window.ResizeClient({static_cast<int32_t>(width), static_cast<int32_t>(height)});
+        else {
+            m_Window.ResizeClient({static_cast<int32_t>(width), static_cast<int32_t>(height)});
+
+            auto clientSize = m_Window.ClientSize();
+            if (clientSize.Width != m_Properties.Width || clientSize.Height != m_Properties.Height)
+            {
+                NB_PLATFORM_WARN("Known Windows App SDK bug: client size ({0}, {1}) does not match requested size ({2}, {3})", clientSize.Width, clientSize.Height, m_Properties.Width, m_Properties.Height);
+                winrt::Windows::Graphics::SizeInt32 newSize;
+                newSize.Width = m_Properties.Width + (m_Properties.Width - clientSize.Width);
+                newSize.Height = m_Properties.Height + (m_Properties.Height - clientSize.Height);
+                m_Window.ResizeClient(newSize);
+            }
+        }
     }
 
     std::pair<int32_t, int32_t> WindowsWindow::GetPos() const

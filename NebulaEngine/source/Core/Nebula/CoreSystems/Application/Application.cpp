@@ -189,7 +189,6 @@ namespace Nebula
 		NB_PROFILE_FUNCTION();
 
 		SceneRenderer::OnWindowResize(e.GetWidth(), e.GetHeight());
-		m_MainWindow->GetSurface()->Resize(e.GetWidth(), e.GetHeight());
 		m_Swapchain->Resize(e.GetWidth(), e.GetHeight());
 
 		return false;

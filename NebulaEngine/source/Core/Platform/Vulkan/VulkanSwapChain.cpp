@@ -60,17 +60,17 @@ namespace Nebula::Graphics
         graphicsQueue->NewFrame(m_FrameSlots[m_CurrentFrameSlotIndex].ImageAcquiredSemaphore);
     }
 
-    Ref<Framebuffer> VulkanSwapChain::GetCurrentFrame() { return m_Framebuffers[m_CurrentFrameIndex]; }
+    Ref<Framebuffer> VulkanSwapChain::GetCurrentFrame() { return m_Frames[m_CurrentFrameIndex].Framebuffer; }
 
     void VulkanSwapChain::Present()
     {
         Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_Device->GetGraphicsQueue());
-        graphicsQueue->EndFrame(m_FrameSlots[m_CurrentFrameSlotIndex].RenderCompleteSemaphore, m_FrameSlots[m_CurrentFrameSlotIndex].Fence);
+        graphicsQueue->EndFrame(m_Frames[m_CurrentFrameIndex].RenderCompleteSemaphore, m_FrameSlots[m_CurrentFrameSlotIndex].Fence);
 
         vk::PresentInfoKHR presentInfo;
         presentInfo.sType = vk::StructureType::ePresentInfoKHR;
         presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_FrameSlots[m_CurrentFrameSlotIndex].RenderCompleteSemaphore;
+        presentInfo.pWaitSemaphores = &m_Frames[m_CurrentFrameIndex].RenderCompleteSemaphore;
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = &m_Swapchain;
         presentInfo.pImageIndices = &m_CurrentFrameIndex;
@@ -100,11 +100,11 @@ namespace Nebula::Graphics
             {
                 m_Device->GetVKLogicalDevice().destroyFence(slot.Fence);
                 m_Device->GetVKLogicalDevice().destroySemaphore(slot.ImageAcquiredSemaphore);
-                m_Device->GetVKLogicalDevice().destroySemaphore(slot.RenderCompleteSemaphore);
             }
-            for (auto& framebuffer : m_Framebuffers)
+            for (auto& frame : m_Frames)
             {
-                framebuffer.reset();
+                frame.Framebuffer.reset();
+                m_Device->GetVKLogicalDevice().destroySemaphore(frame.RenderCompleteSemaphore);
             }
         }
 
@@ -140,14 +140,17 @@ namespace Nebula::Graphics
         std::vector<vk::Image> swapchainImages = m_Device->GetVKLogicalDevice().getSwapchainImagesKHR(m_Swapchain);
         m_MaxFramesInFlight = std::min(3, static_cast<int32_t>(swapchainImages.size()));
         m_FrameSlots = std::vector<VulkanFrameSlot>(m_MaxFramesInFlight);
-        m_Framebuffers = std::vector<Ref<Framebuffer>>(swapchainImages.size());
+        m_Frames = std::vector<VulkanFrame>(swapchainImages.size());
         for (uint32_t index = 0; index < swapchainImages.size(); index++)
         {
             Ref<Texture2D> texture = CreateRef<VulkanTexture2D>(m_Device, swapchainExtent.width, swapchainExtent.height, swapchainImages[index], m_FramebufferSpec.AttachmentSpec.Attachments[m_SwapchainTextureIndex]);
-            m_Framebuffers[index] = m_Device->CreateFramebufferForSwapchain(m_FramebufferSpec, m_SwapchainTextureIndex, texture);
+            m_Frames[index].Framebuffer = m_Device->CreateFramebufferForSwapchain(m_FramebufferSpec, m_SwapchainTextureIndex, texture);
+            m_Frames[index].RenderCompleteSemaphore = m_Device->GetVKLogicalDevice().createSemaphore(semaphoreCreateInfo);
+        }
+        for (uint32_t index = 0; index < m_MaxFramesInFlight; index++)
+        {
             m_FrameSlots[index].Fence = m_Device->GetVKLogicalDevice().createFence(fenceCreateInfo);
             m_FrameSlots[index].ImageAcquiredSemaphore = m_Device->GetVKLogicalDevice().createSemaphore(semaphoreCreateInfo);
-            m_FrameSlots[index].RenderCompleteSemaphore = m_Device->GetVKLogicalDevice().createSemaphore(semaphoreCreateInfo);
         }
         m_CurrentFrameSlotIndex = 0;
 
