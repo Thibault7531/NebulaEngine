@@ -26,6 +26,7 @@ namespace Nebula::Graphics
         imageCreateInfo.arrayLayers = 1;
         imageCreateInfo.samples = vk::SampleCountFlagBits::e1;
         imageCreateInfo.sharingMode = vk::SharingMode::eExclusive;
+        imageCreateInfo.tiling = vk::ImageTiling::eOptimal;
 
         if (Framebuffer::IsDepthStencilFormat(textureSpec.InternalFormat))
         {
@@ -34,7 +35,6 @@ namespace Nebula::Graphics
         else
         {
             imageCreateInfo.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc;
-            imageCreateInfo.tiling = vk::ImageTiling::eLinear;
         }
 
         vma::Allocator allocator = m_Device->GetVMAAllocator();

@@ -87,6 +87,11 @@ namespace Nebula::Graphics
         auto physicalDevices = s_Instance.enumeratePhysicalDevices();
         m_PhysicalDevice = physicalDevices[0];
 
+        vk::PhysicalDeviceProperties deviceProperties = m_PhysicalDevice.getProperties();
+        uint32_t apiVersionMajor = VK_VERSION_MAJOR(deviceProperties.apiVersion);
+        uint32_t apiVersionMinor = VK_VERSION_MINOR(deviceProperties.apiVersion);
+        NB_CORE_ASSERT(apiVersionMajor > 1 || (apiVersionMajor == 1 && apiVersionMinor >= 4), "Nebula Engine requires a Vulkan 1.4 compliant GPU")
+
         auto queueFamilies = m_PhysicalDevice.getQueueFamilyProperties();
         for (uint32_t i = 0; i < queueFamilies.size(); i++)
         {
@@ -177,9 +182,6 @@ namespace Nebula::Graphics
     void VulkanDevice::WaitIdle()
     {
         m_LogicalDevice.waitIdle();
-
-        Ref<VulkanQueue> graphicsQueue = std::dynamic_pointer_cast<VulkanQueue>(m_GraphicsQueue);
-        graphicsQueue->GetVKQueue().waitIdle();
     }
 
     Ref<VertexBuffer> VulkanDevice::CreateVertexBuffer(uint32_t size)

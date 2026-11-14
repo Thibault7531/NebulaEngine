@@ -73,7 +73,7 @@ namespace Nebula::Graphics
         presentInfo.pWaitSemaphores = &m_FrameSlots[m_CurrentFrameSlotIndex].RenderCompleteSemaphore;
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = &m_Swapchain;
-        presentInfo.pImageIndices = &m_CurrentFrameSlotIndex;
+        presentInfo.pImageIndices = &m_CurrentFrameIndex;
 
         vk::Result result = graphicsQueue->GetVKQueue().presentKHR(&presentInfo);
         if (result == vk::Result::eErrorOutOfDateKHR || result == vk::Result::eSuboptimalKHR)
