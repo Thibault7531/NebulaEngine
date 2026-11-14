@@ -334,7 +334,8 @@ namespace Nebula {
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("NBSCENE_DRAG"))
                 {
-                    OpenScene(static_cast<const char*>(payload->Data));
+                    std::string payloadData(static_cast<const char*>(payload->Data), payload->DataSize);
+                    OpenScene(std::filesystem::path(payloadData));
                 }
 
                 ImGui::EndDragDropTarget();
