@@ -23,13 +23,6 @@ namespace Nebula::Graphics
         virtual std::string GetAPIVendor() const override;
         virtual std::string GetAPIRenderer() const override;
 
-        virtual void SetVSync(VSyncMode mode) override;
-        virtual VSyncMode IsVsync() const override;
-        virtual void Resize(uint32_t width, uint32_t height) override;
-
-        virtual void NewFrame() override;
-        virtual void Present(void* framebuffer) override;
-
     public:
         void* GetMetalLayer() { return m_MetalLayer; }
 

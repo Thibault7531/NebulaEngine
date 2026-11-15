@@ -75,10 +75,29 @@ namespace Nebula::Graphics
         stbi_image_free(data);
     }
 
+    Metal3Texture2D::Metal3Texture2D(MTL::Device* device, uint32_t width, uint32_t height, MTL::Texture* swapchainImage, const TextureSpecification& textureSpec)
+    {
+        m_spec = textureSpec;
+        m_Device = device;
+        m_Texture = swapchainImage;
+        m_OwnsTexture = false;
+
+        MTL::SamplerDescriptor* samplerDescriptor = MTL::SamplerDescriptor::alloc()->init();
+        samplerDescriptor->setNormalizedCoordinates(true);
+        samplerDescriptor->setRAddressMode(MTL::SamplerAddressModeRepeat);
+        samplerDescriptor->setSAddressMode(MTL::SamplerAddressModeRepeat);
+        samplerDescriptor->setTAddressMode(MTL::SamplerAddressModeRepeat);
+        samplerDescriptor->setMinFilter(GetMetal3MinMagFilter(m_spec.MinFilter));
+        samplerDescriptor->setMagFilter(GetMetal3MinMagFilter(m_spec.MagFilter));
+
+        m_Sampler = device->newSamplerState(samplerDescriptor);
+        samplerDescriptor->release();
+    }
+
     Metal3Texture2D::~Metal3Texture2D()
     {
         m_Sampler->release();
-        m_Texture->release();
+        if (m_OwnsTexture) m_Texture->release();
     }
 
     void Metal3Texture2D::SetData(void* data, uint32_t size, DataFormat format, DataType dataType)
@@ -86,7 +105,7 @@ namespace Nebula::Graphics
         m_Texture->replaceRegion(MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0, data, size/m_Texture->height());
     }
 
-    std::vector<uint8_t> Metal3Texture2D::GetDataR8()
+    std::vector<uint8_t> Metal3Texture2D::GetRawData()
     {
         MTL::CommandQueue* commandQueue = m_Device->newCommandQueue();
         MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
@@ -97,56 +116,8 @@ namespace Nebula::Graphics
         commandBuffer->waitUntilCompleted();
         commandQueue->release();
 
-        std::vector<uint8_t> result(m_Texture->width() * m_Texture->height());
-        m_Texture->getBytes(result.data(), m_Texture->width() * sizeof(uint8_t), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
-        return result;
-    }
-
-    std::vector<int32_t> Metal3Texture2D::GetDataR32I()
-    {
-        MTL::CommandQueue* commandQueue = m_Device->newCommandQueue();
-        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
-        MTL::BlitCommandEncoder* blitEncoder = commandBuffer->blitCommandEncoder();
-        blitEncoder->synchronizeTexture(m_Texture, 0, 0);
-        blitEncoder->endEncoding();
-        commandBuffer->commit();
-        commandBuffer->waitUntilCompleted();
-        commandQueue->release();
-
-        std::vector<int32_t> result(m_Texture->width() * m_Texture->height());
-        m_Texture->getBytes(result.data(), m_Texture->width() * sizeof(int32_t), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
-        return result;
-    }
-
-    std::vector<uint32_t> Metal3Texture2D::GetDataR32UI()
-    {
-        MTL::CommandQueue* commandQueue = m_Device->newCommandQueue();
-        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
-        MTL::BlitCommandEncoder* blitEncoder = commandBuffer->blitCommandEncoder();
-        blitEncoder->synchronizeTexture(m_Texture, 0, 0);
-        blitEncoder->endEncoding();
-        commandBuffer->commit();
-        commandBuffer->waitUntilCompleted();
-        commandQueue->release();
-
-        std::vector<uint32_t> result(m_Texture->width() * m_Texture->height());
-        m_Texture->getBytes(result.data(), m_Texture->width() * sizeof(uint32_t), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
-        return result;
-    }
-
-    std::vector<glm::vec4> Metal3Texture2D::GetDataRGBA8()
-    {
-        MTL::CommandQueue* commandQueue = m_Device->newCommandQueue();
-        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
-        MTL::BlitCommandEncoder* blitEncoder = commandBuffer->blitCommandEncoder();
-        blitEncoder->synchronizeTexture(m_Texture, 0, 0);
-        blitEncoder->endEncoding();
-        commandBuffer->commit();
-        commandBuffer->waitUntilCompleted();
-        commandQueue->release();
-
-        std::vector<glm::vec4> result(m_Texture->width() * m_Texture->height());
-        m_Texture->getBytes(result.data(), m_Texture->width() * sizeof(glm::vec4), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
+        std::vector<uint8_t> result(m_Texture->width() * m_Texture->height() * GetStrideFromInternalFormat(m_spec.InternalFormat));
+        m_Texture->getBytes(result.data(), m_Texture->width() * GetStrideFromInternalFormat(m_spec.InternalFormat), MTL::Region(0, 0, m_Texture->width(), m_Texture->height()), 0);
         return result;
     }
 
@@ -166,6 +137,7 @@ namespace Nebula::Graphics
         case InternalFormat::R32I: return MTL::PixelFormatR32Sint;
         case InternalFormat::R32UI: return MTL::PixelFormatR32Uint;
         case InternalFormat::Depth24Stencil8: return MTL::PixelFormatDepth24Unorm_Stencil8;
+        case InternalFormat::Depth32Stencil8: return MTL::PixelFormatDepth32Float_Stencil8;
         }
     }
 
@@ -175,6 +147,20 @@ namespace Nebula::Graphics
         {
         case FilterType::Nearest: return MTL::SamplerMinMagFilterNearest;
         case FilterType::Linear: return MTL::SamplerMinMagFilterLinear;
+        }
+    }
+
+    uint32_t Metal3Texture2D::GetStrideFromInternalFormat(InternalFormat format)
+    {
+        switch (format)
+        {
+        case InternalFormat::None: return 0;
+        case InternalFormat::RGB8: return 3;
+        case InternalFormat::RGBA8: return 4;
+        case InternalFormat::R32I: return 4;
+        case InternalFormat::R32UI: return 4;
+        case InternalFormat::Depth24Stencil8: return 4;
+        case InternalFormat::Depth32Stencil8: return 5;
         }
     }
 

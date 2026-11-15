@@ -11,6 +11,7 @@ namespace Nebula::Graphics
     public:
         Metal3Texture2D(MTL::Device* device, uint32_t width, uint32_t height, const TextureSpecification& spec);
         Metal3Texture2D(MTL::Device* device, const std::filesystem::path& path, const TextureSpecification& spec);
+        Metal3Texture2D(MTL::Device* device, uint32_t width, uint32_t height, MTL::Texture* swapchainImage, const TextureSpecification& textureSpec);
         ~Metal3Texture2D();
 
         virtual TextureSpecification GetSpecification() override { return m_spec; }
@@ -19,10 +20,7 @@ namespace Nebula::Graphics
         virtual uint32_t GetHeight() const override { return m_Texture->height(); }
 
         virtual void SetData(void* data, uint32_t size, DataFormat format, DataType dataType) override;
-        virtual std::vector<uint8_t> GetDataR8() override;
-        virtual std::vector<int32_t> GetDataR32I() override;
-        virtual std::vector<uint32_t> GetDataR32UI() override;
-        virtual std::vector<glm::vec4> GetDataRGBA8() override;
+        virtual std::vector<uint8_t> GetRawData() override;
 
         virtual bool operator==(const Texture2D& other) const override;
 
@@ -33,10 +31,12 @@ namespace Nebula::Graphics
     public:
         static MTL::PixelFormat GetMetal3PixelFormat(InternalFormat format);
         static MTL::SamplerMinMagFilter GetMetal3MinMagFilter(FilterType filter);
+        static uint32_t GetStrideFromInternalFormat(InternalFormat format);
         static uint32_t GetStrideFromDataFormat(DataFormat format);
 
     private:
         TextureSpecification m_spec;
+        bool m_OwnsTexture = true;
 
         MTL::Device* m_Device;
         MTL::Texture* m_Texture;

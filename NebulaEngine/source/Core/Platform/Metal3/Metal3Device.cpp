@@ -3,29 +3,35 @@
 #include "Metal3Buffer.h"
 #include "Metal3CommandBuffer.h"
 #include "Metal3Framebuffer.h"
+#include "Metal3Queue.h"
 #include "Metal3Shader.h"
 #include "Metal3ShaderPipeline.h"
-#include "Metal3Surface.h"
 #include "Metal3Texture.h"
 
 namespace Nebula::Graphics
 {
 
     Metal3Device::Metal3Device()
-        : m_Device{MTL::CreateSystemDefaultDevice()}, m_CommandQueue{m_Device->newCommandQueue()}
+        : m_Device{MTL::CreateSystemDefaultDevice()}
     {
+        m_GraphicsQueue = CreateRef<Metal3Queue>(this);
     }
 
     Metal3Device::~Metal3Device()
     {
-        m_CommandQueue->release();
         m_Device->release();
     }
 
     void Metal3Device::SetSurfaceDevice(Ref<Surface> surface)
     {
-        Ref<Metal3Surface> nativeSurface = std::dynamic_pointer_cast<Metal3Surface>(surface);
-        nativeSurface->SetDevice(nullptr, m_Device, m_CommandQueue);
+        Ref<Metal3Queue> queue = std::dynamic_pointer_cast<Metal3Queue>(m_GraphicsQueue);
+        surface->SetDevice(nullptr, m_Device, queue->GetMetalCommandQueue());
+    }
+
+    void Metal3Device::WaitIdle()
+    {
+        Ref<Metal3Queue> queue = std::dynamic_pointer_cast<Metal3Queue>(m_GraphicsQueue);
+        if (queue->GetLastCommandBuffer()) queue->GetLastCommandBuffer()->waitUntilCompleted();
     }
 
     Ref<VertexBuffer> Metal3Device::CreateVertexBuffer(uint32_t size)
@@ -58,8 +64,7 @@ namespace Nebula::Graphics
         return CreateRef<Metal3UniformBuffer>(m_Device, layout, instances);
     }
 
-    Ref<Texture2D> Metal3Device::CreateTexture2D(uint32_t width, uint32_t height,
-        const Texture::TextureSpecification& spec)
+    Ref<Texture2D> Metal3Device::CreateTexture2D(uint32_t width, uint32_t height, const Texture::TextureSpecification& spec)
     {
         return CreateRef<Metal3Texture2D>(m_Device, width, height, spec);
     }
@@ -72,6 +77,11 @@ namespace Nebula::Graphics
     Ref<Framebuffer> Metal3Device::CreateFramebuffer(const FramebufferSpecification& spec)
     {
         return CreateRef<Metal3Framebuffer>(this, spec);
+    }
+
+    Ref<Framebuffer> Metal3Device::CreateFramebufferForSwapchain(const FramebufferSpecification& spec, uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture)
+    {
+
     }
 
     Ref<Shader> Metal3Device::CreateShader(const std::filesystem::path& path)
