@@ -39,7 +39,7 @@ namespace Nebula
 		Graphics::RendererAPI::Init(api);
 
 		m_Device = Graphics::Device::CreateDefaultDevice();
-		m_Swapchain = m_Device->CreateSwapchain(m_MainWindow->GetSurface(), {m_MainWindow->GetClientSize().first, m_MainWindow->GetClientSize().second}, 0);
+		m_Swapchain = m_Device->CreateSwapchain(m_MainWindow->GetSurface(), Graphics::VSyncMode::Adaptive, {m_MainWindow->GetClientSize().first, m_MainWindow->GetClientSize().second}, 0);
 
 		SceneRenderer::Init();
 		Renderer2D::Init();

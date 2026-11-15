@@ -51,7 +51,7 @@ namespace Nebula {
             OpenScene(path);
         });
 
-        Platform::WindowManager::Get().GetMainWindow()->SetVSync(Graphics::VSyncMode::Adaptive);
+        Application::Get().GetMainWindowSwapchain()->SetVSyncMode(Graphics::VSyncMode::Adaptive);
         Platform::WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
         {
             ImGuiIO& io = ImGui::GetIO();

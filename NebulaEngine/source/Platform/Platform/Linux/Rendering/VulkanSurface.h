@@ -21,13 +21,6 @@ namespace Nebula::Graphics
         virtual void SetDevice(void* physicalDevice, void* logicalDevice, void* commandQueue) override;
         virtual void* GetSurface() const override { return m_Surface; }
 
-        virtual void SetVSync(VSyncMode mode) override;
-        virtual VSyncMode IsVsync() const override;
-        virtual void Resize(uint32_t width, uint32_t height) override;
-
-        virtual void NewFrame() override;
-        virtual void Present(void* texture) override;
-
     public:
         vk::SurfaceKHR GetVkSurface() const { return m_Surface; }
 

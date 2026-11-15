@@ -101,7 +101,7 @@ namespace Nebula::Graphics
         virtual Ref<Framebuffer> CreateFramebuffer(const FramebufferSpecification& spec) = 0;
         virtual Ref<Framebuffer> CreateFramebufferForSwapchain(const FramebufferSpecification& spec, uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture) = 0;
 
-        virtual Ref<SwapChain> CreateSwapchain(Ref<Surface> surface, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) = 0;
+        virtual Ref<SwapChain> CreateSwapchain(Ref<Surface> surface, VSyncMode vsyncMode, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) = 0;
 
         virtual Ref<ShaderModule> CreateShaderModule(const std::filesystem::path& path) = 0;
         virtual Ref<ShaderPipeline> CreateShaderPipeline(const VertexLayout& layout,  const PipelineSpecification& spec) = 0;

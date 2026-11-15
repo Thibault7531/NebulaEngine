@@ -659,12 +659,11 @@ namespace Nebula
         {
             viewport_data->GraphicsSurface = viewport_data->Window->GetSurface();
             Application::Get().GetDevice()->SetSurfaceDevice(viewport_data->GraphicsSurface);
-            viewport_data->Window->SetVSync(viewport_data->ParentWindow ? viewport_data->ParentWindow->IsVSync() : Graphics::VSyncMode::Adaptive);
             Graphics::FramebufferSpecification spec = {
                 window->GetClientSize().first,
                 window->GetClientSize().second
             };
-            viewport_data->Swapchain = Application::Get().GetDevice()->CreateSwapchain(viewport_data->GraphicsSurface, spec, 0);
+            viewport_data->Swapchain = Application::Get().GetDevice()->CreateSwapchain(viewport_data->GraphicsSurface, Graphics::VSyncMode::Adaptive, spec, 0);
 
             uint32_t maxFramesInFlight = viewport_data->Swapchain->GetMaxFramesInFlight();
             viewport_data->CommandBuffers.resize(maxFramesInFlight);

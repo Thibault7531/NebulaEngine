@@ -80,11 +80,6 @@ namespace Nebula::Platform
         CoreUtils::PumpEvents();
     }
 
-    void LinuxWindow::Present(void* framebuffer)
-    {
-        m_Surface->Present(framebuffer);
-    }
-
     std::pair<uint32_t, uint32_t> LinuxWindow::GetSize() const
     {
         int width, height;
@@ -152,16 +147,6 @@ namespace Nebula::Platform
     void LinuxWindow::CaptureMouse(bool enabled)
     {
         SDL_CaptureMouse(enabled);
-    }
-
-    void LinuxWindow::SetVSync(Graphics::VSyncMode mode)
-    {
-        m_Surface->SetVSync(mode);
-    }
-
-    Graphics::VSyncMode LinuxWindow::IsVSync() const
-    {
-        return m_Surface->IsVsync();
     }
 
     void LinuxWindow::SetFullscreen(bool enabled)

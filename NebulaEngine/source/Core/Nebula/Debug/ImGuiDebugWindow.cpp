@@ -145,7 +145,7 @@ namespace Nebula::Debug
                 ImGui::TableNextColumn();
                 ImGui::Text("VSync Mode:");
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", window->GetSurface()->GetVSyncModeString().c_str());
+                ImGui::Text("Currently not available from the window");
             }
             ImGui::EndTable();
             ImGui::Separator();

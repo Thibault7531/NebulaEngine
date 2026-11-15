@@ -32,7 +32,6 @@ namespace Nebula::Graphics
             NB_PLATFORM_ERROR("Failed to create OpenGL context: {0}", SDL_GetError());
             return;
         }
-        OpenGL460Surface::NewFrame();
 
         if (!s_GLInitialized)
         {
@@ -60,35 +59,5 @@ namespace Nebula::Graphics
     std::string OpenGL460Surface::GetAPIRenderer() const
     {
         return reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-    }
-
-    void OpenGL460Surface::SetVSync(VSyncMode mode)
-    {
-        if (mode == VSyncMode::Off) SDL_GL_SetSwapInterval(0);
-        if (mode == VSyncMode::Adaptive) SDL_GL_SetSwapInterval(-1);
-        if (mode == VSyncMode::On) SDL_GL_SetSwapInterval(1);
-    }
-
-    VSyncMode OpenGL460Surface::IsVsync() const
-    {
-        int mode;
-        SDL_GL_GetSwapInterval(&mode);
-
-        if (mode == -1) return VSyncMode::Adaptive;
-        if (mode == 1) return VSyncMode::On;
-        return VSyncMode::Off;
-    }
-
-    void OpenGL460Surface::NewFrame()
-    {
-        SDL_GL_MakeCurrent(static_cast<SDL_Window*>(m_Window->GetNativeWindow()), m_Context);
-    }
-
-    void OpenGL460Surface::Present(void* framebuffer)
-    {
-        NewFrame();
-        GLuint fbID = static_cast<GLuint>(reinterpret_cast<intptr_t>(framebuffer));
-        if (fbID != 0) glBlitNamedFramebuffer(fbID, 0, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        SDL_GL_SwapWindow(static_cast<SDL_Window*>(m_Window->GetNativeWindow()));
     }
 }

@@ -5,9 +5,8 @@
 
 namespace Nebula::Graphics
 {
-    VulkanSwapChain::VulkanSwapChain(Device* device, Ref<Surface> surface, const FramebufferSpecification& framebufferSpec,
-        uint32_t swapchainTextureIndex)
-            : m_Device{dynamic_cast<VulkanDevice*>(device)}, m_Surface{surface}, m_FramebufferSpec{framebufferSpec}, m_SwapchainTextureIndex{swapchainTextureIndex}
+    VulkanSwapChain::VulkanSwapChain(Device* device, Ref<Surface> surface, VSyncMode vsyncMode, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex)
+            : m_Device{dynamic_cast<VulkanDevice*>(device)}, m_Surface{surface}, m_FramebufferSpec{framebufferSpec}, m_SwapchainTextureIndex{swapchainTextureIndex}, m_VSyncMode{vsyncMode}
     {
         m_Device->SetSurfaceDevice(m_Surface);
         m_VKSurface = static_cast<VkSurfaceKHR>(m_Surface->GetSurface());
@@ -18,6 +17,12 @@ namespace Nebula::Graphics
     {
         m_Device->GetVKLogicalDevice().waitIdle();
         m_Device->GetVKLogicalDevice().destroySwapchainKHR(m_Swapchain);
+    }
+
+    void VulkanSwapChain::SetVSyncMode(VSyncMode mode)
+    {
+        m_VSyncMode = mode;
+        Invalidate();
     }
 
     void VulkanSwapChain::Resize(uint32_t width, uint32_t height)
@@ -126,7 +131,7 @@ namespace Nebula::Graphics
         swapchainCreateInfo.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
         swapchainCreateInfo.preTransform = vk::SurfaceTransformFlagBitsKHR::eIdentity;
         swapchainCreateInfo.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
-        swapchainCreateInfo.presentMode = vk::PresentModeKHR::eFifo;
+        swapchainCreateInfo.presentMode = GetVKPresentMode(m_VSyncMode);
         swapchainCreateInfo.oldSwapchain = m_Swapchain;
         m_Swapchain = m_Device->GetVKLogicalDevice().createSwapchainKHR(swapchainCreateInfo);
 
@@ -157,6 +162,16 @@ namespace Nebula::Graphics
         if (swapchainCreateInfo.oldSwapchain)
         {
             m_Device->GetVKLogicalDevice().destroySwapchainKHR(swapchainCreateInfo.oldSwapchain);
+        }
+    }
+
+    vk::PresentModeKHR VulkanSwapChain::GetVKPresentMode(VSyncMode mode)
+    {
+        switch (mode)
+        {
+        case VSyncMode::Off: return vk::PresentModeKHR::eImmediate;
+        case VSyncMode::On: return vk::PresentModeKHR::eFifo;
+        case VSyncMode::Adaptive: return vk::PresentModeKHR::eFifo;
         }
     }
 }

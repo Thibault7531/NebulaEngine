@@ -59,8 +59,7 @@ namespace Nebula::Graphics
     Ref<Framebuffer> OpenGL460Device::CreateFramebufferForSwapchain(const FramebufferSpecification& spec,
         uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture) {}
 
-    Ref<SwapChain> OpenGL460Device::CreateSwapchain(Ref<Surface> surface,
-        const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) {}
+    Ref<SwapChain> OpenGL460Device::CreateSwapchain(Ref<Surface> surface, VSyncMode vsyncMode, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex) {}
 
     Ref<ShaderModule> OpenGL460Device::CreateShaderModule(const std::filesystem::path& path)
     {

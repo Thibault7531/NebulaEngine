@@ -23,9 +23,11 @@ namespace Nebula::Graphics
     class VulkanSwapChain : public SwapChain
     {
     public:
-        VulkanSwapChain(Device* device, Ref<Surface> surface, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex);
+        VulkanSwapChain(Device* device, Ref<Surface> surface, VSyncMode vsyncMode, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex);
         ~VulkanSwapChain() override;
 
+        virtual void SetVSyncMode(VSyncMode mode) override;
+        virtual VSyncMode GetVSyncMode() const override { return m_VSyncMode; }
         virtual void Resize(uint32_t width, uint32_t height) override;
 
         virtual void NewFrame() override;
@@ -38,6 +40,9 @@ namespace Nebula::Graphics
     public:
         void Invalidate();
 
+    public:
+        vk::PresentModeKHR GetVKPresentMode(VSyncMode mode);
+
     private:
         VulkanDevice* m_Device;
         Ref<Surface> m_Surface;
@@ -47,6 +52,7 @@ namespace Nebula::Graphics
         uint32_t m_SwapchainTextureIndex;
 
         vk::SwapchainKHR m_Swapchain;
+        VSyncMode m_VSyncMode;
         uint8_t m_MaxFramesInFlight;
         uint32_t m_CurrentFrameSlotIndex;
         std::vector<VulkanFrameSlot> m_FrameSlots;

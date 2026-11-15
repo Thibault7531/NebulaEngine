@@ -22,13 +22,6 @@ namespace Nebula::Graphics
         virtual void SetDevice(void* device, void* logicalDevice, void* commandQueue) override {}
         virtual void* GetSurface() const override { return m_Context; }
 
-        virtual void SetVSync(VSyncMode mode) override;
-        virtual VSyncMode IsVsync() const override;
-        virtual void Resize(uint32_t width, uint32_t height) override {}
-
-        virtual void NewFrame() override;
-        virtual void Present(void* framebuffer) override;
-
     private:
         Platform::Window* m_Window;
         SDL_GLContext m_Context = nullptr;

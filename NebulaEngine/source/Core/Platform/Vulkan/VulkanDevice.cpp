@@ -234,9 +234,9 @@ namespace Nebula::Graphics
         return CreateRef<VulkanFramebuffer>(this, spec, swapchainTextureIndex, swapchainTexture);
     }
 
-    Ref<SwapChain> VulkanDevice::CreateSwapchain(Ref<Surface> surface, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex)
+    Ref<SwapChain> VulkanDevice::CreateSwapchain(Ref<Surface> surface, VSyncMode vsyncMode, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex)
     {
-        return CreateRef<VulkanSwapChain>(this, surface, framebufferSpec, swapchainTextureIndex);
+        return CreateRef<VulkanSwapChain>(this, surface, vsyncMode, framebufferSpec, swapchainTextureIndex);
     }
 
     Ref<ShaderModule> VulkanDevice::CreateShaderModule(const std::filesystem::path& path)
