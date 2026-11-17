@@ -214,5 +214,115 @@
         "rhs": "Darwin"
       }
     }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug-Windows-AMD64",
+      "configurePreset": "Debug-Windows-AMD64",
+      "description": "Build Debug configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformVulkanExample", "PlatformOpenGLExample"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "Release-Windows-AMD64",
+      "configurePreset": "Release-Windows-AMD64",
+      "description": "Build Release configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformVulkanExample", "PlatformOpenGLExample"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "Dist-Windows-AMD64",
+      "configurePreset": "Dist-Windows-AMD64",
+      "description": "Build Distribution configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformVulkanExample", "PlatformOpenGLExample"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "Debug-Linux-AMD64",
+      "configurePreset": "Debug-Linux-AMD64",
+      "description": "Build Debug configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformVulkanExample", "PlatformOpenGLExample"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "Release-Linux-AMD64",
+      "configurePreset": "Release-Linux-AMD64",
+      "description": "Build Release configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformVulkanExample", "PlatformOpenGLExample"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "Dist-Linux-AMD64",
+      "configurePreset": "Dist-Linux-AMD64",
+      "description": "Build Distribution configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformVulkanExample", "PlatformOpenGLExample"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "Debug-MacOS-AMD64",
+      "configurePreset": "Debug-MacOS-AMD64",
+      "description": "Build Debug configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformMetal3Example"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "Release-MacOS-AMD64",
+      "configurePreset": "Release-MacOS-AMD64",
+      "description": "Build Release configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformMetal3Example"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "Dist-MacOS-AMD64",
+      "configurePreset": "Dist-MacOS-AMD64",
+      "description": "Build Distribution configuration",
+      "hidden": false,
+      "targets": ["NebulaEditor", "Renderer2DExample", "3DRendererExample", "BatchRendererExample", "PlatformMetal3Example"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    }
   ]
 }

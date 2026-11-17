@@ -210,7 +210,7 @@ int main()
         swapchainImageViews[imageIndex] = device.createImageView(imageViewCreateInfo);
     }
 
-    const uint32_t maxFramesInFlight = surfaceCapabilities.maxImageCount;
+    const uint32_t maxFramesInFlight = surfaceCapabilities.maxImageCount ? std::max(surfaceCapabilities.maxImageCount, 3u) : 3;
     uint32_t frameInFlightIndex = 0;
 
     vk::SemaphoreCreateInfo semaphoreCreateInfo;

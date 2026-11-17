@@ -6,6 +6,7 @@ set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE INTERNAL "" FORCE)
 set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(Assimp)
 
+target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Assimp/contrib/unzip")
 if (CMAKE_BUILD_TYPE EQUAL "Debug")
     set_property(TARGET assimp PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug")
 else ()
