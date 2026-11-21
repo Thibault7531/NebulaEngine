@@ -21,7 +21,6 @@ namespace Nebula::Graphics
     Ref<CommandBuffer> Metal3Queue::CreateCommandBuffer()
     {
         Ref<CommandBuffer> commandBuffer = CreateRef<Metal3CommandBuffer>(m_Device->GetMetalDevice(), m_CommandQueue);
-        commandBuffer->Begin();
         return commandBuffer;
     }
 
@@ -40,7 +39,7 @@ namespace Nebula::Graphics
 
         Ref<Metal3CommandBuffer> metalCommandBuffer = std::dynamic_pointer_cast<Metal3CommandBuffer>(commandBuffer);
         metalCommandBuffer->GetMetalCommandBuffer()->encodeSignalEvent(m_TimelineEvent, m_LastSyncPoint.Value + 1);
-        metalCommandBuffer->End();
+        metalCommandBuffer->GetMetalCommandBuffer()->commit();
         m_LastCommandBuffer = metalCommandBuffer->GetMetalCommandBuffer();
 
         SyncPoint syncPoint;

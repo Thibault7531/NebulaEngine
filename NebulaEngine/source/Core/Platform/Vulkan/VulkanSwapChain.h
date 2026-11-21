@@ -34,6 +34,7 @@ namespace Nebula::Graphics
         virtual Ref<Framebuffer> GetCurrentFrame() override;
         virtual void Present() override;
 
+        virtual FramebufferSpecification GetFramebufferSpecification() override { return m_FramebufferSpec; }
         virtual uint32_t GetMaxFramesInFlight() const override { return m_MaxFramesInFlight; }
         virtual uint32_t GetCurrentFrameIndex() const override { return m_CurrentFrameSlotIndex; }
 

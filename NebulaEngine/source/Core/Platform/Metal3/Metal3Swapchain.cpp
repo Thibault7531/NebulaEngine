@@ -8,6 +8,7 @@ namespace Nebula::Graphics
     Metal3Swapchain::Metal3Swapchain(Device* device, Ref<Surface> surface, VSyncMode vsyncMode, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex)
         : m_Device{static_cast<Metal3Device*>(device)}, m_Surface{surface}, m_VSyncMode{vsyncMode}, m_FramebufferSpec{framebufferSpec}, m_SwapchainTextureIndex{swapchainTextureIndex}
     {
+        surface->SetDevice(nullptr, m_Device->GetMetalDevice(), nullptr);
         m_MetalLayer = static_cast<CA::MetalLayer*>(surface->GetSurface());
         m_MetalLayer->setDisplaySyncEnabled(vsyncMode == VSyncMode::On || vsyncMode == VSyncMode::Adaptive);
         m_MaxFramesInFlight = std::max(m_MaxFramesInFlight, static_cast<uint32_t>(m_MetalLayer->maximumDrawableCount()));
@@ -17,6 +18,7 @@ namespace Nebula::Graphics
         for (uint32_t i = 0; i < m_MaxFramesInFlight; i++)
         {
             m_InFlightFences[i] = m_Device->GetMetalDevice()->newSharedEvent();
+            m_InFlightFences[i]->setSignaledValue(1);
         }
     }
 
@@ -39,7 +41,7 @@ namespace Nebula::Graphics
 
         m_MetalDrawables[m_CurrentFrameIndex] = m_MetalLayer->nextDrawable();
         MTL::Texture* texture = m_MetalDrawables[m_CurrentFrameIndex]->texture();
-        Ref<Metal3Texture2D> nbTexture = CreateRef<Metal3Texture2D>(m_Device, texture->width(), texture->height(), texture, m_FramebufferSpec.AttachmentSpec.Attachments[m_SwapchainTextureIndex]);
+        Ref<Metal3Texture2D> nbTexture = CreateRef<Metal3Texture2D>(m_Device->GetMetalDevice(), texture->width(), texture->height(), texture, m_FramebufferSpec.AttachmentSpec.Attachments[m_SwapchainTextureIndex]);
         m_Framebuffers[m_CurrentFrameIndex] = std::dynamic_pointer_cast<Metal3Framebuffer>(m_Device->CreateFramebufferForSwapchain(m_FramebufferSpec, m_SwapchainTextureIndex, nbTexture));
 
         m_InFlightFences[m_CurrentFrameIndex]->setSignaledValue(0);

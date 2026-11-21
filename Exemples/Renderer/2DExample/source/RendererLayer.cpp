@@ -60,7 +60,7 @@ void RendererLayer::OnAttach()
     m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColor.slang");
     Nebula::Graphics::PipelineSpecification solidShaderSpec;
     solidShaderSpec.blendState = blendState;
-    solidShaderSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
+    solidShaderSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetFramebufferSpecification();
     solidShaderSpec.stages = {
         { Nebula::Graphics::ShaderStage::Vertex, m_ShaderLibrary.Get("SolidColor"), "vertexMain" },
         { Nebula::Graphics::ShaderStage::Fragment, m_ShaderLibrary.Get("SolidColor"), "fragmentMain" }
@@ -69,7 +69,7 @@ void RendererLayer::OnAttach()
     m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/Texture.slang");
     Nebula::Graphics::PipelineSpecification textureShaderSpec;
     textureShaderSpec.blendState = blendState;
-    textureShaderSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
+    textureShaderSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetFramebufferSpecification();
     textureShaderSpec.stages = {
         { Nebula::Graphics::ShaderStage::Vertex, m_ShaderLibrary.Get("Texture"), "vertexMain" },
         { Nebula::Graphics::ShaderStage::Fragment, m_ShaderLibrary.Get("Texture"), "fragmentMain" }

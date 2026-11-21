@@ -168,11 +168,6 @@ namespace Nebula::Platform
         }
     }
 
-    void WindowsWindow::Present(void* framebuffer)
-    {
-        m_Context->Present(framebuffer);
-    }
-
     std::pair<unsigned int, unsigned int> WindowsWindow::GetSize() const
     {
         auto size = m_Window.Size();
@@ -245,16 +240,6 @@ namespace Nebula::Platform
     void WindowsWindow::CaptureMouse(bool enabled)
     {
         SetCapture(enabled ? m_Hwnd : nullptr);
-    }
-
-    void WindowsWindow::SetVSync(Graphics::VSyncMode mode)
-    {
-        m_Context->SetVSync(mode);
-    }
-
-    Graphics::VSyncMode WindowsWindow::IsVSync() const
-    {
-        return m_Context->IsVsync();
     }
 
     void WindowsWindow::SetFullscreen(bool enabled)

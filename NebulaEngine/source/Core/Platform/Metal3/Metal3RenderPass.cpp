@@ -87,7 +87,7 @@ namespace Nebula::Graphics
     RenderPass& Metal3RenderPass::SetUniformBlock(const std::string& blockName, Ref<UniformBuffer> buffer,
         uint32_t instanceIndex)
     {
-        uint32_t location = m_CurrentlyBoundShaderPipeline->GetUniformBlockLocation(blockName);
+        uint32_t location = m_CurrentlyBoundShaderPipeline->GetUniformBlockBinding(blockName);
         Ref<Metal3UniformBuffer> uniformBuffer = std::dynamic_pointer_cast<Metal3UniformBuffer>(buffer);
         m_RenderCommandEncoder->setVertexBuffer(uniformBuffer->GetBuffer(), uniformBuffer->GetLayout().GetStride() * instanceIndex, location);
         m_RenderCommandEncoder->setFragmentBuffer(uniformBuffer->GetBuffer(), uniformBuffer->GetLayout().GetStride() * instanceIndex, location);
@@ -133,7 +133,8 @@ namespace Nebula::Graphics
     RenderPass& Metal3RenderPass::DrawIndexedOffset(Ref<IndexBuffer> indexBuffer, uint32_t elementCount, uint32_t indexOffset, uint32_t vertexOffset)
     {
         Ref<Metal3IndexBuffer> metalIndexBuffer = std::dynamic_pointer_cast<Metal3IndexBuffer>(indexBuffer);
-        if (elementCount) m_RenderCommandEncoder->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle, elementCount, Metal3IndexBuffer::GetIndexType(metalIndexBuffer->GetDataType()), metalIndexBuffer->GetBuffer(), indexOffset, 1, vertexOffset, 0);
+        uint32_t indexSize = metalIndexBuffer->GetDataType() == BufferDataType::UInt16 ? 2 : 4;
+        if (elementCount) m_RenderCommandEncoder->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle, elementCount, Metal3IndexBuffer::GetIndexType(metalIndexBuffer->GetDataType()), metalIndexBuffer->GetBuffer(), indexOffset * indexSize, 1, vertexOffset, 0);
 
         return *this;
     }
@@ -167,23 +168,23 @@ namespace Nebula::Graphics
         switch (mode)
         {
         case CullMode::None: return MTL::CullModeNone;
-        case CullMode::Front: return MTL::CullModeFront;
-        case CullMode::Back: return MTL::CullModeBack;
+        case CullMode::Front: return MTL::CullModeBack;
+        case CullMode::Back: return MTL::CullModeFront;
         }
     }
 
-    MTL::CompareFunction Metal3RenderPass::GetMetal3CompareFunction(DepthCompareFunction function)
+    MTL::CompareFunction Metal3RenderPass::GetMetal3CompareFunction(CompareFunction function)
     {
         switch (function)
         {
-        case DepthCompareFunction::Never: return MTL::CompareFunctionNever;
-        case DepthCompareFunction::Less: return MTL::CompareFunctionLess;
-        case DepthCompareFunction::Equal: return MTL::CompareFunctionEqual;
-        case DepthCompareFunction::LessEqual: return MTL::CompareFunctionLessEqual;
-        case DepthCompareFunction::Greater: return MTL::CompareFunctionGreater;
-        case DepthCompareFunction::NotEqual: return MTL::CompareFunctionNotEqual;
-        case DepthCompareFunction::GreaterEqual: return MTL::CompareFunctionGreaterEqual;
-        case DepthCompareFunction::Always: return MTL::CompareFunctionAlways;
+        case CompareFunction::Never: return MTL::CompareFunctionNever;
+        case CompareFunction::Less: return MTL::CompareFunctionLess;
+        case CompareFunction::Equal: return MTL::CompareFunctionEqual;
+        case CompareFunction::LessEqual: return MTL::CompareFunctionLessEqual;
+        case CompareFunction::Greater: return MTL::CompareFunctionGreater;
+        case CompareFunction::NotEqual: return MTL::CompareFunctionNotEqual;
+        case CompareFunction::GreaterEqual: return MTL::CompareFunctionGreaterEqual;
+        case CompareFunction::Always: return MTL::CompareFunctionAlways;
         }
     }
 }

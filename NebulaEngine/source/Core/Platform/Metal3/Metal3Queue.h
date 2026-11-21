@@ -14,7 +14,7 @@ namespace Nebula::Graphics
         virtual Ref<CommandBuffer> CreateCommandBuffer() override;
         virtual SyncPoint SubmitCommandBuffer(Ref<CommandBuffer> commandBuffer, std::vector<SyncPoint> waitSyncPoints) override;
 
-        virtual SyncPoint GetLastSyncPoint() const override;
+        virtual SyncPoint GetLastSyncPoint() const override { return m_LastSyncPoint; }
 
     public:
         MTL::CommandQueue* GetMetalCommandQueue() const { return m_CommandQueue; }

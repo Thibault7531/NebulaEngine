@@ -25,7 +25,7 @@ namespace Nebula::Graphics
 
     Metal3IndexBuffer::Metal3IndexBuffer(MTL::Device* device, uint32_t size)
     {
-        m_Buffer = device->newBuffer(size ? size : 3 * 4, MTL::ResourceStorageModeShared);
+        m_Buffer = device->newBuffer(size ? size * 4 : 3 * 4, MTL::ResourceStorageModeShared);
     }
 
     Metal3IndexBuffer::Metal3IndexBuffer(MTL::Device* device, uint16_t* indices, uint32_t count)

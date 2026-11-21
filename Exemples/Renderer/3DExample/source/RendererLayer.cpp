@@ -98,7 +98,7 @@ void RendererLayer::OnAttach()
 	blendState.dstAlphaFactor = Nebula::Graphics::BlendFactor::OneMinusSourceAlpha;
 	Nebula::Graphics::PipelineSpecification texturePipelineSpec;
 	texturePipelineSpec.blendState = blendState;
-	texturePipelineSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
+	texturePipelineSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetFramebufferSpecification();
 	texturePipelineSpec.stages = {
 		{ Nebula::Graphics::ShaderStage::Vertex, m_ShaderLibrary.Get("Texture"), "vertexMain" },
 		{ Nebula::Graphics::ShaderStage::Fragment, m_ShaderLibrary.Get("Texture"), "fragmentMain" }
@@ -106,7 +106,7 @@ void RendererLayer::OnAttach()
 	m_TextureShader = m_Device->CreateShaderPipeline(textureVertexLayout, texturePipelineSpec);
 	Nebula::Graphics::PipelineSpecification modelPipelineSpec;
 	modelPipelineSpec.blendState = blendState;
-	modelPipelineSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
+	modelPipelineSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetFramebufferSpecification();
 	modelPipelineSpec.stages = {
 		{ Nebula::Graphics::ShaderStage::Vertex, m_ShaderLibrary.Get("Model"), "vertexMain" },
 		{ Nebula::Graphics::ShaderStage::Fragment, m_ShaderLibrary.Get("Model"), "fragmentMain" }

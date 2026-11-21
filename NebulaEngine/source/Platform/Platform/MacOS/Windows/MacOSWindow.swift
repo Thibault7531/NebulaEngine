@@ -97,6 +97,7 @@ public struct MacOSWindow {
         MacOSWindow.s_EventHandlers[m_Window.windowNumber] = nil
         MacOSWindow.s_TrackingAreas[m_Window.windowNumber] = nil
         m_Window.delegate = nil
+        m_Window.isReleasedWhenClosed = false
         m_Window.close()
     }
     
@@ -220,9 +221,6 @@ public struct MacOSWindow {
             }
         }
     }
-    public mutating func Present(framebuffer: UnsafeMutableRawPointer) {
-        m_MTL3Surface?.Present(framebuffer)
-    }
     
     public func GetWindowWidth() -> UInt32 {
         return UInt32(m_Window.frame.width)
@@ -285,14 +283,6 @@ public struct MacOSWindow {
         CGAssociateMouseAndMouseCursorPosition(boolean_t(true))
     }
     
-    public mutating func SetVSync(mode: Nebula.Graphics.VSyncMode) {
-        m_MTL3Surface?.SetVSync(mode)
-    }
-    public func IsVSync() -> Nebula.Graphics.VSyncMode {
-        var mode: Nebula.Graphics.VSyncMode = .Off
-        if (m_MTL3Surface != nil) {mode = m_MTL3Surface!.IsVsync()}
-        return mode
-    }
     public func SetFullscreen(enabled: Bool) {
         if (m_Window.contentView!.isInFullScreenMode == enabled) { return }
         m_Window.toggleFullScreen(nil)

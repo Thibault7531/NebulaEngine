@@ -23,7 +23,6 @@ namespace Nebula::Platform
         virtual const std::function<HitTest(int32_t, int32_t)>& GetWindowHitTest() override;
 
         virtual void OnUpdate() override;
-        virtual void Present(void* framebuffer) override;
 
         [[nodiscard]] virtual std::pair<unsigned int, unsigned int> GetSize() const override;
         virtual void SetSize(uint32_t width, uint32_t height) override;
@@ -37,8 +36,6 @@ namespace Nebula::Platform
         virtual void SetMousePos(int32_t x, int32_t y) const override;
         virtual void CaptureMouse(bool enabled) override;
 
-        virtual void SetVSync(Graphics::VSyncMode mode) override;
-        virtual Graphics::VSyncMode IsVSync() const override;
         virtual void SetFullscreen(bool enabled) override;
         [[nodiscard]] virtual bool IsFullscreen() const override;
         virtual void SetMaximized(bool enabled) override;

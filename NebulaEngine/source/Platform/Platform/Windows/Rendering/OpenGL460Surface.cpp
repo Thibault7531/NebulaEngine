@@ -77,37 +77,6 @@ namespace Nebula::Graphics
         return reinterpret_cast<const char*>(glGetString(GL_RENDERER));
     }
 
-    void OpenGL460Surface::SetVSync(VSyncMode mode)
-    {
-        switch (mode)
-        {
-        case VSyncMode::Off: wglSwapIntervalEXT(0); break;
-        case VSyncMode::On: wglSwapIntervalEXT(1); break;
-        case VSyncMode::Adaptive: wglSwapIntervalEXT(-1); break;
-        }
-    }
-
-    VSyncMode OpenGL460Surface::IsVsync() const
-    {
-        int result = wglGetSwapIntervalEXT();
-
-        if (result == -1) return VSyncMode::Adaptive;
-        return result ? VSyncMode::On : VSyncMode::Off;
-    }
-
-    void OpenGL460Surface::NewFrame()
-    {
-        wglMakeCurrent(m_DeviceContext, m_Context);
-    }
-
-    void OpenGL460Surface::Present(void* texture)
-    {
-        NewFrame();
-        GLuint fbID = static_cast<GLuint>(reinterpret_cast<intptr_t>(texture));
-        if (fbID != 0) glBlitNamedFramebuffer(fbID, 0, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, 0, 0, m_Window->GetSize().first, m_Window->GetSize().second, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        ::SwapBuffers(m_DeviceContext);
-    }
-
     void OpenGL460Surface::InitOpenGL()
     {
         PIXELFORMATDESCRIPTOR pfd = {

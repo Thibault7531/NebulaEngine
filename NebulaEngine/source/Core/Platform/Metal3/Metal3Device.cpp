@@ -4,8 +4,9 @@
 #include "Metal3CommandBuffer.h"
 #include "Metal3Framebuffer.h"
 #include "Metal3Queue.h"
-#include "Metal3Shader.h"
+#include "Metal3ShaderModule.h"
 #include "Metal3ShaderPipeline.h"
+#include "Metal3Swapchain.h"
 #include "Metal3Texture.h"
 
 namespace Nebula::Graphics
@@ -31,7 +32,10 @@ namespace Nebula::Graphics
     void Metal3Device::WaitIdle()
     {
         Ref<Metal3Queue> queue = std::dynamic_pointer_cast<Metal3Queue>(m_GraphicsQueue);
-        if (queue->GetLastCommandBuffer()) queue->GetLastCommandBuffer()->waitUntilCompleted();
+        MTL::CommandQueue* commandQueue = queue->GetMetalCommandQueue();
+        MTL::CommandBuffer* commandBuffer = commandQueue->commandBuffer();
+        commandBuffer->commit();
+        commandBuffer->waitUntilCompleted();
     }
 
     Ref<VertexBuffer> Metal3Device::CreateVertexBuffer(uint32_t size)
@@ -81,22 +85,22 @@ namespace Nebula::Graphics
 
     Ref<Framebuffer> Metal3Device::CreateFramebufferForSwapchain(const FramebufferSpecification& spec, uint32_t swapchainTextureIndex, Ref<Texture2D> swapchainTexture)
     {
-
+        return CreateRef<Metal3Framebuffer>(this, spec, swapchainTextureIndex, swapchainTexture);
     }
 
-    Ref<Shader> Metal3Device::CreateShader(const std::filesystem::path& path)
+    Ref<SwapChain> Metal3Device::CreateSwapchain(Ref<Surface> surface, VSyncMode vsyncMode, const FramebufferSpecification& framebufferSpec, uint32_t swapchainTextureIndex)
     {
-        return CreateRef<Metal3Shader>(m_Device, path);
+        return CreateRef<Metal3Swapchain>(this, surface, vsyncMode, framebufferSpec, swapchainTextureIndex);
     }
 
-    Ref<ShaderPipeline> Metal3Device::CreateShaderPipeline(Ref<Shader> shader, VertexLayout layout, const PipelineSpecification& spec)
+    Ref<ShaderModule> Metal3Device::CreateShaderModule(const std::filesystem::path& path)
     {
-        return CreateRef<Metal3ShaderPipeline>(m_Device, std::dynamic_pointer_cast<Metal3Shader>(shader), layout, spec);
+        return CreateRef<Metal3ShaderModule>(m_Device, path);
     }
 
-    Ref<CommandBuffer> Metal3Device::CreateCommandBuffer()
+    Ref<ShaderPipeline> Metal3Device::CreateShaderPipeline(const VertexLayout& layout, const PipelineSpecification& spec)
     {
-        return CreateRef<Metal3CommandBuffer>(m_Device, m_CommandQueue);
+        return CreateRef<Metal3ShaderPipeline>(m_Device, layout, spec);
     }
 
     uint32_t Metal3Device::GetMaximumTextureSize()

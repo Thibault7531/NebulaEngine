@@ -50,12 +50,6 @@ namespace Nebula::Graphics
 
         virtual void SetDevice(void* device, void* commandQueue) { m_Pointer->SetDevice(nullptr, device, commandQueue); }
 
-        virtual void SetVSync(VSyncMode mode) { m_Pointer->SetVSync(mode); }
-        virtual VSyncMode IsVsync() const { return m_Pointer->IsVsync(); }
-
-        virtual void NewFrame() { m_Pointer->NewFrame(); }
-        virtual void Present(void* framebuffer) { m_Pointer->Present(framebuffer); }
-
     private:
         Ref<Metal3Surface> m_Pointer;
     };
