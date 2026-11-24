@@ -10,6 +10,8 @@ namespace Nebula::Graphics
     VulkanShaderPipeline::VulkanShaderPipeline(Device* device, const VertexLayout& layout, const PipelineSpecification& spec)
         : m_Device{dynamic_cast<VulkanDevice*>(device)}, m_VertexLayout{layout}, m_Specification{spec}
     {
+        CheckFormatSupport();
+
         vk::PushConstantRange pushConstantRange;
         pushConstantRange.stageFlags = vk::ShaderStageFlagBits::eVertex;
         pushConstantRange.size = sizeof(vk::DeviceAddress);
@@ -312,6 +314,42 @@ namespace Nebula::Graphics
         case ResourceType::PushConstant: return vk::DescriptorType::eUniformBuffer;
         }
         return vk::DescriptorType::eUniformBuffer;
+    }
+
+    void VulkanShaderPipeline::CheckFormatSupport()
+    {
+        for (auto& attachment : m_Specification.framebufferSpec.AttachmentSpec.Attachments)
+        {
+            vk::FormatProperties formatProperties = m_Device->GetVKPhysicalDevice().getFormatProperties(VulkanTexture2D::GetVulkanInternalFormat(attachment.InternalFormat));
+
+            if (Framebuffer::IsDepthStencilFormat(attachment.InternalFormat))
+            {
+                if (!(formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment))
+                {
+                    switch (attachment.InternalFormat)
+                    {
+                    case Texture::InternalFormat::Depth24Stencil8:
+                        {
+                            attachment.InternalFormat = Texture::InternalFormat::Depth32Stencil8;
+                            break;
+                        }
+                    default: NB_CORE_ERROR("VulkanShaderPipeline: Format {} is not supported as a depth/stencil attachment", static_cast<uint32_t>(VulkanTexture2D::GetVulkanInternalFormat(attachment.InternalFormat))); break;
+                    }
+                }
+            }
+            else if (!(formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eColorAttachment))
+            {
+                switch (attachment.InternalFormat)
+                {
+                case Texture::InternalFormat::RGB8:
+                    {
+                        attachment.InternalFormat = Texture::InternalFormat::RGBA8;
+                        break;
+                    }
+                default: NB_CORE_ERROR("VulkanShaderPipeline: Format {} is not supported as a color attachment", static_cast<uint32_t>(VulkanTexture2D::GetVulkanInternalFormat(attachment.InternalFormat))); break;
+                }
+            }
+        }
     }
 
     vk::Format VulkanShaderPipeline::GetVulkanVertexFormat(ShaderDataType type)

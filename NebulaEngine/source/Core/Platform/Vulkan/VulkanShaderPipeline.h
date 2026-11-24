@@ -23,6 +23,9 @@ namespace Nebula::Graphics
         vk::Pipeline GetVKPipeline() const { return m_Pipeline; }
         vk::DescriptorType GetVKDescriptorType(ResourceType type);
 
+    private:
+        void CheckFormatSupport();
+
     public:
         static vk::Format GetVulkanVertexFormat(ShaderDataType type);
         static vk::ShaderStageFlagBits GetVulkanShaderStage(ShaderStage stage);
