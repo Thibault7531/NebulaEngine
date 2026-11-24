@@ -15,6 +15,7 @@
 # Build directories
 /bin
 /bin-int
+/build
 #/cmake*
 /out
 /winrt

@@ -118,7 +118,6 @@ namespace Nebula::Platform
             }
 
         case GraphicsAPI::Metal3: NB_PLATFORM_ERROR("Metal3 is not supported on Windows"); break;
-        case GraphicsAPI::OpenGL460: m_Context = CreateRef<Graphics::OpenGL460Surface>(this); break;
         case GraphicsAPI::Vulkan: m_Context = CreateRef<Graphics::VulkanSurface>(this);
         }
     }

@@ -76,7 +76,6 @@ target_compile_definitions(Nebula-Platform PUBLIC VULKAN_HPP_DISPATCH_LOADER_DYN
 target_include_directories(Nebula-Platform PRIVATE
                            ../
                            ../../vendor/spdlog/include
-                           ../../vendor/Glad/include
                            ../../vendor/metal-cpp
                            ../../vendor/volk
                            ../../vendor/Vulkan-Headers/include
@@ -89,10 +88,7 @@ if (nebula_cmake_platform STREQUAL Windows)
     target_compile_definitions(Nebula-Platform PUBLIC NB_PLATFORM_WINDOWS)
 
     target_link_libraries(Nebula-Platform PRIVATE
-                          GLAD
-                          GLAD_WGL
                           OneCoreUAP
-                          opengl32
                           volk
                           WindowsApp
     )
@@ -120,7 +116,6 @@ elseif (nebula_cmake_platform STREQUAL Linux)
 
     target_link_libraries(Nebula-Platform PRIVATE
                           SDL3::SDL3
-                          GLAD
                           volk
                           ${EGL_LIBRARIES}
     )
@@ -156,7 +151,6 @@ elseif (nebula_cmake_platform STREQUAL MacOS)
     target_include_directories(Swift-MacOS-Window PUBLIC
             ../
             ../../vendor/spdlog/include
-            ../../vendor/Glad/include
             "${CMAKE_CURRENT_SOURCE_DIR}/swift"
             "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Nebula/CoreSystems/Windows"
             "${CMAKE_SOURCE_DIR}/NebulaEngine/source/Platform/Platform/MacOS/Rendering"

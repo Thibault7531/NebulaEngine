@@ -179,7 +179,6 @@ namespace Nebula::Platform
         switch (api)
         {
         case GraphicsAPI::None: return false;
-        case GraphicsAPI::OpenGL460: return true;
         case GraphicsAPI::Metal3: return false;
         case GraphicsAPI::Vulkan: return true;
         default: return false;
@@ -192,7 +191,6 @@ namespace Nebula::Platform
         {
         case GraphicsAPI::None: return {};
         case GraphicsAPI::Metal3: return {};
-        case GraphicsAPI::OpenGL460: return {};
         case GraphicsAPI::Vulkan:
             {
                 uint32_t count;

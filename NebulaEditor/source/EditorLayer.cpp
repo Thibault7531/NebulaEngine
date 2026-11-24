@@ -323,11 +323,6 @@ namespace Nebula {
 
             ImVec2 uv0 = {0, 0};
             ImVec2 uv1 = {1, 1};
-            if (Graphics::RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460)
-            {
-                uv0 = {0, 1};
-                uv1 = {1, 0};
-            }
             ImGui::Image(m_Framebuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()]->GetColorAttachment().get(), { m_ViewportSize.x, m_ViewportSize.y }, uv0, uv1);
 
             if (ImGui::BeginDragDropTarget())

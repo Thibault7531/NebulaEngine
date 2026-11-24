@@ -13,7 +13,6 @@ namespace Nebula::Graphics {
 #ifdef NB_PLATFORM_MACOS
         case Platform::GraphicsAPI::None: NB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return;
         case Platform::GraphicsAPI::Metal3: s_API = api; return;
-        case Platform::GraphicsAPI::OpenGL460: NB_CORE_ASSERT(false, "RendererAPI::OpenGL not supported on MacOS"); return;
 #elifdef NB_PLATFORM_LINUX
         case Platform::GraphicsAPI::None:
             {
@@ -22,7 +21,6 @@ namespace Nebula::Graphics {
             }
 
         case Platform::GraphicsAPI::Metal3: NB_CORE_ASSERT(false, "RendererAPI::Metal3 is not supported on Linux!"); return;
-        case Platform::GraphicsAPI::OpenGL460: s_API = api; break;
 #endif
         }
     }

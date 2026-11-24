@@ -51,7 +51,7 @@ and platform abstraction.
 - **Model importing** through [Assimp](https://assimp.org/).
 - **Shader support** through the [Slang](https://github.com/shader-slang/slang)
   shading language.
-- **Platform backends** for OpenGL, Metal 3, and Vulkan experiments.
+- **Platform backends** for Metal 3 and Vulkan.
 - **Cross-platform foundation** targeting Windows, macOS, and Linux.
 
 ## Examples
@@ -63,7 +63,6 @@ The repository includes small, focused examples for exploring the engine:
 | `Renderer2DExample` | 2D rendering |
 | `3DRendererExample` | 3D rendering and model loading |
 | `BatchRendererExample` | Batched rendering |
-| `PlatformOpenGLExample` | OpenGL platform layer |
 | `PlatformMetal3Example` | Metal 3 platform layer |
 | `PlatformVulkanExample` | Vulkan platform layer |
 
