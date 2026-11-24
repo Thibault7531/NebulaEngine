@@ -5,14 +5,39 @@
 namespace Nebula::Graphics
 {
 
-    Metal3ShaderPipeline::Metal3ShaderPipeline(MTL::Device* device, Ref<Metal3Shader> shader, VertexLayout layout,
-        PipelineSpecification spec)
-            : m_Shader{shader}, m_Spec{spec}
+    Metal3ShaderPipeline::Metal3ShaderPipeline(MTL::Device* device, const VertexLayout& layout, const PipelineSpecification& spec)
+            : m_VertexLayout{layout}, m_Specification{spec}
     {
         MTL::RenderPipelineDescriptor* renderPipelineDescriptor = MTL::RenderPipelineDescriptor::alloc()->init();
-        renderPipelineDescriptor->setLabel(NS::String::string(shader->GetName().c_str(), NS::ASCIIStringEncoding));
-        renderPipelineDescriptor->setVertexFunction(shader->GetVertexFunction());
-        renderPipelineDescriptor->setFragmentFunction(shader->GetFragmentFunction());
+        std::string name;
+        Ref<Metal3ShaderModule> vertexShader;
+        for (const auto& stage : m_Specification.stages)
+        {
+            switch (stage.ShaderStage)
+            {
+            case ShaderStage::Vertex:
+                {
+                    vertexShader = std::dynamic_pointer_cast<Metal3ShaderModule>(stage.Module);
+                    name = vertexShader->GetName();
+                    MTL::Function* function = vertexShader->GetMTLLibrary()->newFunction(NS::String::string(stage.EntryPoint.c_str(), NS::ASCIIStringEncoding));
+                    renderPipelineDescriptor->setLabel(NS::String::string(name.c_str(), NS::ASCIIStringEncoding));
+                    renderPipelineDescriptor->setVertexFunction(function);
+                    break;
+                }
+
+            case ShaderStage::Fragment:
+                {
+                    Ref<Metal3ShaderModule> shaderModule = std::dynamic_pointer_cast<Metal3ShaderModule>(stage.Module);
+                    name = shaderModule->GetName();
+                    MTL::Function* function = shaderModule->GetMTLLibrary()->newFunction(NS::String::string(stage.EntryPoint.c_str(), NS::ASCIIStringEncoding));
+                    renderPipelineDescriptor->setLabel(NS::String::string(name.c_str(), NS::ASCIIStringEncoding));
+                    renderPipelineDescriptor->setFragmentFunction(function);
+                    break;
+                }
+
+            case ShaderStage::Compute: break;
+            }
+        }
 
         MTL::VertexDescriptor* vertexDescriptor = MTL::VertexDescriptor::vertexDescriptor();
         for (uint32_t index = 0; index < layout.GetElements().size(); index++)
@@ -20,11 +45,11 @@ namespace Nebula::Graphics
             VertexAttribute attribute = layout.GetElements()[index];
             vertexDescriptor->attributes()->object(index)->setFormat(GetMetal3VertexFormat(attribute.Type));
             vertexDescriptor->attributes()->object(index)->setOffset(attribute.Offset);
-            vertexDescriptor->attributes()->object(index)->setBufferIndex(m_Shader->GetVertexInputLocation());
+            vertexDescriptor->attributes()->object(index)->setBufferIndex(vertexShader->GetVertexInputLocation());
         }
-        vertexDescriptor->layouts()->object(m_Shader->GetVertexInputLocation())->setStride(layout.GetStride());
-        vertexDescriptor->layouts()->object(m_Shader->GetVertexInputLocation())->setStepFunction(MTL::VertexStepFunctionPerVertex);
-        vertexDescriptor->layouts()->object(m_Shader->GetVertexInputLocation())->setStepRate(1);
+        vertexDescriptor->layouts()->object(vertexShader->GetVertexInputLocation())->setStride(layout.GetStride());
+        vertexDescriptor->layouts()->object(vertexShader->GetVertexInputLocation())->setStepFunction(MTL::VertexStepFunctionPerVertex);
+        vertexDescriptor->layouts()->object(vertexShader->GetVertexInputLocation())->setStepRate(1);
         renderPipelineDescriptor->setVertexDescriptor(vertexDescriptor);
 
         uint32_t colorAttachmentIndex = 0;
@@ -60,7 +85,7 @@ namespace Nebula::Graphics
 
         NS::Error* error;
         m_RenderPipelineState = device->newRenderPipelineState(renderPipelineDescriptor, &error);
-        NB_CORE_ASSERT(m_RenderPipelineState, std::format("Could not compile shader {0}: {1}", shader->GetName(), error->localizedDescription()->utf8String()))
+        NB_CORE_ASSERT(m_RenderPipelineState, std::format("Could not compile shader {0}: {1}", name, error->localizedDescription()->utf8String()))
 
         renderPipelineDescriptor->release();
     }
@@ -68,6 +93,85 @@ namespace Nebula::Graphics
     Metal3ShaderPipeline::~Metal3ShaderPipeline()
     {
         m_RenderPipelineState->release();
+    }
+
+    ShaderStage Metal3ShaderPipeline::GetUniformBlockShaderStage(const std::string& uniformBlockName)
+    {
+        for (const auto& stage : m_Specification.stages)
+        {
+            Ref<Metal3ShaderModule> shaderModule = std::dynamic_pointer_cast<Metal3ShaderModule>(stage.Module);
+            ShaderReflectionLayout layout = shaderModule->GetLayout();
+            if (layout.ResourceIndex.find(uniformBlockName) != layout.ResourceIndex.end())
+            {
+                return stage.ShaderStage;
+            }
+        }
+        return ShaderStage::Vertex;
+    }
+
+    uint32_t Metal3ShaderPipeline::GetUniformBlockBinding(const std::string& uniformBlockName)
+    {
+        uint32_t binding = 0;
+        for (const auto& stage : m_Specification.stages)
+        {
+            Ref<Metal3ShaderModule> shaderModule = std::dynamic_pointer_cast<Metal3ShaderModule>(stage.Module);
+            ShaderReflectionLayout layout = shaderModule->GetLayout();
+            if (layout.ResourceIndex.find(uniformBlockName) != layout.ResourceIndex.end())
+            {
+                ResourceBinding resource = layout.Resources[layout.ResourceIndex[uniformBlockName]];
+                binding = resource.Binding;
+                return binding;
+            }
+        }
+        return binding;
+    }
+
+    uint32_t Metal3ShaderPipeline::GetUniformBlockSet(const std::string& uniformBlockName)
+    {
+        uint32_t set = 0;
+        for (const auto& stage : m_Specification.stages)
+        {
+            Ref<Metal3ShaderModule> shaderModule = std::dynamic_pointer_cast<Metal3ShaderModule>(stage.Module);
+            ShaderReflectionLayout layout = shaderModule->GetLayout();
+            if (layout.ResourceIndex.find(uniformBlockName) != layout.ResourceIndex.end())
+            {
+                ResourceBinding resource = layout.Resources[layout.ResourceIndex[uniformBlockName]];
+                set = resource.Set;
+                return set;
+            }
+        }
+        return set;
+    }
+
+    ResourceBinding Metal3ShaderPipeline::GetUniformBlockResourceBinding(const std::string& uniformBlockName)
+    {
+        ResourceBinding resourceBinding{};
+        for (const auto& stage : m_Specification.stages)
+        {
+            Ref<Metal3ShaderModule> shaderModule = std::dynamic_pointer_cast<Metal3ShaderModule>(stage.Module);
+            ShaderReflectionLayout layout = shaderModule->GetLayout();
+            if (layout.ResourceIndex.find(uniformBlockName) != layout.ResourceIndex.end())
+            {
+                resourceBinding = layout.Resources[layout.ResourceIndex[uniformBlockName]];
+                return resourceBinding;
+            }
+        }
+        return resourceBinding;
+    }
+
+    uint32_t Metal3ShaderPipeline::GetVertexInputLocation()
+    {
+        uint32_t location = 0;
+        for (const auto& stage : m_Specification.stages)
+        {
+            if (stage.ShaderStage == ShaderStage::Vertex)
+            {
+                Ref<Metal3ShaderModule> shaderModule = std::dynamic_pointer_cast<Metal3ShaderModule>(stage.Module);
+                location = shaderModule->GetVertexInputLocation();
+                return location;
+            }
+        }
+        return location;
     }
 
     MTL::VertexFormat Metal3ShaderPipeline::GetMetal3VertexFormat(ShaderDataType type)

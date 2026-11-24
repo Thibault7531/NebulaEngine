@@ -3,7 +3,6 @@
 #include "../Rendering/VulkanSurface.h"
 #include "Platform/Nebula/CoreSystems/Core/CoreUtils.h"
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
-#include "Platform/Platform/Linux/Rendering/OpenGL460Surface.h"
 
 namespace Nebula::Platform
 {
@@ -35,7 +34,6 @@ namespace Nebula::Platform
             if (m_Properties.isResizable) windowFlags |= SDL_WINDOW_RESIZABLE;
         }
 
-        if (m_Properties.API == GraphicsAPI::OpenGL460) windowFlags |= SDL_WINDOW_OPENGL;
         if (m_Properties.API == GraphicsAPI::Vulkan) windowFlags |= SDL_WINDOW_VULKAN;
 
         m_Window = SDL_CreateWindow(m_Properties.Title.c_str(), m_Properties.Width, m_Properties.Height, windowFlags);
@@ -52,7 +50,6 @@ namespace Nebula::Platform
                 break;
             }
 
-        case GraphicsAPI::OpenGL460: m_Surface = CreateRef<Graphics::OpenGL460Surface>(this); break;
         case GraphicsAPI::Metal3:
             {
                 NB_PLATFORM_CRITICAL("Metal3 is not supported on Linux!");
@@ -78,11 +75,6 @@ namespace Nebula::Platform
     void LinuxWindow::OnUpdate()
     {
         CoreUtils::PumpEvents();
-    }
-
-    void LinuxWindow::Present(void* framebuffer)
-    {
-        m_Surface->Present(framebuffer);
     }
 
     std::pair<uint32_t, uint32_t> LinuxWindow::GetSize() const
@@ -152,16 +144,6 @@ namespace Nebula::Platform
     void LinuxWindow::CaptureMouse(bool enabled)
     {
         SDL_CaptureMouse(enabled);
-    }
-
-    void LinuxWindow::SetVSync(Graphics::VSyncMode mode)
-    {
-        m_Surface->SetVSync(mode);
-    }
-
-    Graphics::VSyncMode LinuxWindow::IsVSync() const
-    {
-        return m_Surface->IsVsync();
     }
 
     void LinuxWindow::SetFullscreen(bool enabled)

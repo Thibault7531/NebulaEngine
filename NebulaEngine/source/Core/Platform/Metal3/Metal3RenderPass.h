@@ -39,7 +39,7 @@ namespace Nebula::Graphics
 
     public:
         MTL::CullMode GetMetal3CullMode(CullMode mode);
-        MTL::CompareFunction GetMetal3CompareFunction(DepthCompareFunction function);
+        MTL::CompareFunction GetMetal3CompareFunction(CompareFunction function);
 
     private:
         MTL::Device* m_Device;

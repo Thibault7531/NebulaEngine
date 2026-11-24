@@ -67,7 +67,10 @@ void RendererLayer::OnAttach()
         }
     }
 
-    Nebula::Application::Get().GetMainFramebuffer()->SetClearColors({{ 0.1f, 0.1f, 0.1f, 1.0f }});
+    m_CommandBuffers.resize(Nebula::Application::Get().GetMainWindowSwapchain()->GetMaxFramesInFlight());
+    for (uint32_t i = 0; i < m_CommandBuffers.size(); i++) {
+        m_CommandBuffers[i] = m_Device->GetGraphicsQueue()->CreateCommandBuffer();
+    }
 }
 
 void RendererLayer::OnDetach()
@@ -78,15 +81,19 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 {
     NB_PROFILE_FUNCTION();
 
+    Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->SetClearColors({{ 0.1f, 0.1f, 0.1f, 1.0f }});
+
     m_CameraController.OnUpdate(ts);
 
     Nebula::Renderer2D::ResetStats();
     {
         NB_PROFILE_SCOPE("Viewport clear");
-        Nebula::Ref<Nebula::Graphics::CommandBuffer> ClearCommandBuffer = m_Device->CreateCommandBuffer();
-        Nebula::Ref<Nebula::Graphics::RenderPass> ClearRenderPass = ClearCommandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
+        Nebula::Ref<Nebula::Graphics::CommandBuffer> ClearCommandBuffer = m_CommandBuffers[Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        ClearCommandBuffer->Begin();
+        Nebula::Ref<Nebula::Graphics::RenderPass> ClearRenderPass = ClearCommandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), true);
         ClearRenderPass->EndRenderPass();
-        ClearCommandBuffer->Commit();
+        ClearCommandBuffer->End();
+        m_Device->GetGraphicsQueue()->SubmitCommandBuffer(ClearCommandBuffer);
     }
 
     {

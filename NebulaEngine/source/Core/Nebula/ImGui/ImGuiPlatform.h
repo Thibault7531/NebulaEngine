@@ -4,6 +4,8 @@
 
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Nebula/CoreSystems/Core/Timestep.h"
+#include "Nebula/Graphics/CommandBuffer.h"
+#include "Nebula/Graphics/SwapChain.h"
 #include "Nebula/Graphics/Buffers/Framebuffer.h"
 #include "Platform/Nebula/CoreSystems/Core/PlatformUtils.h"
 #include "Platform/Nebula/CoreSystems/Events/KeyEvent.h"
@@ -35,7 +37,12 @@ namespace Nebula
         Ref<Platform::Window> ParentWindow;
         bool WindowOwned;
         Ref<Graphics::Surface> GraphicsSurface;
-        Ref<Graphics::Framebuffer> Framebuffer;
+        Ref<Graphics::SwapChain> Swapchain;
+
+        std::vector<Ref<Graphics::CommandBuffer>> CommandBuffers;
+        std::vector<Ref<Graphics::VertexBuffer>> VertexBuffers;
+        std::vector<Ref<Graphics::IndexBuffer>> IndexBuffers;
+        Ref<Graphics::UniformBuffer> UniformBuffer;
 
         ViewportData() { memset((void*)this, 0, sizeof(*this)); }
     };

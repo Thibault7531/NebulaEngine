@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ShaderModule.h"
 #include "Buffers/Framebuffer.h"
 
 namespace Nebula::Graphics
@@ -168,12 +169,26 @@ namespace Nebula::Graphics
         BlendFactor srcAlphaFactor = BlendFactor::One;
         BlendFactor dstAlphaFactor = BlendFactor::Zero;
         BlendOperation alphaOperation = BlendOperation::Add;
+
+        bool operator==(const BlendState&) const = default;
+    };
+
+    struct Stage
+    {
+        ShaderStage ShaderStage;
+        Ref<ShaderModule> Module;
+        std::string EntryPoint;
+
+        bool operator==(const Stage&) const = default;
     };
 
     struct PipelineSpecification
     {
+        std::vector<Stage> stages;
         FramebufferSpecification framebufferSpec;
         BlendState blendState;
+
+        bool operator==(const PipelineSpecification&) const = default;
     };
 
     class ShaderPipeline
@@ -181,7 +196,10 @@ namespace Nebula::Graphics
     public:
         virtual ~ShaderPipeline() = default;
 
-        virtual uint32_t GetUniformBlockLocation(const std::string& uniformBlockName) = 0;
+        virtual ShaderStage GetUniformBlockShaderStage(const std::string& uniformBlockName) = 0;
+        virtual uint32_t GetUniformBlockBinding(const std::string& uniformBlockName) = 0;
+        virtual uint32_t GetUniformBlockSet(const std::string& uniformBlockName) = 0;
+        virtual ResourceBinding GetUniformBlockResourceBinding(const std::string& uniformBlockName) = 0;
         virtual uint32_t GetVertexInputLocation() = 0;
     };
 }

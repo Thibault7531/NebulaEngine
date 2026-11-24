@@ -32,11 +32,6 @@ namespace Nebula::Platform
         m_NativeWindow.OnUpdate();
     }
 
-    void MacOSWindow::Present(void* framebuffer)
-    {
-        m_NativeWindow.Present(framebuffer);
-    }
-
     std::pair<uint32_t, uint32_t> MacOSWindow::GetSize() const
     {
         return {m_NativeWindow.GetWindowWidth(), m_NativeWindow.GetWindowHeight()};
@@ -83,16 +78,6 @@ namespace Nebula::Platform
     }
 
     void MacOSWindow::CaptureMouse(bool enabled) {}
-
-    void MacOSWindow::SetVSync(Graphics::VSyncMode mode)
-    {
-        m_NativeWindow.SetVSync(mode);
-    }
-
-    Graphics::VSyncMode MacOSWindow::IsVSync() const
-    {
-        return m_NativeWindow.IsVSync();
-    }
 
     void MacOSWindow::SetFullscreen(bool enabled)
     {

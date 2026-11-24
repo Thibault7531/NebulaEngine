@@ -163,7 +163,20 @@ namespace Nebula
         viewport_data->Window = platform_data.Window;
         viewport_data->WindowOwned = false;
         viewport_data->GraphicsSurface = platform_data.Window->GetSurface();
-        viewport_data->Framebuffer = Application::Get().GetMainFramebuffer();
+        viewport_data->Swapchain = Application::Get().GetMainWindowSwapchain();
+
+        uint32_t maxFramesInFlight = viewport_data->Swapchain->GetMaxFramesInFlight();
+        viewport_data->CommandBuffers.resize(maxFramesInFlight);
+        viewport_data->VertexBuffers.resize(maxFramesInFlight);
+        viewport_data->IndexBuffers.resize(maxFramesInFlight);
+        for (uint32_t i = 0; i < maxFramesInFlight; i++)
+        {
+            viewport_data->CommandBuffers[i] = Application::Get().GetDevice()->GetGraphicsQueue()->CreateCommandBuffer();
+        }
+        viewport_data->UniformBuffer = Application::Get().GetDevice()->CreateUniformBuffer({
+            {Graphics::ShaderDataType::Matrix4, "u_ProjectionMatrix"}
+        });
+
         main_viewport->PlatformUserData = viewport_data;
         main_viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(platform_data.Window->GetID()));
     }
@@ -354,8 +367,7 @@ namespace Nebula
             return false;
 
         viewport->PlatformRequestResize = true;
-        viewport_data->GraphicsSurface->Resize(event.GetWidth(), event.GetHeight());
-        viewport_data->Framebuffer->Resize(event.GetWidth(), event.GetHeight());
+        viewport_data->Swapchain->Resize(event.GetWidth(), event.GetHeight());
 
         return false;
     }
@@ -647,12 +659,23 @@ namespace Nebula
         {
             viewport_data->GraphicsSurface = viewport_data->Window->GetSurface();
             Application::Get().GetDevice()->SetSurfaceDevice(viewport_data->GraphicsSurface);
-            viewport_data->Window->SetVSync(viewport_data->ParentWindow ? viewport_data->ParentWindow->IsVSync() : Graphics::VSyncMode::Adaptive);
             Graphics::FramebufferSpecification spec = {
-                props.Width,
-                props.Height
+                window->GetClientSize().first,
+                window->GetClientSize().second
             };
-            viewport_data->Framebuffer = Application::Get().GetDevice()->CreateFramebuffer(spec);
+            viewport_data->Swapchain = Application::Get().GetDevice()->CreateSwapchain(viewport_data->GraphicsSurface, Graphics::VSyncMode::Adaptive, spec, 0);
+
+            uint32_t maxFramesInFlight = viewport_data->Swapchain->GetMaxFramesInFlight();
+            viewport_data->CommandBuffers.resize(maxFramesInFlight);
+            viewport_data->VertexBuffers.resize(maxFramesInFlight);
+            viewport_data->IndexBuffers.resize(maxFramesInFlight);
+            for (uint32_t i = 0; i < maxFramesInFlight; i++)
+            {
+                viewport_data->CommandBuffers[i] = Application::Get().GetDevice()->GetGraphicsQueue()->CreateCommandBuffer();
+            }
+            viewport_data->UniformBuffer = Application::Get().GetDevice()->CreateUniformBuffer({
+                {Graphics::ShaderDataType::Matrix4, "u_ProjectionMatrix"}
+            });
         }
 
         viewport->PlatformHandle = reinterpret_cast<void*>(static_cast<intptr_t>(viewport_data->Window->GetID()));
@@ -668,10 +691,23 @@ namespace Nebula
 
         if (auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData))
         {
+            Application::Get().GetDevice()->WaitIdle();
             if (viewport_data->Window && viewport_data->WindowOwned)
             {
                 Platform::WindowManager::Get().DestroyWindow(viewport_data->Window);
             }
+            for (uint32_t i = 0; i < viewport_data->CommandBuffers.size(); i++)
+            {
+                viewport_data->CommandBuffers[i].reset();
+            }
+            for (uint32_t i = 0; i < viewport_data->IndexBuffers.size(); i++) {
+                viewport_data->IndexBuffers[i].reset();
+            }
+            for (uint32_t i = 0; i < viewport_data->VertexBuffers.size(); i++) {
+                viewport_data->VertexBuffers[i].reset();
+            }
+            viewport_data->UniformBuffer.reset();
+            viewport_data->Swapchain = nullptr;
             viewport_data->GraphicsSurface = nullptr;
             viewport_data->Window = nullptr;
             delete viewport_data;
@@ -755,16 +791,16 @@ namespace Nebula
     void ImGuiPlatform::RenderWindow(ImGuiViewport* viewport, void*)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        if (viewport_data->GraphicsSurface)
-            viewport_data->GraphicsSurface->NewFrame();
+        if (viewport_data->Swapchain)
+            viewport_data->Swapchain->NewFrame();
     }
 
     void ImGuiPlatform::SwapBuffers(ImGuiViewport* viewport, void*)
     {
         auto* viewport_data = static_cast<ViewportData*>(viewport->PlatformUserData);
-        if (viewport_data->GraphicsSurface)
+        if (viewport_data->Swapchain)
         {
-            viewport_data->GraphicsSurface->Present(viewport_data->Framebuffer->GetNativeFramebuffer());
+            viewport_data->Swapchain->Present();
         }
     }
 

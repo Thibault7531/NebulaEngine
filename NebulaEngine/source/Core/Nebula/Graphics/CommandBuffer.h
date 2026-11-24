@@ -1,4 +1,5 @@
 #pragma once
+
 #include "RenderPass.h"
 #include "Buffers/Framebuffer.h"
 
@@ -9,8 +10,9 @@ namespace Nebula::Graphics
     public:
         virtual ~CommandBuffer() = default;
 
-        virtual Ref<RenderPass> CreateRenderPass(Ref<Framebuffer> framebuffer, bool clear) = 0;
+        virtual void Begin() = 0;
+        virtual void End() = 0;
 
-        virtual void Commit() = 0;
+        virtual Ref<RenderPass> CreateRenderPass(Ref<Framebuffer> framebuffer, bool clear) = 0;
     };
 }

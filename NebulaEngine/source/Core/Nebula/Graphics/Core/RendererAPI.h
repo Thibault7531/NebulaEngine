@@ -20,7 +20,7 @@ namespace Nebula::Graphics {
 			{
 			case Platform::GraphicsAPI::None: return "None";
 			case Platform::GraphicsAPI::Metal3: return "Metal 3";
-			case Platform::GraphicsAPI::OpenGL460: return "OpenGL 4.6.0";
+			case Platform::GraphicsAPI::Vulkan: return "Vulkan 1.4";
 			}
 		}
 

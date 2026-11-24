@@ -74,61 +74,6 @@ namespace Nebula::Graphics
         return static_cast<MTL::Device*>(m_MetalDevice)->name()->utf8String();
     }
 
-    void Metal3Surface::SetVSync(VSyncMode mode)
-    {
-        switch (mode)
-        {
-        case VSyncMode::Off:
-            {
-                static_cast<CA::MetalLayer*>(m_MetalLayer)->setDisplaySyncEnabled(false);
-                return;
-            }
-
-        case VSyncMode::Adaptive:
-            {
-                static_cast<CA::MetalLayer*>(m_MetalLayer)->setDisplaySyncEnabled(true);
-                return;
-            }
-
-        case VSyncMode::On:
-            {
-                static_cast<CA::MetalLayer*>(m_MetalLayer)->setDisplaySyncEnabled(true);
-                return;
-            }
-        }
-    }
-
-    VSyncMode Metal3Surface::IsVsync() const
-    {
-        if (static_cast<CA::MetalLayer*>(m_MetalLayer)->displaySyncEnabled()) return VSyncMode::On;
-        return VSyncMode::Off;
-    }
-
-    void Metal3Surface::Resize(uint32_t width, uint32_t height)
-    {
-        static_cast<CA::MetalLayer*>(m_MetalLayer)->setDrawableSize(CGSize(width, height));
-    }
-
-    void Metal3Surface::NewFrame()
-    {
-        m_MetalDrawable = static_cast<CA::MetalLayer*>(m_MetalLayer)->nextDrawable();
-    }
-
-    void Metal3Surface::Present(void* framebuffer)
-    {
-        CA::MetalDrawable* drawable = static_cast<CA::MetalDrawable*>(m_MetalDrawable);
-        MTL::CommandBuffer* cmdBuffer = static_cast<MTL::CommandQueue*>(m_MetalCommandQueue)->commandBuffer();
-        MTL::Texture* source = static_cast<MTL::Texture*>(framebuffer);
-
-        MTL::BlitCommandEncoder* cmdEncoder = cmdBuffer->blitCommandEncoder();
-        cmdEncoder->copyFromTexture(source, drawable->texture());
-        cmdEncoder->endEncoding();
-
-        cmdBuffer->presentDrawable(drawable);
-        cmdBuffer->commit();
-        cmdBuffer->waitUntilCompleted();
-    }
-
     std::string Metal3Surface::GPUFamilyToString(void* gpuFamily)
     {
         switch (static_cast<MTL::GPUFamily>(reinterpret_cast<int64_t>(gpuFamily)))

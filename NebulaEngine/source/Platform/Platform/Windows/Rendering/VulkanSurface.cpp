@@ -111,15 +111,4 @@ namespace Nebula::Graphics
     {
         return m_Surface;
     }
-
-    void VulkanSurface::SetVSync(VSyncMode mode) {}
-
-    VSyncMode VulkanSurface::IsVsync() const
-    {
-        return VSyncMode::On;
-    }
-
-    void VulkanSurface::Resize(uint32_t width, uint32_t height) {}
-    void VulkanSurface::NewFrame() {}
-    void VulkanSurface::Present(void* texture) {}
 }

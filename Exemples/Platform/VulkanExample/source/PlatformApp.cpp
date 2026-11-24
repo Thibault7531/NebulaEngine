@@ -52,6 +52,8 @@ int main()
     Nebula::Platform::Log::Init();
     Nebula::Platform::CoreUtils::InitThread();
 
+    volkInitialize();
+
     Nebula::Platform::WindowProperties windowProperties;
     windowProperties.API = Nebula::Platform::GraphicsAPI::Vulkan;
     windowProperties.Title = "Platform Vulkan Example";
@@ -103,6 +105,9 @@ int main()
 
     VkInstance instance;
     chk(vkCreateInstance(&instanceCreateInfo, nullptr, &instance));
+
+    volkLoadInstance(instance);
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(instance, vkGetInstanceProcAddr);
 
     window->GetSurface()->SetInstance(&instance);
     vk::Instance cppInstance(instance);
@@ -210,7 +215,7 @@ int main()
         swapchainImageViews[imageIndex] = device.createImageView(imageViewCreateInfo);
     }
 
-    const uint32_t maxFramesInFlight = surfaceCapabilities.maxImageCount ? std::max(surfaceCapabilities.maxImageCount, 3u) : 3;
+    const uint32_t maxFramesInFlight = surfaceCapabilities.maxImageCount;
     uint32_t frameInFlightIndex = 0;
 
     vk::SemaphoreCreateInfo semaphoreCreateInfo;
@@ -550,8 +555,6 @@ int main()
         queue.presentKHR(&presentInfo);
 
         frameInFlightIndex = (frameInFlightIndex + 1) % maxFramesInFlight;
-
-        window->Present(0);
     }
 
     return 0;

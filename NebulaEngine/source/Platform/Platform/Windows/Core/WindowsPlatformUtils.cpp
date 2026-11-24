@@ -178,18 +178,26 @@ namespace Nebula::Platform
         {
         case GraphicsAPI::None: return false;
         case GraphicsAPI::Metal3: return false;
-        case GraphicsAPI::OpenGL460: return true;
+        case GraphicsAPI::Vulkan: return true;
         default: return false;
         }
     }
 
     std::vector<const char*> Graphics::getRequiredInstanceExtensions(GraphicsAPI api)
     {
-        std::vector<const char*> extensions = {
-            VK_KHR_SURFACE_EXTENSION_NAME,
-            VK_KHR_WIN32_SURFACE_EXTENSION_NAME
-        };
+        switch (api) {
+        case GraphicsAPI::None: return {};
+        case GraphicsAPI::Metal3: return {};
+        case GraphicsAPI::Vulkan:
+            {
+                std::vector<const char*> extensions = {
+                    VK_KHR_SURFACE_EXTENSION_NAME,
+                    VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+                };
+                return extensions;
+            }
+        }
 
-        return extensions;
+        return {};
     }
 }

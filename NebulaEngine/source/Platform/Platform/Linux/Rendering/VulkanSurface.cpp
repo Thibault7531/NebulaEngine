@@ -5,7 +5,6 @@
 
 #include "VulkanSurface.h"
 
-#include "../../../../../vendor/volk/volk.h"
 #include "Platform/Nebula/CoreSystems/Core/Log.h"
 #include "SDL3/SDL_vulkan.h"
 
@@ -13,18 +12,8 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 namespace Nebula::Graphics
 {
-    bool VulkanSurface::s_Initialized = false;
-    bool VulkanSurface::s_InstanceInitialized = false;
-
     VulkanSurface::VulkanSurface(Platform::Window* window)
-        : m_Window(window)
-    {
-        if (!s_Initialized)
-        {
-            volkInitialize();
-            s_Initialized = true;
-        }
-    }
+        : m_Window(window) {}
 
     VulkanSurface::~VulkanSurface()
     {
@@ -78,13 +67,6 @@ namespace Nebula::Graphics
     {
         m_Instance = *static_cast<vk::Instance*>(instance);
         VkInstance vkInstance = *static_cast<VkInstance*>(instance);
-
-        if (!s_InstanceInitialized)
-        {
-            volkLoadInstance(vkInstance);
-            VULKAN_HPP_DEFAULT_DISPATCHER.init(vkInstance, vkGetInstanceProcAddr);
-            s_InstanceInitialized = true;
-        }
     }
 
     void VulkanSurface::SetDevice(void* physicalDevice, void* logicalDevice, void* commandQueue)
@@ -106,15 +88,4 @@ namespace Nebula::Graphics
             swapchainExtent.height = m_Window->GetClientSize().second;
         }
     }
-
-    void VulkanSurface::SetVSync(VSyncMode mode) {}
-
-    VSyncMode VulkanSurface::IsVsync() const
-    {
-        return VSyncMode::On;
-    }
-
-    void VulkanSurface::Resize(uint32_t width, uint32_t height) {}
-    void VulkanSurface::NewFrame() {}
-    void VulkanSurface::Present(void* texture) {}
 }

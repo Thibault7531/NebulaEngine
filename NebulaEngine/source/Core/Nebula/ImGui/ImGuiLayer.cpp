@@ -135,7 +135,6 @@ namespace Nebula
 		{
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			if (Graphics::RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460) Platform::WindowManager::Get().GetMainWindow()->GetSurface()->NewFrame();
 		}
 	}
 

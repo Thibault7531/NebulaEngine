@@ -8,7 +8,7 @@
 
 namespace Nebula
 {
-    const std::string s_StartingPath = Platform::Files::GetResourcesPath() / "assets";
+    const std::string s_StartingPath = (Platform::Files::GetResourcesPath() / "assets").string();
 
     ContentBrowserPanel::ContentBrowserPanel()
     {
@@ -366,7 +366,7 @@ namespace Nebula
         {
             if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
             {
-                ImGui::SetDragDropPayload("NBSCENE_DRAG", path.c_str(), path.string().size() + 1);
+                ImGui::SetDragDropPayload("NBSCENE_DRAG", path.string().c_str(), path.string().size() + 1);
                 ImGui::Image(thumbnail.get(), ImVec2(32.f, 32.f));
                 ImGui::EndDragDropSource();
             }

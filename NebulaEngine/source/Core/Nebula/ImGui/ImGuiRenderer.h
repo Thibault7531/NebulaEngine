@@ -5,7 +5,7 @@
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Nebula/Graphics/Device.h"
 #include "Nebula/Graphics/RenderPass.h"
-#include "Nebula/Graphics/Shader.h"
+#include "Nebula/Graphics/ShaderModule.h"
 #include "Nebula/Graphics/ShaderPipeline.h"
 #include "Nebula/Graphics/Texture.h"
 #include "Nebula/Graphics/Buffers/VertexArray.h"
@@ -15,11 +15,8 @@ namespace Nebula
     struct RendererData
     {
         Ref<Graphics::Device> device;
-        Graphics::ShaderLibrary shaderLibrary;
+        Graphics::ShaderModuleLibrary shaderLibrary;
         Ref<Graphics::ShaderPipeline> shader;
-        Ref<Graphics::UniformBuffer> uniformBuffer;
-        Ref<Graphics::VertexBuffer> vertexBuffer;
-        Ref<Graphics::IndexBuffer> indexBuffer;
 
         std::vector<Ref<Graphics::Texture>> textures;
     };

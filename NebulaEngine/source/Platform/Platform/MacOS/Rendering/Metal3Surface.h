@@ -23,13 +23,6 @@ namespace Nebula::Graphics
         virtual std::string GetAPIVendor() const override;
         virtual std::string GetAPIRenderer() const override;
 
-        virtual void SetVSync(VSyncMode mode) override;
-        virtual VSyncMode IsVsync() const override;
-        virtual void Resize(uint32_t width, uint32_t height) override;
-
-        virtual void NewFrame() override;
-        virtual void Present(void* framebuffer) override;
-
     public:
         void* GetMetalLayer() { return m_MetalLayer; }
 
@@ -56,12 +49,6 @@ namespace Nebula::Graphics
         void* GetPointer() { return m_Pointer.get(); }
 
         virtual void SetDevice(void* device, void* commandQueue) { m_Pointer->SetDevice(nullptr, device, commandQueue); }
-
-        virtual void SetVSync(VSyncMode mode) { m_Pointer->SetVSync(mode); }
-        virtual VSyncMode IsVsync() const { return m_Pointer->IsVsync(); }
-
-        virtual void NewFrame() { m_Pointer->NewFrame(); }
-        virtual void Present(void* framebuffer) { m_Pointer->Present(framebuffer); }
 
     private:
         Ref<Metal3Surface> m_Pointer;

@@ -20,7 +20,7 @@ public:
 
 private:
     Nebula::Ref<Nebula::Graphics::Device> m_Device;
-    Nebula::Graphics::ShaderLibrary m_ShaderLibrary;
+    Nebula::Graphics::ShaderModuleLibrary m_ShaderLibrary;
     Nebula::Ref<Nebula::Graphics::ShaderPipeline> m_SolidColorShader;
     Nebula::Ref<Nebula::Graphics::ShaderPipeline> m_TextureShader;
 
@@ -29,6 +29,8 @@ private:
     Nebula::Ref<Nebula::Graphics::UniformBuffer> m_ColorUBO;
 
     Nebula::Ref<Nebula::Graphics::Texture2D> m_Texture, m_Glass;
+
+    std::vector<Nebula::Ref<Nebula::Graphics::CommandBuffer>> m_CommandBuffers;
 
     Nebula::OrthographicCameraController m_CameraController;
 

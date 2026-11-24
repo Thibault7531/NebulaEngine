@@ -34,6 +34,8 @@ private:
     Nebula::Ref<Nebula::Graphics::Texture2D> m_Coal;
     Nebula::Ref<Nebula::Graphics::Texture2D> m_Rainbow;
 
+    std::vector<Nebula::Ref<Nebula::Graphics::CommandBuffer>> m_CommandBuffers;
+
     std::array<std::array<Nebula::Ref<Nebula::Graphics::Texture2D>, 32>, 32> m_World;
 
     struct ProfileResult

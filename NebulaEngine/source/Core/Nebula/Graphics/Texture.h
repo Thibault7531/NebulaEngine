@@ -3,6 +3,7 @@
 #include <glm.hpp>
 #include <vector>
 
+#include "Core/RendererAPI.h"
 #include "Core/Nebula/CoreSystems/Core/Core.h"
 
 namespace Nebula::Graphics
@@ -17,7 +18,8 @@ namespace Nebula::Graphics
             RGBA8,
             R32I,
             R32UI,
-            Depth24Stencil8
+            Depth24Stencil8,
+            Depth32Stencil8
         };
 
         enum class DataFormat
@@ -68,6 +70,8 @@ namespace Nebula::Graphics
                 : InternalFormat(internalFormat), MinFilter(filter), MagFilter(filter) {}
             TextureSpecification(enum InternalFormat internalFormat, FilterType minFilter, FilterType magFilter)
                 : InternalFormat(internalFormat), MinFilter(minFilter), MagFilter(magFilter) {}
+
+            bool operator==(const TextureSpecification& other) const = default;
         };
 
     public:
@@ -82,12 +86,16 @@ namespace Nebula::Graphics
         [[nodiscard]] virtual uint32_t GetWidth() const = 0;
         [[nodiscard]] virtual uint32_t GetHeight() const = 0;
 
-        // TODO: Consider using function overloading for GetData
         virtual void SetData(void* data, uint32_t size, DataFormat format, DataType dataType = DataType::UnsignedByte) = 0;
-        virtual std::vector<uint8_t> GetDataR8() = 0;
-        virtual std::vector<glm::vec4> GetDataRGBA8() = 0;
-        virtual std::vector<int32_t> GetDataR32I() = 0;
-        virtual std::vector<uint32_t> GetDataR32UI() = 0;
+        template<typename T>
+        std::vector<T> GetData()
+        {
+            std::vector<uint8_t> rawData = GetRawData();
+            std::vector<T> typedData(rawData.size() / sizeof(T));
+            memcpy(typedData.data(), rawData.data(), rawData.size());
+            return typedData;
+        }
+        virtual std::vector<uint8_t> GetRawData() = 0;
 
         virtual bool operator==(const Texture2D& other) const = 0;
     };

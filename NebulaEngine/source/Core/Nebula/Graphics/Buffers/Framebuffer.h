@@ -11,6 +11,8 @@ namespace Nebula::Graphics
         FramebufferAttachmentSpecification() = default;
         FramebufferAttachmentSpecification(std::initializer_list<Texture::TextureSpecification> elements)
             : Attachments(elements) {}
+
+        bool operator==(const FramebufferAttachmentSpecification& other) const = default;
     };
 
     struct FramebufferSpecification
@@ -24,16 +26,7 @@ namespace Nebula::Graphics
 
         bool SwapChainTarget = false;
 
-        uint64_t hash() const
-        {
-            uint64_t hash = 0xcbf29ce484222325ULL;
-            for (auto attachment : AttachmentSpec.Attachments)
-            {
-                hash ^= static_cast<uint32_t>(attachment.InternalFormat);
-                hash *= 0x100000001b3ULL;
-            }
-            return hash;
-        }
+        bool operator==(const FramebufferSpecification& other) const = default;
     };
 
     enum class ColorAttachementDataType
@@ -53,7 +46,9 @@ namespace Nebula::Graphics
         virtual void SetClearDepth(float depth) = 0;
         virtual void SetClearStencil(int32_t stencil) = 0;
 
+        virtual uint32_t GetColorAttachmentCount() const = 0;
         virtual Ref<Texture2D> GetColorAttachment(uint32_t index = 0) const = 0;
+        virtual Ref<Texture2D> GetSwapchainColorAttachment() const = 0;
         virtual const std::vector<Texture::TextureSpecification>& GetColorAttachmentSpecs() const = 0;
         virtual const std::vector<glm::vec4>& GetClearColors() const = 0;
         virtual Ref<Texture2D> GetDepthAttachment() const = 0;
@@ -61,7 +56,6 @@ namespace Nebula::Graphics
         virtual float GetClearDepth() const = 0;
 
         [[nodiscard]] virtual const FramebufferSpecification& GetSpecification() const = 0;
-        virtual void* GetNativeFramebuffer() = 0;
 
         virtual void Resize(uint32_t width, uint32_t height) = 0;
 

@@ -28,8 +28,18 @@ namespace Nebula {
 
         m_Device = Application::Get().GetDevice();
 
-        m_Framebuffer = m_Device->CreateFramebuffer({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y), .AttachmentSpec = {Graphics::Texture::InternalFormat::RGBA8, Graphics::Texture::InternalFormat::R32I, Graphics::Texture::InternalFormat::Depth24Stencil8}});
-        m_Framebuffer->SetClearColors({{.1f, .1f, .1f, 1.f}, glm::vec4{-1.f}});
+        m_Framebuffers.resize(Application::Get().GetMainWindowSwapchain()->GetMaxFramesInFlight());
+        for (size_t i = 0; i < m_Framebuffers.size(); i++)
+        {
+            m_Framebuffers[i] = m_Device->CreateFramebuffer({.width = static_cast<uint32_t>(m_ViewportSize.x), .height = static_cast<uint32_t>(m_ViewportSize.y), .AttachmentSpec = {Graphics::Texture::InternalFormat::RGBA8, Graphics::Texture::InternalFormat::R32I, Graphics::Texture::InternalFormat::Depth24Stencil8}});
+            m_Framebuffers[i]->SetClearColors({{.1f, .1f, .1f, 1.f}, glm::vec4{-1.f}});
+        }
+
+        m_CommandBuffers.resize(Application::Get().GetMainWindowSwapchain()->GetMaxFramesInFlight());
+        for (size_t i = 0; i < m_CommandBuffers.size(); i++)
+        {
+            m_CommandBuffers[i] = m_Device->GetGraphicsQueue()->CreateCommandBuffer();
+        }
 
         m_Scene = CreateRef<Scene>();
 
@@ -41,7 +51,7 @@ namespace Nebula {
             OpenScene(path);
         });
 
-        Platform::WindowManager::Get().GetMainWindow()->SetVSync(Graphics::VSyncMode::Adaptive);
+        Application::Get().GetMainWindowSwapchain()->SetVSyncMode(Graphics::VSyncMode::Adaptive);
         Platform::WindowManager::Get().GetMainWindow()->SetWindowHitTest([&](int x, int y)
         {
             ImGuiIO& io = ImGui::GetIO();
@@ -124,8 +134,15 @@ namespace Nebula {
 
     void EditorLayer::OnUpdate(Timestep ts)
     {
+        Ref<Graphics::Framebuffer> framebuffer = m_Framebuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        Ref<Graphics::CommandBuffer> commandBuffer = m_CommandBuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+
         if (!DoesViewportFit) {
-            m_Framebuffer->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+            m_Device->WaitIdle();
+            for (size_t i = 0; i < m_Framebuffers.size(); i++)
+            {
+                m_Framebuffers[i]->Resize(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+            }
 
             m_Scene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
             m_Camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
@@ -133,12 +150,13 @@ namespace Nebula {
             DoesViewportFit = true;
         }
 
-        Ref<Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
-        Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Application::Get().GetMainFramebuffer(), true);
+        commandBuffer->Begin();
+        Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), true);
         renderPass->EndRenderPass();
-        commandBuffer->Commit();
+        commandBuffer->End();
+        Application::Get().GetDevice()->GetGraphicsQueue()->SubmitCommandBuffer(commandBuffer);
 
-        SceneRenderer::RenderSceneEditor(m_Scene, m_Camera, m_Framebuffer);
+        SceneRenderer::RenderSceneEditor(m_Scene, m_Camera, framebuffer);
     }
 
     void EditorLayer::OnEvent(Platform::Event &event)
@@ -305,18 +323,14 @@ namespace Nebula {
 
             ImVec2 uv0 = {0, 0};
             ImVec2 uv1 = {1, 1};
-            if (Graphics::RendererAPI::GetAPI() == Platform::GraphicsAPI::OpenGL460)
-            {
-                uv0 = {0, 1};
-                uv1 = {1, 0};
-            }
-            ImGui::Image(m_Framebuffer->GetColorAttachment().get(), { m_ViewportSize.x, m_ViewportSize.y }, uv0, uv1);
+            ImGui::Image(m_Framebuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()]->GetColorAttachment().get(), { m_ViewportSize.x, m_ViewportSize.y }, uv0, uv1);
 
             if (ImGui::BeginDragDropTarget())
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("NBSCENE_DRAG"))
                 {
-                    OpenScene(static_cast<const char*>(payload->Data));
+                    std::string payloadData(static_cast<const char*>(payload->Data), payload->DataSize);
+                    OpenScene(std::filesystem::path(payloadData));
                 }
 
                 ImGui::EndDragDropTarget();
@@ -401,7 +415,7 @@ namespace Nebula {
         NewScene();
 
         SceneSerializer serializer(m_Scene);
-        serializer.Deserialize(path);
+        serializer.Deserialize(path.string());
     }
 
     void EditorLayer::SaveSceneAs()
@@ -439,10 +453,12 @@ namespace Nebula {
             uint32_t mouse_X = mousePos.x - m_ViewportPos.x;
             uint32_t mouse_Y = mousePos.y - m_ViewportPos.y;
 
-            Ref<Graphics::Texture2D> texture = m_Framebuffer->GetColorAttachment(1);
-            std::vector<int32_t> viewport = texture->GetDataR32I();
+            if (mouse_X >= m_ViewportSize.x || mouse_Y >= m_ViewportSize.y) return false;
+            m_Device->WaitIdle();
+            Ref<Graphics::Texture2D> texture = m_Framebuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()]->GetColorAttachment(1);
+            std::vector<int32_t> viewport = texture->GetData<int32_t>();
             int32_t entity = viewport[mouse_Y * texture->GetWidth() + mouse_X];
-            m_SceneHierarchyPanel.SetSelectedEntity(entity == -1 ? Entity() : Entity(static_cast<entt::entity>(entity), m_Scene.get()));
+            m_SceneHierarchyPanel.SetSelectedEntity(entity < 0 ? Entity() : Entity(static_cast<entt::entity>(entity), m_Scene.get()));
         }
         return false;
     }

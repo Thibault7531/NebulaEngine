@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Metal3Shader.h"
+#include "Metal3ShaderModule.h"
 #include "Metal/Metal.hpp"
 #include "Nebula/CoreSystems/Core/Core.h"
 #include "Nebula/Graphics/ShaderPipeline.h"
@@ -10,11 +10,14 @@ namespace Nebula::Graphics
     class Metal3ShaderPipeline : public ShaderPipeline
     {
     public:
-        Metal3ShaderPipeline(MTL::Device* device, Ref<Metal3Shader> shader, VertexLayout layout, PipelineSpecification spec);
+        Metal3ShaderPipeline(MTL::Device* device, const VertexLayout& layout, const PipelineSpecification& spec);
         ~Metal3ShaderPipeline() override;
 
-        virtual uint32_t GetUniformBlockLocation(const std::string& uniformBlockName) override { return m_Shader->GetUniformBlockLocation(uniformBlockName); }
-        virtual uint32_t GetVertexInputLocation() override { return m_Shader->GetVertexInputLocation(); }
+        virtual ShaderStage GetUniformBlockShaderStage(const std::string& uniformBlockName) override;
+        virtual uint32_t GetUniformBlockBinding(const std::string& uniformBlockName) override;
+        virtual uint32_t GetUniformBlockSet(const std::string& uniformBlockName) override;
+        virtual ResourceBinding GetUniformBlockResourceBinding(const std::string& uniformBlockName) override;
+        virtual uint32_t GetVertexInputLocation() override;
 
     public:
         static MTL::VertexFormat GetMetal3VertexFormat(ShaderDataType type);
@@ -26,8 +29,9 @@ namespace Nebula::Graphics
         MTL::RenderPipelineState* GetRenderPipelineState() { return m_RenderPipelineState; }
 
     private:
-        Ref<Metal3Shader> m_Shader;
-        PipelineSpecification m_Spec;
+        VertexLayout m_VertexLayout;
+        PipelineSpecification m_Specification;
+
         MTL::RenderPipelineState* m_RenderPipelineState;
     };
 }

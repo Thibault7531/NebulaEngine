@@ -1,6 +1,5 @@
 # Platform Examples
 add_subdirectory(Platform/Metal3Example)
-add_subdirectory(Platform/OpenGLExample)
 add_subdirectory(Platform/VulkanExample)
 
 # Renderer Examples

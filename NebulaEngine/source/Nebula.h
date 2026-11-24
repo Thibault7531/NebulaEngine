@@ -27,7 +27,7 @@
 // Renderer
 #include "Core/Nebula/Renderer/SceneRenderer.h"
 #include "Core/Nebula/Renderer/Renderer2D.h"
-#include "Core/Nebula/Graphics/Shader.h"
+#include "Core/Nebula/Graphics/ShaderModule.h"
 #include "Core/Nebula/Graphics/Texture.h"
 #include "Core/Nebula/Graphics/Buffers/Framebuffer.h"
 #include "Core/Nebula/Graphics/Buffers/VertexArray.h"

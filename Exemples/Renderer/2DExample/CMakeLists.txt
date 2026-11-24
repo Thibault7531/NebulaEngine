@@ -21,21 +21,24 @@ target_link_libraries(Renderer2DExample PRIVATE Nebula)
 
 
 target_include_directories(Renderer2DExample PRIVATE
-        ../../../NebulaEngine/source
-        ../../../NebulaEngine/source/Core
-        ../../../NebulaEngine/source/Platform
-        ../../../NebulaEngine/vendor/Assimp/include
-        ${CMAKE_BINARY_DIR}/NebulaEngine/vendor/Assimp/include
-        ../../../NebulaEngine/vendor/spdlog/include
-        ../../../NebulaEngine/vendor/SDL3/include/SDL3
-        ../../../NebulaEngine/vendor/SDL3/include
-        ../../../NebulaEngine/vendor/stb_image
-        ../../../NebulaEngine/vendor/imgui
-        ../../../NebulaEngine/vendor/entt/single_include
-        ../../../NebulaEngine/vendor/Glad/include
-        ../../../NebulaEngine/vendor/glm
-        ../../../NebulaEngine/vendor/glm/glm
-        ../../../NebulaEngine/vendor/metal-cpp
+                           ../../../NebulaEngine/source
+                           ../../../NebulaEngine/source/Core
+                           ../../../NebulaEngine/source/Platform
+                           ../../../NebulaEngine/vendor/Assimp/include
+                           ${CMAKE_BINARY_DIR}/NebulaEngine/vendor/Assimp/include
+                           ../../../NebulaEngine/vendor/spdlog/include
+                           ../../../NebulaEngine/vendor/SDL3/include/SDL3
+                           ../../../NebulaEngine/vendor/SDL3/include
+                           ../../../NebulaEngine/vendor/stb_image
+                           ../../../NebulaEngine/vendor/imgui
+                           ../../../NebulaEngine/vendor/entt/single_include
+                           ../../../NebulaEngine/vendor/Glad/include
+                           ../../../NebulaEngine/vendor/glm
+                           ../../../NebulaEngine/vendor/glm/glm
+                           ../../../NebulaEngine/vendor/metal-cpp
+                           ../../../NebulaEngine/vendor/vma-hpp/include
+                           ../../../vendor/vma-hpp/VulkanMemoryAllocator/include
+                           ../../../NebulaEngine/vendor/Vulkan-Headers/include
 )
 
 

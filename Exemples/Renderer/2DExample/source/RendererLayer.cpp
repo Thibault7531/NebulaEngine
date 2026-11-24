@@ -58,14 +58,31 @@ void RendererLayer::OnAttach()
     blendState.dstAlphaFactor = Nebula::Graphics::BlendFactor::OneMinusSourceAlpha;
 
     m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/SolidColor.slang");
-    m_SolidColorShader = m_ShaderLibrary.CreatePipeline("SolidColor", vertexLayout, {Nebula::Application::Get().GetMainFramebuffer()->GetSpecification(), blendState});
+    Nebula::Graphics::PipelineSpecification solidShaderSpec;
+    solidShaderSpec.blendState = blendState;
+    solidShaderSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetFramebufferSpecification();
+    solidShaderSpec.stages = {
+        { Nebula::Graphics::ShaderStage::Vertex, m_ShaderLibrary.Get("SolidColor"), "vertexMain" },
+        { Nebula::Graphics::ShaderStage::Fragment, m_ShaderLibrary.Get("SolidColor"), "fragmentMain" }
+    };
+    m_SolidColorShader = m_Device->CreateShaderPipeline(vertexLayout, solidShaderSpec);
     m_ShaderLibrary.Load(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/shaders/Texture.slang");
-    m_TextureShader = m_ShaderLibrary.CreatePipeline("Texture", vertexLayout, {Nebula::Application::Get().GetMainFramebuffer()->GetSpecification(), blendState});
+    Nebula::Graphics::PipelineSpecification textureShaderSpec;
+    textureShaderSpec.blendState = blendState;
+    textureShaderSpec.framebufferSpec = Nebula::Application::Get().GetMainWindowSwapchain()->GetFramebufferSpecification();
+    textureShaderSpec.stages = {
+        { Nebula::Graphics::ShaderStage::Vertex, m_ShaderLibrary.Get("Texture"), "vertexMain" },
+        { Nebula::Graphics::ShaderStage::Fragment, m_ShaderLibrary.Get("Texture"), "fragmentMain" }
+    };
+    m_TextureShader = m_Device->CreateShaderPipeline(vertexLayout, textureShaderSpec);
 
     m_Texture = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/crafting_table_front.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Nearest});
     m_Glass = m_Device->CreateTexture2D(Nebula::Platform::Files::GetResourcesPath() / "assets/Renderer2DExample/textures/glass.png", {Nebula::Graphics::Texture::InternalFormat::RGBA8, Nebula::Graphics::Texture::FilterType::Nearest});
 
-    Nebula::Application::Get().GetMainFramebuffer()->SetClearColors({{.18f, .49f, .6f, 1.f}});
+    uint32_t maxFramesInFlight = Nebula::Application::Get().GetMainWindowSwapchain()->GetMaxFramesInFlight();
+    for (uint32_t i = 0; i < maxFramesInFlight; i++) {
+        m_CommandBuffers.push_back(m_Device->GetGraphicsQueue()->CreateCommandBuffer());
+    }
 }
 
 void RendererLayer::OnDetach()
@@ -74,6 +91,8 @@ void RendererLayer::OnDetach()
 
 void RendererLayer::OnUpdate(Nebula::Timestep ts)
 {
+    Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->SetClearColors({{.18f, .49f, .6f, 1.f}});
+
     m_CameraController.OnUpdate(ts);
 
     if (Nebula::Platform::Input::IsKeyPressed(KeyboardKey::UpArrow)) {
@@ -95,8 +114,9 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
 
     m_ColorUBO->SetData(0, "u_Color", glm::value_ptr(m_Color));
 
-    Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_Device->CreateCommandBuffer();
-    Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainFramebuffer(), true);
+    Nebula::Ref<Nebula::Graphics::CommandBuffer> commandBuffer = m_CommandBuffers[Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+    commandBuffer->Begin();
+    Nebula::Ref<Nebula::Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(Nebula::Application::Get().GetMainWindowSwapchain()->GetCurrentFrame(), true);
     renderPass->SetShaderPipeline(m_SolidColorShader);
 
     for (int i = 0; i < 4; i++)
@@ -126,7 +146,8 @@ void RendererLayer::OnUpdate(Nebula::Timestep ts)
         .DrawArrayIndexed(m_VAO);
 
     renderPass->EndRenderPass();
-    commandBuffer->Commit();
+    commandBuffer->End();
+    m_Device->GetGraphicsQueue()->SubmitCommandBuffer(commandBuffer);
 }
 
 void RendererLayer::OnImGuiRender()

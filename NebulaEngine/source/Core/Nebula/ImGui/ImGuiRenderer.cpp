@@ -58,9 +58,11 @@ namespace Nebula
     {
         ImGuiIO& io = ImGui::GetIO();
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
+        ViewportData* viewport_data = static_cast<ViewportData*>(drawData.OwnerViewport->PlatformUserData);
+        uint32_t currentFrameIndex = viewport_data->Swapchain->GetCurrentFrameIndex();
 
         renderPass->SetCullMode(Graphics::CullMode::None);
-        renderPass->SetDepthStencilState({.depthCompareFunction = Graphics::DepthCompareFunction::Always, .depthWrite = false});
+        renderPass->SetDepthStencilState({.depthTest = false, .depthWrite = false, .depthCompareFunction = Graphics::CompareFunction::Always});
         renderPass->SetViewport(0, 0, width, height, 0.f, 1.f);
 
         float L = drawData.DisplayPos.x;
@@ -78,17 +80,19 @@ namespace Nebula
         };
 
         renderPass->SetShaderPipeline(renderer_data.shader);
-        renderer_data.uniformBuffer->SetData(0, &ortho_projection);
-        renderPass->SetUniformBlock("ImGuiUBO", renderer_data.uniformBuffer);
+        viewport_data->UniformBuffer->SetData(0, &ortho_projection);
+        renderPass->SetUniformBlock("ImGuiUBO", viewport_data->UniformBuffer);
 
-        vertexArray->AddVertexBuffer(renderer_data.vertexBuffer);
-        vertexArray->SetIndexBuffer(renderer_data.indexBuffer);
+        vertexArray->AddVertexBuffer(viewport_data->VertexBuffers[currentFrameIndex]);
+        vertexArray->SetIndexBuffer(viewport_data->IndexBuffers[currentFrameIndex]);
     }
 
     void ImGuiRenderer::RenderDrawData(ImDrawData* drawData)
     {
         ImGuiIO& io = ImGui::GetIO();
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
+        ViewportData* viewport_data = static_cast<ViewportData*>(drawData->OwnerViewport->PlatformUserData);
+        uint32_t currentFrameIndex = viewport_data->Swapchain->GetCurrentFrameIndex();
 
         uint32_t width = drawData->DisplaySize.x * drawData->FramebufferScale.x;
         uint32_t height = drawData->DisplaySize.y * drawData->FramebufferScale.y;
@@ -104,17 +108,18 @@ namespace Nebula
             }
         }
 
-        renderer_data.vertexBuffer = renderer_data.device->CreateVertexBuffer(drawData->TotalVtxCount > 0 ? drawData->TotalVtxCount * sizeof(ImDrawVert) : 4);
-        renderer_data.vertexBuffer->SetLayout({
+        currentFrameIndex = viewport_data->Swapchain->GetCurrentFrameIndex();
+        viewport_data->VertexBuffers[currentFrameIndex] = renderer_data.device->CreateVertexBuffer(drawData->TotalVtxCount > 0 ? drawData->TotalVtxCount * sizeof(ImDrawVert) : 4);
+        viewport_data->VertexBuffers[currentFrameIndex]->SetLayout({
             {Graphics::ShaderDataType::Float2, "a_Position"},
             {Graphics::ShaderDataType::Float2, "a_UV"},
             {Graphics::ShaderDataType::UByte4, "a_Color"}
         });
-        renderer_data.indexBuffer = renderer_data.device->CreateIndexBuffer(drawData->TotalIdxCount > 0 ? drawData->TotalIdxCount * sizeof(ImDrawIdx) : 3);
+        viewport_data->IndexBuffers[currentFrameIndex] = renderer_data.device->CreateIndexBuffer(drawData->TotalIdxCount > 0 ? drawData->TotalIdxCount : 3);
         Ref<Graphics::VertexArray> vertexArray = Graphics::VertexArray::Create();
-        Ref<Graphics::CommandBuffer> commandBuffer = renderer_data.device->CreateCommandBuffer();
-        ViewportData* viewport_data = static_cast<ViewportData*>(drawData->OwnerViewport->PlatformUserData);
-        Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(viewport_data->Framebuffer, false);
+        Ref<Graphics::CommandBuffer> commandBuffer = viewport_data->CommandBuffers[Application::Get().GetMainWindowSwapchain()->GetCurrentFrameIndex()];
+        commandBuffer->Begin();
+        Ref<Graphics::RenderPass> renderPass = commandBuffer->CreateRenderPass(viewport_data->Swapchain->GetCurrentFrame(), false);
         SetupRenderState(*drawData, width, height, renderPass, vertexArray);
 
         ImVec2 clip_off = drawData->DisplayPos;
@@ -129,8 +134,8 @@ namespace Nebula
             const uint32_t vtx_buffer_size = cmdList->VtxBuffer.Size * sizeof(ImDrawVert);
             const uint32_t idx_buffer_size = cmdList->IdxBuffer.Size;
 
-            renderer_data.vertexBuffer->SetData(cmdList->VtxBuffer.Data, vtx_buffer_size, vtxOffset);
-            renderer_data.indexBuffer->SetData((uint16_t*)cmdList->IdxBuffer.Data, idx_buffer_size, idxOffset);
+            viewport_data->VertexBuffers[currentFrameIndex]->SetData(cmdList->VtxBuffer.Data, vtx_buffer_size, vtxOffset);
+            viewport_data->IndexBuffers[currentFrameIndex]->SetData((uint16_t*)cmdList->IdxBuffer.Data, idx_buffer_size, idxOffset);
 
             for (uint32_t cmd_i = 0; cmd_i < cmdList->CmdBuffer.Size; cmd_i++)
             {
@@ -148,7 +153,7 @@ namespace Nebula
 
                     renderPass->SetScissor(clip_min.x, clip_min.y, clip_max.x - clip_min.x, clip_max.y - clip_min.y);
                     renderPass->BindTextureToSlot(reinterpret_cast<Graphics::Texture2D*>(cmd->GetTexID()), 0);
-                    renderPass->DrawArrayIndexedOffset(vertexArray, cmd->ElemCount, idxOffset + cmd->IdxOffset * sizeof(ImDrawIdx), vtxOffset/sizeof(ImDrawVert) + cmd->VtxOffset);
+                    renderPass->DrawArrayIndexedOffset(vertexArray, cmd->ElemCount, idxOffset/sizeof(ImDrawIdx) + cmd->IdxOffset, vtxOffset/sizeof(ImDrawVert) + cmd->VtxOffset);
                 }
             }
 
@@ -157,7 +162,8 @@ namespace Nebula
         }
 
         renderPass->EndRenderPass();
-        commandBuffer->Commit();
+        commandBuffer->End();
+        Application::Get().GetDevice()->GetGraphicsQueue()->SubmitCommandBuffer(commandBuffer);
     }
 
     void ImGuiRenderer::CreateTexture(ImTextureData& textureData)
@@ -179,6 +185,7 @@ namespace Nebula
     {
         ImGuiIO& io = ImGui::GetIO();
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
+        renderer_data.device->WaitIdle();
 
         uint32_t i = 0;
         bool found = false;
@@ -207,6 +214,7 @@ namespace Nebula
     {
         ImGuiIO& io = ImGui::GetIO();
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
+        renderer_data.device->WaitIdle();
 
         if (textureData.Status == ImTextureStatus_WantCreate)
         {
@@ -239,12 +247,18 @@ namespace Nebula
         Graphics::VertexLayout pipelineLayout = {
             { Graphics::ShaderDataType::Float2, "a_Position" },
             { Graphics::ShaderDataType::Float2, "a_UV" },
-            { Graphics::ShaderDataType::UByte4, "a_Color" }
+            { Graphics::ShaderDataType::UByte4, "a_Color"}
         };
-        renderer_data.shader = renderer_data.shaderLibrary.CreatePipeline("ImGui", pipelineLayout, {.framebufferSpec = {}, .blendState = blendState});
-        renderer_data.uniformBuffer = renderer_data.device->CreateUniformBuffer({
-            {Graphics::ShaderDataType::Matrix4, "u_ProjectionMatrix"}
-        });
+        Graphics::PipelineSpecification pipelineSpec;
+        pipelineSpec.stages = {
+            { Graphics::ShaderStage::Vertex, renderer_data.shaderLibrary.Get("ImGui"), "vertexMain" },
+            { Graphics::ShaderStage::Fragment, renderer_data.shaderLibrary.Get("ImGui"), "fragmentMain" }
+        };
+        pipelineSpec.framebufferSpec = Application::Get().GetMainWindowSwapchain()->GetCurrentFrame()->GetSpecification();
+        pipelineSpec.blendState = blendState;
+        renderer_data.shader = Application::Get().GetDevice()->CreateShaderPipeline(pipelineLayout, pipelineSpec);
+
+        uint32_t maxFramesInFlight = Application::Get().GetMainWindowSwapchain()->GetMaxFramesInFlight();
     }
 
     void ImGuiRenderer::DestroyDeviceObjects()
@@ -253,9 +267,6 @@ namespace Nebula
         RendererData& renderer_data = *static_cast<RendererData*>(io.BackendRendererUserData);
 
         renderer_data.shader.reset();
-        renderer_data.uniformBuffer.reset();
-        renderer_data.vertexBuffer.reset();
-        renderer_data.indexBuffer.reset();
     }
 
     void ImGuiRenderer::RenderWindow(ImGuiViewport* viewport, void*)

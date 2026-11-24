@@ -43,7 +43,8 @@ namespace Nebula {
         glm::vec2 m_ViewportPos = { 0.0f, 0.0f };
         glm::vec2 m_ViewportSize = { 1920.0f, 1080.0f };
         Ref<Graphics::Device> m_Device;
-        Ref<Graphics::Framebuffer> m_Framebuffer;
+        std::vector<Ref<Graphics::Framebuffer>> m_Framebuffers;
+        std::vector<Ref<Graphics::CommandBuffer>> m_CommandBuffers;
 
         EditorCamera m_Camera;
 
