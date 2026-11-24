@@ -4,9 +4,6 @@
 # Setup Target
 if (nebula_cmake_platform STREQUAL MacOS)
     add_executable(PlatformMetal3Example MACOSX_BUNDLE source/PlatformApp.cpp)
-else ()
-    add_executable(PlatformMetal3Example source/PlatformApp.cpp)
-endif ()
 
 
 # Output Directory
@@ -66,4 +63,6 @@ elseif (nebula_cmake_platform STREQUAL MacOS)
                           MACOSX_BUNDLE_SHORT_VERSION_STRING "dev"
                           MACOSX_BUNDLE_COPYRIGHT "© 2024 - 2026 Infinity"
     )
+endif ()
+
 endif ()

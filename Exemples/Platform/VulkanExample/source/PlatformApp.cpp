@@ -215,7 +215,7 @@ int main()
         swapchainImageViews[imageIndex] = device.createImageView(imageViewCreateInfo);
     }
 
-    const uint32_t maxFramesInFlight = surfaceCapabilities.maxImageCount == 0 ? 3 : surfaceCapabilities.maxImageCount;
+    const uint32_t maxFramesInFlight = surfaceCapabilities.maxImageCount;
     uint32_t frameInFlightIndex = 0;
 
     vk::SemaphoreCreateInfo semaphoreCreateInfo;
@@ -555,8 +555,6 @@ int main()
         queue.presentKHR(&presentInfo);
 
         frameInFlightIndex = (frameInFlightIndex + 1) % maxFramesInFlight;
-
-        window->Present(0);
     }
 
     return 0;
